@@ -22,3 +22,14 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+.board {
+    padding: 10px;
+    border: 1px solid black;
+}
+
+.spot {
+    margin: 2px;
+    padding: 3px 5px;
+    border: 1px solid green;
+}

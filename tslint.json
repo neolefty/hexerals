@@ -22,7 +22,7 @@
         "jsx-no-lambda": false,
         "jsx-no-multiline-js": false,
         "label-position": true,
-        "max-line-length": [ true, 120 ],
+        "max-line-length": [ true, 100 ],
         "member-ordering": [
             true,
             "public-before-private",
@@ -56,10 +56,10 @@
         "no-use-before-declare": true,
         "one-line": [
             true,
-            "check-catch",
-            "check-else",
-            "check-open-brace",
-            "check-whitespace"
+//            "check-else",
+//            "check-open-brace",
+//            "check-whitespace",
+            "check-catch"
         ],
         "quotemark": [true, "single", "jsx-double"],
         "radix": true,
