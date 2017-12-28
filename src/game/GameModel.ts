@@ -1,3 +1,5 @@
+// import { createStore } from redux
+
 export enum Player {
     Compy, Human, Nobody
 }

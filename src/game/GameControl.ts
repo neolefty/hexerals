@@ -1,5 +1,5 @@
 // a player's control of their part in a game
-import { Board, Move, Player } from './game';
+import { Board, Move, Player } from './GameModel';
 import * as assert from 'assert';
 
 export class GamePlayerControl {

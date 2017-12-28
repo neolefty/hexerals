@@ -1,8 +1,8 @@
 import * as React from 'react';
 import './App.css';
-import { Board, Player } from './game';
-import { BoardView } from './components/Board';
-import { GamePlayerControl } from './GameView';
+import { Board, Player } from './game/GameModel';
+import { BoardView } from './game/BoardView';
+import { GamePlayerControl } from './game/GameControl';
 
 const logo = require('./logo.svg');
 let game = new Board(10);

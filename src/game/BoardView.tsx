@@ -1,6 +1,6 @@
-import { Player, Spot } from '../game';
+import { Player, Spot } from './GameModel';
 import * as React from 'react';
-import { GamePlayerControl } from '../GameView';
+import { GamePlayerControl } from './GameControl';
 
 export const BoardView = (props: { control: GamePlayerControl }) => (
     <div className="board">
@@ -64,6 +64,3 @@ class SpotView extends React.Component<SpotProps, SpotState> {
         };
     }
 }
-
-// const SpotView = (props: { spot: Spot, key: number, foo: number }) => (
-// );
