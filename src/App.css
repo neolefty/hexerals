@@ -30,6 +30,18 @@
 
 .spot {
     margin: 2px;
-    padding: 3px 5px;
-    border: 1px solid green;
+    padding: 3px 7px;
+    border: 1px solid #083;
+    background-color: #ccc;
+    cursor: default;
+}
+
+.spot:hover {
+    padding: 2px 6px;
+    border: 2px solid #2B6;
+    background-color: #fff;
+}
+
+.active {
+    color: red;
 }

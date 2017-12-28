@@ -2,7 +2,7 @@ export enum Player {
     Compy, Human, Nobody
 }
 
-// contents of a space on the board
+// contents of a space on the positions
 export class Spot {
     pop: number;
     owner: Player;
@@ -26,36 +26,36 @@ export class Spot {
 }
 
 export class Board {
-    // board: Array<Spot>; // alt syntax
-    board: Spot[];
+    // positions: Array<Spot>; // alt syntax
+    positions: Spot[];
 
     constructor(size: number) {
-        this.board = new Array<Spot>(size);
+        this.positions = new Array<Spot>(size);
         for (let i = 0; i < size; ++i) {
-            this.board[i] = new Spot(Player.Nobody, 0);
+            this.positions[i] = new Spot(Player.Nobody, 0);
         }
-        this.board[0] = new Spot(Player.Compy, 3);
-        this.board[size - 1] = new Spot(Player.Human, 3);
+        this.positions[0] = new Spot(Player.Compy, 3);
+        this.positions[size - 1] = new Spot(Player.Human, 3);
     }
 
     // do a move
     apply(move: Move) {
-        const origin = this.board[move.coord];
-        const dest = this.board[move.dest()];
+        const origin = this.positions[move.coord];
+        const dest = this.positions[move.dest()];
 
         if (origin.pop > 1) {
             const from = new Spot(1, origin.owner);
             const march = new Spot(origin.pop - 1, origin.owner);
             const to = dest.resolve(march);
 
-            this.board[move.coord] = from;
-            this.board[move.dest()] = to;
+            this.positions[move.coord] = from;
+            this.positions[move.dest()] = to;
         }
     }
 }
 
 export class Move {
-    coord: number; // index on board
+    coord: number; // index on positions
     step: number;  // +-1
 
     constructor(coord: number, step: number) {
