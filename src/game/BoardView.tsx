@@ -1,21 +1,21 @@
 import { Player, Spot } from './GameModel';
 import * as React from 'react';
+import { List } from 'collectable';
 import { GamePlayerControl } from './GameControl';
+import * as assert from 'assert';
 
 export const BoardView = (props: { control: GamePlayerControl }) => (
     <div className="board">
         {
-            props.control.board.positions.map((spot, i) =>
-                <SpotView
-                    control={props.control}
-                    key={i}
-                    position={i}
-                />
+            List.map(
+                (spot, i) => <SpotView control={props.control} key={i} position={i} />,
+                props.control.board.positions
             )
         }
     </div>
 );
 
+// TODO remove dependence on GamePlayerControl? (use Spot instead?)
 interface SpotProps {
     control: GamePlayerControl;
     key: number;
@@ -28,12 +28,14 @@ interface SpotState {
     owner: Player;
 }
 
-class SpotView extends React.Component<SpotProps, SpotState> {
+export class SpotView extends React.Component<SpotProps, SpotState> {
     spot: Spot;
 
     constructor(props: SpotProps) {
         super(props);
-        this.spot = props.control.board.positions[props.position];
+        const t: Spot | undefined = List.get(props.position, props.control.board.positions);
+        assert(t !== undefined);
+        this.spot = t || new Spot(Player.NOBODY, -1);
         this.state = this.deriveState();
     }
 

@@ -3,18 +3,27 @@ import { Board, Move, Player } from './GameModel';
 import * as assert from 'assert';
 
 export class GamePlayerControl {
-    board: Board;
     cursor: number;  // coordinate of cursor
-    player: Player;
+    board: Board;
 
-    constructor(player: Player, board: Board) {
-        this.player = player;
+    constructor(readonly player: Player, board: Board) {
         this.board = board;
-        this.cursor = -1;  // nowhere
+        this.cursor = NaN;  // nowhere
     }
 
     createMove(step: number): Move {
-        assert(this.board.positions[this.cursor].owner === this.player);
+        // can only create a move for this controller's player
+        assert(this.board.getSpot(this.cursor).owner === this.player);
         return new Move(this.cursor, step);
+    }
+
+    getCursorSpot() {
+        return this.board.getSpot(this.cursor);
+    }
+
+    // TODO make this immutable
+    apply(move: Move) {
+        this.board = this.board.apply(move);
+        this.cursor = move.dest();
     }
 }

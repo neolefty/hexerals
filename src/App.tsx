@@ -5,8 +5,8 @@ import { BoardView } from './game/BoardView';
 import { GamePlayerControl } from './game/GameControl';
 
 const logo = require('./logo.svg');
-let game = new Board(10);
-let playerControl = new GamePlayerControl(Player.HUMAN, game);
+let board = Board.construct(15);
+let playerControl = new GamePlayerControl(Player.HUMAN, board);
 
 class App extends React.Component {
     render() {
