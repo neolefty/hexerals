@@ -46,8 +46,8 @@ export class Board {
         const dest = this.positions[move.dest()];
 
         if (origin.pop > 1) {
-            const from = new Spot(1, origin.owner);
-            const march = new Spot(origin.pop - 1, origin.owner);
+            const from = new Spot(origin.owner, 1);
+            const march = new Spot(origin.owner, origin.pop - 1);
             const to = dest.resolve(march);
 
             this.positions[move.coord] = from;
