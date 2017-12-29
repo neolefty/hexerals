@@ -42,7 +42,7 @@ class SpotView extends React.Component<SpotProps, SpotState> {
             <span
                 className={this.state.selected ? 'active spot' : 'spot'}
                 key={this.props.position}
-                title={this.spot.owner.toString()}
+                title={this.spot.owner.name}
                 onClick={(e) => this.select(e)}
             >
                 {this.spot.pop}

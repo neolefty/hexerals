@@ -1,7 +1,14 @@
 // import { createStore } from redux
 
-export enum Player {
-    Compy, Human, Nobody
+export class Player {
+    public static COMPY = new Player('Compy');
+    public static HUMAN = new Player('Human');
+    public static NOBODY = new Player('');
+
+    name: string;
+    constructor(name: string) {
+        this.name = name;
+    }
 }
 
 // contents of a space on the positions
@@ -34,10 +41,10 @@ export class Board {
     constructor(size: number) {
         this.positions = new Array<Spot>(size);
         for (let i = 0; i < size; ++i) {
-            this.positions[i] = new Spot(Player.Nobody, 0);
+            this.positions[i] = new Spot(Player.NOBODY, 0);
         }
-        this.positions[0] = new Spot(Player.Compy, 3);
-        this.positions[size - 1] = new Spot(Player.Human, 3);
+        this.positions[0] = new Spot(Player.COMPY, 3);
+        this.positions[size - 1] = new Spot(Player.HUMAN, 3);
     }
 
     // do a move

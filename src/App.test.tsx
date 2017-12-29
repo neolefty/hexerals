@@ -15,25 +15,26 @@ it('renders without crashing', () => {
 it('renders the board', () => {
     const n = 10;
     enzyme.configure({adapter: new Adapter()});
-    const control = new GamePlayerControl(Player.Human, new Board(n));
+    const control = new GamePlayerControl(Player.HUMAN, new Board(n));
     const board = enzyme.render(<BoardView control={control} />);
     expect(board.children().length).toEqual(n);  // board size = 10
     expect(board.find('.spot').text()).toEqual(('3000000003'));
     expect(board.children()[0]).toEqual(board.find('.spot')[0]);
     expect(board.find('.spot').first().text()).toEqual('3');
+    expect(board.children()[0].attribs['title']).toEqual(Player.COMPY.name)
 });
 
 it('game model basics', () => {
     const n = 10;
-    const control = new GamePlayerControl(Player.Human, new Board(n));
+    const control = new GamePlayerControl(Player.HUMAN, new Board(n));
     const foo = () => control.createMove(-1);
     expect(foo).toThrowError();
     control.cursor = 9;
     expect(foo()).toEqual(new Move(9, -1));
     expect(foo().dest()).toEqual(8);
     control.board.apply(foo());
-    expect(control.board.positions[7]).toEqual(new Spot(Player.Nobody, 0));
-    expect(control.board.positions[8]).toEqual(new Spot(Player.Human, 2));
-    expect(control.board.positions[9]).toEqual(new Spot(Player.Human, 1));
+    expect(control.board.positions[7]).toEqual(new Spot(Player.NOBODY, 0));
+    expect(control.board.positions[8]).toEqual(new Spot(Player.HUMAN, 2));
+    expect(control.board.positions[9]).toEqual(new Spot(Player.HUMAN, 1));
 });
 

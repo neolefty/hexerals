@@ -6,7 +6,7 @@ import { GamePlayerControl } from './game/GameControl';
 
 const logo = require('./logo.svg');
 let game = new Board(10);
-let playerControl = new GamePlayerControl(Player.Human, game);
+let playerControl = new GamePlayerControl(Player.HUMAN, game);
 
 class App extends React.Component {
     render() {
