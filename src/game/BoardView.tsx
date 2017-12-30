@@ -1,15 +1,18 @@
-import { Player, Spot } from './GameModel';
+import { Board, Player, Spot } from './GameModel';
 import * as React from 'react';
-import { List } from 'collectable';
 import { GamePlayerControl } from './GameControl';
-import * as assert from 'assert';
 
 export const BoardView = (props: { control: GamePlayerControl }) => (
     <div className="board">
         {
-            List.map(
-                (spot, i) => <SpotView control={props.control} key={i} position={i} />,
-                props.control.board.positions
+            props.control.board.positions.map(
+                (spot, i) => {
+                    // assert(i !== undefined);
+                    // if (i === undefined) i = NaN;  // Is there a better way?
+                    return (
+                        <SpotView control={props.control} key={i} position={i} />
+                    );
+                }
             )
         }
     </div>
@@ -33,9 +36,8 @@ export class SpotView extends React.Component<SpotProps, SpotState> {
 
     constructor(props: SpotProps) {
         super(props);
-        const t: Spot | undefined = List.get(props.position, props.control.board.positions);
-        assert(t !== undefined);
-        this.spot = t || new Spot(Player.NOBODY, -1);
+        const control = props.control || new GamePlayerControl(Player.ERROR, Board.ERROR);
+        this.spot = control.board.positions.get(props.position);
         this.state = this.deriveState();
     }
 

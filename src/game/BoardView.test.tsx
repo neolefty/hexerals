@@ -15,13 +15,13 @@ it('renders a spot', () => {
 });
 
 it('renders the board', () => {
-    const n = 10;
-    const control = new GamePlayerControl(Player.HUMAN, Board.construct(n));
+    const n = 4;
+    const control = new GamePlayerControl(Player.HUMAN, Board.construct(n, 3));
     const board = enzyme.render(
         <BoardView control={control} />
     );
     expect(board.children().length).toEqual(n);  // board size = 10
-    expect(board.find('.spot').text()).toEqual(('3000000003'));
+    expect(board.find('.spot').text()).toEqual(('3003'));
     expect(board.children()[0]).toEqual(board.find('.spot')[0]);
     expect(board.find('.spot').first().text()).toEqual('3');
     expect(board.children()[0].attribs['title']).toEqual(Player.COMPY.name)

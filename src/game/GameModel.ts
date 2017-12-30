@@ -1,14 +1,10 @@
-// import { createStore } from redux
-// import { set, fromArray, ListStructure } from '@collectable/list';
-// import { List } from 'immutable';
-import { List } from 'collectable';
-import * as assert from 'assert';
+import { List } from 'immutable';
 
 export class Player {
     static readonly COMPY = new Player('Compy');
     static readonly HUMAN = new Player('Human');
     static readonly NOBODY = new Player('');
-    static readonly ERROR = new Player('Error'); // should never appear
+    static readonly ERROR = new Player('Error');
 
     name: string;
     constructor(name: string) {
@@ -40,6 +36,8 @@ export class Spot {
 }
 
 export class Board {
+    static readonly ERROR = new Board(List([]));
+
     static construct(size: number, initialPop: number = 3) {  // create a blank Board
         const positions = new Array<Spot>(size);
         for (let i = 0; i < size; ++i) {
@@ -47,17 +45,14 @@ export class Board {
         }
         positions[0] = new Spot(Player.COMPY, initialPop);
         positions[size - 1] = new Spot(Player.HUMAN, initialPop);
-        return new Board(List.fromArray(positions));
+        return new Board(List(positions));
     }
 
-    // TODO figure out how to use List<Spot> and its instance methods?
-    constructor(readonly positions: List.Instance<Spot>) {}
+    constructor(readonly positions: List<Spot>) {}
 
     getSpot(index: number): Spot {
-        // List.get accepts any number, including NaN (bug?)
-        assert(index >= 0 && index < List.size(this.positions));
-        // deal with List.get() returning (Spot | undefined).
-        return List.get(index, this.positions) || new Spot(Player.ERROR, -1);
+        // assert(index >= 0 && index < this.positions.size);
+        return this.positions.get(index);
     }
 
     // do a move
@@ -71,8 +66,9 @@ export class Board {
             const to = dest.settle(march);
 
             return new Board(
-                List.set(move.coord, from, List.set(move.dest(), to, this.positions))
-                // this.positions.set(move.coord, from).set(move.dest(), to)
+                this.positions
+                    .set(move.coord, from)
+                    .set(move.dest(), to)
             );
         }
         else  // no effect if 1 or less population in origin
