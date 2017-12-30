@@ -7,8 +7,6 @@ export const BoardView = (props: { control: GamePlayerControl }) => (
         {
             props.control.board.positions.map(
                 (spot, i) => {
-                    // assert(i !== undefined);
-                    // if (i === undefined) i = NaN;  // Is there a better way?
                     return (
                         <SpotView control={props.control} key={i} position={i} />
                     );

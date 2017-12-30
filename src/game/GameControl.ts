@@ -1,7 +1,7 @@
-// a player's control of their part in a game
 import { Board, Move, Player } from './GameModel';
 import * as assert from 'assert';
 
+// a player's control of their part in a game
 export class GamePlayerControl {
     cursor: number;  // coordinate of cursor
     board: Board;
