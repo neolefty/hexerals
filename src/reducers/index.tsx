@@ -11,7 +11,7 @@ import { Board, Move } from '../game/GameModel';
 //     }
 // }
 
-const initialState: StoreState = {
+export const initialState: StoreState = {
     board: Board.construct(12, 6),
     cursor: NaN,
 };

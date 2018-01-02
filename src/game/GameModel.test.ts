@@ -1,29 +1,41 @@
-import {Board, Move, Player, Spot} from './GameModel';
-import {GamePlayerControl} from './GameControl';
+import {createStore} from 'redux';
+import {movePlayerAction, placeCursorAction} from '../actions';
+import {baseReducer, initialState} from '../reducers';
+import {StoreState} from '../types';
+import {Player, Spot} from './GameModel';
 
-it('game model basics', () => {
-    const n = 10;
-    const control = new GamePlayerControl(Player.HUMAN, Board.construct(n, 4));
-    const mover = () => control.createMove(-1);
+it('controls game flow via react-redux', () => {
+    const store = createStore<StoreState>(baseReducer);
+    const n = initialState.board.positions.size;
+    const p = initialState.board.positions.get(0).pop;
+    expect(store.getState().board.positions.size).toEqual(n);
+    expect(store.getState().board.positions.get(0).pop).toEqual(p);
+
+    const mover = () => store.dispatch(movePlayerAction(-1, true));
     expect(mover).toThrowError();
-    control.cursor = n;
-    expect(mover).toThrowError();
+    store.dispatch(placeCursorAction(n-1));
+    expect(store.getState().cursor).toBe(n-1);
+    expect(store.getState().board.positions.get(n-2).pop).toBe(0);
+    const before = store.getState().board;
+    mover();
+    expect(store.getState().board).not.toBe(before);  // board state changed
+    expect(store.getState().cursor).toBe(n-2);
+    expect(store.getState().board.positions.get(n-2).pop).toBe(p - 1);
 
-    control.cursor = 9;
-    expect(mover()).toEqual(new Move(9, -1));
-    expect(mover().dest()).toEqual(8);
+    mover();
+    const spots = store.getState().board.positions;
+    expect(spots.get(0)).toEqual(new Spot(Player.COMPY, p));
+    expect(spots.get(n-4)).toEqual(new Spot(Player.NOBODY, 0));
+    expect(spots.get(n-3)).toEqual(new Spot(Player.HUMAN, p-2));
+    expect(spots.get(n-2)).toEqual(new Spot(Player.HUMAN, 1));
+    expect(spots.get(n-1)).toEqual(new Spot(Player.HUMAN, 1));
 
-    control.apply(mover());
-    expect(control.board.getSpot(0)).toEqual(new Spot(Player.COMPY, 4));
-    expect(control.board.getSpot(7)).toEqual(new Spot(Player.NOBODY, 0));
-    expect(control.board.getSpot(8)).toEqual(new Spot(Player.HUMAN, 3));
-    expect(control.board.getSpot(9)).toEqual(new Spot(Player.HUMAN, 1));
+    // moving pop 1 has no effect
+    store.dispatch(placeCursorAction(n-1));
+    const before2 = store.getState().board;
+    mover();
+    expect(store.getState().board.positions.get(n-1).pop).toBe(1);
+    expect(store.getState().board).toBe(before2);
 
-    control.cursor = 1;  // no owner, 0 pop
-    expect(control.getCursorSpot()).toEqual(new Spot(Player.NOBODY, 0));
-    expect(mover).toThrowError();  // can't move someone else's stuff
-    control.cursor = 9;
-    expect(control.getCursorSpot()).toEqual(new Spot(Player.HUMAN, 1));
-    const same: Board = control.board.apply(mover());  // can't move pop 1
-    expect(same).toBe(control.board);
+    // TODO test that you can't move someone else's stuff?
 });
