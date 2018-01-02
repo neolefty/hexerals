@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 // a player's control of their part in a game
 export class GamePlayerControl {
-    cursor: number;  // coordinate of cursor
+    cursor: number;  // coordinate of current selection
     board: Board;
 
     constructor(readonly player: Player, board: Board) {

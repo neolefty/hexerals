@@ -1,10 +1,12 @@
+import * as assert from 'assert';
 import { List } from 'immutable';
 
+// TODO try String Literal Type https://typescriptlang.org/docs/handbook/advanced-types.html
+// type Player = 'Compy' | 'Human' | 'Nobody'
 export class Player {
     static readonly COMPY = new Player('Compy');
     static readonly HUMAN = new Player('Human');
     static readonly NOBODY = new Player('');
-    static readonly ERROR = new Player('Error');
 
     name: string;
     constructor(name: string) {
@@ -12,7 +14,7 @@ export class Player {
     }
 }
 
-// contents of a space on the positions
+// contents of a space on the board
 export class Spot {
     pop: number;
     owner: Player;
@@ -36,8 +38,6 @@ export class Spot {
 }
 
 export class Board {
-    static readonly ERROR = new Board(List([]));
-
     static construct(size: number, initialPop: number = 3) {  // create a blank Board
         const positions = new Array<Spot>(size);
         for (let i = 0; i < size; ++i) {
@@ -51,7 +51,7 @@ export class Board {
     constructor(readonly positions: List<Spot>) {}
 
     getSpot(index: number): Spot {
-        // assert(index >= 0 && index < this.positions.size);
+        assert(index >= 0 && index < this.positions.size);
         return this.positions.get(index);
     }
 
@@ -66,13 +66,20 @@ export class Board {
             const to = dest.settle(march);
 
             return new Board(
-                this.positions
+                this.positions.withMutations(mList => mList
                     .set(move.coord, from)
                     .set(move.dest(), to)
+                )
             );
         }
         else  // no effect if 1 or less population in origin
             return this;
+    }
+
+    toString(): string {
+        let result = '';
+        this.positions.map((spot) => result += spot.pop + ' ');
+        return result;
     }
 }
 

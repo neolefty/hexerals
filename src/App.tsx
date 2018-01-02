@@ -1,12 +1,25 @@
 import * as React from 'react';
 import './App.css';
-import { Board, Player } from './game/GameModel';
+import { connect, Dispatch } from 'react-redux';
+import { movePlayerAction, placeCursorAction } from './actions';
 import { BoardView } from './game/BoardView';
-import { GamePlayerControl } from './game/GameControl';
+import { StoreState } from './types';
 
 const logo = require('./logo.svg');
-let board = Board.construct(15);
-let playerControl = new GamePlayerControl(Player.HUMAN, board);
+
+const mapStateToProps = (state: StoreState) => ({
+    board: state.board,
+    cursor: state.cursor,
+});
+
+const mapDispatchToProps = (dispatch: Dispatch<StoreState>) => ({
+    onMovePlayer: (delta: number) => dispatch(movePlayerAction(delta, true)),
+    onPlaceCursor: (position: number) => dispatch(placeCursorAction(position)),
+});
+
+const BoardContainer = connect(mapStateToProps, mapDispatchToProps)(
+    BoardView
+);
 
 class App extends React.Component {
     render() {
@@ -19,7 +32,7 @@ class App extends React.Component {
                 <p className="App-intro">
                     To get started, edit <code>src/App.tsx</code> and save to reload.
                 </p>
-                <BoardView control={playerControl}/>
+                <BoardContainer />
             </div>
         );
     }

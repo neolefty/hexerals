@@ -22,26 +22,3 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-
-.board {
-    padding: 10px;
-    border: 1px solid black;
-}
-
-.spot {
-    margin: 2px;
-    padding: 3px 7px;
-    border: 1px solid #083;
-    background-color: #ccc;
-    cursor: default;
-}
-
-.spot:hover {
-    padding: 2px 6px;
-    border: 2px solid #2B6;
-    background-color: #fff;
-}
-
-.active {
-    color: red;
-}
