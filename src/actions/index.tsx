@@ -2,14 +2,19 @@ import * as constants from '../constants';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
-// TODO: figure out immutable approach too, maybe with immutable.js (
-export interface MovePlayer {
+// TODO: figure out immutable approach too, maybe with immutable.js
+
+export interface GenericAction {
+    type: string;
+}
+
+export interface MovePlayer extends GenericAction {
     type: constants.MOVE_PLAYER;
     delta: number;
     alsoCursor: boolean;
 }
 
-export interface PlaceCursor {
+export interface PlaceCursor extends GenericAction {
     type: constants.PLACE_CURSOR;
     position: number;
 }

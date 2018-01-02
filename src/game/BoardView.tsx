@@ -16,12 +16,15 @@ export const BoardView = (props: BoardProps) => (
         tabIndex={0}
         onKeyDown={(e/*: KeyboardEvent*/) => {
             if (props.onMovePlayer) {
-                let move = 0;
+                let move = NaN;
                 if (e.key === 'ArrowLeft') move = -1;
                 else if (e.key === 'ArrowRight') move = 1;
-                if (move) {
-                    props.onMovePlayer(move);
-                    e.preventDefault();
+                if (move && (props.cursor === 0 || props.cursor)) {
+                    const dest = move + props.cursor;
+                    if (dest >= 0 && props.board && dest < props.board.positions.size) {
+                        props.onMovePlayer(move);
+                        e.preventDefault();
+                    }
                 }
             }
         }}
@@ -46,9 +49,12 @@ interface SpotProps {
     onSelect?: () => void;
 }
 
+const spotStyle = (props: SpotProps) =>
+    (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner.name;
+
 export const SpotView = (props: SpotProps) => (
     <span
-        className={props.selected ? 'active spot' : 'spot'}
+        className={spotStyle(props)}
         title={props.spot.owner.name}
         // onClick={props.onSelect}
         onClick={(/*e*/) => props.onSelect && props.onSelect()}

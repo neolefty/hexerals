@@ -1,7 +1,8 @@
+import * as assert from 'assert';
 import { BoardAction, MovePlayer, PlaceCursor } from '../actions';
 import { MOVE_PLAYER, PLACE_CURSOR } from '../constants';
-import { StoreState } from '../types';
 import { Board, Move } from '../game/GameModel';
+import { StoreState } from '../types';
 
 // export function boardReducer(state: StoreState, action: BoardAction): StoreState {
 //     switch(action.type) {
@@ -33,14 +34,11 @@ function isPlaceCursor(action: BoardAction): action is PlaceCursor {
 }
 
 export function placeCursorReducer(state: StoreState, action: PlaceCursor): StoreState {
-    // TODO write out-of-bounds tests that fail and then fix them
-    // if (action.position < 0 || action.position >= state.board.positions.size)
-    //     return state;
-    // else
-        return {
-            ...state,
-            cursor: action.position,
-        };
+    assert(action.position >= 0 && action.position < state.board.positions.size);
+    return {
+        ...state,
+        cursor: action.position,
+    };
 }
 
 export function movePlayerReducer(state: StoreState, action: MovePlayer): StoreState {

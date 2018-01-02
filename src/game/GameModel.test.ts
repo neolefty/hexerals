@@ -13,6 +13,7 @@ it('controls game flow via react-redux', () => {
 
     const mover = () => store.dispatch(movePlayerAction(-1, true));
     expect(mover).toThrowError();
+    expect(() => store.dispatch(placeCursorAction(-1))).toThrowError();
     store.dispatch(placeCursorAction(n-1));
     expect(store.getState().cursor).toBe(n-1);
     expect(store.getState().board.positions.get(n-2).pop).toBe(0);
