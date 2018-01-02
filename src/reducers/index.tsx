@@ -13,7 +13,7 @@ import { StoreState } from '../types';
 // }
 
 export const initialState: StoreState = {
-    board: Board.construct(12, 6),
+    board: Board.construct(9, 8),
     cursor: NaN,
 };
 
