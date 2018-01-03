@@ -3,16 +3,19 @@ import { List } from 'immutable';
 
 // TODO try String Literal Type https://typescriptlang.org/docs/handbook/advanced-types.html
 // type Player = 'Compy' | 'Human' | 'Nobody'
-export class Player {
-    static readonly COMPY = new Player('Compy');
-    static readonly HUMAN = new Player('Human');
-    static readonly NOBODY = new Player('');
-
-    name: string;
-    constructor(name: string) {
-        this.name = name;
-    }
+export enum Player {
+    Compy = 'Compy', Human = 'Human', Nobody = 'Nobody'
 }
+// export class Player {
+//     static readonly COMPY = new Player('Compy');
+//     static readonly HUMAN = new Player('Human');
+//     static readonly NOBODY = new Player('');
+//
+//     name: string;
+//     constructor(name: string) {
+//         this.name = name;
+//     }
+// }
 
 // contents of a space on the board
 export class Spot {
@@ -41,10 +44,10 @@ export class Board {
     static construct(size: number, initialPop: number = 3) {  // create a blank Board
         const positions = new Array<Spot>(size);
         for (let i = 0; i < size; ++i) {
-            positions[i] = new Spot(Player.NOBODY, 0);
+            positions[i] = new Spot(Player.Nobody, 0);
         }
-        positions[0] = new Spot(Player.COMPY, initialPop);
-        positions[size - 1] = new Spot(Player.HUMAN, initialPop);
+        positions[0] = new Spot(Player.Compy, initialPop);
+        positions[size - 1] = new Spot(Player.Human, initialPop);
         return new Board(List(positions));
     }
 
@@ -61,6 +64,7 @@ export class Board {
         const dest = this.getSpot(move.dest());
 
         if (origin.pop > 1) {
+            assert(Math.abs(move.step) <= 1);
             const from = new Spot(origin.owner, 1);
             const march = new Spot(origin.owner, origin.pop - 1);
             const to = dest.settle(march);

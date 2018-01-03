@@ -21,7 +21,7 @@ export interface PlaceCursor extends GenericAction {
 
 export type BoardAction = MovePlayer | PlaceCursor;
 
-export function movePlayerAction(delta: number, alsoCursor: boolean): MovePlayer {
+export function movePlayerAction(delta: number, alsoCursor: boolean=true): MovePlayer {
     return {
         type: constants.MOVE_PLAYER,
         delta: delta,

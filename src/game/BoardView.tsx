@@ -50,12 +50,12 @@ interface SpotProps {
 }
 
 const spotStyle = (props: SpotProps) =>
-    (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner.name;
+    (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner;
 
 export const SpotView = (props: SpotProps) => (
     <span
         className={spotStyle(props)}
-        title={props.spot.owner.name}
+        title={props.spot.owner}
         // onClick={props.onSelect}
         onClick={(/*e*/) => props.onSelect && props.onSelect()}
     >

@@ -24,7 +24,7 @@ it('renders a board with no selection', () => {
     expect(view.find('.spot').text()).toEqual(('3003'));
     expect(view.children()[0]).toEqual(view.find('.spot')[0]);
     expect(view.find('.spot').first().text()).toEqual('3');
-    expect(view.children()[0].attribs['title']).toEqual(Player.COMPY.name);
+    expect(view.children()[0].attribs['title']).toEqual(Player.Compy);
     // none are selected
     expect(view.find('.active').length).toEqual(0);
 });
