@@ -17,6 +17,7 @@ const mapDispatchToProps = (dispatch: Dispatch<StoreState>) => ({
     onPlaceCursor: (position: number) => dispatch(placeCursorAction(position)),
 });
 
+// TODO add types -- connect<A,B,C> -- for example, cmd-B on connect or see https://spin.atomicobject.com/2017/04/20/typesafe-container-components/
 const BoardContainer = connect(mapStateToProps, mapDispatchToProps)(
     BoardView
 );
