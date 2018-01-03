@@ -8,7 +8,6 @@ import {Board, Player} from './GameModel';
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
     const board = Board.construct(3, 5);
-    // TODO test selection
     const view = enzyme.render(
         <SpotView spot={board.getSpot(0)} key={0} selected={false} />
     );
@@ -21,7 +20,6 @@ it('renders a board with no selection', () => {
     const view = enzyme.render(
         <BoardView board={board} cursor={NaN}/>
     );
-    // TODO test selection
     expect(view.children().length).toEqual(n);  // board size = 10
     expect(view.find('.spot').text()).toEqual(('3003'));
     expect(view.children()[0]).toEqual(view.find('.spot')[0]);
@@ -43,15 +41,6 @@ it('renders a board with a selection', () => {
 
 it('clicks a spot to select it', () => {
     const board = Board.construct(3, 6);
-    const props = {
-        board: board,
-        cursor: NaN,
-        onPlaceCursor: (x: number) => props.cursor = x,
-    }
-});
-
-it('a selected a spot to select it', () => {
-    const board = Board.construct(3, 6);
     const spot = board.getSpot(2);
     const props = {
         spot: spot,
@@ -69,6 +58,7 @@ it('a selected a spot to select it', () => {
     spotWrap.simulate('click');
     expect(props.selected).toBeTruthy();
 
+    // have to recreate since rendering above uses static reference to props.selected
     expect(shallow(<SpotView spot={props.spot} selected={props.selected}/>)
         .hasClass('active')).toBeTruthy();
 });
