@@ -1,41 +1,51 @@
+import { Map } from 'immutable';
 import * as React from 'react';
-import { Board, Spot } from './GameModel';
+import { HexCoord } from './Hex';
+import { Spot, HexBoard } from './HexBoard';
 import './Board.css';
 
 export interface BoardProps {
-    board?: Board;
-    cursor?: number;
+    board: HexBoard;
+    cursor: HexCoord;
 
-    onMovePlayer?: (delta: number) => void;
-    onPlaceCursor?: (position: number) => void;
+    onMovePlayer?: (delta: HexCoord) => void;
+    onPlaceCursor?: (position: HexCoord) => void;
 }
 
+const KEY_CONTROLS: Map<string, HexCoord> = Map({
+    'ArrowLeft': HexCoord.LEFT,
+    'ArrowRight': HexCoord.RIGHT,
+});
+
+// TODO enable way to find SpotView based on coord? Or is that only useful for testing?
 export const BoardView = (props: BoardProps) => (
     <div
         className="board"
         tabIndex={0}
         onKeyDown={(e/*: KeyboardEvent*/) => {
             if (props.onMovePlayer) {
-                let move = NaN;
-                if (e.key === 'ArrowLeft') move = -1;
-                else if (e.key === 'ArrowRight') move = 1;
-                if (move && (props.cursor === 0 || props.cursor)) {
-                    const dest = move + props.cursor;
-                    if (dest >= 0 && props.board && dest < props.board.positions.size) {
-                        props.onMovePlayer(move);
+                let delta = HexCoord.NONE;
+                if (e.key in KEY_CONTROLS)
+                    delta = KEY_CONTROLS.get(e.key);
+                if (delta !== HexCoord.NONE && props.cursor !== HexCoord.NONE) {
+                    const dest = props.cursor.plus(delta);
+                    if (props.board.inBounds(dest)) {
+                        props.onMovePlayer(delta);
                         e.preventDefault();
                     }
                 }
             }
         }}
     >
+        // TODO lay out in a hex grid instead of hash-ordered line
         {
-            props.board && props.board.positions.map((spot, i) => (
+            props.board && props.board.spots.map((spot, coord) => (
                 <SpotView
                     spot={spot}
-                    key={i}
-                    selected={i === props.cursor}
-                    onSelect={() => props.onPlaceCursor && props.onPlaceCursor(i)}
+                    selected={coord === props.cursor}
+                    // TODO consider implementing HexCoord.toString() as [x,y,z] or at least check that it's what we want
+                    key={coord.toString()}
+                    onSelect={() => props.onPlaceCursor && props.onPlaceCursor(coord)}
                 />
             ))
         }

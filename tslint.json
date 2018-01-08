@@ -25,7 +25,7 @@
 //        "max-line-length": [ true, 100 ],
         "member-ordering": [
             true,
-            "public-before-private",
+//            "public-before-private",
             "static-before-instance",
             "variables-before-functions"
         ],
@@ -65,9 +65,7 @@
         "radix": true,
         "semicolon": [true, "always"],
         "switch-default": true,
-
         "trailing-comma": [false],
-
         "triple-equals": [ true, "allow-null-check" ],
         "typedef": [
             true,
@@ -84,12 +82,14 @@
                 "variable-declaration": "nospace"
             }
         ],
-        "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"],
+        "variable-name": [
+            true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"
+        ],
         "whitespace": [
             true,
             "check-branch",
             "check-decl",
-            "check-module",
+//            "check-module",
             "check-operator",
             "check-separator",
             "check-type",

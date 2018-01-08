@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { BoardAction, MovePlayer, PlaceCursor } from '../actions';
-import { MOVE_PLAYER, PLACE_CURSOR } from '../constants';
-import { Board, Move } from '../game/GameModel';
+import { INITIAL_STATE, MOVE_PLAYER, PLACE_CURSOR } from '../constants';
+import { Move } from '../game/HexBoard';
 import { StoreState } from '../types';
 
 // export function boardReducer(state: StoreState, action: BoardAction): StoreState {
@@ -12,12 +12,11 @@ import { StoreState } from '../types';
 //     }
 // }
 
-export const initialState: StoreState = {
-    board: Board.construct(9, 8),
-    cursor: NaN,
-};
-
-export function baseReducer(state: StoreState = initialState, action: BoardAction): StoreState {
+export function baseReducer(
+    // TODO start with blank board?
+    // TODO create "Start Game" action & reducers etc
+    state: StoreState = INITIAL_STATE, action: BoardAction
+): StoreState {
     if (isPlaceCursor(action))
         state = placeCursorReducer(state, action);
     if (isMovePlayer(action))
@@ -34,7 +33,7 @@ function isPlaceCursor(action: BoardAction): action is PlaceCursor {
 }
 
 export function placeCursorReducer(state: StoreState, action: PlaceCursor): StoreState {
-    assert(action.position >= 0 && action.position < state.board.positions.size);
+    assert(state.board.inBounds(action.position));
     return {
         ...state,
         cursor: action.position,
@@ -43,9 +42,11 @@ export function placeCursorReducer(state: StoreState, action: PlaceCursor): Stor
 
 export function movePlayerReducer(state: StoreState, action: MovePlayer): StoreState {
     // TODO write tests
+    const move = new Move(state.cursor, action.delta);
+    assert(state.board.inBounds(move.dest));
     return {
         ...state,
-        cursor: (action.alsoCursor ? state.cursor + action.delta : state.cursor),
-        board: state.board.apply(new Move(state.cursor, action.delta)),
+        cursor: (action.alsoCursor ? move.dest : state.cursor),
+        board: state.board.apply(move),
     };
 }
