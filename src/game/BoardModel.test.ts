@@ -17,14 +17,14 @@ it('checks rectangular board sizes', () => {
     //  * * * *
     // * * * * *
     //  * * * *  <-- lower-right is at cartesian (7, 3)
-    expect(fiveByFour.constraints.extreme(x => x.cartX())).toBe(0);  // left 0
-    expect(fiveByFour.constraints.extreme(x => x.cartY())).toBe(0);  // top 0
-    expect(fiveByFour.constraints.extreme(x => - x.cartX())).toBe(-8);  // right 8
-    expect(fiveByFour.constraints.extreme(x => - x.cartY())).toBe(-3);  // bottom 3
+    expect(fiveByFour.constraints.extreme(x => x.cartX()).cartX()).toBe(0);  // left 0
+    expect(fiveByFour.constraints.extreme(x => x.cartY()).cartY()).toBe(0);  // top 0
+    expect(fiveByFour.constraints.extreme(x => - x.cartX()).cartX()).toBe(8);  // right 8
+    expect(fiveByFour.constraints.extreme(x => - x.cartY()).cartY()).toBe(3);  // bottom 3
     expect(fiveByFour.constraints.extreme(
         // cartY is first digit, cartX is second digit
         x => x.cartX() + 10 * x.cartY(), HexBoardConstraints.GT
-    )).toBe(37); // bottom right
+    )).toBe(HexCoord.getCart(7, 3)); // bottom right
 });
 
 it('checks hex neighbors', () => {
@@ -55,11 +55,12 @@ it('checks hex neighbors', () => {
     checkHexNeighbors(HexCoord.ORIGIN.getRight());
     checkHexNeighbors(HexCoord.ORIGIN.getLeftDown());
     expect(HexCoord.NONE.getRight()).toBe(HexCoord.NONE); // true, but is it what we want?
-    checkHexNeighbors(HexCoord.NONE); // weird but true
 
     function r() { return Math.floor(Math.random() * 20); } // 0 - 19
-    for (let i = 0; i < 20; ++i)
-        checkHexNeighbors(HexCoord.get(r(), r(), r()));
+    for (let i = 0; i < 20; ++i) {
+        const x = r(), y = r();
+        checkHexNeighbors(HexCoord.get(x, y, - x - y));
+    }
 });
 
 it('navigates around a board', () => {
@@ -107,26 +108,31 @@ it('controls game flow via react-redux', () => {
     mover();
     const after = store.getState().board;
     expect(before).not.toBe(after);  // board updated
+    expect(store.getState().cursor).toBe(rb.getLeft());
 
     // can't move more than 1 space
-    const right2 = HexCoord.RIGHT.getRight();
-    expect(() => store.dispatch(movePlayerAction(right2))).toThrowError();
-    expect(store.getState()).toBe(after);  // no change occurred due to rejected move
+    const left2 = HexCoord.LEFT.getLeft();
+    const dest2 = store.getState().cursor.plus(left2);
+    // even though the destination is in bounds
+    expect((store.getState().board.inBounds(dest2)));
+    expect(() => store.dispatch(movePlayerAction(left2))).toThrowError();
+    expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
 
     expect(store.getState().cursor).toBe(rb.getLeft());
-    expect(curSpot()).toEqual(new Spot(Player.Compy, n - 1));
+    expect(curSpot()).toEqual(new Spot(Player.Human, pop - 1));
 
     mover(false);
-    expect(store.getState().cursor).toBe(n-2);  // didn't move cursor this time
+    expect(store.getState().cursor).toBe(rb.getLeft());  // didn't move cursor this time
     const ul = HexCoord.ORIGIN;
-    const spots = store.getState().board.spots;
-    expect(spots.get(ul)).toEqual(new Spot(Player.Compy, pop));
-    const leftFromRB = (n: number) => spots.get(rb.plus(HexCoord.LEFT.times(n)));
+    const board = store.getState().board;
+    expect(board.getSpot(ul)).toEqual(new Spot(Player.Compy, pop));
+    const leftFromRB = (n: number) => board.getSpot(rb.plus(HexCoord.LEFT.times(n)));
     const human1 = new Spot(Player.Human, 1);
+    expect(leftFromRB(0)).toEqual(human1);
     expect(leftFromRB(1)).toEqual(human1);
-    expect(leftFromRB(2)).toEqual(human1);
-    expect(leftFromRB(3)).toEqual(new Spot(Player.Human, pop-2));
-    expect(leftFromRB(4)).toEqual(new Spot(Player.Nobody, 0));
+    expect(leftFromRB(2)).toEqual(new Spot(Player.Human, pop-2));
+    expect(leftFromRB(3)).toEqual(new Spot(Player.Nobody, 0));
+    expect(leftFromRB(3)).toBe(Spot.BLANK);
 
     // moving pop 1 has no effect
     store.dispatch(placeCursorAction(rb.getLeft()));

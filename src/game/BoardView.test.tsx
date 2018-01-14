@@ -19,16 +19,22 @@ it('renders a spot', () => {
 });
 
 it('renders a board with no selection', () => {
-    const n = 4;
+    const n = 3; // *** / ** / ***
     const board = HexBoard.constructSquare(n, 3);
     const view = enzyme.render(
-        <BoardView board={board} cursor={HexCoord.NONE}/>
+        <BoardView
+            board={board}
+            cursor={HexCoord.NONE}
+            onPlaceCursor={() => {}}
+            onMovePlayer={() => {}}
+        />
     );
-    expect(view.children().length).toEqual(n);  // board size = 10
-    expect(view.find('.spot').text()).toEqual(('3003'));
-    expect(view.children()[0]).toEqual(view.find('.spot')[0]);
-    expect(view.find('.spot').first().text()).toEqual('3');
-    expect(view.children()[0].attribs['title']).toEqual(Player.Compy);
+    expect(view.children().length).toEqual(n);  // n rows
+    const spots = view.find('.spot');
+    expect(spots.length).toEqual(8);
+    expect(spots.text()).toEqual(('300'+'00'+'003'));
+    expect(spots.first().text()).toEqual('3');
+    expect(spots[0].attribs['title']).toEqual(Player.Compy);
     // none are selected
     expect(view.find('.active').length).toEqual(0);
 });
@@ -38,7 +44,12 @@ it('renders a board with a selection', () => {
     const board = HexBoard.constructSquare(3, 2);
     const lr = board.constraints.extreme(c => - c.cartY() - c.cartX());
     const view = enzyme.render(
-        <BoardView board={board} cursor={lr}/>
+        <BoardView
+            board={board}
+            cursor={lr}
+            onPlaceCursor={() => {}}
+            onMovePlayer={() => {}}
+        />
     );
     const active = view.find('.active');
     expect(active.length).toEqual(1);  // only one selected

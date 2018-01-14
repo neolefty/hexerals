@@ -1,16 +1,14 @@
 import * as assert from 'assert';
-import {List, Record, Set} from 'immutable';
-
-class HexCoordCacheKey extends Record({x: NaN, y: NaN}) {}
+import { List, Map, Range, Seq, Set } from 'immutable';
 
 // HexCoord.get(x, y, z)  or HexCoord.getCart(cx, cy) -- constructor is private.
 // "Cube coordinates"; for a description, see:
 // www.redblobgames.com/grids/hexagons/#coordinates-cube
 export class HexCoord {
-    // intern instances in a GC-safe way, so we can use ===
-    // key is [x,y]
-    // (must be declared before being use)
-    /*private*/ static instanceCache = new WeakMap();
+    // keys are x and then y
+    private static readonly instanceCache
+        = Map<number, Map<number, HexCoord>>().asMutable();
+    private static ID = 0;
 
     // a HexCoord whose x, y, and z are all NaN
     static readonly NONE = new HexCoord(NaN, NaN);
@@ -30,18 +28,33 @@ export class HexCoord {
         HexCoord.LEFT, HexCoord.LEFT_DOWN, HexCoord.RIGHT_DOWN,
     ]);
 
+    // useful as a key in react components
+    readonly id = HexCoord.ID++;
+
     // z: leftUp-rightDown
     readonly z: number;
 
     private neighborsCache?: List<HexCoord>;
 
     static get(x: number, y: number, z: number): HexCoord {
-        assert(x + y + z === 0);
-        const key = {x: x, y: y};
-        if (HexCoord.instanceCache.has(key))
-            return HexCoord.instanceCache.get(key);
-        else
-            return new HexCoord(x, y);
+        const total = x + y + z;
+        if (isNaN(total)) return HexCoord.NONE;
+        else {
+            assert(total === 0);
+            // TODO eliminate memory leak of accumulated cache
+            // (tried WeakMap but couldn't get it to work -- see git log)
+            let yCache = HexCoord.instanceCache.get(x);
+            if (yCache === undefined) {
+                yCache = Map<number, HexCoord>().asMutable();
+                HexCoord.instanceCache.set(x, yCache);
+            }
+            let result = yCache.get(y);
+            if (result === undefined) {
+                result = new HexCoord(x, y);
+                yCache.set(y, result);
+            }
+            return result;
+        }
     }
 
     // Convert from cartesian (rectangular) coordinates.
@@ -54,7 +67,7 @@ export class HexCoord {
     // In other words, (x + y) must be even.
     static getCart(cx: number, cy: number): HexCoord {
         assert((cx + cy) % 2 === 0);
-        return HexCoord.get((cx - cy) / 2, (cx + cy) / 2, cy);
+        return HexCoord.get((cx - cy) / 2, - (cx + cy) / 2, cy);
     }
 
     plus(that: HexCoord): HexCoord {
@@ -63,6 +76,12 @@ export class HexCoord {
 
     times(n: number): HexCoord {
         return HexCoord.get(this.x * n, this.y * n, this.z * n);
+    }
+
+    // Note: Useful for Manhattan hex distance -- a.minus(b).maxAbs().
+    maxAbs() {
+        // noinspection JSSuspiciousNameCombination
+        return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z));
     }
 
     getNeighbors(): List<HexCoord> {
@@ -88,20 +107,13 @@ export class HexCoord {
     // convert to rectangular Y, assuming flat-topped hexagons twice as wide as high
     cartY(): number { return this.z; }
 
-    abs() {
-        // noinspection JSSuspiciousNameCombination
-        return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z));
-    }
-
-    toString(includeCart: boolean=false) {
-        return `[${this.x},${this.y},${this.z}${includeCart?' ' + this.toCartString():''}]`;
+    toString(includeCart: boolean = false) {
+        return `[${ this.x },${ this.y },${ this.z }]${ includeCart ? ' ' + this.toCartString() : '' }`;
     }
 
     toCartString() {
         return `(${this.cartX()},${this.cartY()})`;
     }
-
-    private cacheKey: HexCoordCacheKey;
 
     // Private constructor: access instances through get() or getCart().
     // Instances are interned in HexCoord.instanceCache
@@ -109,12 +121,36 @@ export class HexCoord {
         // x: left-right
         // y: leftDown-rightUp
         this.z = -x - y;
-        // Keep a reference to this key so that as long as this object isn't gc'd, its key
-        // stays in the WeakMap. In other words, once this hex coord has no more
-        // references, it is subject to gc and therefore its key is too, so it can be removed
-        // from the cache.
-        this.cacheKey = new HexCoordCacheKey({x: x, y: y});
-        HexCoord.instanceCache.set(this.cacheKey, this);
+    }
+}
+
+export class RectEdges {
+    readonly left: number;
+    readonly right: number;
+    readonly top: number;
+    readonly bottom: number;
+
+    constructor(constraints: HexBoardConstraints) {
+        this.left = constraints.extreme(x => x.cartX()).cartX();
+        this.right = constraints.extreme(x => -x.cartX()).cartX();
+        this.top = constraints.extreme(x => x.cartY()).cartY();
+        this.bottom = constraints.extreme(x => -x.cartY()).cartY();
+    }
+
+    get height(): number {
+        return (this.bottom - this.top) + 1;
+    }
+
+    get width(): number {
+        return (this.right - this.left) + 1;
+    }
+
+    xRange(): Seq.Indexed<number> {
+        return Range(this.left, this.right + 1);
+    }
+
+    yRange(): Seq.Indexed<number> {
+        return Range(this.top, this.bottom + 1);
     }
 }
 
@@ -123,9 +159,9 @@ export abstract class HexBoardConstraints {
     private allCache?: Set<HexCoord>;
     // what's a good place to start if we want to enumerate this board's coordinates?
 
-    static readonly LTE = (x: number, y: number) => (x <= y);
+    // static readonly LTE = (x: number, y: number) => (x <= y);
     static readonly LT = (x: number, y: number) => (x < y);
-    static readonly GTE = (x: number, y: number) => (x >= y);
+    // static readonly GTE = (x: number, y: number) => (x >= y);
     static readonly GT = (x: number, y: number) => (x > y);
 
     // Override to have a constraints class start somewhere else.
@@ -158,38 +194,24 @@ export abstract class HexBoardConstraints {
      * Compile the set of all hexes that are in bounds and connected to this.start().
      * @param {Set<HexCoord>} inBounds the set so far; any hexes in this set
      * will not be revisited
-     * @param {Set<HexCoord>} oob (aka outOfBounds: any hexes visited but found
-     * to be not within bounds. Keep track of these so that we can avoid re-checking them.
-     * // TODO seems like we shouldn't really need oob?
      * @param {HexCoord} x the current hex whose neighbors we're checking.
      */
-    private buildAll(
-        inBounds: Set<HexCoord>,
-        // oob: Set<HexCoord> = Set<HexCoord>().asMutable(),
-        x?: HexCoord
-    ) {
+    private buildAll(inBounds: Set<HexCoord>, x?: HexCoord) {
         assert(inBounds.asMutable() === inBounds); // must be mutable
-        // assert(oob.asMutable() === oob);
         if (x === undefined) {
             x = this.start();
             assert(this.inBounds(x));
             inBounds.add(x);
         }
 
-        const ic = HexCoord.instanceCache;
-        console.log(`${inBounds.size} considering ${x.toString()} (${this.inBounds(x) ? 'in' : 'OOB'})`);
-        ic.get(x);
         x.getNeighbors().map(neighbor => {
             // have we found one that isn't yet visited?
             // TODO test that we visit each position exactly once?
-            if (!inBounds.contains(neighbor) /* && !oob.contains(neighbor) */) {
+            if (!inBounds.contains(neighbor)) {
                 if (this.inBounds(neighbor)) {
                     inBounds.add(neighbor);
-                    this.buildAll(inBounds, /* oob, */neighbor);
+                    this.buildAll(inBounds, neighbor);
                 }
-                // keep track of boundary but avoid revisiting
-                // else
-                //     oob.add(neighbor);
             }
         });
     }

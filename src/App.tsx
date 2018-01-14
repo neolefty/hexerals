@@ -14,8 +14,12 @@ const mapStateToProps = (state: StoreState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<StoreState>) => ({
-    onMovePlayer: (delta: HexCoord) => dispatch(movePlayerAction(delta, true)),
-    onPlaceCursor: (position: HexCoord) => dispatch(placeCursorAction(position)),
+    onMovePlayer: (delta: HexCoord) => {
+        dispatch(movePlayerAction(delta, true));
+    },
+    onPlaceCursor: (position: HexCoord) => {
+        dispatch(placeCursorAction(position));
+    },
 });
 
 // TODO add types -- connect<A,B,C> -- for example, cmd-B on connect or see https://spin.atomicobject.com/2017/04/20/typesafe-container-components/
