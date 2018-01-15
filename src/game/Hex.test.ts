@@ -1,4 +1,4 @@
-import { HexCoord } from './Hex';
+import {HexCoord, RectangularConstraints} from './Hex';
 
 it('checks hex neighbors', () => {
     expect(HexCoord.ORIGIN.getRight()).toBe(HexCoord.RIGHT);
@@ -35,3 +35,22 @@ it('checks hex neighbors', () => {
         checkHexNeighbors(HexCoord.get(x, y, - x - y));
     }
 });
+
+const timeRect = (w: number, h: number) => {
+    const start = new Date();
+    const constraints = new RectangularConstraints(w, h);
+    const n = constraints.all().size;
+    expect(n).toBe(w * h - Math.trunc(h / 2));
+    const elapsed = new Date().getTime() - start.getTime();
+    const msPerCell = elapsed / n;
+    console.log(`Elapsed for ${ w } x ${ h } rectangular constraints: ${ 
+        elapsed } ms -- ${ msPerCell } ms per cell`);
+};
+
+it('checks small and medium boards constraints', () => {
+    [ 1, 10, 50, 100, 200 ].forEach(n => timeRect(n, n));
+});
+
+// it('checks large boards constraints', () => {
+//     [ 500, 1000 ].forEach(n => timeRect(n, n));
+// });

@@ -210,34 +210,38 @@ export abstract class BoardConstraints {
 
     all(): Set<HexCoord> {
         if (this.allCache === undefined)
-            this.allCache = Set<HexCoord>().withMutations(this.buildAll.bind(this));
+            this.allCache = this.buildAll();
         return this.allCache;
     }
 
-    /**
-     * Compile the set of all hexes that are in bounds and connected to this.start().
-     * @param {Set<HexCoord>} inBounds the set so far; any hexes in this set
-     * will not be revisited
-     * @param {HexCoord} x the current hex whose neighbors we're checking.
-     */
-    private buildAll(inBounds: Set<HexCoord>, x?: HexCoord) {
-        assert(inBounds.asMutable() === inBounds); // must be mutable
-        if (x === undefined) {
-            x = this.start();
-            assert(this.inBounds(x));
-            inBounds.add(x);
+    // Compile the set of all hexes that are in bounds and connected to this.start().
+    private buildAll(): Set<HexCoord> {
+        const result = Set<HexCoord>().asMutable();
+
+        let floodEdge = Set<HexCoord>().asMutable();
+        assert(this.inBounds(this.start()));
+        floodEdge.add(this.start());
+
+        // Could do this recursively but for large boards it overflows the stack
+
+        // Flood out from this.start(), one layer at a time
+        while (!floodEdge.isEmpty()) {
+            // freeze the old edge
+            const oldEdge = floodEdge.asImmutable();
+            // start building a new edge
+            floodEdge = Set<HexCoord>().asMutable();
+            oldEdge.forEach(x => {
+                result.add(x);
+                x.getNeighbors().map(neighbor => {
+                    // discard any that are out of bounds or already included
+                    // conversely: keep those that are in bounds and novel
+                    if (this.inBounds(neighbor) && !result.contains(neighbor))
+                        floodEdge.add(neighbor);
+                });
+            });
         }
 
-        x.getNeighbors().map(neighbor => {
-            // have we found one that isn't yet visited?
-            // TODO test that we visit each position exactly once?
-            if (!inBounds.contains(neighbor)) {
-                if (this.inBounds(neighbor)) {
-                    inBounds.add(neighbor);
-                    this.buildAll(inBounds, neighbor);
-                }
-            }
-        });
+        return result.asImmutable();
     }
 }
 

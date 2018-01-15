@@ -5,7 +5,7 @@ import * as enzyme from 'enzyme';
 import { createStore } from 'redux';
 import { placeCursorAction } from './Actions';
 import { movePlayerAction } from './Actions';
-import {INITIAL_HEIGHT, INITIAL_STATE, INITIAL_WIDTH} from './Constants';
+import { INITIAL_STATE } from './Constants';
 import { baseReducer } from './Reducers';
 import { HexCoord } from './Hex';
 import { Player, Spot } from './Board';
@@ -103,15 +103,15 @@ it('controls game flow via react-redux', () => {
     expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT))).toThrowError();
 
     // place cursor at right bottom
-    const rb = HexCoord.getCart(INITIAL_WIDTH * 2 - 2, INITIAL_HEIGHT - 1);
-    store.dispatch(placeCursorAction(rb));
-    expect(store.getState().cursor).toBe(rb);
-    expect(store.getState().board.getSpot(rb.getLeft()).pop).toBe(0);
+    const lr = store.getState().board.edges.lowerRight;
+    store.dispatch(placeCursorAction(lr));
+    expect(store.getState().cursor).toBe(lr);
+    expect(store.getState().board.getSpot(lr.getLeft()).pop).toBe(0);
     const before = store.getState().board;
     mover();
     const after = store.getState().board;
     expect(before).not.toBe(after);  // board updated
-    expect(store.getState().cursor).toBe(rb.getLeft());
+    expect(store.getState().cursor).toBe(lr.getLeft());
 
     // can't move more than 1 space
     const left2 = HexCoord.LEFT.getLeft();
@@ -121,15 +121,15 @@ it('controls game flow via react-redux', () => {
     expect(() => store.dispatch(movePlayerAction(left2))).toThrowError();
     expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
 
-    expect(store.getState().cursor).toBe(rb.getLeft());
+    expect(store.getState().cursor).toBe(lr.getLeft());
     expect(curSpot()).toEqual(new Spot(Player.Human, pop - 1));
 
     mover(false);
-    expect(store.getState().cursor).toBe(rb.getLeft());  // didn't move cursor this time
+    expect(store.getState().cursor).toBe(lr.getLeft());  // didn't move cursor this time
     const ul = HexCoord.ORIGIN;
     const board = store.getState().board;
     expect(board.getSpot(ul)).toEqual(new Spot(Player.Compy, pop));
-    const leftFromRB = (n: number) => board.getSpot(rb.plus(HexCoord.LEFT.times(n)));
+    const leftFromRB = (n: number) => board.getSpot(lr.plus(HexCoord.LEFT.times(n)));
     const human1 = new Spot(Player.Human, 1);
     expect(leftFromRB(0)).toEqual(human1);
     expect(leftFromRB(1)).toEqual(human1);
@@ -138,11 +138,11 @@ it('controls game flow via react-redux', () => {
     expect(leftFromRB(3)).toBe(Spot.BLANK);
 
     // moving pop 1 has no effect
-    store.dispatch(placeCursorAction(rb.getLeft()));
+    store.dispatch(placeCursorAction(lr.getLeft()));
     expect(store.getState().board.getSpot(store.getState().cursor)).toEqual(human1);
     const before2 = store.getState().board;
     mover();
-    expect(store.getState().board.spots.get(rb.getLeft()).pop).toBe(1);
+    expect(store.getState().board.spots.get(lr.getLeft()).pop).toBe(1);
     // move had no effect, so board not updated
     expect(store.getState().board).toBe(before2);
 
