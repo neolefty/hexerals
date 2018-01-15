@@ -2,15 +2,16 @@ import { shallow } from 'enzyme';
 import * as React from 'react';
 import * as Adapter from 'enzyme-adapter-react-16';
 import * as enzyme from 'enzyme';
-import {createStore} from 'redux';
-import {movePlayerAction, placeCursorAction} from '../actions';
-import {INITIAL_HEIGHT, INITIAL_STATE, INITIAL_WIDTH} from '../constants';
-import {baseReducer} from '../reducers';
-import {StoreState} from '../types';
+import { createStore } from 'redux';
+import { placeCursorAction } from './Actions';
+import { movePlayerAction } from './Actions';
+import {INITIAL_HEIGHT, INITIAL_STATE, INITIAL_WIDTH} from './Constants';
+import { baseReducer } from './Reducers';
 import { HexCoord } from './Hex';
-import {Player, Spot} from './Board';
+import { Player, Spot } from './Board';
 import { BoardView, SpotView } from './BoardView';
 import { Board } from './Board';
+import {StoreState} from './Types';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});

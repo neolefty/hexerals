@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import App from './App';
-import { StoreState } from './types';
-import { baseReducer } from './reducers';
+import { baseReducer } from './game/Reducers';
+import { StoreState } from './game/Types';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 

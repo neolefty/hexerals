@@ -1,5 +1,5 @@
-import * as constants from '../constants';
-import {HexCoord} from '../game/Hex';
+import { MOVE_PLAYER, PLACE_CURSOR } from './Constants';
+import { HexCoord } from './Hex';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -10,13 +10,13 @@ export interface GenericAction {
 }
 
 export interface MovePlayer extends GenericAction {
-    type: constants.MOVE_PLAYER;
+    type: MOVE_PLAYER;
     delta: HexCoord;
     alsoCursor: boolean; // should the cursor move at the end as well?
 }
 
 export interface PlaceCursor extends GenericAction {
-    type: constants.PLACE_CURSOR;
+    type: PLACE_CURSOR;
     position: HexCoord;
 }
 
@@ -26,7 +26,7 @@ export function movePlayerAction(
     delta: HexCoord, alsoCursor: boolean = true
 ): MovePlayer {
     return {
-        type: constants.MOVE_PLAYER,
+        type: MOVE_PLAYER,
         delta: delta,
         alsoCursor: alsoCursor,
     };
@@ -34,7 +34,7 @@ export function movePlayerAction(
 
 export function placeCursorAction(position: HexCoord): PlaceCursor {
     return {
-        type: constants.PLACE_CURSOR,
+        type: PLACE_CURSOR,
         position: position,
     };
 }

@@ -1,6 +1,6 @@
-import {HexCoord} from '../game/Hex';
-import {Board} from '../game/Board';
-import {StoreState} from '../types';
+import { Board } from './Board';
+import { HexCoord } from './Hex';
+import { StoreState } from './Types';
 
 export const MOVE_PLAYER = 'MOVE_PLAYER';
 export type MOVE_PLAYER = typeof MOVE_PLAYER;

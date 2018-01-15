@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
 import App from './App';
-import {baseReducer} from './reducers';
-import {StoreState} from './types';
+import {baseReducer} from './game/Reducers';
+import {StoreState} from './game/Types';
 
 it('renders without crashing', () => {
     const store = createStore<StoreState>(baseReducer);

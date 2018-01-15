@@ -1,10 +1,11 @@
 import * as React from 'react';
 import './App.css';
 import { connect, Dispatch } from 'react-redux';
-import { movePlayerAction, placeCursorAction } from './actions';
+import { placeCursorAction } from './game/Actions';
+import { movePlayerAction } from './game/Actions';
 import { BoardView } from './game/BoardView';
 import { HexCoord } from './game/Hex';
-import { StoreState } from './types';
+import { StoreState } from './game/Types';
 
 const logo = require('./logo.svg');
 
