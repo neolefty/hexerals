@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { BoardAction, MovePlayer, PlaceCursor } from '../actions';
 import { INITIAL_STATE, MOVE_PLAYER, PLACE_CURSOR } from '../constants';
-import { Move } from '../game/HexBoard';
+import { Move } from '../game/Board';
 import { StoreState } from '../types';
 
 // export function boardReducer(state: StoreState, action: BoardAction): StoreState {

@@ -1,7 +1,7 @@
 import { HexCoord } from '../game/Hex';
-import { HexBoard } from '../game/HexBoard';
+import { Board } from '../game/Board';
 
 export interface StoreState {
-    board: HexBoard;
+    board: Board;
     cursor: HexCoord;
 }

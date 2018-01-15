@@ -2,11 +2,11 @@ import { Map } from 'immutable';
 import { Component, KeyboardEvent } from 'react';
 import * as React from 'react';
 import { HexCoord } from './Hex';
-import { Spot, HexBoard } from './HexBoard';
+import { Spot, Board } from './Board';
 import './Board.css';
 
 export interface BoardProps {
-    board: HexBoard;
+    board: Board;
     cursor: HexCoord;
 
     onMovePlayer: (delta: HexCoord) => void;

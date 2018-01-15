@@ -2,14 +2,19 @@ import { shallow } from 'enzyme';
 import * as React from 'react';
 import * as Adapter from 'enzyme-adapter-react-16';
 import * as enzyme from 'enzyme';
+import {createStore} from 'redux';
+import {movePlayerAction, placeCursorAction} from '../actions';
+import {INITIAL_HEIGHT, INITIAL_STATE, INITIAL_WIDTH} from '../constants';
+import {baseReducer} from '../reducers';
+import {StoreState} from '../types';
 import { HexCoord } from './Hex';
-import { Player } from './HexBoard';
+import {Player, Spot} from './Board';
 import { BoardView, SpotView } from './BoardView';
-import { HexBoard } from './HexBoard';
+import { Board } from './Board';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
-    const board = HexBoard.constructSquare(3, 5);
+    const board = Board.constructSquare(3, 5);
     const view = enzyme.render(
         <SpotView
             spot={board.getSpot(HexCoord.ORIGIN)} key={0} selected={false}
@@ -20,7 +25,7 @@ it('renders a spot', () => {
 
 it('renders a board with no selection', () => {
     const n = 3; // *** / ** / ***
-    const board = HexBoard.constructSquare(n, 3);
+    const board = Board.constructSquare(n, 3);
     const view = enzyme.render(
         <BoardView
             board={board}
@@ -41,7 +46,7 @@ it('renders a board with no selection', () => {
 
 it('renders a board with a selection', () => {
     // select lower-right corner
-    const board = HexBoard.constructSquare(3, 2);
+    const board = Board.constructSquare(3, 2);
     const lr = board.constraints.extreme(c => - c.cartY() - c.cartX());
     const view = enzyme.render(
         <BoardView
@@ -57,7 +62,7 @@ it('renders a board with a selection', () => {
 });
 
 it('clicks a spot to select it', () => {
-    const board = HexBoard.constructSquare(3, 6);
+    const board = Board.constructSquare(3, 6);
     const spot = board.getSpot(board.constraints.extreme(c => - c.cartX() - c.cartY()));
     const props = {
         spot: spot,
@@ -78,4 +83,67 @@ it('clicks a spot to select it', () => {
     // have to recreate since rendering above uses static reference to props.selected
     expect(shallow(<SpotView spot={props.spot} selected={props.selected}/>)
         .hasClass('active')).toBeTruthy();
+});
+
+it('controls game flow via react-redux', () => {
+    const store = createStore<StoreState>(baseReducer);
+    const n = INITIAL_STATE.board.spots.size;
+    const pop = INITIAL_STATE.board.spots.get(HexCoord.ORIGIN).pop;
+    expect(store.getState().board.spots.size).toEqual(n);
+    expect(store.getState().board.spots.get(HexCoord.ORIGIN).pop).toEqual(pop);
+
+    // mover steps moves 1 space to the left
+    const mover = (alsoCursor=true) =>
+        store.dispatch(movePlayerAction(HexCoord.LEFT, alsoCursor));
+    const curSpot = () => store.getState().board.getSpot(store.getState().cursor);
+
+    expect(mover).toThrowError();  // no cursor
+    // place cursor outside bounds
+    expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT))).toThrowError();
+
+    // place cursor at right bottom
+    const rb = HexCoord.getCart(INITIAL_WIDTH * 2 - 2, INITIAL_HEIGHT - 1);
+    store.dispatch(placeCursorAction(rb));
+    expect(store.getState().cursor).toBe(rb);
+    expect(store.getState().board.getSpot(rb.getLeft()).pop).toBe(0);
+    const before = store.getState().board;
+    mover();
+    const after = store.getState().board;
+    expect(before).not.toBe(after);  // board updated
+    expect(store.getState().cursor).toBe(rb.getLeft());
+
+    // can't move more than 1 space
+    const left2 = HexCoord.LEFT.getLeft();
+    const dest2 = store.getState().cursor.plus(left2);
+    // even though the destination is in bounds
+    expect((store.getState().board.inBounds(dest2)));
+    expect(() => store.dispatch(movePlayerAction(left2))).toThrowError();
+    expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
+
+    expect(store.getState().cursor).toBe(rb.getLeft());
+    expect(curSpot()).toEqual(new Spot(Player.Human, pop - 1));
+
+    mover(false);
+    expect(store.getState().cursor).toBe(rb.getLeft());  // didn't move cursor this time
+    const ul = HexCoord.ORIGIN;
+    const board = store.getState().board;
+    expect(board.getSpot(ul)).toEqual(new Spot(Player.Compy, pop));
+    const leftFromRB = (n: number) => board.getSpot(rb.plus(HexCoord.LEFT.times(n)));
+    const human1 = new Spot(Player.Human, 1);
+    expect(leftFromRB(0)).toEqual(human1);
+    expect(leftFromRB(1)).toEqual(human1);
+    expect(leftFromRB(2)).toEqual(new Spot(Player.Human, pop-2));
+    expect(leftFromRB(3)).toEqual(new Spot(Player.Nobody, 0));
+    expect(leftFromRB(3)).toBe(Spot.BLANK);
+
+    // moving pop 1 has no effect
+    store.dispatch(placeCursorAction(rb.getLeft()));
+    expect(store.getState().board.getSpot(store.getState().cursor)).toEqual(human1);
+    const before2 = store.getState().board;
+    mover();
+    expect(store.getState().board.spots.get(rb.getLeft()).pop).toBe(1);
+    // move had no effect, so board not updated
+    expect(store.getState().board).toBe(before2);
+
+    // TODO test that you can't move someone else's stuff?
 });

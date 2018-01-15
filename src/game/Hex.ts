@@ -130,19 +130,35 @@ export class RectEdges {
     readonly top: number;
     readonly bottom: number;
 
-    constructor(constraints: HexBoardConstraints) {
+    readonly width: number;
+    readonly height: number;
+
+    readonly upperLeft: HexCoord;
+    readonly upperRight: HexCoord;
+    readonly lowerLeft: HexCoord;
+    readonly lowerRight: HexCoord;
+
+    constructor(constraints: BoardConstraints) {
         this.left = constraints.extreme(x => x.cartX()).cartX();
         this.right = constraints.extreme(x => -x.cartX()).cartX();
         this.top = constraints.extreme(x => x.cartY()).cartY();
         this.bottom = constraints.extreme(x => -x.cartY()).cartY();
-    }
 
-    get height(): number {
-        return (this.bottom - this.top) + 1;
-    }
+        this.height = (this.bottom - this.top) + 1;
+        this.width = (this.right - this.left) + 1;
 
-    get width(): number {
-        return (this.right - this.left) + 1;
+        this.upperLeft = constraints.extreme(
+            h => h.cartY() * this.width + h.cartX()
+        );
+        this.lowerRight = constraints.extreme(
+            h => - (h.cartY() * this.width + h.cartX())
+        );
+        this.upperRight = constraints.extreme(
+            h => h.cartY() * this.width - h.cartX()
+        );
+        this.lowerLeft = constraints.extreme(
+            h => - h.cartY() * this.width + h.cartX()
+        );
     }
 
     xRange(): Seq.Indexed<number> {
@@ -155,7 +171,7 @@ export class RectEdges {
 }
 
 // The shape of a board -- what hexes are in and not in the board?
-export abstract class HexBoardConstraints {
+export abstract class BoardConstraints {
     private allCache?: Set<HexCoord>;
     // what's a good place to start if we want to enumerate this board's coordinates?
 
@@ -174,10 +190,18 @@ export abstract class HexBoardConstraints {
     // is coord within the constrained area?
     abstract inBounds(coord: HexCoord): boolean;
 
-    // Find an extreme value
+    /**
+     * Find coord at extreme value; by default, finds the smallest, by
+     * using BoardConstraints.LT. To find the largest instead, use
+     * BoardConstraints.GT, or negate the sort value, or something.
+     *
+     * @param {(x: HexCoord) => number} f indexing function
+     * @param {(x: number, y: number) => boolean} compare ordering function
+     * @returns {HexCoord} that wins in comparison to all the others
+     */
     extreme(
         f: (x: HexCoord) => number,
-        compare: (x: number, y: number) => boolean = HexBoardConstraints.LT
+        compare: (x: number, y: number) => boolean = BoardConstraints.LT
     ): HexCoord {
         return this.all().reduce((champ: HexCoord, contender: HexCoord) =>
             compare(f(contender), f(champ)) ? contender : champ
@@ -221,7 +245,7 @@ export abstract class HexBoardConstraints {
 // If height and width are H and W, then the corners are
 // (0,0,0)      (w, -w, 0)
 // (-h/2, -h/2, h) (w-h/2, w-h/2, h)
-export class RectangularConstraints extends HexBoardConstraints {
+export class RectangularConstraints extends BoardConstraints {
     constructor(readonly w: number, readonly h: number) {
         super();
     }
