@@ -43,12 +43,13 @@ const timeRect = (w: number, h: number) => {
     expect(n).toBe(w * h - Math.trunc(h / 2));
     const elapsed = new Date().getTime() - start.getTime();
     const msPerCell = elapsed / n;
+    const cellPerMs = Math.round(100/msPerCell) / 100;
     console.log(`Elapsed for ${ w } x ${ h } rectangular constraints: ${ 
-        elapsed } ms -- ${ msPerCell } ms per cell`);
+        elapsed } ms -- ${ cellPerMs } cell per ms / ${ msPerCell } ms per cell`);
 };
 
 it('checks small and medium boards constraints', () => {
-    [ 1, 10, 50, 100, 200 ].forEach(n => timeRect(n, n));
+    [ 1, 10, 50, 100, 200, 200 ].forEach(n => timeRect(n, n));
 });
 
 // it('checks large boards constraints', () => {
