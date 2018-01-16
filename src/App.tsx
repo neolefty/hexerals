@@ -5,9 +5,8 @@ import { placeCursorAction } from './game/Actions';
 import { movePlayerAction } from './game/Actions';
 import { BoardView } from './game/BoardView';
 import { HexCoord } from './game/Hex';
+import { PerfTest } from './game/PerfTest';
 import { StoreState } from './game/Types';
-
-const logo = require('./logo.svg');
 
 const mapStateToProps = (state: StoreState) => ({
     board: state.board,
@@ -32,14 +31,14 @@ class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <div className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h2>Welcome to React</h2>
-                </div>
-                <p className="App-intro">
-                    To get started, edit <code>src/App.tsx</code> and save to reload.
-                </p>
                 <BoardContainer />
+                <PerfTest w={500} h={500} />
+                <PerfTest w={100} h={100} />
+                <PerfTest w={200} h={300} />
+                <PerfTest w={500} h={500} />
+                {/*
+                <PerfTest w={500} h={500} />
+                */}
             </div>
         );
     }
