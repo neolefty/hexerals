@@ -1,17 +1,15 @@
-import { shallow } from 'enzyme';
 import * as React from 'react';
-import * as Adapter from 'enzyme-adapter-react-16';
-import * as enzyme from 'enzyme';
 import { createStore } from 'redux';
-import { placeCursorAction } from './Actions';
-import { movePlayerAction } from './Actions';
-import { INITIAL_STATE } from './Constants';
-import { baseReducer } from './Reducers';
-import { HexCoord } from './Hex';
-import { Player, Spot } from './Board';
+import * as enzyme from 'enzyme';
+import { shallow } from 'enzyme';
+import * as Adapter from 'enzyme-adapter-react-16';
+
+import { placeCursorAction, movePlayerAction } from './BoardActions';
+import { Board, Player, Spot } from './Board';
+import { BoardReducer, BoardState } from './BoardContainer';
 import { BoardView, SpotView } from './BoardView';
-import { Board } from './Board';
-import {StoreState} from './Types';
+import { INITIAL_STATE } from './Constants';
+import { HexCoord } from './Hex';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
@@ -87,7 +85,7 @@ it('clicks a spot to select it', () => {
 });
 
 it('controls game flow via react-redux', () => {
-    const store = createStore<StoreState>(baseReducer);
+    const store = createStore<BoardState>(BoardReducer);
     const n = INITIAL_STATE.board.spots.size;
     const pop = INITIAL_STATE.board.spots.get(HexCoord.ORIGIN).pop;
     expect(store.getState().board.spots.size).toEqual(n);

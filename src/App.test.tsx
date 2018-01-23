@@ -3,11 +3,11 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
 import App from './App';
-import {baseReducer} from './game/Reducers';
-import {StoreState} from './game/Types';
+import {BoardReducer} from './game/BoardContainer';
+import {BoardState} from './game/BoardContainer';
 
 it('renders without crashing', () => {
-    const store = createStore<StoreState>(baseReducer);
+    const store = createStore<BoardState>(BoardReducer);
     const div = document.createElement('div');
     ReactDOM.render(
         <Provider store={store}>

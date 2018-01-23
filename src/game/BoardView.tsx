@@ -5,7 +5,7 @@ import { HexCoord } from './Hex';
 import { Spot, Board } from './Board';
 import './Board.css';
 
-export interface BoardProps {
+interface BoardProps {
     board: Board;
     cursor: HexCoord;
 
