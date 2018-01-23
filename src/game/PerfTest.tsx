@@ -1,14 +1,52 @@
 import { List } from 'immutable';
 import * as React from 'react';
+import {connect} from 'react-redux';
+import {Dispatch} from 'redux';
+
+import {GenericAction} from './BoardActions';
 import { RectangularConstraints } from './Hex';
 
-export interface PerfProps {
+export interface PerfState {
     history: List<PerfRecord>;
     inputs: Wh;
-
-    onChange: (wh: Wh) => void;
-    onRun: () => void;
 }
+
+export function PerfReducer(
+    state: PerfState = INITIAL_PERF_STATE, action: PerfAction
+): PerfState {
+    if (isRunPerfTest(action))
+        return { ...state, history: state.history.push(runPerfTest(state.inputs)) };
+    else if (isChangeWh(action))
+        return { ...state, inputs: action.wh };
+    else
+        return state;
+}
+
+const RUN_PERF_TEST = 'RUN_PERF_TEST';
+type RUN_PERF_TEST = typeof RUN_PERF_TEST;
+function isRunPerfTest(action: PerfAction): action is RunPerfTest {
+    return action.type === RUN_PERF_TEST; }
+const CHANGE_WH = 'CHANGE_WH';
+type CHANGE_WH = typeof CHANGE_WH;
+function isChangeWh(action: PerfAction): action is ChangeWh {
+    return action.type === CHANGE_WH; }
+
+interface RunPerfTest extends GenericAction { type: RUN_PERF_TEST; }
+interface ChangeWh extends GenericAction { type: CHANGE_WH; wh: Wh; }
+type PerfAction = RunPerfTest | ChangeWh;
+
+function runPerfTestAction(): RunPerfTest { return {type: RUN_PERF_TEST}; }
+function changeWhAction(wh: Wh): ChangeWh { return {type: CHANGE_WH, wh: wh}; }
+
+const mapStateToPerfProps = (state: PerfState) => ({
+    history: state.history,
+    inputs: state.inputs,
+});
+
+const mapDispatchToPerfProps = (dispatch: Dispatch<PerfState>) => ({
+    onChange: (wh: Wh) => { dispatch(changeWhAction(wh)); },
+    onRun: () => { dispatch(runPerfTestAction()); },
+});
 
 export const runPerfTest = (wh: Wh) => {
     const start = new Date();
@@ -18,21 +56,12 @@ export const runPerfTest = (wh: Wh) => {
     return new PerfRecord(wh, elapsed, n);
 };
 
-export class PerfRecord {
-    constructor(
-        readonly wh: Wh,
-        readonly elapsed: number,
-        readonly n: number = wh.area,
-    ) {}
-    get nPerMs() { return this.n / this.elapsed; }
+export interface PerfProps extends PerfState {
+    onChange: (wh: Wh) => void;
+    onRun: () => void;
 }
 
-export class Wh {
-    constructor(readonly w: number, readonly h: number) {}
-    get area() { return this.w * this.h; }
-}
-
-export const PerfTest = (props: PerfProps) => {
+const PerfTest = (props: PerfProps) => {
     return (
         <div>
             <WhInput wh={props.inputs} onChange={props.onChange} onTest={props.onRun}/>
@@ -45,25 +74,11 @@ export const PerfTest = (props: PerfProps) => {
     );
 };
 
-export interface PerfResultProps {
-    record: PerfRecord
-}
-
-export const PerfResultView = (props: PerfResultProps) => (
-    <div>
-        Built {props.record.wh.w} x {props.record.wh.h} board
-        in {props.record.elapsed} ms.
-        | {props.record.n} cells at {props.record.nPerMs} cells per ms
-    </div>
+export const PerfContainer = connect(mapStateToPerfProps, mapDispatchToPerfProps)(
+    PerfTest
 );
 
-export interface WhInputProps {
-    wh: Wh;
-    onChange: (wh: Wh) => void;
-    onTest: (wh: Wh) => void;
-}
-
-export const WhInput = (props: WhInputProps) => (
+const WhInput = (props: WhInputProps) => (
     <div>
         <NumberInput value={props.wh.w} label='width' key='width' onChange={
             w => props.onChange(new Wh(w, props.wh.h))
@@ -75,13 +90,50 @@ export const WhInput = (props: WhInputProps) => (
     </div>
 );
 
-export interface NumberInputProps {
+class PerfRecord {
+    constructor(
+        readonly wh: Wh,
+        readonly elapsed: number,
+        readonly n: number = wh.area,
+    ) {}
+    get nPerMs() { return this.n / this.elapsed; }
+}
+
+class Wh {
+    constructor(readonly w: number, readonly h: number) {}
+    get area() { return this.w * this.h; }
+}
+
+const INITIAL_PERF_STATE = {
+    history: List<PerfRecord>(),
+    inputs: new Wh(500, 200),
+};
+
+interface PerfResultProps {
+    record: PerfRecord
+}
+
+const PerfResultView = (props: PerfResultProps) => (
+    <div>
+        Built {props.record.wh.w} x {props.record.wh.h} board
+        in {props.record.elapsed} ms.
+        | {props.record.n} cells at {props.record.nPerMs} cells per ms
+    </div>
+);
+
+interface WhInputProps {
+    wh: Wh;
+    onChange: (wh: Wh) => void;
+    onTest: (wh: Wh) => void;
+}
+
+interface NumberInputProps {
     label: string;
     value: number;
     onChange: (x: number) => void;
 }
 
-export const NumberInput = (props: NumberInputProps) => (
+const NumberInput = (props: NumberInputProps) => (
     <label>{props.label}: <input type="number" value={props.value} onChange={
         (e: React.ChangeEvent<HTMLInputElement>) => {
             const str = e.currentTarget.value;

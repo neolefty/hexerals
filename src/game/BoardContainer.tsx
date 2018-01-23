@@ -1,7 +1,9 @@
 import * as assert from 'assert';
-import {connect, Dispatch} from 'react-redux';
-import {BoardAction, MovePlayer, movePlayerAction, PlaceCursor, placeCursorAction} from './BoardActions';
+import {connect} from 'react-redux';
+import {Dispatch} from 'redux';
+
 import {Board, Move} from './Board';
+import {BoardAction, MovePlayer, movePlayerAction, PlaceCursor, placeCursorAction} from './BoardActions';
 import {BoardView} from './BoardView';
 import {INITIAL_STATE, MOVE_PLAYER, PLACE_CURSOR} from './Constants';
 import {HexCoord} from './Hex';
@@ -30,6 +32,7 @@ export const BoardContainer = connect(mapStateToBoardProps, mapDispatchToBoardPr
     BoardView
 );
 
+// the more succinct but less typescript-y way
 // export function boardReducer(state: BoardState, action: BoardAction): BoardState {
 //     switch(action.type) {
 //         case MOVE_PLAYER:
