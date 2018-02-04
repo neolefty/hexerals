@@ -7,7 +7,7 @@ import * as Adapter from 'enzyme-adapter-react-16';
 import { placeCursorAction, movePlayerAction } from './BoardActions';
 import { Board, Player, Spot } from './Board';
 import { BoardReducer, BoardState } from './BoardContainer';
-import { BoardView, SpotView } from './BoardView';
+import { OldGridView, SpotView } from './BoardView';
 import { INITIAL_STATE } from './Constants';
 import { HexCoord } from './Hex';
 
@@ -29,7 +29,7 @@ it('renders a board with no selection', () => {
     const n = 3; // ++* / ++ / *++
     const board = Board.constructSquare(n, 3);
     const view = enzyme.render(
-        <BoardView
+        <OldGridView
             board={board}
             cursor={HexCoord.NONE}
             onPlaceCursor={() => {}}
@@ -53,7 +53,7 @@ it('renders a board with a selection', () => {
     const board = Board.constructSquare(3, 2);
     const ur = board.edges.upperRight;
     const view = enzyme.render(
-        <BoardView
+        <OldGridView
             board={board}
             cursor={ur}
             onPlaceCursor={() => {}}

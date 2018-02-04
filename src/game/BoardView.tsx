@@ -26,13 +26,45 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'd': HexCoord.RIGHT_DOWN,
 });
 
-// TODO enable way to find SpotView based on coord? Or is that only useful for testing?
-export class BoardView extends Component<BoardProps> {
+export const BoardView = (props: BoardProps) => (
+    <div>
+        <OldGridView {...props}/>
+        <FlatTopHexView {...props}/>
+    </div>
+);
+
+class BoardBase extends Component<BoardProps> {
     constructor(props: BoardProps) {
         super(props);
         this.onKeyDown = this.onKeyDown.bind(this);
     }
 
+    onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
+        if (this.props.onMovePlayer && this.props.cursor !== HexCoord.NONE) {
+            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
+            if (delta !== HexCoord.NONE) {
+                const dest = this.props.cursor.plus(delta);
+                if (this.props.board.inBounds(dest)) {
+                    this.props.onMovePlayer(delta);
+                    e.preventDefault();
+                }
+            }
+        }
+    }
+}
+
+export class FlatTopHexView extends BoardBase {
+    render(): React.ReactNode {
+        return (
+            <svg width="800" height="300">
+                <line x1="20" y1="20" x2="780" y2="280" stroke="green" strokeWidth="10" strokeLinecap="round"/>
+                <line x1="20" y2="20" x2="780" y1="280" stroke="blue" strokeWidth="10" strokeLinecap="round"/>
+            </svg>
+        );
+    }
+}
+
+export class OldGridView extends BoardBase {
     render(): React.ReactNode {
         return (
             <div
@@ -67,19 +99,6 @@ export class BoardView extends Component<BoardProps> {
                 }
             </div>
         );
-    }
-
-    onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
-        if (this.props.onMovePlayer && this.props.cursor !== HexCoord.NONE) {
-            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
-            if (delta !== HexCoord.NONE) {
-                const dest = this.props.cursor.plus(delta);
-                if (this.props.board.inBounds(dest)) {
-                    this.props.onMovePlayer(delta);
-                    e.preventDefault();
-                }
-            }
-        }
     }
 }
 
