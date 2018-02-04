@@ -74,18 +74,16 @@ export interface PerfProps extends PerfState {
     onQueue: () => void;
 }
 
-const PerfTest = (props: PerfProps) => {
-    return (
-        <div>
-            <WhInput wh={props.inputs} onChange={props.onChange} onTest={props.onQueue}/>
-            {
-                props.history.map((record: PerfRecord, index: number) => (
-                    <PerfResultView record={record} key={index} />
-                ))
-            }
-        </div>
-    );
-};
+const PerfTest = (props: PerfProps) => (
+    <div>
+        <WhInput wh={props.inputs} onChange={props.onChange} onTest={props.onQueue}/>
+        {
+            props.history.map((record: PerfRecord, index: number) => (
+                <PerfResultView record={record} key={index} />
+            ))
+        }
+    </div>
+);
 
 export const PerfContainer = connect(mapStateToPerfProps, mapDispatchToPerfProps)(
     PerfTest
