@@ -16,14 +16,17 @@ it('renders a spot', () => {
     const board = Board.constructSquare(3, 5);
     const view = enzyme.render(
         <SpotView
-            spot={board.getSpot(HexCoord.ORIGIN)} key={0} selected={false}
+            spot={board.getSpot(HexCoord.ORIGIN)}
+            key={0}
+            selected={false}
+            coord={HexCoord.ORIGIN}
         />
     );
     expect(view.text()).toEqual('5');
 });
 
 it('renders a board with no selection', () => {
-    const n = 3; // *** / ** / ***
+    const n = 3; // ++* / ++ / *++
     const board = Board.constructSquare(n, 3);
     const view = enzyme.render(
         <BoardView
@@ -36,9 +39,11 @@ it('renders a board with no selection', () => {
     expect(view.children().length).toEqual(n);  // n rows
     const spots = view.find('.spot');
     expect(spots.length).toEqual(8);
-    expect(spots.text()).toEqual(('300'+'00'+'003'));
-    expect(spots.first().text()).toEqual('3');
-    expect(spots[0].attribs['title']).toEqual(Player.Compy);
+    expect(spots.first().text()).toEqual('0');
+    expect(spots.first().next().next().text()).toEqual('3');
+    expect(spots.text()).toEqual(('003'+'00'+'300'));
+    expect(spots[2].attribs['title'].substr(0, String(Player.Human).length))
+        .toEqual(String(Player.Human));
     // none are selected
     expect(view.find('.active').length).toEqual(0);
 });
@@ -46,11 +51,11 @@ it('renders a board with no selection', () => {
 it('renders a board with a selection', () => {
     // select lower-right corner
     const board = Board.constructSquare(3, 2);
-    const lr = board.constraints.extreme(c => - c.cartY() - c.cartX());
+    const ur = board.edges.upperRight;
     const view = enzyme.render(
         <BoardView
             board={board}
-            cursor={lr}
+            cursor={ur}
             onPlaceCursor={() => {}}
             onMovePlayer={() => {}}
         />
@@ -62,26 +67,27 @@ it('renders a board with a selection', () => {
 
 it('clicks a spot to select it', () => {
     const board = Board.constructSquare(3, 6);
-    const spot = board.getSpot(board.constraints.extreme(c => - c.cartX() - c.cartY()));
-    const props = {
-        spot: spot,
+    const coord = board.constraints.extreme(c => - c.cartX() - c.cartY());
+    const spot = board.getSpot(coord);
+    const state = {
         selected: false,
-        onSelect: () => props.selected = true,
     };
 
     const spotWrap = shallow(<SpotView
-        spot={props.spot}
-        selected={props.selected}
-        onSelect={props.onSelect}
+        spot={spot}
+        coord={coord}
+        selected={state.selected}
+        onSelect={() => state.selected = true}
     />);
 
     expect(spotWrap.hasClass('active')).toBeFalsy();
     spotWrap.simulate('click');
-    expect(props.selected).toBeTruthy();
+    expect(state.selected).toBeTruthy();
 
     // have to recreate since rendering above uses static reference to props.selected
-    expect(shallow(<SpotView spot={props.spot} selected={props.selected}/>)
-        .hasClass('active')).toBeTruthy();
+    expect(shallow(
+        <SpotView spot={spot} selected={true} coord={coord}/>
+    ).hasClass('active')).toBeTruthy();
 });
 
 it('controls game flow via react-redux', () => {
@@ -91,56 +97,59 @@ it('controls game flow via react-redux', () => {
     expect(store.getState().board.spots.size).toEqual(n);
     expect(store.getState().board.spots.get(HexCoord.ORIGIN).pop).toEqual(pop);
 
-    // mover steps moves 1 space to the left
+    // mover steps moves 1 space down
     const mover = (alsoCursor=true) =>
-        store.dispatch(movePlayerAction(HexCoord.LEFT, alsoCursor));
+        store.dispatch(movePlayerAction(HexCoord.DOWN, alsoCursor));
     const curSpot = () => store.getState().board.getSpot(store.getState().cursor);
 
     expect(mover).toThrowError();  // no cursor
     // place cursor outside bounds
-    expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT))).toThrowError();
+    expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT_UP))).toThrowError();
 
-    // place cursor at right bottom
-    const lr = store.getState().board.edges.lowerRight;
-    store.dispatch(placeCursorAction(lr));
-    expect(store.getState().cursor).toBe(lr);
-    expect(store.getState().board.getSpot(lr.getLeft()).pop).toBe(0);
+    // place cursor at upper right
+    const ur = store.getState().board.edges.upperRight;
+    store.dispatch(placeCursorAction(ur));
+    expect(store.getState().cursor).toBe(ur);
+    expect(store.getState().board.getSpot(ur.getDown()).pop).toBe(0);
     const before = store.getState().board;
     mover();
     const after = store.getState().board;
     expect(before).not.toBe(after);  // board updated
-    expect(store.getState().cursor).toBe(lr.getLeft());
+    expect(store.getState().cursor).toBe(ur.getDown());
 
     // can't move more than 1 space
-    const left2 = HexCoord.LEFT.getLeft();
-    const dest2 = store.getState().cursor.plus(left2);
+    const down2 = HexCoord.DOWN.getDown();
+    const dest2 = store.getState().cursor.plus(down2);
     // even though the destination is in bounds
     expect((store.getState().board.inBounds(dest2)));
-    expect(() => store.dispatch(movePlayerAction(left2))).toThrowError();
+    expect(() => store.dispatch(movePlayerAction(down2))).toThrowError();
     expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
 
-    expect(store.getState().cursor).toBe(lr.getLeft());
+    expect(store.getState().cursor).toBe(ur.getDown());
     expect(curSpot()).toEqual(new Spot(Player.Human, pop - 1));
 
     mover(false);
-    expect(store.getState().cursor).toBe(lr.getLeft());  // didn't move cursor this time
-    const ul = HexCoord.ORIGIN;
+    expect(store.getState().cursor).toBe(ur.getDown());  // didn't move cursor this time
+
+    const ll = HexCoord.ORIGIN;  // lower left
     const board = store.getState().board;
-    expect(board.getSpot(ul)).toEqual(new Spot(Player.Compy, pop));
-    const leftFromRB = (n: number) => board.getSpot(lr.plus(HexCoord.LEFT.times(n)));
+    expect(board.getSpot(ll)).toEqual(new Spot(Player.Compy, pop));
+
+    const downFromUR = (n: number) =>
+        board.getSpot(ur.plus(HexCoord.DOWN.times(n)));
     const human1 = new Spot(Player.Human, 1);
-    expect(leftFromRB(0)).toEqual(human1);
-    expect(leftFromRB(1)).toEqual(human1);
-    expect(leftFromRB(2)).toEqual(new Spot(Player.Human, pop-2));
-    expect(leftFromRB(3)).toEqual(new Spot(Player.Nobody, 0));
-    expect(leftFromRB(3)).toBe(Spot.BLANK);
+    expect(downFromUR(0)).toEqual(human1);
+    expect(downFromUR(1)).toEqual(human1);
+    expect(downFromUR(2)).toEqual(new Spot(Player.Human, pop-2));
+    expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0));
+    expect(downFromUR(3)).toBe(Spot.BLANK);
 
     // moving pop 1 has no effect
-    store.dispatch(placeCursorAction(lr.getLeft()));
+    store.dispatch(placeCursorAction(ur.getDown()));
     expect(store.getState().board.getSpot(store.getState().cursor)).toEqual(human1);
     const before2 = store.getState().board;
     mover();
-    expect(store.getState().board.spots.get(lr.getLeft()).pop).toBe(1);
+    expect(store.getState().board.spots.get(ur.getDown()).pop).toBe(1);
     // move had no effect, so board not updated
     expect(store.getState().board).toBe(before2);
 

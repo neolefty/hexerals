@@ -1,17 +1,42 @@
+import * as assert from 'assert';
 import {List} from 'immutable';
-import {Board, Spot} from './Board';
+import {Board, Player, Spot} from './Board';
 import {BoardConstraints, HexCoord} from './Hex';
+
+export function printBoard(board: Board) {
+    let out = '';
+    board.edges.yRange().reverse().forEach((y: number) => {
+        let line = '';
+        board.edges.xRange().forEach((x: number) => {
+            let c = ' ';
+            if ((x + y) % 2 === 0 && board.inBounds(HexCoord.getCart(x, y))) {
+                const spot = board.getCartSpot(x, y);
+                if (spot.owner === Player.Human)
+                    c = spot.pop === 0 ? 'o' : (spot.pop === 1 ? 'p' : 'P');
+                else if (spot.owner === Player.Compy)
+                    c = spot.pop === 0 ? '=' : (spot.pop === 1 ? 'c' : 'C');
+                else
+                    c = '-';
+            }
+            line += c;
+        });
+        out += line + '\n';
+        // console.log(line);
+    });
+    console.log(out);
+}
+
+it('passes', () => {});
 
 it('checks rectangular board geometry', () => {
     expect(Board.constructSquare(5).constraints.all().size)
         .toBe(5 * 3 + 4 * 2);
+
     expect(Board.constructRectangular(10, 20).constraints.all().size)
         .toBe(10 * 10 + 10 * 9);
     const fiveByFour = Board.constructRectangular(5, 4);
-    // * * * * *
-    //  * * * *
-    // * * * * *
-    //  * * * *  <-- lower-right is at cartesian (7, 3)
+    // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
+    // _ - _ - _ - _ - _
     expect(fiveByFour.constraints.extreme(x => x.cartX()).cartX()).toBe(0);  // left 0
     expect(fiveByFour.constraints.extreme(x => x.cartY()).cartY()).toBe(0);  // top 0
     expect(fiveByFour.constraints.extreme(x => - x.cartX()).cartX()).toBe(8);  // right 8
@@ -28,10 +53,19 @@ it('checks rectangular board geometry', () => {
         .toEqual(List<number>([0, 1, 2, 3, 4, 5, 6, 7, 8]));
     expect(List<number>(fiveByFour.edges.yRange()))
         .toEqual(List<number>([0, 1, 2, 3]));
-    expect(fiveByFour.edges.lowerLeft).toBe(HexCoord.getCart(1, 3));
-    expect(fiveByFour.edges.lowerRight).toBe(HexCoord.getCart(7, 3));
-    expect(fiveByFour.edges.upperRight).toBe(HexCoord.getCart(8, 0));
-    expect(fiveByFour.edges.upperLeft).toBe(HexCoord.ORIGIN);
+
+    // for some reason, these both cause a stack overflow:
+    // expect(upperLeft).toBe(HexCoord.ORIGIN);
+    // expect(upperLeft).toEqual(HexCoord.ORIGIN);
+    expect(fiveByFour.edges.upperLeft === HexCoord.ORIGIN).toBeFalsy();
+    expect(fiveByFour.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy();
+    expect(fiveByFour.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy();
+    expect(fiveByFour.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy();
+    expect(fiveByFour.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy();
+    // expect(fiveByFour.edges.upperLeft).toBe(HexCoord.getCart(1, 3));
+    // expect(fiveByFour.edges.upperRight).toBe(HexCoord.getCart(7, 3));
+    // expect(fiveByFour.edges.lowerRight).toBe(HexCoord.getCart(8, 0));
+    // expect(fiveByFour.edges.lowerLeft).toBe(HexCoord.ORIGIN);
 });
 
 it('converts between hex and cartesian coords', () => {
@@ -52,7 +86,8 @@ it('converts between hex and cartesian coords', () => {
     expect(metaCartSpot(0, h)).toThrow();  // out of bounds
 
     const midHex = HexCoord.getCart(6, 2);
-    expect(midHex).toBe(HexCoord.get(2, -4, 2));
+    expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy();
+    // expect(midHex).toBe(HexCoord.get(6, -2, -4));
     expect(tenByFive.getCartSpot(6, 2)).toBe(Spot.BLANK);
 });
 
@@ -63,15 +98,27 @@ it('navigates around a board', () => {
     expect(sixByTen.inBounds(HexCoord.NONE)).toBeFalsy();
     expect(sixByTen.constraints.all().contains(HexCoord.NONE)).toBeFalsy();
 
-    // walk from origin RIGHT to the edge
+    // staggered walk from origin to the right edge
     let c = HexCoord.ORIGIN;
-    while (sixByTen.inBounds(c)) {
-        c = c.getRight();
+    while (sixByTen.inBounds(c.getRightUp().getRightDown())) {
+        c = c.getRightUp().getRightDown();
         expect(sixByTen.constraints.all().contains(c));
     }
-    expect(c.x).toBe(6);
+    expect(c === sixByTen.edges.lowerRight).toBeTruthy();
+    assert(c === sixByTen.edges.lowerRight);
+    expect(c).toEqual(sixByTen.edges.lowerRight);
+    expect(c).toBe(sixByTen.edges.lowerRight);
+    expect(c.x).toBe(10);
 
     expect(
-        HexCoord.ORIGIN.plus(HexCoord.LEFT_DOWN).plus(HexCoord.LEFT)
-    ).toBe(HexCoord.getCart(-3, 1));
+        HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
+    ).toBe(HexCoord.getCart(1, 3));
+    // This causes a stack overflow in V8, where === does not. Why?
+    // See jest source code -- packages/expect/matchers.js and
+    // possibly packages/jest-matcher-utils/src. Could stringification be
+    // the culprit, maybe with HexCoord.neighborsCache? Is there a way to hide that?
+    // Or is it something else (probably)?
+    // expect(
+    //     HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
+    // ).toBe(HexCoord.getCart(1, 5));
 });

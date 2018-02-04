@@ -15,17 +15,17 @@ export class HexCoord {
     static readonly ORIGIN = HexCoord.get(0, 0, 0);
 
     // neighbor directions
-    static readonly RIGHT = HexCoord.get(1, -1, 0);
+    static readonly RIGHT_DOWN = HexCoord.get(1, -1, 0);
     static readonly RIGHT_UP = HexCoord.get(1, 0, -1);
-    static readonly LEFT_UP = HexCoord.get(0, 1, -1);
-    static readonly LEFT = HexCoord.get(-1, 1, 0);
+    static readonly UP = HexCoord.get(0, 1, -1);
+    static readonly DOWN = HexCoord.get(0, -1, 1);
+    static readonly LEFT_UP = HexCoord.get(-1, 1, 0);
     static readonly LEFT_DOWN = HexCoord.get(-1, 0, 1);
-    static readonly RIGHT_DOWN = HexCoord.get(0, -1, 1);
 
     // TODO test consistency
     static readonly DIRECTIONS: List<HexCoord> = List([
-        HexCoord.RIGHT, HexCoord.RIGHT_UP, HexCoord.LEFT_UP,
-        HexCoord.LEFT, HexCoord.LEFT_DOWN, HexCoord.RIGHT_DOWN,
+        HexCoord.RIGHT_DOWN, HexCoord.RIGHT_UP, HexCoord.UP,
+        HexCoord.LEFT_UP, HexCoord.LEFT_DOWN, HexCoord.DOWN,
     ]);
 
     // useful as a key in react components
@@ -67,7 +67,7 @@ export class HexCoord {
     // In other words, (x + y) must be even.
     static getCart(cx: number, cy: number): HexCoord {
         assert((cx + cy) % 2 === 0);
-        return HexCoord.get((cx - cy) / 2, - (cx + cy) / 2, cy);
+        return HexCoord.get(cx, (cy - cx) / 2, - (cy + cx) / 2);
     }
 
     plus(that: HexCoord): HexCoord {
@@ -78,6 +78,7 @@ export class HexCoord {
         return HexCoord.get(this.x * n, this.y * n, this.z * n);
     }
 
+    // Maximum of absolute values of all three axes.
     // Note: Useful for Manhattan hex distance -- a.minus(b).maxAbs().
     maxAbs() {
         // noinspection JSSuspiciousNameCombination
@@ -93,21 +94,21 @@ export class HexCoord {
         return this.neighborsCache;
     }
 
-    getRight(): HexCoord { return this.plus(HexCoord.RIGHT); }
     getRightUp(): HexCoord { return this.plus(HexCoord.RIGHT_UP); }
     getRightDown(): HexCoord { return this.plus(HexCoord.RIGHT_DOWN); }
-    getLeft(): HexCoord { return this.plus(HexCoord.LEFT); }
+    getDown(): HexCoord { return this.plus(HexCoord.DOWN); }
     getLeftDown(): HexCoord { return this.plus(HexCoord.LEFT_DOWN); }
     getLeftUp(): HexCoord { return this.plus(HexCoord.LEFT_UP); }
+    getUp(): HexCoord { return this.plus(HexCoord.UP); }
 
     // TODO test consistency -- maybe randomly create coords and navigate nearby using both hex & cartesian coords
     // convert to rectangular X, assuming flat-topped hexagons twice as wide as high
-    cartX(): number { return this.x - this.y; }
+    cartX(): number { return this.x; } // was x - y
 
     // convert to rectangular Y, assuming flat-topped hexagons twice as wide as high
-    cartY(): number { return this.z; }
+    cartY(): number { return this.y - this.z; } // was z
 
-    toString(includeCart: boolean = false) {
+    toString(includeCart: boolean = true) {
         return `[${ this.x },${ this.y },${ this.z }]${ includeCart ? ' ' + this.toCartString() : '' }`;
     }
 
@@ -133,31 +134,31 @@ export class RectEdges {
     readonly width: number;
     readonly height: number;
 
-    readonly upperLeft: HexCoord;
-    readonly upperRight: HexCoord;
-    readonly lowerLeft: HexCoord;
-    readonly lowerRight: HexCoord;
+    readonly lowerLeft: HexCoord; // (0, 0)
+    readonly lowerRight: HexCoord; // (2(w-1), 0)
+    readonly upperLeft: HexCoord; // (0, h-1)
+    readonly upperRight: HexCoord; // (2(w-1), h-1)
 
     constructor(constraints: BoardConstraints) {
-        this.left = constraints.extreme(x => x.cartX()).cartX();
-        this.right = constraints.extreme(x => -x.cartX()).cartX();
-        this.top = constraints.extreme(x => x.cartY()).cartY();
-        this.bottom = constraints.extreme(x => -x.cartY()).cartY();
+        this.left = constraints.extreme(h => h.cartX()).cartX(); // min x
+        this.right = constraints.extreme(h => -h.cartX()).cartX(); // max x
+        this.bottom = constraints.extreme(h => h.cartY()).cartY(); // min y
+        this.top = constraints.extreme(h => -h.cartY()).cartY(); // max y
 
-        this.height = (this.bottom - this.top) + 1;
+        this.height = (this.top - this.bottom) + 1;
         this.width = (this.right - this.left) + 1;
 
-        this.upperLeft = constraints.extreme(
-            h => h.cartY() * this.width + h.cartX()
+        this.lowerLeft = constraints.extreme(
+            h => h.cartY() * this.width + h.cartX() // min y, min x
         );
         this.lowerRight = constraints.extreme(
-            h => - (h.cartY() * this.width + h.cartX())
+            h => h.cartY() * this.width - h.cartX() // min y, max x
+        );
+        this.upperLeft = constraints.extreme(
+            h => - h.cartY() * this.width + h.cartX() // max y, min x
         );
         this.upperRight = constraints.extreme(
-            h => h.cartY() * this.width - h.cartX()
-        );
-        this.lowerLeft = constraints.extreme(
-            h => - h.cartY() * this.width + h.cartX()
+            h => - h.cartY() * this.width - h.cartX() // max y, max x
         );
     }
 
@@ -166,7 +167,7 @@ export class RectEdges {
     }
 
     yRange(): Seq.Indexed<number> {
-        return Range(this.top, this.bottom + 1);
+        return Range(this.bottom, this.top + 1);
     }
 }
 
@@ -246,9 +247,11 @@ export abstract class BoardConstraints {
 }
 
 // Defines a board of hexes with an overall rectangular shape.
-// If height and width are H and W, then the corners are
-// (0,0,0)      (w, -w, 0)
-// (-h/2, -h/2, h) (w-h/2, w-h/2, h)
+// If width and height are w and h, then -- assuming both are odd -- the corners are:
+// (0,0,0)      (w-1, -(w-1)/2, -(w-1)/2)
+// (0, -(h-1), h-1) (w-1, -(w-1)/2 -(h-1), -(w-1)/2 +(h-1))
+//
+// General formula: (cx, (cy - cx) / 2, - (cy + cx) / 2)
 export class RectangularConstraints extends BoardConstraints {
     constructor(readonly w: number, readonly h: number) {
         super();
@@ -266,6 +269,9 @@ export class RectangularConstraints extends BoardConstraints {
             //   * * * * *
             //    * * * *
             //   * * * * *
+            // - _ - _ - _ - _ -
+            // - _ - _ - _ - _ -
+            // -    -   -    -    -
             && x >= 0 && x < this.w * 2 - 1
         );
     }

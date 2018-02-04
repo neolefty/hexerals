@@ -97,7 +97,7 @@ export class Board {
         return this.spots.get(coord, Spot.BLANK);
     }
 
-    getCartSpot(cx: number, cy: number): Spot | undefined {
+    getCartSpot(cx: number, cy: number): Spot {
         assert((cx + cy) % 2 === 0);
         return this.getSpot(HexCoord.getCart(cx, cy));
     }

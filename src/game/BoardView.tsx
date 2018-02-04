@@ -14,13 +14,15 @@ interface BoardProps {
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
-    'ArrowLeft': HexCoord.LEFT,
-    'ArrowRight': HexCoord.RIGHT,
-    'a': HexCoord.LEFT,
-    'f': HexCoord.RIGHT,
-    'w': HexCoord.LEFT_UP,
+    'ArrowLeft': HexCoord.LEFT_UP,
+    'ArrowRight': HexCoord.RIGHT_DOWN,
+    'ArrowUp': HexCoord.UP,
+    'ArrowDown': HexCoord.DOWN,
+    'q': HexCoord.LEFT_UP,
+    'a': HexCoord.LEFT_DOWN,
+    'w': HexCoord.UP,
+    's': HexCoord.DOWN,
     'e': HexCoord.RIGHT_UP,
-    's': HexCoord.LEFT_DOWN,
     'd': HexCoord.RIGHT_DOWN,
 });
 
@@ -39,7 +41,7 @@ export class BoardView extends Component<BoardProps> {
                 onKeyDown={this.onKeyDown}
             >
                 {
-                    this.props.board.edges.yRange().map((cy: number) => (
+                    this.props.board.edges.yRange().reverse().map((cy: number) => (
                         <div key={cy}>
                             {
                                 this.props.board.edges.xRange().filter( // remove nonexistent
@@ -55,6 +57,7 @@ export class BoardView extends Component<BoardProps> {
                                             key={coord.id}
                                             selected={coord === this.props.cursor}
                                             onSelect={() => this.props.onPlaceCursor(coord)}
+                                            coord={coord}
                                         />
                                     )
                                 )
@@ -83,6 +86,7 @@ export class BoardView extends Component<BoardProps> {
 interface SpotProps {
     spot: Spot;
     selected: boolean;
+    coord: HexCoord;
 
     onSelect?: () => void;
 }
@@ -93,7 +97,7 @@ const spotStyle = (props: SpotProps) =>
 export const SpotView = (props: SpotProps) => (
     <span
         className={spotStyle(props)}
-        title={props.spot.owner}
+        title={props.spot.owner + ' - ' + props.coord.toString(true)}
         // onClick={props.onSelect}
         onClick={(/*e*/) => props.onSelect && props.onSelect()}
     >

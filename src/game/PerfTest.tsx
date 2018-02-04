@@ -79,8 +79,8 @@ const PerfTest = (props: PerfProps) => {
         <div>
             <WhInput wh={props.inputs} onChange={props.onChange} onTest={props.onQueue}/>
             {
-                props.history.map((record: PerfRecord) => (
-                    <PerfResultView record={record} />
+                props.history.map((record: PerfRecord, index: number) => (
+                    <PerfResultView record={record} key={index} />
                 ))
             }
         </div>
@@ -101,8 +101,8 @@ const WhInput = (props: WhInputProps) => (
         />
         <NumberInput
             value={props.wh.h}
-            label="width"
-            key="width"
+            label="height"
+            key="height"
             onChange={h => props.onChange(new Wh(props.wh.w, h))}
         />
         <button onClick={() => props.onTest(props.wh)}>Test Performance</button>
