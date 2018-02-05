@@ -37,3 +37,13 @@
 }
 
 .Nobody {}
+
+polygon.Human {
+    fill: #de6;
+    stroke: #452;
+}
+
+polygon.Compy {
+    fill: #9cf;
+    stroke: #245;
+}

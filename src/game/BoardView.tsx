@@ -77,8 +77,8 @@ export class FlatTopHexView extends BoardBase {
         super(props);
         this.sqrt3half = 0.866; // 0.8660254;
         this.w = 550;
-        this.h = 300;
-        const widthMaxR = this.w / INITIAL_WIDTH * 0.5;
+        this.h = 200;
+        const widthMaxR = this.w / (INITIAL_WIDTH - 1/3) / 3;
         const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
         this.hexMid = this.hexRadius * 0.5;
@@ -91,8 +91,6 @@ export class FlatTopHexView extends BoardBase {
         // console.log('Hex at origin: ' + hexPoints(0, 0, hexRadius, hexMid, hexHalfHeight));
         return (
             <svg width={this.w} height={this.h}>
-                <line key="g" x1="20" y1="20" x2={this.w - 20} y2={this.h - 20} stroke="green" strokeWidth="10" strokeLinecap="round"/>
-                <line key="b" x1="20" y2="20" x2={this.w - 20} y1={this.h - 20} stroke="blue" strokeWidth="10" strokeLinecap="round"/>
                 <rect x="0" y="0" width={this.w} height={this.h} stroke="#777" fill="white" strokeWidth="3" />
                 <g id="hexMap"> {
                     // e[0]: HexCoord, e[1]: Spot
@@ -100,8 +98,9 @@ export class FlatTopHexView extends BoardBase {
                         <polygon
                             key={e[0].id}
                             id={'hex' + e[0].id}
+                            className={e[1].owner}
                             points={hexPoints(
-                                (e[0].cartX() + 1) * this.hexRadius, // x
+                                ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius, // x
                                 this.h - (e[0].cartY() + 1) * this.hexHalfHeight, // y
                                 this.hexRadius, this.hexMid, this.hexHalfHeight
                             )}
