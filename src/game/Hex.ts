@@ -28,11 +28,11 @@ export class HexCoord {
         HexCoord.LEFT_UP, HexCoord.LEFT_DOWN, HexCoord.DOWN,
     ]);
 
-    // useful as a key in react components
-    readonly id = HexCoord.ID++;
-
     // z: leftUp-rightDown
     readonly z: number;
+
+    // useful as a key in react components
+    readonly id = HexCoord.ID++;
 
     private neighborsCache?: List<HexCoord>;
 

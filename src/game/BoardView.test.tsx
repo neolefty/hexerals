@@ -7,7 +7,7 @@ import * as Adapter from 'enzyme-adapter-react-16';
 import { placeCursorAction, movePlayerAction } from './BoardActions';
 import { Board, Player, Spot } from './Board';
 import { BoardReducer, BoardState } from './BoardContainer';
-import { OldGridView, SpotView } from './BoardView';
+import { OldGridView, OldGridSpotView } from './BoardView';
 import { INITIAL_STATE } from './Constants';
 import { HexCoord } from './Hex';
 
@@ -15,7 +15,7 @@ it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
     const board = Board.constructSquare(3, 5);
     const view = enzyme.render(
-        <SpotView
+        <OldGridSpotView
             spot={board.getSpot(HexCoord.ORIGIN)}
             key={0}
             selected={false}
@@ -73,7 +73,7 @@ it('clicks a spot to select it', () => {
         selected: false,
     };
 
-    const spotWrap = shallow(<SpotView
+    const spotWrap = shallow(<OldGridSpotView
         spot={spot}
         coord={coord}
         selected={state.selected}
@@ -86,7 +86,7 @@ it('clicks a spot to select it', () => {
 
     // have to recreate since rendering above uses static reference to props.selected
     expect(shallow(
-        <SpotView spot={spot} selected={true} coord={coord}/>
+        <OldGridSpotView spot={spot} selected={true} coord={coord}/>
     ).hasClass('active')).toBeTruthy();
 });
 

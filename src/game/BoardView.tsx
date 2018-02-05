@@ -53,12 +53,43 @@ class BoardBase extends Component<BoardProps> {
     }
 }
 
+const hexPoints = (
+    x: number, y: number, hexRadius: number, hexMid: number, hexHalfHeight: number
+) => ''
+    + (x - hexRadius) + ',' + y + ' ' // left
+    + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
+    + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
+    // TODO only include this if nothing on that side?
+    + (x + hexRadius) + ',' + y + ' ' // right
+    + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
+    + (x - hexMid) + ',' + (y + hexHalfHeight); // down left
+
 export class FlatTopHexView extends BoardBase {
     render(): React.ReactNode {
+        const hexRadius = 15, sqrt3half = 0.866; // 0.8660254;
+        // TODO consider rounding height to integer
+        const hexMid = hexRadius * 0.5, hexHalfHeight = hexRadius * sqrt3half;
+        const w = 500, h = 300;
+        // console.log('Hex at origin: ' + hexPoints(0, 0, hexRadius, hexMid, hexHalfHeight));
         return (
-            <svg width="800" height="300">
-                <line x1="20" y1="20" x2="780" y2="280" stroke="green" strokeWidth="10" strokeLinecap="round"/>
-                <line x1="20" y2="20" x2="780" y1="280" stroke="blue" strokeWidth="10" strokeLinecap="round"/>
+            <svg width={w} height={h}>
+                <line key="g" x1="20" y1="20" x2={w - 20} y2={h - 20} stroke="green" strokeWidth="10" strokeLinecap="round"/>
+                <line key="b" x1="20" y2="20" x2={w - 20} y1={h - 20} stroke="blue" strokeWidth="10" strokeLinecap="round"/>
+                <g id="hexMap"> {
+                    // e[0]: HexCoord, e[1]: Spot
+                    this.props.board.spots.entrySeq().map(e => (
+                        <polygon
+                            key={e[0].id}
+                            id={'hex' + e[0].id}
+                            points={hexPoints(
+                                (e[0].cartX() + 1) * hexRadius, // x
+                                h - (e[0].cartY() + 1) * hexHalfHeight, // y
+                                hexRadius, hexMid, hexHalfHeight
+                            )}
+                        />
+                    ))
+                }
+                </g>
             </svg>
         );
     }
@@ -84,7 +115,7 @@ export class OldGridView extends BoardBase {
                                     (coord: HexCoord) => this.props.board.inBounds(coord)
                                 ).map(
                                     (coord: HexCoord) => (
-                                        <SpotView
+                                        <OldGridSpotView
                                             spot={this.props.board.getSpot(coord)}
                                             key={coord.id}
                                             selected={coord === this.props.cursor}
@@ -113,7 +144,7 @@ interface SpotProps {
 const spotStyle = (props: SpotProps) =>
     (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner;
 
-export const SpotView = (props: SpotProps) => (
+export const OldGridSpotView = (props: SpotProps) => (
     <span
         className={spotStyle(props)}
         title={props.spot.owner + ' - ' + props.coord.toString(true)}
