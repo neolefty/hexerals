@@ -1,6 +1,7 @@
 import { Map } from 'immutable';
 import { Component, KeyboardEvent } from 'react';
 import * as React from 'react';
+import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
 import { HexCoord } from './Hex';
 import { Spot, Board } from './Board';
 import './Board.css';
@@ -65,16 +66,34 @@ const hexPoints = (
     + (x - hexMid) + ',' + (y + hexHalfHeight); // down left
 
 export class FlatTopHexView extends BoardBase {
+    readonly w: number;
+    readonly h: number;
+    readonly hexRadius: number;
+    readonly sqrt3half: number;
+    readonly hexMid: number;
+    readonly hexHalfHeight: number;
+
+    constructor(props: BoardProps) {
+        super(props);
+        this.sqrt3half = 0.866; // 0.8660254;
+        this.w = 550;
+        this.h = 300;
+        const widthMaxR = this.w / INITIAL_WIDTH * 0.5;
+        const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
+        this.hexRadius = Math.min(widthMaxR, heightMaxR);
+        this.hexMid = this.hexRadius * 0.5;
+        this.hexHalfHeight = this.hexRadius * this.sqrt3half;
+    }
+
     render(): React.ReactNode {
-        const hexRadius = 15, sqrt3half = 0.866; // 0.8660254;
         // TODO consider rounding height to integer
-        const hexMid = hexRadius * 0.5, hexHalfHeight = hexRadius * sqrt3half;
-        const w = 500, h = 300;
+
         // console.log('Hex at origin: ' + hexPoints(0, 0, hexRadius, hexMid, hexHalfHeight));
         return (
-            <svg width={w} height={h}>
-                <line key="g" x1="20" y1="20" x2={w - 20} y2={h - 20} stroke="green" strokeWidth="10" strokeLinecap="round"/>
-                <line key="b" x1="20" y2="20" x2={w - 20} y1={h - 20} stroke="blue" strokeWidth="10" strokeLinecap="round"/>
+            <svg width={this.w} height={this.h}>
+                <line key="g" x1="20" y1="20" x2={this.w - 20} y2={this.h - 20} stroke="green" strokeWidth="10" strokeLinecap="round"/>
+                <line key="b" x1="20" y2="20" x2={this.w - 20} y1={this.h - 20} stroke="blue" strokeWidth="10" strokeLinecap="round"/>
+                <rect x="0" y="0" width={this.w} height={this.h} stroke="#777" fill="white" strokeWidth="3" />
                 <g id="hexMap"> {
                     // e[0]: HexCoord, e[1]: Spot
                     this.props.board.spots.entrySeq().map(e => (
@@ -82,9 +101,9 @@ export class FlatTopHexView extends BoardBase {
                             key={e[0].id}
                             id={'hex' + e[0].id}
                             points={hexPoints(
-                                (e[0].cartX() + 1) * hexRadius, // x
-                                h - (e[0].cartY() + 1) * hexHalfHeight, // y
-                                hexRadius, hexMid, hexHalfHeight
+                                (e[0].cartX() + 1) * this.hexRadius, // x
+                                this.h - (e[0].cartY() + 1) * this.hexHalfHeight, // y
+                                this.hexRadius, this.hexMid, this.hexHalfHeight
                             )}
                         />
                     ))
