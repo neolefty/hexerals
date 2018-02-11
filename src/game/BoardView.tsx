@@ -54,6 +54,7 @@ class BoardBase extends Component<BoardProps> {
     }
 }
 
+// a hexagon centered at (x, y)
 const hexPoints = (
     x: number, y: number, hexRadius: number, hexMid: number, hexHalfHeight: number
 ) => ''
@@ -78,7 +79,7 @@ export class FlatTopHexView extends BoardBase {
         this.sqrt3half = 0.866; // 0.8660254;
         this.w = 550;
         this.h = 200;
-        const widthMaxR = this.w / (INITIAL_WIDTH - 1/3) / 3;
+        const widthMaxR = this.w / (INITIAL_WIDTH - 1 / 3) / 3;
         const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
         this.hexMid = this.hexRadius * 0.5;
@@ -91,20 +92,36 @@ export class FlatTopHexView extends BoardBase {
         // console.log('Hex at origin: ' + hexPoints(0, 0, hexRadius, hexMid, hexHalfHeight));
         return (
             <svg width={this.w} height={this.h}>
-                <rect x="0" y="0" width={this.w} height={this.h} stroke="#777" fill="white" strokeWidth="3" />
+                <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
                 <g id="hexMap"> {
+                    // TODO render the selected spot last so that it is on top?
                     // e[0]: HexCoord, e[1]: Spot
                     this.props.board.spots.entrySeq().map(e => (
-                        <polygon
-                            key={e[0].id}
-                            id={'hex' + e[0].id}
-                            className={e[1].owner}
-                            points={hexPoints(
-                                ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius, // x
-                                this.h - (e[0].cartY() + 1) * this.hexHalfHeight, // y
-                                this.hexRadius, this.hexMid, this.hexHalfHeight
-                            )}
-                        />
+                        <g>
+                            <polygon
+                                key={e[0].id}
+                                id={'hex' + e[0].id}
+                                className={
+                                    'spot '
+                                    + e[1].owner
+                                    + ((e[0] === this.props.cursor) ? ' active' : '')
+                                }
+                                points={hexPoints(
+                                    ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius, // x
+                                    this.h - (e[0].cartY() + 1) * this.hexHalfHeight, // y
+                                    this.hexRadius, this.hexMid, this.hexHalfHeight
+                                )}
+                            />
+                            <text
+                                x={((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius}
+                                y={this.h - (e[0].cartY() + 0.6) * this.hexHalfHeight}
+                                fontFamily="Sans-Serif"
+                                fontSize={this.hexRadius * 0.9}
+                                textAnchor="middle"
+                            >
+                                {e[1].pop}
+                            </text>
+                        </g>
                     ))
                 }
                 </g>

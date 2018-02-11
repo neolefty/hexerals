@@ -38,6 +38,17 @@
 
 .Nobody {}
 
+/* SVG Styles */
+rect.mapBound {
+    stroke: #777;
+    stroke-width: 3px;
+    fill: white;
+}
+
+polygon.spot {
+    fill: #ccc;
+}
+
 polygon.Human {
     fill: #de6;
     stroke: #452;
@@ -46,4 +57,14 @@ polygon.Human {
 polygon.Compy {
     fill: #9cf;
     stroke: #245;
+}
+
+polygon.active {
+    stroke: #c33;
+    stroke-width: 3px;
+}
+
+polygon.spot:hover {
+    stroke: #666;
+    stroke-width: 3px;
 }
