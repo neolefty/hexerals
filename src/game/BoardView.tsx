@@ -37,6 +37,8 @@ export const BoardView = (props: BoardProps) => (
 class BoardBase extends Component<BoardProps> {
     constructor(props: BoardProps) {
         super(props);
+        // TODO capture keydown on SVG -- may have to attach to window background
+        // https://stackoverflow.com/questions/6747848/attaching-keyboard-events-to-an-svg-element-inside-html
         this.onKeyDown = this.onKeyDown.bind(this);
     }
 
@@ -96,33 +98,38 @@ export class FlatTopHexView extends BoardBase {
                 <g id="hexMap"> {
                     // TODO render the selected spot last so that it is on top?
                     // e[0]: HexCoord, e[1]: Spot
-                    this.props.board.spots.entrySeq().map(e => (
-                        <g>
-                            <polygon
-                                key={e[0].id}
-                                id={'hex' + e[0].id}
+                    this.props.board.spots.entrySeq().map(e => {
+                        const selected = e[0] === this.props.cursor;
+                        const x = ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius;
+                        const y = this.h - (e[0].cartY() + 1) * this.hexHalfHeight;
+                        return (
+                            <g
+                                onClick={(/*e*/) => this.props.onPlaceCursor(e[0])}
                                 className={
-                                    'spot '
-                                    + e[1].owner
-                                    + ((e[0] === this.props.cursor) ? ' active' : '')
+                                    e[1].owner
+                                    + " spot"
+                                    + (selected ? ' active' : '')
                                 }
-                                points={hexPoints(
-                                    ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius, // x
-                                    this.h - (e[0].cartY() + 1) * this.hexHalfHeight, // y
-                                    this.hexRadius, this.hexMid, this.hexHalfHeight
-                                )}
-                            />
-                            <text
-                                x={((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius}
-                                y={this.h - (e[0].cartY() + 0.6) * this.hexHalfHeight}
-                                fontFamily="Sans-Serif"
-                                fontSize={this.hexRadius * 0.9}
-                                textAnchor="middle"
                             >
-                                {e[1].pop}
-                            </text>
-                        </g>
-                    ))
+                                <polygon
+                                    key={e[0].id}
+                                    id={'hex' + e[0].id}
+                                    points={hexPoints(
+                                        x, y, this.hexRadius, this.hexMid, this.hexHalfHeight
+                                    )}
+                                />
+                                <text
+                                    x={x}
+                                    y={y + 0.35 * this.hexHalfHeight}
+                                    fontFamily="Sans-Serif"
+                                    fontSize={this.hexRadius * 0.9}
+                                    textAnchor="middle"
+                                >
+                                    {e[1].pop}
+                                </text>
+                            </g>
+                        )
+                    })
                 }
                 </g>
             </svg>

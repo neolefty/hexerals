@@ -45,26 +45,36 @@ rect.mapBound {
     fill: white;
 }
 
-polygon.spot {
+g.spot {
+    cursor: default;
+}
+
+g.spot polygon {
     fill: #ccc;
 }
 
-polygon.Human {
+g.Human polygon {
     fill: #de6;
     stroke: #452;
 }
 
-polygon.Compy {
+g.Compy polygon {
     fill: #9cf;
     stroke: #245;
 }
 
-polygon.active {
-    stroke: #c33;
+g.spot:hover polygon {
+    stroke: #666;
     stroke-width: 3px;
 }
 
-polygon.spot:hover {
-    stroke: #666;
-    stroke-width: 3px;
+/* TODO would be nice for active to take precedence over hover or something */
+g.active polygon {
+    stroke: #c33;
+    stroke-width: 2px;
+}
+
+g.active text {
+    fill: #a22;
+    font-weight: bold;
 }
