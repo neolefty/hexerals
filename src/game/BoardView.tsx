@@ -1,10 +1,11 @@
-import { Map } from 'immutable';
-import { Component, KeyboardEvent } from 'react';
+import {Map} from 'immutable';
 import * as React from 'react';
-import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
-import { HexCoord } from './Hex';
-import { Spot, Board } from './Board';
+import {Component, KeyboardEvent} from 'react';
+import {Board} from './Board';
 import './Board.css';
+import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
+import {HexCoord} from './Hex';
+// import {OldGridView} from './OldGridView';
 
 interface BoardProps {
     board: Board;
@@ -34,7 +35,7 @@ export const BoardView = (props: BoardProps) => (
     </div>
 );
 
-class BoardBase extends Component<BoardProps> {
+export class BoardBase extends Component<BoardProps> {
     constructor(props: BoardProps) {
         super(props);
         this.onKeyDown = this.onKeyDown.bind(this);
@@ -78,7 +79,7 @@ export class FlatTopHexView extends BoardBase {
         super(props);
         this.sqrt3half = 0.866; // 0.8660254;
         this.w = 600;
-        this.h = 400;
+        this.h = 1000;
         const widthMaxR = this.w / (INITIAL_WIDTH - 1 / 3) / 3;
         const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
@@ -136,63 +137,3 @@ export class FlatTopHexView extends BoardBase {
         );
     }
 }
-
-export class OldGridView extends BoardBase {
-    render(): React.ReactNode {
-        return (
-            <div
-                className="board"
-                tabIndex={0}
-                onKeyDown={this.onKeyDown}
-            >
-                {
-                    this.props.board.edges.yRange().reverse().map((cy: number) => (
-                        <div key={cy}>
-                            {
-                                this.props.board.edges.xRange().filter( // remove nonexistent
-                                    (cx: number) => (cx + cy) % 2 === 0
-                                ).map( // turn cartesian into hex
-                                    (cx: number) => HexCoord.getCart(cx, cy)
-                                ).filter( // only in-bounds
-                                    (coord: HexCoord) => this.props.board.inBounds(coord)
-                                ).map(
-                                    (coord: HexCoord) => (
-                                        <OldGridSpotView
-                                            spot={this.props.board.getSpot(coord)}
-                                            key={coord.id}
-                                            selected={coord === this.props.cursor}
-                                            onSelect={() => this.props.onPlaceCursor(coord)}
-                                            coord={coord}
-                                        />
-                                    )
-                                )
-                            }
-                        </div>
-                    ))
-                }
-            </div>
-        );
-    }
-}
-
-interface SpotProps {
-    spot: Spot;
-    selected: boolean;
-    coord: HexCoord;
-
-    onSelect?: () => void;
-}
-
-const spotStyle = (props: SpotProps) =>
-    (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner;
-
-export const OldGridSpotView = (props: SpotProps) => (
-    <span
-        className={spotStyle(props)}
-        title={props.spot.owner + ' - ' + props.coord.toString(true)}
-        // onClick={props.onSelect}
-        onClick={(/*e*/) => props.onSelect && props.onSelect()}
-    >
-        {props.spot.pop}
-    </span>
-);

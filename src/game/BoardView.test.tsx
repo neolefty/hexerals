@@ -7,9 +7,10 @@ import * as Adapter from 'enzyme-adapter-react-16';
 import { placeCursorAction, movePlayerAction } from './BoardActions';
 import { Board, Player, Spot } from './Board';
 import { BoardReducer, BoardState } from './BoardContainer';
-import { OldGridView, OldGridSpotView } from './BoardView';
+import { OldGridSpotView } from './OldGridView';
 import { INITIAL_STATE } from './Constants';
 import { HexCoord } from './Hex';
+import {OldGridView} from './OldGridView';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
