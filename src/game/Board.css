@@ -63,6 +63,11 @@ g.Compy polygon {
     stroke: #245;
 }
 
+g.Nobody polygon {
+    fill: #ddd;
+    stroke: #888;
+}
+
 g.spot:hover polygon {
     stroke: #666;
     stroke-width: 3px;

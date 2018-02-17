@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, Range } from 'immutable';
 import { Component, KeyboardEvent } from 'react';
 import * as React from 'react';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
@@ -31,6 +31,7 @@ export const BoardView = (props: BoardProps) => (
     <div>
         <OldGridView {...props}/>
         <FlatTopHexView {...props}/>
+        <HexTwo {...props}/>
     </div>
 );
 
@@ -79,8 +80,8 @@ export class FlatTopHexView extends BoardBase {
     constructor(props: BoardProps) {
         super(props);
         this.sqrt3half = 0.866; // 0.8660254;
-        this.w = 550;
-        this.h = 200;
+        this.w = 600;
+        this.h = 400;
         const widthMaxR = this.w / (INITIAL_WIDTH - 1 / 3) / 3;
         const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
@@ -93,28 +94,28 @@ export class FlatTopHexView extends BoardBase {
 
         // console.log('Hex at origin: ' + hexPoints(0, 0, hexRadius, hexMid, hexHalfHeight));
         return (
+            <div tabIndex={0} onKeyDown={this.onKeyDown}>
             <svg width={this.w} height={this.h}>
                 <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
                 <g id="hexMap"> {
-                    // TODO render the selected spot last so that it is on top?
-                    // e[0]: HexCoord, e[1]: Spot
-                    this.props.board.spots.entrySeq().map(e => {
-                        const selected = e[0] === this.props.cursor;
-                        const x = ((e[0].cartX() + 1) * 1.5 - 0.5) * this.hexRadius;
-                        const y = this.h - (e[0].cartY() + 1) * this.hexHalfHeight;
+                    // TODO: empty first,  then filled,  then cursor
+                    this.props.board.constraints.all().map(hex => {
+                        const spot = this.props.board.getSpot(hex);
+                        const selected = hex === this.props.cursor;
+                        const x = ((hex.cartX() + 1) * 1.5 - 0.5) * this.hexRadius;
+                        const y = this.h - (hex.cartY() + 1) * this.hexHalfHeight;
                         return (
                             <g
-                                onClick={(/*e*/) => this.props.onPlaceCursor(e[0])}
+                                onClick={(/*e*/) => this.props.onPlaceCursor(hex)}
                                 className={
-                                    e[1].owner
+                                    spot.owner
                                     + ' spot'
                                     + (selected ? ' active' : '')
                                 }
-                                key={e[0].id}
+                                key={hex.id}
                             >
                                 <polygon
-                                    key={e[0].id}
-                                    id={'hex' + e[0].id}
+                                    // id={'hex' + hex.id}
                                     points={hexPoints(
                                         x, y, this.hexRadius, this.hexMid, this.hexHalfHeight
                                     )}
@@ -126,7 +127,7 @@ export class FlatTopHexView extends BoardBase {
                                     fontSize={this.hexRadius * 0.9}
                                     textAnchor="middle"
                                 >
-                                    {e[1].pop}
+                                    {spot.pop}
                                 </text>
                             </g>
                         );
@@ -134,9 +135,100 @@ export class FlatTopHexView extends BoardBase {
                 }
                 </g>
             </svg>
+            </div>
         );
     }
 }
+
+export class HexTwo extends FlatTopHexView {
+    render(): React.ReactNode {
+        const out: string[] = [];
+        out.push(this.props.board.edges.upperLeft.toString() + ' -- ' + this.props.board.edges.upperRight.toString());
+        out.push(this.props.board.edges.lowerLeft.toString() + ' -- ' + this.props.board.edges.lowerRight.toString());
+        const sum = Range(1, 4).map((n: number) => {
+            out.push(`n = ${n}`);
+            return n;
+        }).reduce((r: number, n: number) => r + n, 0);
+        out.push(`sum = ${sum}`);
+        Range(1, 10).map((n: number) => out.push("one of ten"));
+        this.props.board.edges.yRange().reverse().map((cy: number) => {
+            out.push(`y = ${cy}`);
+        });
+        this.props.board.edges.xRange().map((cx: number) => {
+            out.push(`x = ${cx}`);
+        });
+        return (
+            <div tabIndex={0} onKeyDown={this.onKeyDown}>
+                <svg width={this.w} height={this.h}>
+                    <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
+                    <g id="hexMap"> {
+                        this.props.board.edges.yRange().reverse().map((cy: number) => {
+                                this.props.board.edges.xRange().filter( // remove nonexistent
+                                    (cx: number) => (cx + cy) % 2 === 0
+                                ).map( // turn cartesian into hex
+                                    (cx: number) => HexCoord.getCart(cx, cy)
+                                ).filter( // only in-bounds
+                                    (coord: HexCoord) => this.props.board.inBounds(coord)
+                                ).map(
+                                    (hex: HexCoord) => {
+                                        const spot = this.props.board.getSpot(hex);
+                                        const selected = hex === this.props.cursor;
+                                        const x = ((hex.cartX() + 1) * 1.5 - 0.5) * this.hexRadius;
+                                        const y = this.h - (hex.cartY() + 1) * this.hexHalfHeight;
+                                        out.push(`${hex} -- ${x}, ${y}`);
+                                        return (
+                                            <g
+                                                onClick={(/*e*/) => this.props.onPlaceCursor(hex)}
+                                                className={
+                                                    spot.owner
+                                                    + ' spot'
+                                                    + (selected ? ' active' : '')
+                                                }
+                                                key={hex.id}
+                                            >
+                                                <polygon
+                                                    // id={'hex' + hex.id}
+                                                    points={hexPoints(
+                                                        x, y, this.hexRadius, this.hexMid, this.hexHalfHeight
+                                                    )}
+                                                />
+                                                <text
+                                                    x={x}
+                                                    y={y + 0.35 * this.hexHalfHeight}
+                                                    fontFamily="Sans-Serif"
+                                                    fontSize={this.hexRadius * 0.9}
+                                                    textAnchor="middle"
+                                                >
+                                                    {spot.pop}
+                                                </text>
+                                            </g>
+                                        );
+                                    }
+                                );
+                            }
+                        )
+                    }
+                    </g>
+                </svg>
+                <Debug messages={out}/>
+            </div>
+        );
+    }
+}
+
+interface DebugProps {
+    messages: string[];
+}
+
+const Debug = (props: DebugProps) => (
+    <div>
+        {
+            props.messages.map((s, i) => (
+                <div key={i}>{s}</div>
+            ))
+        }
+    </div>
+);
 
 export class OldGridView extends BoardBase {
     render(): React.ReactNode {
