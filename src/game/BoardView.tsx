@@ -107,9 +107,10 @@ export class FlatTopHexView extends BoardBase {
                                 onClick={(/*e*/) => this.props.onPlaceCursor(e[0])}
                                 className={
                                     e[1].owner
-                                    + " spot"
+                                    + ' spot'
                                     + (selected ? ' active' : '')
                                 }
+                                key={e[0].id}
                             >
                                 <polygon
                                     key={e[0].id}
@@ -128,7 +129,7 @@ export class FlatTopHexView extends BoardBase {
                                     {e[1].pop}
                                 </text>
                             </g>
-                        )
+                        );
                     })
                 }
                 </g>
