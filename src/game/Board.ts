@@ -82,7 +82,7 @@ export class Board {
     //         // TODO test that overwriting works, at least
     //         positions.map((value: Spot, key: HexCoord) => {
     //             const oldSpot: Spot = mSpots.get(key, Spot.BLANK);
-    //             mSpots.set(key, new Spot(value.owner, value.pop, oldSpot.terrain));
+    //             mSpots.set(key, new Spot(value.owner, value.contents, oldSpot.terrain));
     //         });
     //     });
     //     return new Board(this.constraints, newSpots, this.edges);

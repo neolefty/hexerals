@@ -145,7 +145,7 @@ it('controls game flow via react-redux', () => {
     expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0));
     expect(downFromUR(3)).toBe(Spot.BLANK);
 
-    // moving pop 1 has no effect
+    // moving contents 1 has no effect
     store.dispatch(placeCursorAction(ur.getDown()));
     expect(store.getState().board.getSpot(store.getState().cursor)).toEqual(human1);
     const before2 = store.getState().board;

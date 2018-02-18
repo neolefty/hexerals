@@ -6,7 +6,7 @@ import './Board.css';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
 
-interface BoardProps {
+interface BoardViewProps {
     board: Board;
     cursor: HexCoord;
 
@@ -27,14 +27,14 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'd': HexCoord.RIGHT_DOWN,
 });
 
-export const BoardView = (props: BoardProps) => (
+export const BoardView = (props: BoardViewProps) => (
     <div>
-        <FlatTopHexView {...props}/>
+        <HexBoardView {...props}/>
     </div>
 );
 
-export class BoardBase extends Component<BoardProps> {
-    constructor(props: BoardProps) {
+export class BoardViewBase extends Component<BoardViewProps> {
+    constructor(props: BoardViewProps) {
         super(props);
         this.onKeyDown = this.onKeyDown.bind(this);
     }
@@ -53,36 +53,80 @@ export class BoardBase extends Component<BoardProps> {
     }
 }
 
-// a hexagon centered at (x, y)
-const hexPoints = (
-    x: number, y: number, hexRadius: number, hexMid: number, hexHalfHeight: number
-) => ''
-    + (x - hexRadius) + ',' + y + ' ' // left
-    + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
-    + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
-    // TODO only include this if nothing on that side?
-    + (x + hexRadius) + ',' + y + ' ' // right
-    + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
-    + (x - hexMid) + ',' + (y + hexHalfHeight); // down left
-
-export class FlatTopHexView extends BoardBase {
+export class HexBoardView extends BoardViewBase {
     readonly w: number;
     readonly h: number;
     readonly hexRadius: number;
-    readonly sqrt3half: number;
-    readonly hexMid: number;
-    readonly hexHalfHeight: number;
 
-    constructor(props: BoardProps) {
+    constructor(props: BoardViewProps) {
         super(props);
-        this.sqrt3half = 0.866; // 0.8660254;
         this.w = 600;
         this.h = 1000;
         const widthMaxR = this.w / (INITIAL_WIDTH - 1 / 3) / 3;
-        const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / this.sqrt3half;
+        const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / SQRT_3_HALF;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
-        this.hexMid = this.hexRadius * 0.5;
-        this.hexHalfHeight = this.hexRadius * this.sqrt3half;
+        this.filterNobody = this.filterNobody.bind(this);
+        this.filterPlayer = this.filterPlayer.bind(this);
+        this.filterCursor = this.filterCursor.bind(this);
+    }
+
+    filterNobody(hex: HexCoord): boolean {
+        return this.props.cursor !== hex
+            && this.props.board.getSpot(hex).owner === Player.Nobody;
+    }
+
+    filterPlayer(hex: HexCoord): boolean {
+        return this.props.cursor !== hex
+            && this.props.board.getSpot(hex).owner !== Player.Nobody;
+    }
+
+    filterCursor(hex: HexCoord): boolean {
+        return this.props.cursor === hex;
+    }
+
+    render(): React.ReactNode {
+        return (
+            <div tabIndex={0} onKeyDown={this.onKeyDown}>
+                <svg width={this.w} height={this.h}>
+                    <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
+                    <HexFilterBoardView
+                        filter={this.filterNobody}
+                        hexRadius={this.hexRadius}
+                        height={this.h}
+                        key={'nobody'}
+                        {...this.props}
+                    />
+                    <HexFilterBoardView
+                        filter={this.filterPlayer}
+                        hexRadius={this.hexRadius}
+                        height={this.h}
+                        key={'player'}
+                        {...this.props}
+                    />
+                    <HexFilterBoardView
+                        filter={this.filterCursor}
+                        hexRadius={this.hexRadius}
+                        height={this.h}
+                        key={'compy'}
+                        {...this.props}
+                    />
+                </svg>
+            </div>
+        );
+    }
+}
+
+interface FilterBoardViewProps extends BoardViewProps {
+    filter: (hex: HexCoord) => boolean;
+    hexRadius: number;
+    height: number;
+}
+
+const SQRT_3_HALF = 0.866; // 0.8660254;
+
+class HexFilterBoardView extends Component<FilterBoardViewProps> {
+    constructor(props: FilterBoardViewProps) {
+        super(props);
     }
 
     render(): React.ReactNode {
@@ -90,32 +134,28 @@ export class FlatTopHexView extends BoardBase {
         // TODO look into SVGFactory / SVGElement
         return (
             // div required to receive keyboard events
-            <div tabIndex={0} onKeyDown={this.onKeyDown}>
-            <svg width={this.w} height={this.h}>
-                <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
                 <g id="hexMap"> {
                     // TODO: draw empty first,  then filled,  then cursor
-                    this.props.board.constraints.all().map(hex => {
+                    // empty first
+                    this.props.board.constraints.all().filter(
+                        this.props.filter
+                    ).map(hex => {
                         const spot = this.props.board.getSpot(hex);
                         return (
                             <FlatTopHex
                                 key={hex.id}
                                 owner={spot.owner}
                                 selected={hex === this.props.cursor}
-                                centerX={((hex.cartX() + 1) * 1.5 - 0.5) * this.hexRadius}
-                                centerY={this.h - (hex.cartY() + 1) * this.hexHalfHeight}
-                                hexRadius={this.hexRadius}
-                                hexMid={this.hexMid}
-                                hexHalfHeight={this.hexHalfHeight}
+                                centerX={((hex.cartX() + 1) * 1.5 - 0.5) * this.props.hexRadius}
+                                centerY={this.props.height - (hex.cartY() + 1) * this.props.hexRadius * SQRT_3_HALF}
+                                hexRadius={this.props.hexRadius}
                                 onSelect={() => this.props.onPlaceCursor(hex)}
-                                pop={spot.pop}
+                                contents={spot.pop === 0 ? '' : `${spot.pop}`}
                             />
                         );
                     })
                 }
                 </g>
-            </svg>
-            </div>
         );
     }
 }
@@ -126,11 +166,23 @@ interface FlatTopHexProps {
     centerX: number;
     centerY: number;
     hexRadius: number;
-    hexMid: number;
-    hexHalfHeight: number;
     onSelect: () => void;
-    pop: number;
+    contents: string;
 }
+
+// a hexagon centered at (x, y)
+const hexPoints = (x: number, y: number, hexRadius: number) => {
+    const hexMid = hexRadius * 0.5;
+    const hexHalfHeight = hexRadius * SQRT_3_HALF;
+    return ''
+        + (x - hexRadius) + ',' + y + ' ' // left
+        + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
+        + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
+        // TODO only include this if nothing on that side?
+        + (x + hexRadius) + ',' + y + ' ' // right
+        + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
+        + (x - hexMid) + ',' + (y + hexHalfHeight); // down left
+};
 
 const FlatTopHex = (props: FlatTopHexProps) => (
     <g
@@ -142,19 +194,16 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         }
     >
         <polygon
-            // id={'hex' + hex.id}
-            points={hexPoints(
-                props.centerX, props.centerY, props.hexRadius, props.hexMid, props.hexHalfHeight
-            )}
+            points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
         />
         <text
             x={props.centerX}
-            y={props.centerY + 0.35 * props.hexHalfHeight}
+            y={props.centerY + 0.35 * SQRT_3_HALF * props.hexRadius}
             fontFamily="Sans-Serif"
             fontSize={props.hexRadius * 0.9}
             textAnchor="middle"
         >
-            {props.pop}
+            {props.contents}
         </text>
     </g>
 );

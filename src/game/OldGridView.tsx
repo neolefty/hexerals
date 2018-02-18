@@ -1,10 +1,10 @@
 import * as React from 'react';
 import {Spot} from './Board';
-import {BoardBase} from './BoardView';
+import {BoardViewBase} from './BoardView';
 import {HexCoord} from './Hex';
 import './Board.css';
 
-export class OldGridView extends BoardBase {
+export class OldGridView extends BoardViewBase {
     render(): React.ReactNode {
         return (
             <div
