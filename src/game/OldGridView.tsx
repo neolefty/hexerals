@@ -42,9 +42,9 @@ export class OldGridView extends BoardBase {
     }
 }
 
-export const OldGridSpotView = (props: SpotProps) => (
+export const OldGridSpotView = (props: OldGridSpotProps) => (
     <span
-        className={spotStyle(props)}
+        className={oldGridSpotStyle(props)}
         title={props.spot.owner + ' - ' + props.coord.toString(true)}
         // onClick={props.onSelect}
         onClick={(/*e*/) => props.onSelect && props.onSelect()}
@@ -53,7 +53,7 @@ export const OldGridSpotView = (props: SpotProps) => (
     </span>
 );
 
-interface SpotProps {
+interface OldGridSpotProps {
     spot: Spot;
     selected: boolean;
     coord: HexCoord;
@@ -61,5 +61,5 @@ interface SpotProps {
     onSelect?: () => void;
 }
 
-const spotStyle = (props: SpotProps) =>
+const oldGridSpotStyle = (props: OldGridSpotProps) =>
     (props.selected ? 'active ' : '') + 'spot ' + props.spot.owner;

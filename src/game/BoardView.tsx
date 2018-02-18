@@ -1,11 +1,10 @@
 import {Map} from 'immutable';
 import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
-import {Board} from './Board';
+import {Board, Player} from './Board';
 import './Board.css';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
-// import {OldGridView} from './OldGridView';
 
 interface BoardProps {
     board: Board;
@@ -30,7 +29,6 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
 
 export const BoardView = (props: BoardProps) => (
     <div>
-        {/*<OldGridView {...props}/>*/}
         <FlatTopHexView {...props}/>
     </div>
 );
@@ -89,7 +87,7 @@ export class FlatTopHexView extends BoardBase {
 
     render(): React.ReactNode {
         // TODO consider rounding height to integer
-
+        // TODO look into SVGFactory / SVGElement
         return (
             // div required to receive keyboard events
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
@@ -99,35 +97,19 @@ export class FlatTopHexView extends BoardBase {
                     // TODO: draw empty first,  then filled,  then cursor
                     this.props.board.constraints.all().map(hex => {
                         const spot = this.props.board.getSpot(hex);
-                        const selected = hex === this.props.cursor;
-                        const x = ((hex.cartX() + 1) * 1.5 - 0.5) * this.hexRadius;
-                        const y = this.h - (hex.cartY() + 1) * this.hexHalfHeight;
                         return (
-                            <g
-                                onClick={(/*e*/) => this.props.onPlaceCursor(hex)}
-                                className={
-                                    spot.owner
-                                    + ' spot'
-                                    + (selected ? ' active' : '')
-                                }
+                            <FlatTopHex
                                 key={hex.id}
-                            >
-                                <polygon
-                                    // id={'hex' + hex.id}
-                                    points={hexPoints(
-                                        x, y, this.hexRadius, this.hexMid, this.hexHalfHeight
-                                    )}
-                                />
-                                <text
-                                    x={x}
-                                    y={y + 0.35 * this.hexHalfHeight}
-                                    fontFamily="Sans-Serif"
-                                    fontSize={this.hexRadius * 0.9}
-                                    textAnchor="middle"
-                                >
-                                    {spot.pop}
-                                </text>
-                            </g>
+                                owner={spot.owner}
+                                selected={hex === this.props.cursor}
+                                centerX={((hex.cartX() + 1) * 1.5 - 0.5) * this.hexRadius}
+                                centerY={this.h - (hex.cartY() + 1) * this.hexHalfHeight}
+                                hexRadius={this.hexRadius}
+                                hexMid={this.hexMid}
+                                hexHalfHeight={this.hexHalfHeight}
+                                onSelect={() => this.props.onPlaceCursor(hex)}
+                                pop={spot.pop}
+                            />
                         );
                     })
                 }
@@ -137,3 +119,42 @@ export class FlatTopHexView extends BoardBase {
         );
     }
 }
+
+interface FlatTopHexProps {
+    owner: Player;
+    selected: boolean;
+    centerX: number;
+    centerY: number;
+    hexRadius: number;
+    hexMid: number;
+    hexHalfHeight: number;
+    onSelect: () => void;
+    pop: number;
+}
+
+const FlatTopHex = (props: FlatTopHexProps) => (
+    <g
+        onClick={(/*e*/) => props.onSelect()}
+        className={
+            props.owner
+            + ' spot'
+            + (props.selected ? ' active' : '')
+        }
+    >
+        <polygon
+            // id={'hex' + hex.id}
+            points={hexPoints(
+                props.centerX, props.centerY, props.hexRadius, props.hexMid, props.hexHalfHeight
+            )}
+        />
+        <text
+            x={props.centerX}
+            y={props.centerY + 0.35 * props.hexHalfHeight}
+            fontFamily="Sans-Serif"
+            fontSize={props.hexRadius * 0.9}
+            textAnchor="middle"
+        >
+            {props.pop}
+        </text>
+    </g>
+);
