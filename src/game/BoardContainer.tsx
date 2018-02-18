@@ -16,6 +16,9 @@ export interface BoardState {
 const mapStateToBoardProps = (state: BoardState) => ({
     board: state.board,
     cursor: state.cursor,
+    // TODO move to window resize events
+    width: 600,
+    height: 1000,
 });
 
 const mapDispatchToBoardProps = (dispatch: Dispatch<BoardState>) => ({

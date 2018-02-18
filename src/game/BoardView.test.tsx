@@ -26,6 +26,7 @@ it('renders a spot', () => {
     expect(view.text()).toEqual('5');
 });
 
+// TODO write test of HexBoardView
 it('renders a board with no selection', () => {
     const n = 3; // ++* / ++ / *++
     const board = Board.constructSquare(n, 3);
@@ -35,6 +36,8 @@ it('renders a board with no selection', () => {
             cursor={HexCoord.NONE}
             onPlaceCursor={() => {}}
             onMovePlayer={() => {}}
+            height={1000}
+            width={1000}
         />
     );
     expect(view.children().length).toEqual(n);  // n rows
@@ -59,6 +62,8 @@ it('renders a board with a selection', () => {
             cursor={ur}
             onPlaceCursor={() => {}}
             onMovePlayer={() => {}}
+            height={1000}
+            width={1000}
         />
     );
     const active = view.find('.active');

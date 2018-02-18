@@ -40,8 +40,8 @@
 
 /* SVG Styles */
 rect.mapBound {
-    stroke: #777;
-    stroke-width: 3px;
+    stroke: #444;
+    stroke-width: 1px;
     fill: white;
 }
 
@@ -76,7 +76,7 @@ g.spot:hover polygon {
 /* TODO would be nice for active to take precedence over hover or something */
 g.active polygon {
     stroke: #c33;
-    stroke-width: 2px;
+    stroke-width: 3px;
 }
 
 g.active text {

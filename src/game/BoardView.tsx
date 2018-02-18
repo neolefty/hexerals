@@ -3,12 +3,14 @@ import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
 import {Board, Player} from './Board';
 import './Board.css';
-import {INITIAL_HEIGHT, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
 
 interface BoardViewProps {
     board: Board;
     cursor: HexCoord;
+
+    height: number;
+    width: number;
 
     onMovePlayer: (delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
@@ -26,6 +28,8 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'e': HexCoord.RIGHT_UP,
     'd': HexCoord.RIGHT_DOWN,
 });
+
+const BOARD_MARGIN = 1; // space between bounding rect and hexes
 
 export const BoardView = (props: BoardViewProps) => (
     <div>
@@ -54,17 +58,33 @@ export class BoardViewBase extends Component<BoardViewProps> {
 }
 
 export class HexBoardView extends BoardViewBase {
-    readonly w: number;
-    readonly h: number;
     readonly hexRadius: number;
 
+    readonly innerH: number;
+    readonly innerW: number;
+
+    // margin to center hexes in bounding rect
+    readonly marginX: number;
+    readonly marginY: number;
+
     constructor(props: BoardViewProps) {
+        // TODO adapt to window size
         super(props);
-        this.w = 600;
-        this.h = 1000;
-        const widthMaxR = this.w / (INITIAL_WIDTH - 1 / 3) / 3;
-        const heightMaxR = this.h / (INITIAL_HEIGHT + 1) / SQRT_3_HALF;
+        // calculate hex size
+        this.innerW = props.width - 2 * BOARD_MARGIN;
+        this.innerH = props.height - 2 * BOARD_MARGIN;
+        const cartWidth = props.board.edges.width;
+        const cartHeight = props.board.edges.height;
+        const widthMaxR = this.innerW / (cartWidth * 1.5 + 0.5);
+        const heightMaxR = this.innerH / (cartHeight + 1) / HALF_SQRT_3;
         this.hexRadius = Math.min(widthMaxR, heightMaxR);
+
+        // calculate margin
+        const totalHexWidth = (cartWidth * 1.5 + 0.5) * this.hexRadius;
+        const totalHexHeight = (cartHeight + 1) * HALF_SQRT_3 * this.hexRadius;
+        this.marginX = (props.width - totalHexWidth) / 2;
+        this.marginY = (props.height - totalHexHeight) / 2;
+
         this.filterNobody = this.filterNobody.bind(this);
         this.filterPlayer = this.filterPlayer.bind(this);
         this.filterCursor = this.filterCursor.bind(this);
@@ -85,31 +105,41 @@ export class HexBoardView extends BoardViewBase {
     }
 
     render(): React.ReactNode {
+        // TODO scale so that hex coords are ints as much as possible
+        // hack approximating sqrt3/2 to 13/15
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
-                <svg width={this.w} height={this.h}>
-                    <rect x="0" y="0" width={this.w} height={this.h} className="mapBound" />
-                    <HexFilterBoardView
-                        filter={this.filterNobody}
-                        hexRadius={this.hexRadius}
-                        height={this.h}
-                        key={'nobody'}
-                        {...this.props}
+                <svg width={this.props.width} height={this.props.height}>
+                    <rect
+                        x="0"
+                        y="0"
+                        width={this.props.width}
+                        height={this.props.height}
+                        className="mapBound"
                     />
-                    <HexFilterBoardView
-                        filter={this.filterPlayer}
-                        hexRadius={this.hexRadius}
-                        height={this.h}
-                        key={'player'}
-                        {...this.props}
-                    />
-                    <HexFilterBoardView
-                        filter={this.filterCursor}
-                        hexRadius={this.hexRadius}
-                        height={this.h}
-                        key={'compy'}
-                        {...this.props}
-                    />
+                    <g transform={`translate(${this.marginX},${-this.marginY})`}>
+                        <HexFilterBoardView
+                            filter={this.filterNobody}
+                            hexRadius={this.hexRadius}
+                            height={this.innerH}
+                            key={'nobody'}
+                            {...this.props}
+                        />
+                        <HexFilterBoardView
+                            filter={this.filterPlayer}
+                            hexRadius={this.hexRadius}
+                            height={this.innerH}
+                            key={'player'}
+                            {...this.props}
+                        />
+                        <HexFilterBoardView
+                            filter={this.filterCursor}
+                            hexRadius={this.hexRadius}
+                            height={this.innerH}
+                            key={'compy'}
+                            {...this.props}
+                        />
+                    </g>
                 </svg>
             </div>
         );
@@ -122,7 +152,7 @@ interface FilterBoardViewProps extends BoardViewProps {
     height: number;
 }
 
-const SQRT_3_HALF = 0.866; // 0.8660254;
+const HALF_SQRT_3 = 13 / 15; // 0.866; // 0.8660254;
 
 class HexFilterBoardView extends Component<FilterBoardViewProps> {
     constructor(props: FilterBoardViewProps) {
@@ -135,7 +165,6 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
         return (
             // div required to receive keyboard events
                 <g id="hexMap"> {
-                    // TODO: draw empty first,  then filled,  then cursor
                     // empty first
                     this.props.board.constraints.all().filter(
                         this.props.filter
@@ -147,7 +176,7 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                                 owner={spot.owner}
                                 selected={hex === this.props.cursor}
                                 centerX={((hex.cartX() + 1) * 1.5 - 0.5) * this.props.hexRadius}
-                                centerY={this.props.height - (hex.cartY() + 1) * this.props.hexRadius * SQRT_3_HALF}
+                                centerY={this.props.height - (hex.cartY() + 1) * this.props.hexRadius * HALF_SQRT_3}
                                 hexRadius={this.props.hexRadius}
                                 onSelect={() => this.props.onPlaceCursor(hex)}
                                 contents={spot.pop === 0 ? '' : `${spot.pop}`}
@@ -173,7 +202,7 @@ interface FlatTopHexProps {
 // a hexagon centered at (x, y)
 const hexPoints = (x: number, y: number, hexRadius: number) => {
     const hexMid = hexRadius * 0.5;
-    const hexHalfHeight = hexRadius * SQRT_3_HALF;
+    const hexHalfHeight = hexRadius * HALF_SQRT_3;
     return ''
         + (x - hexRadius) + ',' + y + ' ' // left
         + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
@@ -198,7 +227,7 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         />
         <text
             x={props.centerX}
-            y={props.centerY + 0.35 * SQRT_3_HALF * props.hexRadius}
+            y={props.centerY + 0.35 * HALF_SQRT_3 * props.hexRadius}
             fontFamily="Sans-Serif"
             fontSize={props.hexRadius * 0.9}
             textAnchor="middle"
