@@ -50,8 +50,9 @@ g.spot {
 }
 
 g.spot polygon {
-    fill: #ccc;
-    stroke-width: 0.01%;
+    fill: #ddd;
+    stroke: #aaa;
+    stroke-width: 0.2%;
 }
 
 g.Human polygon {
@@ -65,19 +66,17 @@ g.Compy polygon {
 }
 
 g.Nobody polygon {
-    fill: #ddd;
-    stroke: #888;
 }
 
 g.spot:hover polygon {
     stroke: #a22;
-    stroke-width: 0.022%;
+    stroke-width: 0.5%;
 }
 
 /* TODO would be nice for active to take precedence over hover or something */
 g.active polygon {
     stroke: #a22;
-    stroke-width: 0.017%;
+    stroke-width: 0.35%;
 }
 
 g.active text {
