@@ -117,27 +117,27 @@ export class HexBoardView extends BoardViewBase {
                         height={this.props.height}
                         className="mapBound"
                     />
-                    <g transform={`translate(${this.marginX},${-this.marginY})`}>
+                    <g transform={`translate(${this.marginX},${this.marginY}) scale(${this.hexRadius})`}>
                         <HexFilterBoardView
-                            filter={this.filterNobody}
-                            hexRadius={this.hexRadius}
-                            height={this.innerH}
                             key={'nobody'}
+                            filter={this.filterNobody}
+                            hexRadius={1}
                             {...this.props}
+                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3}
                         />
                         <HexFilterBoardView
-                            filter={this.filterPlayer}
-                            hexRadius={this.hexRadius}
-                            height={this.innerH}
                             key={'player'}
+                            filter={this.filterPlayer}
+                            hexRadius={1}
                             {...this.props}
+                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3}
                         />
                         <HexFilterBoardView
-                            filter={this.filterCursor}
-                            hexRadius={this.hexRadius}
-                            height={this.innerH}
                             key={'compy'}
+                            filter={this.filterCursor}
+                            hexRadius={1}
                             {...this.props}
+                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3}
                         />
                     </g>
                 </svg>
@@ -225,14 +225,17 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         <polygon
             points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
         />
-        <text
-            x={props.centerX}
-            y={props.centerY + 0.35 * HALF_SQRT_3 * props.hexRadius}
-            fontFamily="Sans-Serif"
-            fontSize={props.hexRadius * 0.9}
-            textAnchor="middle"
-        >
-            {props.contents}
-        </text>
+        {
+            props.contents &&
+                <text
+                    x={props.centerX}
+                    y={props.centerY + 0.35 * HALF_SQRT_3 * props.hexRadius}
+                    fontFamily="Sans-Serif"
+                    fontSize={props.hexRadius * 0.9}
+                    textAnchor="middle"
+                >
+                    {props.contents}
+                </text>
+        }
     </g>
 );
