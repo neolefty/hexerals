@@ -46,8 +46,8 @@ it('renders a board with no selection', () => {
     expect(spots.first().text()).toEqual('0');
     expect(spots.first().next().next().text()).toEqual('3');
     expect(spots.text()).toEqual(('003'+'00'+'300'));
-    expect(spots[2].attribs['title'].substr(0, String(Player.Human).length))
-        .toEqual(String(Player.Human));
+    expect(spots[2].attribs['title'].substr(0, String(Player.Two).length))
+        .toEqual(String(Player.Two));
     // none are selected
     expect(view.find('.active').length).toEqual(0);
 });
@@ -132,21 +132,21 @@ it('controls game flow via react-redux', () => {
     expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
 
     expect(store.getState().cursor).toBe(ur.getDown());
-    expect(curSpot()).toEqual(new Spot(Player.Human, pop - 1));
+    expect(curSpot()).toEqual(new Spot(Player.Two, pop - 1));
 
     mover(false);
     expect(store.getState().cursor).toBe(ur.getDown());  // didn't move cursor this time
 
     const ll = HexCoord.ORIGIN;  // lower left
     const board = store.getState().board;
-    expect(board.getSpot(ll)).toEqual(new Spot(Player.Compy, pop));
+    expect(board.getSpot(ll)).toEqual(new Spot(Player.One, pop));
 
     const downFromUR = (n: number) =>
         board.getSpot(ur.plus(HexCoord.DOWN.times(n)));
-    const human1 = new Spot(Player.Human, 1);
+    const human1 = new Spot(Player.Two, 1);
     expect(downFromUR(0)).toEqual(human1);
     expect(downFromUR(1)).toEqual(human1);
-    expect(downFromUR(2)).toEqual(new Spot(Player.Human, pop-2));
+    expect(downFromUR(2)).toEqual(new Spot(Player.Two, pop-2));
     expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0));
     expect(downFromUR(3)).toBe(Spot.BLANK);
 

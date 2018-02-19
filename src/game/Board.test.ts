@@ -11,9 +11,9 @@ export function printBoard(board: Board) {
             let c = ' ';
             if ((x + y) % 2 === 0 && board.inBounds(HexCoord.getCart(x, y))) {
                 const spot = board.getCartSpot(x, y);
-                if (spot.owner === Player.Human)
+                if (spot.owner === Player.Two)
                     c = spot.pop === 0 ? 'o' : (spot.pop === 1 ? 'p' : 'P');
-                else if (spot.owner === Player.Compy)
+                else if (spot.owner === Player.One)
                     c = spot.pop === 0 ? '=' : (spot.pop === 1 ? 'c' : 'C');
                 else
                     c = '-';

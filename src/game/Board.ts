@@ -3,8 +3,22 @@ import { Map } from 'immutable';
 import { RectEdges, BoardConstraints, HexCoord, RectangularConstraints } from './Hex';
 
 export enum Player {
-    Compy = 'Compy', Human = 'Human', Nobody = 'Nobody'
+    Nobody = 'Nobody',
+    Zero = 'Zero',
+    One = 'One',
+    Two = 'Two',
+    Three = 'Three',
+    Four = 'Four',
 }
+
+const PLAYERS: Map<number, Player> = Map([
+    [ -1, Player.Nobody],
+    [ 0, Player.Zero],
+    [ 1, Player.One],
+    [ 2, Player.Two],
+    [ 3, Player.Three],
+    [ 4, Player.Four],
+]);
 
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?
@@ -56,12 +70,15 @@ export class Board {
         w: number, h: number, startingArmy: number = 1
     ): Board {
         const constraints = new RectangularConstraints(w, h);
-        const upperLeft = constraints.extreme(x => x.cartX() + x.cartY() * w);
-        const lowerRight = constraints.extreme(x => -(x.cartX() + x.cartY() * w));
-
-        const starts = Map<HexCoord, Spot>()
-            .set(upperLeft, new Spot(Player.Compy, startingArmy))
-            .set(lowerRight, new Spot(Player.Human, startingArmy));
+        const allHexes: HexCoord[] = constraints.all().toArray();
+        let starts = Map<HexCoord, Spot>();
+        PLAYERS.map((player: Player) => {
+            if (player !== Player.Nobody && allHexes.length > 0) {
+                const i = Math.floor(Math.random() * allHexes.length);
+                const hex = allHexes.splice(i, 1)[0];
+                starts = starts.set(hex, new Spot(player, startingArmy));
+            }
+        });
 
         return Board.construct(constraints, starts);
     }
