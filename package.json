@@ -14,14 +14,17 @@
     "react-redux": "^5.0.6",
     "react-scripts-ts": "2.8.0",
     "redux": "^3.7.2",
-    "reselect": "^3.0.1"
+    "reselect": "^3.0.1",
+    "yarn-run-all": "^3.1.1"
   },
   "scripts": {
+    "make": "node-sass-chokidar src/ -o src/ && react-scripts-ts build",
     "start": "react-scripts-ts start",
     "build": "react-scripts-ts build",
     "build-css": "node-sass-chokidar src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
     "test": "react-scripts-ts test --env=jsdom --setupTestFrameworkScriptFile=raf/polyfill",
+    "dev": "npm-run-all --parallel start watch-css test",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
