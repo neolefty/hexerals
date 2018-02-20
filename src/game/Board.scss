@@ -1,0 +1,67 @@
+body,input {
+    background-color: black;
+    color: white;
+}
+
+button {
+    background: linear-gradient(#222, #444);
+    color: white;
+    &:hover{ background: linear-gradient(#666, #333); }
+    &:active { background: linear-gradient(#444, #222); }
+}
+
+/* SVG Styles */
+rect.mapBound {
+    stroke: #444;
+    stroke-width: 1px;
+    fill: white;
+}
+
+g.spot {
+    cursor: default;
+
+    polygon {
+        fill: #999;
+        stroke: #777;
+        stroke-width: 0.2%;
+    }
+}
+
+g.Nobody polygon {}
+
+$playerColors: (
+        Zero: #adf,
+        One: #6b6,
+        Two: #fff,
+        Three: #e8f,
+        Four: #fc8,
+);
+/* Could be cool to have a reverse one, #533 & #faa */
+
+@each $name, $bg in $playerColors {
+    g.#{$name} {
+        polygon {
+            fill: #{$bg};
+            stroke: darken($bg, 40%);
+        }
+        text {
+            fill: darken($bg, 60%);
+        }
+    }
+}
+
+g.spot:hover polygon {
+    stroke: #a22;
+    stroke-width: 0.5%;
+}
+
+/* TODO would be nice for active to take precedence over hover or something */
+g.active polygon {
+    stroke: #a22;
+    stroke-width: 0.35%;
+}
+
+g.active text {
+    fill: #a22;
+    font-weight: bold;
+}
