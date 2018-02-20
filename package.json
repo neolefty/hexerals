@@ -18,13 +18,14 @@
     "yarn-run-all": "^3.1.1"
   },
   "scripts": {
-    "make": "node-sass-chokidar src/ -o src/ && react-scripts-ts build",
+    "build": "npm-run-all build-css build-react",
+    "watch": "npm-run-all --parallel start watch-css test",
+
     "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "build-react": "react-scripts-ts build",
     "build-css": "node-sass-chokidar src/ -o src/",
     "watch-css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
     "test": "react-scripts-ts test --env=jsdom --setupTestFrameworkScriptFile=raf/polyfill",
-    "dev": "npm-run-all --parallel start watch-css test",
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
