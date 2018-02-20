@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body,input {
+  background-color: black;
+  color: white;
+}
+
+button {
+  background: linear-gradient(#222, #444);
+  color: white;
+  &:hover{ background: linear-gradient(#666, #333); }
+  &:active { background: linear-gradient(#444, #222); }
+}
+
