@@ -46,7 +46,7 @@ function newGameReducer(state: BoardState, action: NewGame): BoardState {
         ...state,
         cursor: HexCoord.NONE,
         board: action.board,
-    }
+    };
 }
 
 const MOVE_PLAYER = 'MOVE_PLAYER';

@@ -57,7 +57,6 @@ const mapDispatchToPerfProps = (dispatch: Dispatch<PerfState>) => ({
     onQueue: (wh: Wh) => {
         setTimeout((x: Wh) => dispatch(runPerfTestAction(x)), 0, wh);
     },
-    onRun: (wh: Wh) => { dispatch(runPerfTestAction(wh)); },
 });
 
 export const runPerfTest = (wh: Wh) => {
@@ -70,7 +69,6 @@ export const runPerfTest = (wh: Wh) => {
 
 export interface PerfProps extends PerfState {
     onChange: (wh: Wh) => void;
-    onRun: (wh: Wh) => void;
     onQueue: () => void;
 }
 

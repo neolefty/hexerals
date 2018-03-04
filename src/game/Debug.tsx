@@ -4,6 +4,7 @@ export interface DebugProps {
     messages: string[];
 }
 
+// noinspection JSUnusedGlobalSymbols
 export const Debug = (props: DebugProps) => (
     <div>
         {

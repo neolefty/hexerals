@@ -3,6 +3,7 @@ import {List} from 'immutable';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
 import {BoardConstraints, HexCoord} from './Hex';
 
+// noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
     let out = '';
     board.edges.yRange().reverse().forEach((y: number) => {

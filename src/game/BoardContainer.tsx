@@ -41,4 +41,3 @@ export const BoardContainer = connect(
 )(
     BoardView
 );
-
