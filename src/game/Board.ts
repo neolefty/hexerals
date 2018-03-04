@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Map } from 'immutable';
-import { RectEdges, BoardConstraints, HexCoord, RectangularConstraints } from './Hex';
+import {Map} from 'immutable';
+import {RectEdges, BoardConstraints, HexCoord, RectangularConstraints} from './Hex';
 
 export enum Player {
     Nobody = 'Nobody',
@@ -11,7 +11,7 @@ export enum Player {
     Four = 'Four',
 }
 
-const PLAYERS: Map<number, Player> = Map([
+export const PLAYERS: Map<number, Player> = Map([
     [ -1, Player.Nobody],
     [ 0, Player.Zero],
     [ 1, Player.One],
@@ -19,6 +19,9 @@ const PLAYERS: Map<number, Player> = Map([
     [ 3, Player.Three],
     [ 4, Player.Four],
 ]);
+
+export const PLAYABLE_PLAYERS = [
+    Player.Zero, Player.One, Player.Two, Player.Three, Player.Four ];
 
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?
@@ -54,6 +57,55 @@ export class Spot {
     }
 }
 
+export interface StartingArranger {
+    arrange(board: Board): Map<HexCoord, Spot>;
+}
+
+export class RandomArranger implements StartingArranger {
+    constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {}
+
+    public arrange(board: Board): Map<HexCoord, Spot> {
+        const allHexes: HexCoord[] = board.constraints.all().toArray();
+        let starts = Map<HexCoord, Spot>();
+        PLAYERS.map((player: Player) => {
+            if (player !== Player.Nobody && allHexes.length > 0) {
+                const i = Math.floor(Math.random() * allHexes.length);
+                const hex = allHexes.splice(i, 1)[0];
+                starts = starts.set(hex, new Spot(player, this.startingArmy));
+            }
+        });
+        return starts;
+    }
+}
+
+export class CornersArranger implements StartingArranger {
+    constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {}
+
+    public arrange(board: Board): Map<HexCoord, Spot> {
+        let starts = Map<HexCoord, Spot>();
+        const corners = [
+            (b: Board) => board.edges.lowerLeft,
+            (b: Board) => board.edges.upperRight,
+            (b: Board) => board.edges.upperLeft,
+            (b: Board) => board.edges.lowerRight,
+        ];
+        let i = 0;
+        for (let p in this.players) { // not sure why we can't use of instead of in
+            if (p && this.players[p]) {
+                const hex = corners[i++](board);
+                starts = starts.set(hex, new Spot(this.players[p], this.startingArmy));
+            }
+        }
+        return starts;
+    }
+}
+
+export class TwoCornersArranger extends CornersArranger {
+    constructor(startingArmy: number = 1) {
+        super(startingArmy, [Player.Zero, Player.One]);
+    }
+}
+
 export class Board {
     static construct(
         constraints: BoardConstraints,
@@ -62,25 +114,18 @@ export class Board {
         return new Board(constraints, spots, new RectEdges(constraints));
     }
 
-    static constructSquare(size: number, startingArmy: number = 1) {
-        return Board.constructRectangular(size, size, startingArmy);
+    static constructSquare(size: number, arranger: StartingArranger) {
+        return Board.constructRectangular(size, size, arranger);
     }
 
     static constructRectangular(
-        w: number, h: number, startingArmy: number = 1
+        w: number, h: number, arranger: StartingArranger
     ): Board {
         const constraints = new RectangularConstraints(w, h);
-        const allHexes: HexCoord[] = constraints.all().toArray();
-        let starts = Map<HexCoord, Spot>();
-        PLAYERS.map((player: Player) => {
-            if (player !== Player.Nobody && allHexes.length > 0) {
-                const i = Math.floor(Math.random() * allHexes.length);
-                const hex = allHexes.splice(i, 1)[0];
-                starts = starts.set(hex, new Spot(player, startingArmy));
-            }
-        });
+        const blank = Board.construct(constraints);
+        const starts = arranger.arrange(blank);
 
-        return Board.construct(constraints, starts);
+        return new Board(blank.constraints, starts, blank.edges);
     }
 
     // keep constructor private so that edges doesn't get mis-constructed

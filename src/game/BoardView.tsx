@@ -106,9 +106,7 @@ export class HexBoardView extends BoardViewBase {
     }
 
     render(): React.ReactNode {
-        // TODO scale so that hex coords are integers as much as possible
-        // hack approximating sqrt3/2 to 13/15
-        // TODO consider using SVG viewbox instead of all this
+        // TODO consider using SVG viewbox instead of scale & translate
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
                 <svg width={this.props.width} height={this.props.height}>
@@ -162,49 +160,44 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
     }
 
     render(): React.ReactNode {
-        // TODO consider rounding height to integer
         // TODO look into SVGFactory / SVGElement
         return (
-            // div required to receive keyboard events
-                <g id="hexMap"> {
-                    // empty first
-                    this.props.board.constraints.all().filter(
-                        this.props.filter
-                    ).map(hex => {
-                        const spot = this.props.board.getSpot(hex);
-                        const centerX = ((hex.cartX() + 1) * 1.5 - 0.5) * this.props.hexRadius;
-                        const centerY = Math.round(
-                            this.props.height - (hex.cartY() + 1)
-                            * this.props.hexRadius * HALF_SQRT_3
-                        );
-                        return (
-                            <FlatTopHex
-                                key={hex.id}
-                                owner={spot.owner}
-                                selected={hex === this.props.cursor}
-                                centerX={centerX}
-                                centerY={centerY}
-                                hexRadius={this.props.hexRadius}
-                                onSelect={() => this.props.onPlaceCursor(hex)}
-                                contents={spot.pop === 0 ? '' : `${spot.pop}`}
-                            >
-                                {
-                                    spot.pop === 0 ? undefined :
-                                        <text
-                                            x={centerX}
-                                            y={centerY + 0.35 * HALF_SQRT_3 * this.props.hexRadius}
-                                            fontFamily="Sans-Serif"
-                                            fontSize={this.props.hexRadius * 0.9}
-                                            textAnchor="middle"
-                                        >
-                                            {spot.pop}
-                                        </text>
-                                }
-                            </FlatTopHex>
-                        );
-                    })
-                }
-                </g>
+            <g id="hexMap"> {
+                this.props.board.constraints.all().filter(
+                    this.props.filter
+                ).map(hex => {
+                    const spot = this.props.board.getSpot(hex);
+                    const centerX = ((hex.cartX() + 1) * 1.5 - 0.5) * this.props.hexRadius;
+                    const centerY = this.props.height - (hex.cartY() + 1)
+                        * this.props.hexRadius * HALF_SQRT_3;
+                    return (
+                        <FlatTopHex
+                            key={hex.id}
+                            owner={spot.owner}
+                            selected={hex === this.props.cursor}
+                            centerX={centerX}
+                            centerY={centerY}
+                            hexRadius={this.props.hexRadius}
+                            onSelect={() => this.props.onPlaceCursor(hex)}
+                            contents={spot.pop === 0 ? '' : `${spot.pop}`}
+                        >
+                            {
+                                spot.pop === 0 ? undefined :
+                                    <text
+                                        x={centerX}
+                                        y={centerY + 0.35 * HALF_SQRT_3 * this.props.hexRadius}
+                                        fontFamily="Sans-Serif"
+                                        fontSize={this.props.hexRadius * 0.9}
+                                        textAnchor="middle"
+                                    >
+                                        {spot.pop}
+                                    </text>
+                            }
+                        </FlatTopHex>
+                    );
+                })
+            }
+            </g>
         );
     }
 }
@@ -246,8 +239,6 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         <polygon
             points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
         />
-        {
-            props.children && <g>{props.children}</g>
-        }
+        {props.children && <g>{props.children}</g>}
     </g>
 );
