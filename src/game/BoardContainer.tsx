@@ -1,28 +1,29 @@
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
+import Dimension from '../Dimension';
 
 import {HexCoord} from './Hex';
 import {Board} from './Board';
 import {
     movePlayerAction, newGameAction, placeCursorAction,
-    BoardReducerImpl,
+    BoardReducerImpl, changeDisplaySizeAction,
 } from './BoardActions';
 import {BoardView} from './BoardView';
 
-export interface BoardState {
+export interface BoardViewState {
     board: Board;
     cursor: HexCoord;
+    displaySize: Dimension;
 }
 
-const mapStateToBoardProps = (state: BoardState) => ({
+const mapStateToBoardProps = (state: BoardViewState) => ({
     board: state.board,
     cursor: state.cursor,
-    // TODO move to window resize events
-    width: 600,
-    height: 1000,
+    width: state.displaySize.w,
+    height: state.displaySize.h,
 });
 
-const mapDispatchToBoardProps = (dispatch: Dispatch<BoardState>) => ({
+const mapDispatchToBoardProps = (dispatch: Dispatch<BoardViewState>) => ({
     onMovePlayer: (delta: HexCoord) => {
         dispatch(movePlayerAction(delta, true));
     },
@@ -32,6 +33,9 @@ const mapDispatchToBoardProps = (dispatch: Dispatch<BoardState>) => ({
     onNewGame: (board: Board) => {
         dispatch(newGameAction(board));
     },
+    onChangeDisplaySize: (dim: Dimension) => {
+        dispatch(changeDisplaySizeAction(dim));
+    }
 });
 
 export const BoardReducer = BoardReducerImpl;

@@ -1,6 +1,7 @@
 import * as assert from 'assert';
+import Dimension from '../Dimension';
 import {Board, Move} from './Board';
-import {BoardState} from './BoardContainer';
+import {BoardViewState} from './BoardContainer';
 import {INITIAL_STATE} from './Constants';
 import {HexCoord} from './Hex';
 
@@ -12,17 +13,19 @@ export interface GenericAction {
     type: string;
 }
 
-export type GameAction = NewGame | MovePlayer | PlaceCursor;
+export type GameAction = NewGame | MovePlayer | PlaceCursor | ChangeDisplaySize;
 
 export function BoardReducerImpl(
-    state: BoardState = INITIAL_STATE, action: GameAction
-): BoardState {
+    state: BoardViewState = INITIAL_STATE, action: GameAction
+): BoardViewState {
     if (isNewGame(action))
         state = newGameReducer(state, action);
     if (isPlaceCursor(action))
         state = placeCursorReducer(state, action);
     if (isMovePlayer(action))
         state = movePlayerReducer(state, action);
+    if (isChangeDisplaySize(action))
+        state = changeDisplaySizeReducer(state, action);
     return state;
 }
 
@@ -41,11 +44,35 @@ export function newGameAction(board: Board): NewGame {
         board: board,
     };
 }
-function newGameReducer(state: BoardState, action: NewGame): BoardState {
+function newGameReducer(state: BoardViewState, action: NewGame): BoardViewState {
     return {
         ...state,
         cursor: HexCoord.NONE,
         board: action.board,
+    };
+}
+
+const CHANGE_DISPLAY_SIZE = 'CHANGE_DISPLAY_SIZE';
+type CHANGE_DISPLAY_SIZE = typeof CHANGE_DISPLAY_SIZE;
+interface ChangeDisplaySize extends GenericAction {
+    type: CHANGE_DISPLAY_SIZE;
+    dim: Dimension;
+}
+function isChangeDisplaySize(action: GameAction): action is ChangeDisplaySize {
+    return (action.type === CHANGE_DISPLAY_SIZE);
+}
+export function changeDisplaySizeAction(dim: Dimension): ChangeDisplaySize {
+    return {
+        type: CHANGE_DISPLAY_SIZE,
+        dim: dim,
+    };
+}
+function changeDisplaySizeReducer(
+    state: BoardViewState, action: ChangeDisplaySize
+): BoardViewState {
+    return {
+        ...state,
+        displaySize: action.dim,
     };
 }
 
@@ -68,7 +95,7 @@ export function movePlayerAction(
         alsoCursor: alsoCursor,
     };
 }
-function movePlayerReducer(state: BoardState, action: MovePlayer): BoardState {
+function movePlayerReducer(state: BoardViewState, action: MovePlayer): BoardViewState {
     const move = new Move(state.cursor, action.delta);
     assert(state.board.inBounds(move.dest));
     return {
@@ -93,7 +120,7 @@ export function placeCursorAction(position: HexCoord): PlaceCursor {
         position: position,
     };
 }
-function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState {
+function placeCursorReducer(state: BoardViewState, action: PlaceCursor): BoardViewState {
     assert(state.board.inBounds(action.position));
     return {
         ...state,

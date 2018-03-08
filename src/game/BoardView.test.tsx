@@ -6,7 +6,7 @@ import * as Adapter from 'enzyme-adapter-react-16';
 
 import {placeCursorAction, movePlayerAction, newGameAction} from './BoardActions';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
-import {BoardReducer, BoardState} from './BoardContainer';
+import {BoardReducer, BoardViewState} from './BoardContainer';
 import {OldGridSpotView} from './OldGridView';
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
@@ -98,7 +98,7 @@ it('clicks a spot to select it', () => {
 });
 
 it('controls game flow via react-redux', () => {
-    const store = createStore<BoardState>(BoardReducer);
+    const store = createStore<BoardViewState>(BoardReducer);
     store.dispatch(newGameAction(Board.constructRectangular(
         INITIAL_WIDTH, INITIAL_HEIGHT, new TwoCornersArranger(INITIAL_POP))));
     expect(store.getState().board.spots.size).toEqual(2);
