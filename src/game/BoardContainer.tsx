@@ -10,20 +10,19 @@ import {
 } from './BoardActions';
 import {BoardView} from './BoardView';
 
-export interface BoardViewState {
+export interface BoardContainerState {
     board: Board;
     cursor: HexCoord;
     displaySize: Dimension;
 }
 
-const mapStateToBoardProps = (state: BoardViewState) => ({
+const mapStateToBoardProps = (state: BoardContainerState/*, ownProps: BoardViewProps*/) => ({
     board: state.board,
     cursor: state.cursor,
-    width: state.displaySize.w,
-    height: state.displaySize.h,
+    displaySize: state.displaySize,
 });
 
-const mapDispatchToBoardProps = (dispatch: Dispatch<BoardViewState>) => ({
+const mapDispatchToBoardProps = (dispatch: Dispatch<BoardContainerState>) => ({
     onMovePlayer: (delta: HexCoord) => {
         dispatch(movePlayerAction(delta, true));
     },
@@ -41,7 +40,7 @@ const mapDispatchToBoardProps = (dispatch: Dispatch<BoardViewState>) => ({
 export const BoardReducer = BoardReducerImpl;
 
 export const BoardContainer = connect(
-    mapStateToBoardProps, mapDispatchToBoardProps
+    mapStateToBoardProps, mapDispatchToBoardProps/*, mergeProps, options,*/
 )(
     BoardView
 );

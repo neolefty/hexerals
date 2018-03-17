@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import Dimension from '../Dimension';
 import {Board, Move} from './Board';
-import {BoardViewState} from './BoardContainer';
+import {BoardContainerState} from './BoardContainer';
 import {INITIAL_STATE} from './Constants';
 import {HexCoord} from './Hex';
 
@@ -16,8 +16,8 @@ export interface GenericAction {
 export type GameAction = NewGame | MovePlayer | PlaceCursor | ChangeDisplaySize;
 
 export function BoardReducerImpl(
-    state: BoardViewState = INITIAL_STATE, action: GameAction
-): BoardViewState {
+    state: BoardContainerState = INITIAL_STATE, action: GameAction
+): BoardContainerState {
     if (isNewGame(action))
         state = newGameReducer(state, action);
     if (isPlaceCursor(action))
@@ -44,7 +44,7 @@ export function newGameAction(board: Board): NewGame {
         board: board,
     };
 }
-function newGameReducer(state: BoardViewState, action: NewGame): BoardViewState {
+function newGameReducer(state: BoardContainerState, action: NewGame): BoardContainerState {
     return {
         ...state,
         cursor: HexCoord.NONE,
@@ -68,8 +68,8 @@ export function changeDisplaySizeAction(dim: Dimension): ChangeDisplaySize {
     };
 }
 function changeDisplaySizeReducer(
-    state: BoardViewState, action: ChangeDisplaySize
-): BoardViewState {
+    state: BoardContainerState, action: ChangeDisplaySize
+): BoardContainerState {
     return {
         ...state,
         displaySize: action.dim,
@@ -95,7 +95,7 @@ export function movePlayerAction(
         alsoCursor: alsoCursor,
     };
 }
-function movePlayerReducer(state: BoardViewState, action: MovePlayer): BoardViewState {
+function movePlayerReducer(state: BoardContainerState, action: MovePlayer): BoardContainerState {
     const move = new Move(state.cursor, action.delta);
     assert(state.board.inBounds(move.dest));
     return {
@@ -120,7 +120,7 @@ export function placeCursorAction(position: HexCoord): PlaceCursor {
         position: position,
     };
 }
-function placeCursorReducer(state: BoardViewState, action: PlaceCursor): BoardViewState {
+function placeCursorReducer(state: BoardContainerState, action: PlaceCursor): BoardContainerState {
     assert(state.board.inBounds(action.position));
     return {
         ...state,

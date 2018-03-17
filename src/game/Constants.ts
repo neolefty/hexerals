@@ -1,5 +1,5 @@
 import {Board, PLAYABLE_PLAYERS, RandomArranger} from './Board';
-import {BoardViewState} from './BoardContainer';
+import {BoardContainerState} from './BoardContainer';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 
@@ -7,7 +7,10 @@ export const INITIAL_WIDTH = 5;
 export const INITIAL_HEIGHT = 27;
 export const INITIAL_POP = 120;
 
-export const INITIAL_STATE: BoardViewState = {
+export const MIN_WIDTH = 450;
+export const MIN_HEIGHT = 120;
+
+export const INITIAL_STATE: BoardContainerState = {
     board: Board.constructRectangular(
         INITIAL_WIDTH,
         INITIAL_HEIGHT,

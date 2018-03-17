@@ -4,13 +4,12 @@ import {Component, KeyboardEvent} from 'react';
 import {Board, Player} from './Board';
 import './Board.css';
 import {HexCoord} from './Hex';
+import Dimension from '../Dimension';
 
 interface BoardViewProps {
     board: Board;
     cursor: HexCoord;
-
-    height: number;
-    width: number;
+    displaySize: Dimension;
 
     onMovePlayer: (delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
@@ -72,8 +71,8 @@ export class HexBoardView extends BoardViewBase {
         // TODO adapt to window size
         super(props);
         // calculate hex size
-        this.innerW = props.width - 2 * BOARD_MARGIN;
-        this.innerH = props.height - 2 * BOARD_MARGIN;
+        this.innerW = props.displaySize.w - 2 * BOARD_MARGIN;
+        this.innerH = props.displaySize.h - 2 * BOARD_MARGIN;
         const cartWidth = props.board.edges.width;
         const cartHeight = props.board.edges.height;
         const widthMaxR = this.innerW / (cartWidth * 1.5 + 0.5);
@@ -83,11 +82,11 @@ export class HexBoardView extends BoardViewBase {
         // calculate margin
         const totalHexWidth = (cartWidth * 1.5 + 0.5) * this.hexRadius;
         const totalHexHeight = (cartHeight + 1) * HALF_SQRT_3 * this.hexRadius;
-        this.marginX = (props.width - totalHexWidth) / 2;
-        this.marginY = (props.height - totalHexHeight) / 2;
+        this.marginX = (props.displaySize.w - totalHexWidth) / 2;
+        this.marginY = (props.displaySize.h - totalHexHeight) / 2;
 
         this.filterNobody = this.filterNobody.bind(this);
-        this.filterPlayer = this.filterPlayer.bind(this);
+        this.filterPlayers = this.filterPlayers.bind(this);
         this.filterCursor = this.filterCursor.bind(this);
     }
 
@@ -96,7 +95,7 @@ export class HexBoardView extends BoardViewBase {
             && this.props.board.getSpot(hex).owner === Player.Nobody;
     }
 
-    filterPlayer(hex: HexCoord): boolean {
+    filterPlayers(hex: HexCoord): boolean {
         return this.props.cursor !== hex
             && this.props.board.getSpot(hex).owner !== Player.Nobody;
     }
@@ -109,12 +108,12 @@ export class HexBoardView extends BoardViewBase {
         // TODO consider using SVG viewbox instead of scale & translate
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
-                <svg width={this.props.width} height={this.props.height}>
+                <svg width={this.props.displaySize.w} height={this.props.displaySize.h}>
                     <rect
                         x="0"
                         y="0"
-                        width={this.props.width}
-                        height={this.props.height}
+                        width={this.props.displaySize.w}
+                        height={this.props.displaySize.h}
                         className="mapBound"
                     />
                     <g transform={`translate(${this.marginX},${this.marginY}) scale(${this.hexRadius / INT_MULTIPLE})`}>
@@ -126,14 +125,14 @@ export class HexBoardView extends BoardViewBase {
                             height={(this.props.board.edges.height + 1) * HALF_SQRT_3 * INT_MULTIPLE}
                         />
                         <HexFilterBoardView
-                            key={'player'}
-                            filter={this.filterPlayer}
+                            key={'players'}
+                            filter={this.filterPlayers}
                             hexRadius={INT_MULTIPLE}
                             {...this.props}
                             height={(this.props.board.edges.height + 1) * HALF_SQRT_3 * INT_MULTIPLE}
                         />
                         <HexFilterBoardView
-                            key={'compy'}
+                            key={'cursor'}
                             filter={this.filterCursor}
                             hexRadius={INT_MULTIPLE}
                             {...this.props}
