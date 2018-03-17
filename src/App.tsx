@@ -7,23 +7,24 @@ import {BoardContainer} from './game/BoardContainer';
 // )
 
 class App extends React.Component {
-    updateDimensions() {
+    private dimensionListener = this.updateDimensions.bind(this);
 
-        if(window.innerWidth < 500) {
+    updateDimensions() {
+        if (window.innerWidth < 500) {
             this.setState({ width: 450, height: 102 });
         } else {
-            let update_width  = window.innerWidth-100;
-            let update_height = Math.round(update_width/4.4);
-            this.setState({ width: update_width, height: update_height });
+            let updateWidth  = window.innerWidth - 100;
+            let updateHeight = Math.round(updateWidth / 4.4);
+            this.setState({ width: updateWidth, height: updateHeight });
         }
     }
 
     componentDidMount(): void {
-        window.addEventListener("resize", this.updateDimensions.bind(this));
+        window.addEventListener('resize', this.dimensionListener);
     }
 
     componentWillUnmount(): void {
-        window.removeEventListener(this.updateDimensions.bind(this));
+        window.removeEventListener('resize', this.dimensionListener);
     }
 
     render() {
