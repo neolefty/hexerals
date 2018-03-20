@@ -1,23 +1,39 @@
 import * as React from 'react';
 import './App.css';
-import {BoardContainer} from './game/BoardContainer';
+import {GameContainer} from './game/BoardContainer';
 import {MIN_HEIGHT, MIN_WIDTH} from './game/Constants';
+import Dimension from './Dimension';
 
-// const PerfContainer = connect(mapStateToPerf, mapDispatchToPerf)(
-//     PerfTest
-// )
+export interface AppProps {
+    displaySize: Dimension;
+}
 
-class App extends React.Component {
+export interface AppState {
+    displaySize: Dimension;
+}
+
+class App extends React.Component<AppProps, AppState> {
     private dimensionListener = this.updateDimensions.bind(this);
 
     updateDimensions() {
-        const updateWidth  = Math.max(window.innerWidth - 100, MIN_WIDTH);
-        let updateHeight = Math.max(window.innerHeight - 25, MIN_HEIGHT);
-        this.setState({ width: updateWidth, height: updateHeight });
+        const newDim = new Dimension(
+            Math.max(window.innerWidth, MIN_WIDTH),
+            Math.max(window.innerHeight - 25, MIN_HEIGHT)
+        );
+        this.setState({
+            displaySize: newDim
+        });
+    }
+
+    componentWillMount(): void {
+        this.setState({
+            displaySize: new Dimension(0, 0)
+        });
     }
 
     componentDidMount(): void {
         window.addEventListener('resize', this.dimensionListener);
+        this.updateDimensions();
     }
 
     componentWillUnmount(): void {
@@ -27,7 +43,9 @@ class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <BoardContainer />
+                <GameContainer
+                    displaySize={this.state.displaySize}
+                />
             </div>
         );
     }

@@ -6,7 +6,7 @@ import * as Adapter from 'enzyme-adapter-react-16';
 
 import {placeCursorAction, movePlayerAction, newGameAction} from './BoardActions';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
-import {BoardReducer, BoardContainerState} from './BoardContainer';
+import {GameReducer, BoardContainerState} from './BoardContainer';
 import {OldGridSpotView} from './OldGridView';
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
@@ -35,9 +35,11 @@ it('renders a board with no selection', () => {
         <OldGridView
             board={board}
             cursor={HexCoord.NONE}
-            onPlaceCursor={() => {}}
-            onMovePlayer={() => {}}
             displaySize={new Dimension(1000, 1000)}
+            onMovePlayer={() => {}}
+            onPlaceCursor={() => {}}
+            onNewGame={() => {}}
+            onChangeDisplaySize={() => {}}
         />
     );
     expect(view.children().length).toEqual(n);  // n rows
@@ -61,9 +63,11 @@ it('renders a board with a selection', () => {
         <OldGridView
             board={board}
             cursor={ur}
+            displaySize={new Dimension(1000, 1000)}
             onPlaceCursor={() => {}}
             onMovePlayer={() => {}}
-            displaySize={new Dimension(1000, 1000)}
+            onNewGame={() => {}}
+            onChangeDisplaySize={() => {}}
         />
     );
     const active = view.find('.active');
@@ -97,7 +101,7 @@ it('clicks a spot to select it', () => {
 });
 
 it('controls game flow via react-redux', () => {
-    const store = createStore<BoardContainerState>(BoardReducer);
+    const store = createStore<BoardContainerState>(GameReducer);
     store.dispatch(newGameAction(Board.constructRectangular(
         INITIAL_WIDTH, INITIAL_HEIGHT, new TwoCornersArranger(INITIAL_POP))));
     expect(store.getState().board.spots.size).toEqual(2);

@@ -3,8 +3,8 @@ import {BoardContainerState} from './BoardContainer';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 
-export const INITIAL_WIDTH = 5;
-export const INITIAL_HEIGHT = 27;
+export const INITIAL_WIDTH = 7;
+export const INITIAL_HEIGHT = 17;
 export const INITIAL_POP = 120;
 
 export const MIN_WIDTH = 450;

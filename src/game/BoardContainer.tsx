@@ -8,21 +8,36 @@ import {
     movePlayerAction, newGameAction, placeCursorAction,
     BoardReducerImpl, changeDisplaySizeAction,
 } from './BoardActions';
-import {BoardView} from './BoardView';
+import {GameView} from './BoardView';
 
 export interface BoardContainerState {
     board: Board;
     cursor: HexCoord;
+    // TODO remove (redundant with BoardContainerProps.displaySize)
     displaySize: Dimension;
 }
 
-const mapStateToBoardProps = (state: BoardContainerState/*, ownProps: BoardViewProps*/) => ({
-    board: state.board,
-    cursor: state.cursor,
-    displaySize: state.displaySize,
+export interface BoardContainerProps {
+    displaySize: Dimension;
+}
+
+const mapStateToBoardViewProps = (
+    state: BoardContainerState
+) => ({
+    ...state,
 });
 
-const mapDispatchToBoardProps = (dispatch: Dispatch<BoardContainerState>) => ({
+const mergeProps = (
+    state: BoardContainerState,
+    actions: any,
+    parentProps: any,
+) => ({
+    ...state,
+    ...actions,
+    ...parentProps,
+});
+
+const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardContainerState>) => ({
     onMovePlayer: (delta: HexCoord) => {
         dispatch(movePlayerAction(delta, true));
     },
@@ -37,10 +52,10 @@ const mapDispatchToBoardProps = (dispatch: Dispatch<BoardContainerState>) => ({
     }
 });
 
-export const BoardReducer = BoardReducerImpl;
+export const GameReducer = BoardReducerImpl;
 
-export const BoardContainer = connect(
-    mapStateToBoardProps, mapDispatchToBoardProps/*, mergeProps, options,*/
+export const GameContainer = connect(
+    mapStateToBoardViewProps, mapDispatchToBoardViewProps, mergeProps/* , options,*/
 )(
-    BoardView
+    GameView
 );

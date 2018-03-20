@@ -3,18 +3,21 @@ import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import App from './App';
-import { BoardContainerState, BoardReducer } from './game/BoardContainer';
+import { BoardContainerState, GameReducer } from './game/BoardContainer';
 import { PerfState, PerfReducer, PerfContainer } from './game/PerfTest';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
+import Dimension from './Dimension';
 
-const boardStore = createStore<BoardContainerState>(BoardReducer);
+const boardStore = createStore<BoardContainerState>(GameReducer);
 const perfStore = createStore<PerfState>(PerfReducer);
 
 ReactDOM.render(
     <div>
         <Provider store={boardStore}>
-            <App />
+            <App
+                displaySize={new Dimension(1200, 800)}
+            />
         </Provider>
         <Provider store={perfStore}>
             <PerfContainer />

@@ -13,6 +13,8 @@ interface BoardViewProps {
 
     onMovePlayer: (delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
+    onNewGame: (board: Board) => void;
+    onChangeDisplaySize: (dim: Dimension) => void;
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
@@ -31,11 +33,19 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
 const BOARD_MARGIN = 1; // space between bounding rect and hexes
 const INT_MULTIPLE = 30; // how much to multiply by to approximate integers
 
-export const BoardView = (props: BoardViewProps) => (
-    <div>
-        <HexBoardView {...props}/>
-    </div>
-);
+export const GameView = (props: BoardViewProps) => {
+    return (
+        <div>
+            {
+                props.board ? (
+                    <HexBoardView {...props}/>
+                ) : (
+                    <button>New Game</button>
+                )
+            }
+        </div>
+    );
+};
 
 export class BoardViewBase extends Component<BoardViewProps> {
     constructor(props: BoardViewProps) {
@@ -58,33 +68,8 @@ export class BoardViewBase extends Component<BoardViewProps> {
 }
 
 export class HexBoardView extends BoardViewBase {
-    readonly hexRadius: number;
-
-    readonly innerH: number;
-    readonly innerW: number;
-
-    // margin to center hexes in bounding rect
-    readonly marginX: number;
-    readonly marginY: number;
-
     constructor(props: BoardViewProps) {
-        // TODO adapt to window size
         super(props);
-        // calculate hex size
-        this.innerW = props.displaySize.w - 2 * BOARD_MARGIN;
-        this.innerH = props.displaySize.h - 2 * BOARD_MARGIN;
-        const cartWidth = props.board.edges.width;
-        const cartHeight = props.board.edges.height;
-        const widthMaxR = this.innerW / (cartWidth * 1.5 + 0.5);
-        const heightMaxR = this.innerH / (cartHeight + 1) / HALF_SQRT_3;
-        this.hexRadius = Math.min(widthMaxR, heightMaxR);
-
-        // calculate margin
-        const totalHexWidth = (cartWidth * 1.5 + 0.5) * this.hexRadius;
-        const totalHexHeight = (cartHeight + 1) * HALF_SQRT_3 * this.hexRadius;
-        this.marginX = (props.displaySize.w - totalHexWidth) / 2;
-        this.marginY = (props.displaySize.h - totalHexHeight) / 2;
-
         this.filterNobody = this.filterNobody.bind(this);
         this.filterPlayers = this.filterPlayers.bind(this);
         this.filterCursor = this.filterCursor.bind(this);
@@ -105,6 +90,23 @@ export class HexBoardView extends BoardViewBase {
     }
 
     render(): React.ReactNode {
+        // calculate hex size
+        const innerW = this.props.displaySize.w - 2 * BOARD_MARGIN;
+        const innerH = this.props.displaySize.h - 2 * BOARD_MARGIN;
+        const cartWidth = this.props.board.edges.width;
+        const cartHeight = this.props.board.edges.height;
+        const widthMaxR = innerW / (cartWidth * 1.5 + 0.5);
+        const heightMaxR = innerH / (cartHeight + 1) / HALF_SQRT_3;
+        const hexRadius = Math.min(widthMaxR, heightMaxR);
+
+        // calculate margin
+        const totalHexWidth = (cartWidth * 1.5 + 0.5) * hexRadius;
+        const totalHexHeight = (cartHeight + 1) * HALF_SQRT_3 * hexRadius;
+
+        // margin to center hexes in bounding rect
+        const marginX = (this.props.displaySize.w - totalHexWidth) / 2;
+        const marginY = (this.props.displaySize.h - totalHexHeight) / 2;
+
         // TODO consider using SVG viewbox instead of scale & translate
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
@@ -116,7 +118,7 @@ export class HexBoardView extends BoardViewBase {
                         height={this.props.displaySize.h}
                         className="mapBound"
                     />
-                    <g transform={`translate(${this.marginX},${this.marginY}) scale(${this.hexRadius / INT_MULTIPLE})`}>
+                    <g transform={`translate(${marginX},${marginY}) scale(${hexRadius / INT_MULTIPLE})`}>
                         <HexFilterBoardView
                             key={'nobody'}
                             filter={this.filterNobody}
