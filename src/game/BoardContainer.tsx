@@ -6,15 +6,13 @@ import {HexCoord} from './Hex';
 import {Board} from './Board';
 import {
     movePlayerAction, newGameAction, placeCursorAction,
-    BoardReducerImpl, changeDisplaySizeAction,
+    BoardReducerImpl,
 } from './BoardActions';
 import {GameView} from './BoardView';
 
 export interface BoardContainerState {
     board: Board;
     cursor: HexCoord;
-    // TODO remove (redundant with BoardContainerProps.displaySize)
-    displaySize: Dimension;
 }
 
 export interface BoardContainerProps {
@@ -47,9 +45,6 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardContainerState>) =>
     onNewGame: (board: Board) => {
         dispatch(newGameAction(board));
     },
-    onChangeDisplaySize: (dim: Dimension) => {
-        dispatch(changeDisplaySizeAction(dim));
-    }
 });
 
 export const GameReducer = BoardReducerImpl;

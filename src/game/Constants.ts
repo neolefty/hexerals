@@ -1,7 +1,6 @@
 import {Board, PLAYABLE_PLAYERS, RandomArranger} from './Board';
 import {BoardContainerState} from './BoardContainer';
 import {HexCoord} from './Hex';
-import Dimension from '../Dimension';
 
 export const INITIAL_WIDTH = 7;
 export const INITIAL_HEIGHT = 17;
@@ -17,5 +16,4 @@ export const INITIAL_STATE: BoardContainerState = {
         new RandomArranger(INITIAL_POP, PLAYABLE_PLAYERS),
     ),
     cursor: HexCoord.NONE,
-    displaySize: new Dimension(1000, 600),
 };

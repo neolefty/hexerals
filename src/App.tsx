@@ -4,9 +4,7 @@ import {GameContainer} from './game/BoardContainer';
 import {MIN_HEIGHT, MIN_WIDTH} from './game/Constants';
 import Dimension from './Dimension';
 
-export interface AppProps {
-    displaySize: Dimension;
-}
+export interface AppProps {}
 
 export interface AppState {
     displaySize: Dimension;

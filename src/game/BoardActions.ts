@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import Dimension from '../Dimension';
 import {Board, Move} from './Board';
 import {BoardContainerState} from './BoardContainer';
 import {INITIAL_STATE} from './Constants';
@@ -13,7 +12,7 @@ export interface GenericAction {
     type: string;
 }
 
-export type GameAction = NewGame | MovePlayer | PlaceCursor | ChangeDisplaySize;
+export type GameAction = NewGame | MovePlayer | PlaceCursor;
 
 export function BoardReducerImpl(
     state: BoardContainerState = INITIAL_STATE, action: GameAction
@@ -24,8 +23,6 @@ export function BoardReducerImpl(
         state = placeCursorReducer(state, action);
     if (isMovePlayer(action))
         state = movePlayerReducer(state, action);
-    if (isChangeDisplaySize(action))
-        state = changeDisplaySizeReducer(state, action);
     return state;
 }
 
@@ -49,30 +46,6 @@ function newGameReducer(state: BoardContainerState, action: NewGame): BoardConta
         ...state,
         cursor: HexCoord.NONE,
         board: action.board,
-    };
-}
-
-const CHANGE_DISPLAY_SIZE = 'CHANGE_DISPLAY_SIZE';
-type CHANGE_DISPLAY_SIZE = typeof CHANGE_DISPLAY_SIZE;
-interface ChangeDisplaySize extends GenericAction {
-    type: CHANGE_DISPLAY_SIZE;
-    dim: Dimension;
-}
-function isChangeDisplaySize(action: GameAction): action is ChangeDisplaySize {
-    return (action.type === CHANGE_DISPLAY_SIZE);
-}
-export function changeDisplaySizeAction(dim: Dimension): ChangeDisplaySize {
-    return {
-        type: CHANGE_DISPLAY_SIZE,
-        dim: dim,
-    };
-}
-function changeDisplaySizeReducer(
-    state: BoardContainerState, action: ChangeDisplaySize
-): BoardContainerState {
-    return {
-        ...state,
-        displaySize: action.dim,
     };
 }
 
