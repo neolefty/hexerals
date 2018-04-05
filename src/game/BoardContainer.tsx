@@ -8,34 +8,44 @@ import {
     movePlayerAction, newGameAction, placeCursorAction,
     BoardReducerImpl,
 } from './BoardActions';
-import {GameView} from './BoardView';
+import {BoardViewActions, GameView} from './BoardView';
+import {AppState} from '../App';
 
-export interface BoardContainerState {
+export interface GameState {
     board: Board;
     cursor: HexCoord;
 }
 
-export interface BoardContainerProps {
+export interface GameProps {
     displaySize: Dimension;
 }
 
 const mapStateToBoardViewProps = (
-    state: BoardContainerState
+    state: AppState
 ) => ({
-    ...state,
+    ...state.game,
 });
 
+// const mergeProps = (
+//     state: Object,
+//     actions: Object,
+//     parentProps: Object,
+// ) => Object.assign({}, state, actions, parentProps);
 const mergeProps = (
-    state: BoardContainerState,
-    actions: any,
+    state: GameState,
+    actions: BoardViewActions,
+    /* tslint:disable:no-any */
     parentProps: any,
-) => ({
-    ...state,
-    ...actions,
-    ...parentProps,
-});
+    /* tslint:enable */
+) => {
+    return {
+        ...state,
+        ...actions,
+        displaySize: parentProps.displaySize,
+    };
+};
 
-const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardContainerState>) => ({
+const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
     onMovePlayer: (delta: HexCoord) => {
         dispatch(movePlayerAction(delta, true));
     },

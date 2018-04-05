@@ -6,7 +6,7 @@ import * as Adapter from 'enzyme-adapter-react-16';
 
 import {placeCursorAction, movePlayerAction, newGameAction} from './BoardActions';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
-import {GameReducer, BoardContainerState} from './BoardContainer';
+import {GameReducer, GameState} from './BoardContainer';
 import {OldGridSpotView} from './OldGridView';
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './Constants';
 import {HexCoord} from './Hex';
@@ -101,16 +101,19 @@ it('clicks a spot to select it', () => {
 });
 
 it('controls game flow via react-redux', () => {
-    const store = createStore<BoardContainerState>(GameReducer);
+    const store = createStore<GameState>(GameReducer);
+    // console.log(`before: board ${store.getState().board}; game.board ${store.getState().board.spots.size}`);
     store.dispatch(newGameAction(Board.constructRectangular(
         INITIAL_WIDTH, INITIAL_HEIGHT, new TwoCornersArranger(INITIAL_POP))));
+    // console.log(`after: board ${store.getState().board.spots.size}; game.board ${store.getState().board.spots.size}`);
     expect(store.getState().board.spots.size).toEqual(2);
     expect(store.getState().board.spots.get(HexCoord.ORIGIN).pop).toEqual(INITIAL_POP);
 
     // mover steps moves 1 space down
     const mover = (alsoCursor=true) =>
         store.dispatch(movePlayerAction(HexCoord.DOWN, alsoCursor));
-    const curSpot = () => store.getState().board.getSpot(store.getState().cursor);
+    const curSpot = () => store.getState()
+        .board.getSpot(store.getState().cursor);
 
     expect(mover).toThrowError();  // no cursor
     // place cursor outside bounds
@@ -133,13 +136,15 @@ it('controls game flow via react-redux', () => {
     // even though the destination is in bounds
     expect((store.getState().board.inBounds(dest2)));
     expect(() => store.dispatch(movePlayerAction(down2))).toThrowError();
-    expect(store.getState().board).toBe(after);  // no change occurred due to rejected move
+    // no change occurred due to rejected move
+    expect(store.getState().board).toBe(after);
 
     expect(store.getState().cursor).toBe(ur.getDown());
     expect(curSpot()).toEqual(new Spot(Player.One, INITIAL_POP - 1));
 
     mover(false);
-    expect(store.getState().cursor).toBe(ur.getDown());  // didn't move cursor this time
+    // didn't move cursor this time
+    expect(store.getState().cursor).toBe(ur.getDown());
 
     const ll = HexCoord.ORIGIN;  // lower left
     const board = store.getState().board;
@@ -156,7 +161,8 @@ it('controls game flow via react-redux', () => {
 
     // moving contents 1 has no effect
     store.dispatch(placeCursorAction(ur.getDown()));
-    expect(store.getState().board.getSpot(store.getState().cursor)).toEqual(human1);
+    expect(store.getState().board.getSpot(store.getState().cursor))
+        .toEqual(human1);
     const before2 = store.getState().board;
     mover();
     expect(store.getState().board.spots.get(ur.getDown()).pop).toBe(1);

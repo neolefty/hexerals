@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import {Board, Move} from './Board';
-import {BoardContainerState} from './BoardContainer';
 import {INITIAL_STATE} from './Constants';
 import {HexCoord} from './Hex';
+import {GameState} from './BoardContainer';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -15,8 +15,8 @@ export interface GenericAction {
 export type GameAction = NewGame | MovePlayer | PlaceCursor;
 
 export function BoardReducerImpl(
-    state: BoardContainerState = INITIAL_STATE, action: GameAction
-): BoardContainerState {
+    state: GameState = INITIAL_STATE, action: GameAction
+): GameState {
     if (isNewGame(action))
         state = newGameReducer(state, action);
     if (isPlaceCursor(action))
@@ -41,7 +41,7 @@ export function newGameAction(board: Board): NewGame {
         board: board,
     };
 }
-function newGameReducer(state: BoardContainerState, action: NewGame): BoardContainerState {
+function newGameReducer(state: GameState, action: NewGame): GameState {
     return {
         ...state,
         cursor: HexCoord.NONE,
@@ -68,7 +68,7 @@ export function movePlayerAction(
         alsoCursor: alsoCursor,
     };
 }
-function movePlayerReducer(state: BoardContainerState, action: MovePlayer): BoardContainerState {
+function movePlayerReducer(state: GameState, action: MovePlayer): GameState {
     const move = new Move(state.cursor, action.delta);
     assert(state.board.inBounds(move.dest));
     return {
@@ -93,7 +93,7 @@ export function placeCursorAction(position: HexCoord): PlaceCursor {
         position: position,
     };
 }
-function placeCursorReducer(state: BoardContainerState, action: PlaceCursor): BoardContainerState {
+function placeCursorReducer(state: GameState, action: PlaceCursor): GameState {
     assert(state.board.inBounds(action.position));
     return {
         ...state,

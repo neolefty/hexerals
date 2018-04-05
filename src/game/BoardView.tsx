@@ -6,15 +6,17 @@ import './Board.css';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 
-interface BoardViewProps {
-    board: Board;
-    cursor: HexCoord;
-    displaySize: Dimension;
-
+export interface BoardViewActions {
     onMovePlayer: (delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
     onNewGame: (board: Board) => void;
     onChangeDisplaySize: (dim: Dimension) => void;
+}
+
+interface BoardViewProps extends BoardViewActions {
+    board: Board;
+    cursor: HexCoord;
+    displaySize: Dimension;
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
