@@ -1,15 +1,19 @@
 import * as React from 'react';
 import './App.css';
-import {
-    GameState, GameContainer
-} from './game/BoardContainer';
-import {MIN_HEIGHT, MIN_WIDTH} from './game/Constants';
+import {GameContainer, GameState} from './game/BoardContainer';
+import {MIN_HEIGHT, MIN_WIDTH} from './game/BoardConstants';
 import Dimension from './Dimension';
+import {ColorsContainer, ColorsState} from './color/ColorsContainer';
+
+export interface GenericAction {
+    type: string;
+}
 
 export interface AppProps {}
 
 export interface AppState {
     game: GameState;
+    colors: ColorsState;
     displaySize: Dimension;
 }
 
@@ -44,6 +48,9 @@ class App extends React.Component<AppProps, AppState> {
             <div className="App">
                 <GameContainer
                     displaySize={this.getDisplaySize()}
+                />
+                <ColorsContainer
+                    displaySize={this.getDisplaySize().scale(0.5)}
                 />
             </div>
         );

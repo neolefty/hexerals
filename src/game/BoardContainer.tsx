@@ -37,13 +37,11 @@ const mergeProps = (
     /* tslint:disable:no-any */
     parentProps: any,
     /* tslint:enable */
-) => {
-    return {
-        ...state,
-        ...actions,
-        displaySize: parentProps.displaySize,
-    };
-};
+) => ({
+    ...state,
+    ...actions,
+    displaySize: parentProps.displaySize,
+});
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
     onMovePlayer: (delta: HexCoord) => {

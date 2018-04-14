@@ -6,11 +6,13 @@ import App, {AppState} from './App';
 import {GameReducer} from './game/BoardContainer';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
+import {ColorsReducer} from './color/ColorsContainer';
 
 /* eslint-disable no-underscore-dangle */
 const store = createStore<AppState>(
     combineReducers({
         game: GameReducer,
+        colors: ColorsReducer,
         /* perf: PerfReducer,*/
     }),
     // preloadedState,

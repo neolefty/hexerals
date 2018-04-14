@@ -3,7 +3,7 @@ import * as React from 'react';
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
 
-import {GenericAction} from './BoardActions';
+import {GenericAction} from '../App';
 import { RectangularConstraints } from './Hex';
 
 export interface PerfState {

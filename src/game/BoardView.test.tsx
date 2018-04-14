@@ -8,7 +8,7 @@ import {placeCursorAction, movePlayerAction, newGameAction} from './BoardActions
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
 import {GameReducer, GameState} from './BoardContainer';
 import {OldGridSpotView} from './OldGridView';
-import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './Constants';
+import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants';
 import {HexCoord} from './Hex';
 import {OldGridView} from './OldGridView';
 import Dimension from "../Dimension";

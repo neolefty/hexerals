@@ -6,6 +6,7 @@
     "collectable": "^0.27.0",
     "enzyme": "^3.2.0",
     "enzyme-adapter-react-16": "^1.1.1",
+    "hsluv": "^0.0.3",
     "immutable": "^3.8.2",
     "node-sass-chokidar": "^0.0.3",
     "raf": "^3.4.0",
@@ -20,7 +21,6 @@
   "scripts": {
     "build": "npm-run-all build-css build-react",
     "watch": "npm-run-all --parallel start watch-css test",
-
     "start": "react-scripts-ts start",
     "build-react": "react-scripts-ts build",
     "build-css": "node-sass-chokidar src/ -o src/",

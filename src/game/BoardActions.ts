@@ -1,21 +1,18 @@
 import * as assert from 'assert';
 import {Board, Move} from './Board';
-import {INITIAL_STATE} from './Constants';
+import {INITIAL_GAME_STATE} from './BoardConstants';
 import {HexCoord} from './Hex';
 import {GameState} from './BoardContainer';
+import {GenericAction} from '../App';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
 // TODO: figure out immutable approach too, maybe with immutable.js
 
-export interface GenericAction {
-    type: string;
-}
-
 export type GameAction = NewGame | MovePlayer | PlaceCursor;
 
 export function BoardReducerImpl(
-    state: GameState = INITIAL_STATE, action: GameAction
+    state: GameState = INITIAL_GAME_STATE, action: GameAction
 ): GameState {
     if (isNewGame(action))
         state = newGameReducer(state, action);
