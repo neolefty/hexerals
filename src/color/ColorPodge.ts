@@ -15,4 +15,8 @@ export class ColorPodge {
     addRandomColor(): ColorPodge {
         return new ColorPodge(this.hsluvColors.push(ColorPodge.randomColor()));
     }
+
+    removeColor(x: number): ColorPodge {
+        return new ColorPodge(this.hsluvColors.remove(x));
+    }
 }
