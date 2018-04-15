@@ -6,6 +6,9 @@ import {AppState, GenericAction} from '../App';
 import {List} from 'immutable';
 import {ColorWheel} from './ColorWheel';
 
+const TICK = 100; // milliseconds
+const DRIFT = 1;
+
 export interface ColorsState {
     colors: ColorPodge;
 }
@@ -13,13 +16,23 @@ export interface ColorsState {
 export interface ColorsActions {
     onAddColor: () => void;
     onRemoveColor: (x: number) => void;
+    onDiverge: () => void;
 }
 
 export interface ColorsProps {
     displaySize: Dimension;
+    tick: number;
 }
 
-type ColorsAction = AddColor | RemoveColor;
+type ColorsAction = AddColor | RemoveColor | Diverge;
+
+const DIVERGE = 'DIVERGE';
+type DIVERGE = typeof DIVERGE;
+interface Diverge extends GenericAction { type: DIVERGE; }
+function isDiverge(action: ColorsAction): action is Diverge {
+    return action.type === DIVERGE;
+}
+function divergeAction(): Diverge { return { type: DIVERGE }; }
 
 const ADD_COLOR = 'ADD_COLOR';
 type ADD_COLOR = typeof ADD_COLOR;
@@ -63,6 +76,11 @@ export function ColorsReducer(
             ...state,
             colors: state.colors.removeColor(action.x),
         };
+    if (isDiverge(action))
+        state = {
+            ...state,
+            colors: state.colors.diverge(DRIFT),
+        };
     return state;
 }
 
@@ -71,12 +89,14 @@ export const ColorsContainer = connect(
     (dispatch: Dispatch<ColorsState>) => ({
         onAddColor: () => dispatch(addColorAction()),
         onRemoveColor: (x: number) => dispatch(removeColorAction(x)),
+        onDiverge: () => dispatch(divergeAction()),
     }),
     /* tslint:disable:no-any */
     (state: ColorsState, actions: ColorsActions, parentProps: any) => ({
         ...state,
         ...actions,
         displaySize: parentProps.displaySize,
+        tick: TICK,
     })
     /* tslint:enable */
 )(

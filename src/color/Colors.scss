@@ -1,11 +1,9 @@
-circle.colorWheel {
-  stroke: #fff;
-  stroke-width: 1%;
-}
-
 circle.addColor {
   fill: black;
   &:after {
     content: '+';
+  }
+  text {
+    fill: white;
   }
 }
