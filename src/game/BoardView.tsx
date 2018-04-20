@@ -105,42 +105,49 @@ export class HexBoardView extends BoardViewBase {
         const totalHexWidth = (cartWidth * 1.5 + 0.5) * hexRadius;
         const totalHexHeight = (cartHeight + 1) * HALF_SQRT_3 * hexRadius;
 
-        // margin to center hexes in bounding rect
-        const marginX = (this.props.displaySize.w - totalHexWidth) / 2;
-        const marginY = (this.props.displaySize.h - totalHexHeight) / 2;
-
         // TODO consider using SVG viewbox instead of scale & translate
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
-                <svg width={this.props.displaySize.w} height={this.props.displaySize.h}>
-                    <rect
-                        x="0"
-                        y="0"
-                        width={this.props.displaySize.w}
-                        height={this.props.displaySize.h}
-                        className="mapBound"
-                    />
-                    <g transform={`translate(${marginX},${marginY}) scale(${hexRadius / INT_MULTIPLE})`}>
+                {/*<svg width={this.props.displaySize.w} height={this.props.displaySize.h}>*/}
+                <svg
+                    className='board'
+                    width={totalHexWidth}
+                    height={totalHexHeight}
+                    viewBox={[0, 0, totalHexWidth, totalHexHeight].join(',')}
+                >
+                    <g transform={
+                        `translate(${BOARD_MARGIN},${BOARD_MARGIN})
+                        scale(${hexRadius / INT_MULTIPLE})`
+                    }>
                         <HexFilterBoardView
                             key={'nobody'}
                             filter={this.filterNobody}
                             hexRadius={INT_MULTIPLE}
                             {...this.props}
-                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3 * INT_MULTIPLE}
+                            height={
+                                (this.props.board.edges.height + 1)
+                                * HALF_SQRT_3 * INT_MULTIPLE
+                            }
                         />
                         <HexFilterBoardView
                             key={'players'}
                             filter={this.filterPlayers}
                             hexRadius={INT_MULTIPLE}
                             {...this.props}
-                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3 * INT_MULTIPLE}
+                            height={
+                                (this.props.board.edges.height + 1)
+                                * HALF_SQRT_3 * INT_MULTIPLE
+                            }
                         />
                         <HexFilterBoardView
                             key={'cursor'}
                             filter={this.filterCursor}
                             hexRadius={INT_MULTIPLE}
                             {...this.props}
-                            height={(this.props.board.edges.height + 1) * HALF_SQRT_3 * INT_MULTIPLE}
+                            height={
+                                (this.props.board.edges.height + 1)
+                                * HALF_SQRT_3 * INT_MULTIPLE
+                            }
                         />
                     </g>
                 </svg>

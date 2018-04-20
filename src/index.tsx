@@ -24,15 +24,10 @@ const store = createStore<AppState>(
 );
 /* eslint-enable */
 
-// const store = createStore<AppState>(GameReducer);
-// const boardStore = createStore<AppState>(GameReducer);
-// const perfStore = createStore<PerfState>(PerfReducer);
-
 ReactDOM.render(
     <div>
         <Provider store={store}>
             <App/>
-            {/*<PerfContainer/>*/}
         </Provider>
     </div>,
     document.getElementById('root') as HTMLElement
