@@ -131,6 +131,7 @@ export class RectEdges {
     readonly top: number;
     readonly bottom: number;
 
+    // width and height in cartesian coords
     readonly width: number;
     readonly height: number;
 
