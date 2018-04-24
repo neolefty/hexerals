@@ -101,8 +101,11 @@ export class HexBoardView extends BoardViewBase {
         // integer approximation of hexes -- half of sqrt 3 ~= 13 / 15
         // coords inside viewport -- hex radius is 15, hex half-height is 13
         // row height is 26, hex diameter is 30
+
+        // horizontally, hex centers are 1.5 diameters apart
         const scaleWidth = coordsWidth * 45 + 15;
-        const scaleHeight = (coordsHeight + 1) * 26;
+        // vertically, hex centers are half a row apart
+        const scaleHeight = (coordsHeight + 1) * 26; // hex
 
         // figure out whether height or width is constraining factor
         const boardAspectRatio = scaleHeight / scaleWidth;
@@ -121,9 +124,8 @@ export class HexBoardView extends BoardViewBase {
 
         return (
             <div tabIndex={0} onKeyDown={this.onKeyDown}>
-                {/*<svg width={this.props.displaySize.w} height={this.props.displaySize.h}>*/}
                 <svg
-                    className='board'
+                    className="board"
                     width={boardWidth}
                     height={boardHeight}
                     viewBox={[
@@ -133,21 +135,22 @@ export class HexBoardView extends BoardViewBase {
                         scaleHeight + INNER_BOARD_MARGIN
                     ].join(',')}
                 >
-                        <HexFilterBoardView
-                            key={'nobody'}
-                            filter={this.filterNobody}
-                            {...this.props}
-                        />
-                        <HexFilterBoardView
-                            key={'players'}
-                            filter={this.filterPlayers}
-                            {...this.props}
-                        />
-                        <HexFilterBoardView
-                            key={'cursor'}
-                            filter={this.filterCursor}
-                            {...this.props}
-                        />
+                    <rect width={scaleWidth} height={scaleHeight} stroke="white" strokeWidth="3"/>
+                    <HexFilterBoardView
+                        key={'nobody'}
+                        filter={this.filterNobody}
+                        {...this.props}
+                    />
+                    <HexFilterBoardView
+                        key={'players'}
+                        filter={this.filterPlayers}
+                        {...this.props}
+                    />
+                    <HexFilterBoardView
+                        key={'cursor'}
+                        filter={this.filterCursor}
+                        {...this.props}
+                    />
                 </svg>
             </div>
         );

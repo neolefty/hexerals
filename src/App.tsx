@@ -28,7 +28,7 @@ class App extends React.Component<AppProps, AppState> {
             Math.max(window.innerWidth, MIN_WIDTH),
             Math.max(window.innerHeight - 25, MIN_HEIGHT)
         );
-        console.log(`${dim.toString()} -- ${window.innerWidth} x ${window.innerHeight}`);
+        // console.log(`${dim.toString()} -- ${window.innerWidth} x ${window.innerHeight}`);
         this.setState({
             ...this.state,
             displaySize: dim,

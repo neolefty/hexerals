@@ -6,7 +6,7 @@ export const INITIAL_WIDTH = 7;
 export const INITIAL_HEIGHT = 17;
 export const INITIAL_POP = 120;
 
-export const MIN_WIDTH = 450;
+export const MIN_WIDTH = 420;
 export const MIN_HEIGHT = 120;
 
 export const INITIAL_GAME_STATE: GameState = {
