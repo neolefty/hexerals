@@ -7,6 +7,7 @@ import {List} from 'immutable';
 import {ColorWheel} from './ColorWheel';
 
 const TICK = 100; // milliseconds
+// TODO simulate annealing by progressing from large ticks down
 const DRIFT = 1;
 
 export interface ColorsState {

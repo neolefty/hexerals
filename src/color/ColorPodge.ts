@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 
-const MIN_BRIGHT = 50; // minimum allowed brightness
-const MIN_SAT = 0; // minimum allowed saturation
+const MIN_BRIGHT = 30, MAX_BRIGHT = 80;
+const MIN_SAT = 40, MAX_SAT = 100; // minimum allowed saturation
 
 // A collection of colors in CIE space
 export class ColorPodge {
@@ -13,8 +13,8 @@ export class ColorPodge {
         return [
             /* TODO even p across CIELUV for uniform perceptual distribution*/
             Math.random() * 360,
-            Math.random() * (100 - MIN_SAT) + MIN_SAT,
-            Math.random() * (100 - MIN_BRIGHT) + MIN_BRIGHT,
+            Math.random() * (MAX_SAT - MIN_SAT) + MIN_SAT,
+            Math.random() * (MAX_BRIGHT - MIN_BRIGHT) + MIN_BRIGHT,
             // TODO make this properly immutable by moving this value out of array into cache
             -Infinity, // hack: distance to nearest other color
         ];
@@ -34,15 +34,17 @@ export class ColorPodge {
     private static driftOne(color: number[], f: number) {
         return [
             (color[0] + Math.random() * f),
-            ColorPodge.clamp(color[1] + Math.random() * f, MIN_SAT, 100),
-            ColorPodge.clamp(color[2], MIN_BRIGHT, 100),
+            ColorPodge.clamp(color[1] + Math.random() * f, MIN_SAT, MAX_SAT),
+            ColorPodge.clamp(color[2], MIN_BRIGHT, MAX_BRIGHT),
         ];
     }
 
-    constructor(readonly hsluvColors: List<number[]> = List()) {}
+    constructor(readonly hsluvColors: List<number[]> = List()) {
+        this.calculateDistances();
+    }
 
     // populate nearest distances
-    calculateDistances() {
+    private calculateDistances() {
         this.hsluvColors.forEach((c) => {
             c[3] = this.minDist2(c);
         });
@@ -82,29 +84,32 @@ export class ColorPodge {
     // largest minimum distance from all other colors
     private disperseOne(color: number[], f: number): number[] {
         let result = color;
-        let maxMinDist = this.minDist2(color); // baseline: no change
+        let maxMinDist = color[3]; // baseline: no change
         ColorPodge.DELTAS.forEach(delta => {
             const c = [
                 (delta[0] * f + color[0]) % 360,
-                ColorPodge.clamp(delta[1] * f + color[1], MIN_SAT, 100),
-                ColorPodge.clamp(delta[2] * f + color[2], MIN_BRIGHT, 100),
+                ColorPodge.clamp(delta[1] * f + color[1], MIN_SAT, MAX_SAT),
+                ColorPodge.clamp(delta[2] * f + color[2], MIN_BRIGHT, MAX_BRIGHT),
                 Infinity, // hack: min dist from other colors
             ];
-            const d = this.minDist2(c);
+            const d = this.minDist2(c, color);
             c[3] = d;
+            // console.log(`${color} -- consider ${c} -- ${d}`);
             if (d > maxMinDist) {
                 result = c;
                 maxMinDist = d;
             }
         });
+        // console.log(`-----> chose ${result} -- ${maxMinDist}`);
         return result;
     }
 
     // what is the distance to the nearest other color in this podge?
-    private minDist2(color: number[]) {
+    // if ignore is supplied, skip it in the list of colors
+    private minDist2(color: number[], ignore?: number[]) {
         let result = Infinity;
         this.hsluvColors.forEach((c: number[]) => {
-            if (c !== color)
+            if (c !== color && c !== ignore)
                 result = Math.min(result, ColorPodge.dist2(color, c));
         });
         return result;

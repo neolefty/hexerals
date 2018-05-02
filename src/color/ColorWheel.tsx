@@ -67,19 +67,20 @@ export class ColorWheel extends Component<ColorWheelProps> {
                         r={1 / 2.5}
                         onClick={this.props.onAddColor}
                     />
-{/*
                     <text
                         x="0"
-                        y="0.15"
-                        onClick={this.props.onAddColor}
-                    >+</text>
-*/}
-                    <text
-                        x="0"
-                        y="0.15"
+                        y="0.13"
                         onClick={this.props.onAddColor}
                     >
-                        {this.props.colors.closestTwo()}
+                        +
+                    </text>
+                    <text
+                        className="debug"
+                        x="0"
+                        y="0.5"
+                        onClick={this.props.onAddColor}
+                    >
+                        {Math.round(this.props.colors.closestTwo())}
                     </text>
                 </g>
             </svg>
