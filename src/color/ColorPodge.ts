@@ -11,7 +11,7 @@ export class ColorPodge {
 
     static randomColor(): number[] {
         return [
-            /* TODO even p across CIELUV for uniform perceptual distribution*/
+            /* TODO even p across CIELUV for uniform perceptual distribution */
             Math.random() * 360,
             Math.random() * (MAX_SAT - MIN_SAT) + MIN_SAT,
             Math.random() * (MAX_BRIGHT - MIN_BRIGHT) + MIN_BRIGHT,
