@@ -1,9 +1,11 @@
-circle.addColor {
-  fill: black;
-  &:after {
-    content: '+';
+g.addColor {
+  circle {
+    fill: black;
   }
   text {
     fill: white;
+    text-anchor: middle;
+    font-size: 0.6px;
+    cursor: default;
   }
 }

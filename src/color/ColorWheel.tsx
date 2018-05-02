@@ -62,13 +62,26 @@ export class ColorWheel extends Component<ColorWheelProps> {
                         );
                     })
                 }
-                <circle
-                    className={'addColor'}
-                    r={1 / 2.5}
-                    onClick={this.props.onAddColor}
-                >
-                    <text x="0" y="0" textAnchor="middle" fontSize="10">+</text>
-                </circle>
+                <g className="addColor">
+                    <circle
+                        r={1 / 2.5}
+                        onClick={this.props.onAddColor}
+                    />
+{/*
+                    <text
+                        x="0"
+                        y="0.15"
+                        onClick={this.props.onAddColor}
+                    >+</text>
+*/}
+                    <text
+                        x="0"
+                        y="0.15"
+                        onClick={this.props.onAddColor}
+                    >
+                        {this.props.colors.closestTwo()}
+                    </text>
+                </g>
             </svg>
         );
     }

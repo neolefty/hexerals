@@ -79,7 +79,7 @@ export function ColorsReducer(
     if (isDiverge(action))
         state = {
             ...state,
-            colors: state.colors.diverge(DRIFT),
+            colors: state.colors.disperse(DRIFT),
         };
     return state;
 }
