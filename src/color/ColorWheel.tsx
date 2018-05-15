@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 // import hsluv from 'hsluv';
-import * as hsluv from 'hsluv';
 import './Colors.css';
 import {ColorsActions, ColorsProps, ColorsState} from './ColorsContainer';
 import {Component} from 'react';
@@ -32,16 +31,15 @@ export class ColorWheel extends Component<ColorWheelProps> {
                 viewBox="-1,-1,2,2"
             >
                 {
-                    this.props.colors.hsluvColors.map((hsluvColor, i) => {
-                        // const rgb = hsluv.hsluvToRgb(hsluvColor);
+                    this.props.colors.driftColors.map((driftColor, i) => {
                         const style = {
-                            // stroke: hsluv.hsluvToHex(hsluvColor),
-                            fill: hsluv.hsluvToHex(hsluvColor),
-                            strokeWidth: '1%',
+                            // stroke: driftColor.toHex(),
+                            fill: driftColor.toHex(),
                         };
                         const r1 = 2.5; // inner radius fraction (2 = half, 3 = third)
                         const r2 = 0.5; // outer radius fraction
-                        const delta = Math.PI * 2 / this.props.colors.hsluvColors.size;
+                        const rText = 1.8; // text radius fraction
+                        const delta = Math.PI * 2 / this.props.colors.driftColors.size;
                         const a = delta * i, b = delta * (i + 1), m = (a + b) / 2;
                         const cosA = Math.cos(a), cosB = Math.cos(b),
                             sinA = Math.sin(a), sinB = Math.sin(b),
@@ -52,13 +50,31 @@ export class ColorWheel extends Component<ColorWheelProps> {
                             + ` ${cosB / r1},${sinB / r1}`
                             + ` ${cosM / r1},${sinM / r1}`
                             + ` ${cosA / r1},${sinA / r1}`;
+                        const textX = cosM / rText;
+                        const textY = sinM / rText;
+                        const textStyle = {
+                            fill: driftColor.contrast().toHex(),
+                        };
                         return (
-                            <polygon
-                                style={style}
-                                points={points}
+                            <g
+                                className="colorWedge"
                                 key={i}
                                 onClick={() => this.props.onRemoveColor(i)}
-                            />
+                            >
+                                <polygon
+                                    style={style}
+                                    points={points}
+                                />
+                                <text
+                                    className="debug"
+                                    style={textStyle}
+                                    x={textX}
+                                    y={textY}
+                                    transform={`rotate(${m * 180 / Math.PI} ${textX},${textY})`}
+                                >
+                                    {driftColor.cie.toHsluvString()}
+                                </text>
+                            </g>
                         );
                     })
                 }
@@ -77,7 +93,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
                     <text
                         className="debug"
                         x="0"
-                        y="0.5"
+                        y="0.30"
                         onClick={this.props.onAddColor}
                     >
                         {Math.round(this.props.colors.closestTwo())}

@@ -1,4 +1,5 @@
 g.addColor {
+  cursor: copy; // cell;
   circle {
     fill: black;
   }
@@ -6,9 +7,8 @@ g.addColor {
     fill: white;
     text-anchor: middle;
     font-size: 0.5px;
-    cursor: default;
     &.debug {
-      font-size: 0.1px;
+      font-size: 0.15px;
       fill: #aaa;
 
       // black outline from
@@ -18,7 +18,26 @@ g.addColor {
       stroke-width: 0.012px;
       stroke-linecap: butt;
       stroke-linejoin: miter;
-      font-weight: 800;
+      font-weight: 700;
     }
   }
+}
+
+g.colorWedge {
+  cursor: alias; // default;
+  text.debug {
+    font-size: 0.09px;
+    //fill: #777;
+    //paint-order: stroke;
+    //stroke: #000;
+    //stroke-width: 0.014px;
+    //stroke-linecap: butt;
+    //stroke-linejoin: miter;
+    font-weight: 600;
+  }
+  polygon {
+    //strokeWidth: 1%;
+    strokeWidth: 0;
+  }
+
 }

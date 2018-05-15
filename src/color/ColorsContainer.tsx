@@ -5,6 +5,7 @@ import {ColorPodge} from './ColorPodge';
 import {AppState, GenericAction} from '../App';
 import {List} from 'immutable';
 import {ColorWheel} from './ColorWheel';
+import {DriftColor} from './DriftColor';
 
 const TICK = 100; // milliseconds
 // TODO simulate annealing by progressing from large ticks down
@@ -60,7 +61,7 @@ function removeColorAction(x: number): RemoveColor {
 }
 
 const INITIAL_COLOR_PODGE = new ColorPodge(List([
-    ColorPodge.randomColor(), ColorPodge.randomColor(), ColorPodge.randomColor()
+    DriftColor.random(), DriftColor.random(), DriftColor.random()
 ]));
 
 export function ColorsReducer(
