@@ -38,7 +38,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
                         };
                         const r1 = 2.5; // inner radius fraction (2 = half, 3 = third)
                         const r2 = 0.5; // outer radius fraction
-                        const rText = 1.8; // text radius fraction
+                        const rText = 2.3; // text radius fraction
                         const delta = Math.PI * 2 / this.props.colors.driftColors.size;
                         const a = delta * i, b = delta * (i + 1), m = (a + b) / 2;
                         const cosA = Math.cos(a), cosB = Math.cos(b),
@@ -70,7 +70,10 @@ export class ColorWheel extends Component<ColorWheelProps> {
                                     style={textStyle}
                                     x={textX}
                                     y={textY}
-                                    transform={`rotate(${m * 180 / Math.PI} ${textX},${textY})`}
+                                    transform={
+                                        `rotate(${m * 180 / Math.PI} ${textX},${textY})`
+                                        + ` translate(0 0.043)` // center vertically in wedge
+                                    }
                                 >
                                     {driftColor.cie.toHsluvString()}
                                 </text>
