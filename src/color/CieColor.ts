@@ -8,6 +8,7 @@ export class CieColor {
         this.hp = hsluv.rgbToHpluv(hsluv.hsluvToRgb(this.hs));
     }
 
+    // TODO reduce perceptual distance between dark blue & green
     perceptualDistance2(that: CieColor) {
         const dHueRaw = Math.abs(this.hp[0] - that.hp[0]),
             dSat = this.hs[1] - that.hs[1],

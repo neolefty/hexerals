@@ -7,7 +7,7 @@ export class DriftColor {
     static readonly MID_BRIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2;
     static readonly MIN_SAT = 60;
     static readonly MAX_SAT = 100;
-    static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2;
+    // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2;
 
     static clamp_bright(b: number): number {
         return DriftColor.clamp(b, DriftColor.MIN_BRIGHT, DriftColor.MAX_BRIGHT);
@@ -17,41 +17,50 @@ export class DriftColor {
     }
 
     static random(): DriftColor {
-        return new DriftColor(new CieColor([
-            // TODO even p across CIELUV for uniform perceptual distribution
-            Math.random() * 360,
-            Math.random() * (DriftColor.MAX_SAT - DriftColor.MIN_SAT)
-                + DriftColor.MIN_SAT,
-            Math.random() * (DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT)
-                + DriftColor.MIN_BRIGHT,
-        ]));
+        return new DriftColor(
+            new CieColor([
+                // TODO even p across CIELUV for uniform perceptual distribution
+                Math.random() * 360,
+                Math.random() * (DriftColor.MAX_SAT - DriftColor.MIN_SAT)
+                    + DriftColor.MIN_SAT,
+                Math.random() * (DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT)
+                    + DriftColor.MIN_BRIGHT,
+            ]),
+            Math.random()
+        );
     }
 
     static clamp(x: number, min: number, max: number): number {
         return Math.max(min, Math.min(x, max));
     }
 
-    constructor(readonly cie: CieColor) {}
+    constructor(readonly cie: CieColor, readonly key: number = Math.random()) {}
 
     d2(that: DriftColor) {
         return this.cie.perceptualDistance2(that.cie);
     }
 
     drift(f: number) {
-        return new DriftColor(new CieColor([
-            (this.cie.hp[0] + Math.random() * f),
-            DriftColor.clamp_sat(this.cie.hp[1] + Math.random() * f),
-            DriftColor.clamp_bright(this.cie.hp[2] + Math.random() * f),
-        ]));
+        return new DriftColor(
+            new CieColor([
+                (this.cie.hp[0] + Math.random() * f),
+                DriftColor.clamp_sat(this.cie.hp[1] + Math.random() * f),
+                DriftColor.clamp_bright(this.cie.hp[2] + Math.random() * f),
+            ]),
+            this.key
+        );
     }
 
     // shift a certain amount (mag) in a given direction (unit), in hsluv space.
     shift(unit: number[], mag: number): DriftColor {
-        return new DriftColor(new CieColor([
-            unit[0] * mag + this.cie.hs[0],
-            DriftColor.clamp_sat(unit[1] * mag + this.cie.hs[1]),
-            DriftColor.clamp_bright(unit[2] * mag + this.cie.hs[2]),
-        ]));
+        return new DriftColor(
+            new CieColor([
+                unit[0] * mag + this.cie.hs[0],
+                DriftColor.clamp_sat(unit[1] * mag + this.cie.hs[1]),
+                DriftColor.clamp_bright(unit[2] * mag + this.cie.hs[2]),
+            ]),
+            this.key
+        );
     }
 
     perceptualDistance(that: DriftColor): number {
@@ -64,8 +73,11 @@ export class DriftColor {
             new CieColor([
                 newCie.hs[0],
                 DriftColor.MAX_SAT,
-                newCie.hs[2] > DriftColor.MID_BRIGHT ? DriftColor.MIN_BRIGHT : DriftColor.MAX_BRIGHT,
-            ])
+                newCie.hs[2] > DriftColor.MID_BRIGHT
+                    ? DriftColor.MIN_BRIGHT
+                    : DriftColor.MAX_BRIGHT,
+            ]),
+            1 - this.key
         );
     }
 

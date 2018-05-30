@@ -1,11 +1,11 @@
 import * as React from 'react';
 
 // import hsluv from 'hsluv';
-import './Colors.css';
+import './ColorWheel.css';
 import {ColorsActions, ColorsProps, ColorsState} from './ColorsContainer';
 import {Component} from 'react';
 
-interface ColorWheelProps extends ColorsState, ColorsActions, ColorsProps {
+export interface ColorWheelProps extends ColorsState, ColorsActions, ColorsProps {
 }
 
 export class ColorWheel extends Component<ColorWheelProps> {
@@ -32,7 +32,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
             >
                 {
                     this.props.colors.driftColors.map((driftColor, i) => {
-                        const style = {
+                        const wedgeStyle = {
                             // stroke: driftColor.toHex(),
                             fill: driftColor.toHex(),
                         };
@@ -62,7 +62,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
                                 onClick={() => this.props.onRemoveColor(i)}
                             >
                                 <polygon
-                                    style={style}
+                                    style={wedgeStyle}
                                     points={points}
                                 />
                                 <text
@@ -72,8 +72,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
                                     y={textY}
                                     transform={
                                         `rotate(${m * 180 / Math.PI} ${textX},${textY})`
-                                        + ` translate(0 0.043)` // center vertically in wedge
-                                    }
+                                        + ` translate(0 0.043)`} // center vertically in wedge
                                 >
                                     {driftColor.cie.toHsluvString()}
                                 </text>

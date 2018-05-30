@@ -4,8 +4,8 @@ import Dimension from '../Dimension';
 import {ColorPodge} from './ColorPodge';
 import {AppState, GenericAction} from '../App';
 import {List} from 'immutable';
-import {ColorWheel} from './ColorWheel';
 import {DriftColor} from './DriftColor';
+import {ColorsDiv} from './ColorsDiv';
 
 const TICK = 100; // milliseconds
 // TODO simulate annealing by progressing from large ticks down
@@ -102,5 +102,6 @@ export const ColorsContainer = connect(
     })
     /* tslint:enable */
 )(
-        ColorWheel
+        ColorsDiv
+        // ColorWheel
 );

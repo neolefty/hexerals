@@ -12,6 +12,11 @@ it('color distance', () => {
     expect(c0.d2(c1)).toBeCloseTo(14);
     expect(c0.d2(c2)).toBeCloseTo(14);
     expect(c1.d2(c2)).toBeCloseTo(56);
+
+    expect(c0.key).toEqual(c0.drift(1).key);
+    expect(c0.key).toEqual(c0.shift([1,1,1], 1).key);
+    expect(c0.contrast().key).toEqual(c0.drift(1).contrast().key);
+    expect(c0.contrast().key).toEqual(c0.shift([1,1,1], 1).contrast().key);
 });
 
 it('color podge basics', () => {
@@ -49,4 +54,4 @@ it('color podge basics', () => {
 });
 
 // TODO test that after divergence, drifting reduces min distance
-// TODO test that mindist of each color in a podge is similar
+// TODO test that mindist() of each color in a podge is similar

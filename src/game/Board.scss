@@ -18,11 +18,11 @@ g.spot {
 g.Nobody polygon {}
 
 $playerColors: (
-        Zero: #adf,
-        One: #6b6,
-        Two: #fff,
-        Three: #e8f,
-        Four: #fc8,
+    Zero: #adf,
+    One: #6b6,
+    Two: #fff,
+    Three: #e8f,
+    Four: #fc8,
 );
 /* Could be cool to have a reverse one, #533 & #faa */
 
@@ -46,6 +46,8 @@ g.spot:hover polygon {
 
 /* TODO would be nice for active to take precedence over hover or something */
 g.active polygon {
+    // TODO check for a way to draw line on inside instead of half-in-half-out
+    // TODO instead expand coords to allow inner and outer?
     stroke: #a22;
     stroke-width: 0.35%;
 }
