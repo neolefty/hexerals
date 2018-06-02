@@ -24,6 +24,7 @@ export class ColorWheel extends Component<ColorWheelProps> {
     }
 
     render(): React.ReactNode {
+        const onlyOne = this.props.colors.driftColors.size === 1;
         return (
             <svg
                 width={this.props.displaySize.min}
@@ -44,7 +45,9 @@ export class ColorWheel extends Component<ColorWheelProps> {
                         const cosA = Math.cos(a), cosB = Math.cos(b),
                             sinA = Math.sin(a), sinB = Math.sin(b),
                             cosM = Math.cos(m), sinM = Math.sin(m);
-                        const points = `${cosA / r2},${sinA / r2}`
+                        const points = onlyOne
+                            ? `1,1 -1,1 -1,-1 1,-1` // fill square if only one color
+                            : `${cosA / r2},${sinA / r2}` // otherwise wedges
                             + ` ${cosM / r2},${sinM / r2}`
                             + ` ${cosB / r2},${sinB / r2}`
                             + ` ${cosB / r1},${sinB / r1}`
