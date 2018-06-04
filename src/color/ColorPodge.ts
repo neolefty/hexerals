@@ -84,11 +84,11 @@ export class ColorPodge {
         return result;
     }
 
-    minDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+    minDist(color: DriftColor, ignore?: DriftColor, ignoreCache: boolean = false) {
         return this.minMaxDist(color, ignore, ignoreCache)[0];
     }
 
-    maxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+    maxDist(color: DriftColor, ignore?: DriftColor, ignoreCache: boolean = false) {
         return this.minMaxDist(color, ignore, ignoreCache)[0];
     }
 
@@ -97,7 +97,7 @@ export class ColorPodge {
     /* tslint:enable */
     // what are the distances to the nearest and farthest other color in this podge?
     // if ignore is supplied, skip it in the list of colors
-    minMaxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+    minMaxDist(color: DriftColor, ignore?: DriftColor, ignoreCache: boolean = false) {
         let result: number[] = this.minMaxDistCache[color.key];
         if (ignoreCache || !result) {
             result = [Infinity, -Infinity];

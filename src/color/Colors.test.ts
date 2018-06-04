@@ -83,6 +83,8 @@ it('color podge random tests', () => {
         const cp5 = cp.disperse(5);
         expect(cp.closestTwo() < cp2.closestTwo()).toBeTruthy();
         expect(cp2.closestTwo() < cp5.closestTwo()).toBeTruthy();
+        expect(cp.furthestTwo() > cp2.furthestTwo()).toBeTruthy();
+        expect(cp2.furthestTwo() > cp5.furthestTwo()).toBeTruthy();
     }
 });
 
