@@ -5,7 +5,13 @@ import {DriftColor} from './DriftColor';
 export class ColorPodge {
 
     static readonly DELTAS: number[][] = [
-        [-1, 0, 0], [0, -1, 0], [0, 0, -1], [1, 0, 0], [0, 1, 0], [0, 0, 1],
+        // random number used as a hash
+        [-1, 0, 0, Math.random()],
+        [0, -1, 0, Math.random()],
+        [0, 0, -1, Math.random()],
+        [1, 0, 0, Math.random()],
+        [0, 1, 0, Math.random()],
+        [0, 0, 1, Math.random()],
     ];
 
     constructor(readonly driftColors: List<DriftColor> = List()) {}
@@ -36,13 +42,30 @@ export class ColorPodge {
         return result;
     }
 
-    closestTwo(): number {
-        return this.driftColors.reduce(
-            (champ: number, contender: DriftColor) =>
-                Math.min(champ, this.minDist(contender)),
-            Infinity
-        );
+    // The perceptual distance between the closest two colors
+    closestTwo(): number { return this.closestFurthestTwo()[0]; }
+
+    // The perceptual distance between the furthest two colors
+    furthestTwo(): number { return this.closestFurthestTwo()[1]; }
+
+    /* tslint:disable:member-ordering */
+    private readonly closestFurtherTwoCache: number[] = [Infinity, -Infinity];
+    /* tslint:enable */
+    closestFurthestTwo(): number[] {
+        if (this.closestFurtherTwoCache[0] === Infinity)
+            this.driftColors.forEach((color: DriftColor) =>
+                ColorPodge.mutateMinMax2(
+                    this.closestFurtherTwoCache, this.minMaxDist(color))
+            );
+        return this.closestFurtherTwoCache;
     }
+
+    /* tslint:disable:member-ordering */
+    static mutateMinMax2(a: number[], b: number[]) {
+        a[0] = Math.min(a[0], b[0]);
+        a[1] = Math.max(a[1], b[1]);
+    }
+    /* tslint:enable */
 
     // try moving color a distance f in each of 6 directions and return the one with the
     // largest minimum distance from all other colors
@@ -51,7 +74,7 @@ export class ColorPodge {
         let maxMinDist = this.minDist(color);
         ColorPodge.DELTAS.forEach(delta => {
             const candidate = color.shift(delta, f);
-            const dist = this.minDist(candidate, color);
+            const dist = this.minDist(candidate, color, true);
             // console.log(`${color} -- consider ${c} -- ${d}`);
             if (dist > maxMinDist) {
                 result = candidate;
@@ -61,15 +84,32 @@ export class ColorPodge {
         return result;
     }
 
-    // what is the distance to the nearest other color in this podge?
+    minDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+        return this.minMaxDist(color, ignore, ignoreCache)[0];
+    }
+
+    maxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+        return this.minMaxDist(color, ignore, ignoreCache)[0];
+    }
+
+    /* tslint:disable:member-ordering */
+    private readonly minMaxDistCache = {};
+    /* tslint:enable */
+    // what are the distances to the nearest and farthest other color in this podge?
     // if ignore is supplied, skip it in the list of colors
-    // TODO memoize
-    minDist(color: DriftColor, ignore?: DriftColor) {
-        let result = Infinity;
-        this.driftColors.forEach((dc: DriftColor) => {
-            if (dc !== color && dc !== ignore)
-                result = Math.min(result, dc.perceptualDistance(color));
-        });
+    minMaxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+        let result: number[] = this.minMaxDistCache[color.key];
+        if (ignoreCache || !result) {
+            result = [Infinity, -Infinity];
+            this.driftColors.forEach((dc: DriftColor) => {
+                if (dc !== color && dc !== ignore) {
+                    const pd = dc.perceptualDistance(color);
+                    ColorPodge.mutateMinMax2(result, [pd, pd]);
+                }
+            });
+            if (!ignoreCache)
+                this.minMaxDistCache[color.key] = result;
+        }
         return result;
     }
 

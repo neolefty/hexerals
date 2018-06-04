@@ -12,7 +12,7 @@ export interface ColorBlobsProps {
 }
 
 // Warning: mutable and used mutably
-class Coord {
+export class Coord {
     x: number;
     y: number;
     static rand(xRange: number = 1, yRange: number = 1) {
@@ -22,28 +22,40 @@ class Coord {
         this.x = x;
         this.y = y;
     }
-    scale(n: number) { // mutates
+    mutateScale(n: number) { // mutates
         this.x *= n;
         this.y *= n;
         return this;
     }
-    add(that: Coord) { // mutates
+    mutateAdd(that: Coord) { // mutates
         this.x += that.x;
         this.y += that.y;
         return this;
     }
+    diff(that: Coord) {
+        return new Coord(this.x - that.x, this.y - that.y);
+    }
+    d2(that: Coord) {
+        const dx = this.x - that.x;
+        const dy = this.y - that.y;
+        return dx * dx + dy * dy;
+    }
     copy() {
         return new Coord(this.x, this.y);
     }
-    toString() { return `(${this.x}, ${this.y})`; }
+    toString(fixed: number = 5) {
+        return `(${this.x.toFixed(fixed)}, ${this.y.toFixed(fixed)})`;
+    }
 }
 
 const SPACE_FILL = 0.5;
 const MIN_STEP_MILLIS = 16; // no faster than 60 fps
-const VELOCITY_MAX = 0.25 / 1000; // per ms; whole space is 1x1 square
+const VELOCITY_MAX = 0.25 / 100; // per ms; whole space is 1x1 square
+// const VELOCITY_MAX = 0.25 / 1000; // per ms; whole space is 1x1 square
 
 export class ColorBlobs extends Component<ColorBlobsProps> {
     private locations: Map<number, Coord> = Map();
+    private velocities: Map<number, Coord> = Map();
     private lastStep = new Date();
 
     step() {
@@ -55,15 +67,28 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
         }
     }
 
+    private ensureLocations() {
+        this.props.colors.driftColors.forEach((color: DriftColor) => {
+            this.getLocation(color.key);
+            this.getVelocity(color.key);
+        });
+    }
+
     private evolve(elapsed: number) {
+        this.ensureLocations();
         const r = this.getRadius();
-        const f: Map<number, Coord> = Map();
-        const forces = f.asMutable();
+        // const closestTwo = this.props.colors.closestTwo();
+        const diam = r * 2;
+        const diam2 = diam * diam;
+        const fTemp: Map<number, Coord> = Map();
+        const forces = fTemp.asMutable();
         // walls
         this.props.colors.driftColors.forEach((color: DriftColor) => {
             const force = new Coord();
             forces.set(color.key, force);
-            const location = this.getCoord(color.key);
+            const location = this.getLocation(color.key);
+
+            // walls
             if (location.x < r)
                 force.x += (r - location.x);
             if (location.y < r)
@@ -72,21 +97,56 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
                 force.x -= (location.x + r - 1);
             if (location.y + r > 1)
                 force.y -= (r + location.y - 1);
+
+            // other blobs
+            this.props.colors.driftColors.forEach((other: DriftColor) => {
+                if (other !== color) {
+                    const otherLoc = this.getLocation(other.key);
+                    const dist2 = location.d2(otherLoc);
+                    // nearby
+                    if (dist2 < diam2) { // overlap?
+                        const dist = Math.sqrt(dist2);
+                        const vec = location.diff(otherLoc);
+                        const mag = diam - dist;
+                        const vecScale = vec.copy().mutateScale(mag);
+                        // const f = 4;
+                        // console.log(`${color.toHex()} -- diam = ${diam.toFixed(f)} -- overlap ${dist2.toFixed(f)}/${diam2.toFixed(f)} = ${dist.toFixed(f)}/${diam.toFixed(f)}--> ${vec.toString(f)} * ${(mag).toFixed(f)} = ${vecScale.toString(f)}`);
+                        force.mutateAdd(vecScale);
+                        // force.mutateAdd(location.diff(otherLoc).mutateScale(d - r));
+                        // force.mutateAdd(location.diff(otherLoc).mutateScale(1 / d2));
+                    }
+                    // color
+                    // const colorDist = color.perceptualDistance(other);
+                }
+            });
         });
 
         // update locations
         const scale = elapsed * VELOCITY_MAX;
         forces.forEach((force: Coord, key: number) => {
-            this.locations.get(key).add(force.scale(scale));
+            // const v = this.velocities.get(key);
+            // v.mutateAdd(force.mutateScale(scale));
+            // this.locations.get(key).mutateAdd(v.copy().mutateScale(elapsed));
+            this.locations.get(key).mutateAdd(force.mutateScale(scale));
         });
     }
 
-    getCoord(i: number) {
+    getLocation(i: number) {
         if (this.locations.has(i))
             return this.locations.get(i);
         else {
             const result = Coord.rand();
             this.locations = this.locations.set(i, result);
+            return result;
+        }
+    }
+
+    getVelocity(i: number) {
+        if (this.velocities.has(i))
+            return this.velocities.get(i);
+        else {
+            const result = Coord.rand();
+            this.velocities = this.velocities.set(i, result);
             return result;
         }
     }
@@ -108,7 +168,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
                 {
                     this.props.colors.driftColors.map((drift: DriftColor, i: number) => (
                         <ColorBlob
-                            coord={this.getCoord(drift.key)}
+                            coord={this.getLocation(drift.key)}
                             color={drift}
                             onRemove={() => this.props.onRemoveColor(i)}
                             key={i}
