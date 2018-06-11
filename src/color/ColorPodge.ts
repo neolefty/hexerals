@@ -6,12 +6,7 @@ export class ColorPodge {
 
     static readonly DELTAS: number[][] = [
         // random number used as a hash
-        [-1, 0, 0, Math.random()],
-        [0, -1, 0, Math.random()],
-        [0, 0, -1, Math.random()],
-        [1, 0, 0, Math.random()],
-        [0, 1, 0, Math.random()],
-        [0, 0, 1, Math.random()],
+        [-1, 0, 0], [0, -1, 0], [0, 0, -1], [1, 0, 0], [0, 1, 0], [0, 0, 1],
     ];
 
     constructor(readonly driftColors: List<DriftColor> = List()) {}
@@ -53,10 +48,12 @@ export class ColorPodge {
     /* tslint:enable */
     closestFurthestTwo(): number[] {
         if (this.closestFurtherTwoCache[0] === Infinity)
-            this.driftColors.forEach((color: DriftColor) =>
-                ColorPodge.mutateMinMax2(
-                    this.closestFurtherTwoCache, this.minMaxDist(color))
-            );
+            if (this.driftColors.size <= 1)
+                ColorPodge.mutateMinMax2(this.closestFurtherTwoCache, [0, 0]);
+            else
+                this.driftColors.forEach((color: DriftColor) =>
+                    ColorPodge.mutateMinMax2(
+                        this.closestFurtherTwoCache, this.minMaxDist(color)));
         return this.closestFurtherTwoCache;
     }
 

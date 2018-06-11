@@ -79,14 +79,17 @@ it('color podge random tests', () => {
         ];
         expect(cp.closestTwo()).toEqual(Math.min(...distances));
         expect(cp.furthestTwo()).toEqual(Math.max(...distances));
+
         const cp2 = cp.disperse(2);
-        const cp5 = cp.disperse(5);
         expect(cp.closestTwo() < cp2.closestTwo()).toBeTruthy();
+        const cp5 = cp.disperse(5);
         expect(cp2.closestTwo() < cp5.closestTwo()).toBeTruthy();
-        expect(cp.furthestTwo() > cp2.furthestTwo()).toBeTruthy();
-        expect(cp2.furthestTwo() > cp5.furthestTwo()).toBeTruthy();
+
+        // can't count on this though--we're only maximizing min dist,
+        // not trying to do anything about max dist.
+        // expect(cp.furthestTwo() > cp2.furthestTwo()).toBeTruthy();
+        // expect(cp2.furthestTwo() > cp5.furthestTwo()).toBeTruthy();
     }
 });
 
-// TODO test that after divergence, drifting reduces min distance
-// TODO test that mindist() of each color in a podge is similar
+// TODO test that mindist() of each color in a podge is similar, after convergence

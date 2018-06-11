@@ -61,6 +61,7 @@ function removeColorAction(x: number): RemoveColor {
 }
 
 const INITIAL_COLOR_PODGE = new ColorPodge(List([
+    DriftColor.random(), DriftColor.random(), DriftColor.random(),
     DriftColor.random(), DriftColor.random(), DriftColor.random()
 ]));
 

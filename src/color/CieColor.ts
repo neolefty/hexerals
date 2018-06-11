@@ -4,7 +4,8 @@ export class CieColor {
     readonly hp: number[];
 
     constructor(readonly hs: number[]) {
-        this.hs[0] = this.hs[0] % 360;
+        // positive modulo
+        this.hs[0] = ((this.hs[0] % 360) + 360) % 360;
         this.hp = hsluv.rgbToHpluv(hsluv.hsluvToRgb(this.hs));
     }
 
