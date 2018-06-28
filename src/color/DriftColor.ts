@@ -4,9 +4,12 @@ export class DriftColor {
     // allowed limits on brightness & saturation when drifting (hsluv)
     static readonly MIN_BRIGHT = 30;
     static readonly MAX_BRIGHT = 80;
+    static readonly SPAN_BRIGHT = DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT;
+    static readonly RECIP_BRIGHT = 1 / DriftColor.SPAN_BRIGHT;
     static readonly MID_BRIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2;
     static readonly MIN_SAT = 60;
     static readonly MAX_SAT = 100;
+    static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT;
     // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2;
 
     static clamp_bright(b: number): number {

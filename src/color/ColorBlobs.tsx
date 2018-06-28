@@ -5,7 +5,7 @@ import {ColorPodge} from './ColorPodge';
 import {DriftColor} from './DriftColor';
 import Dimension from '../Dimension';
 
-const SPACE_FILL = 0.55;
+const SPACE_FILL = 0.65;
 const MIN_STEP_MILLIS = 16; // no faster than 60 fps
 const VELOCITY_MAX = 0.25 / 100; // per ms; whole space is 1x1 square
 const COLOR_NEIGHBORHOOD = 20; // multiple of radius
@@ -149,10 +149,11 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
             if (x)
                 force.mutateAdd(this.repelSquareWalls(r, location));
             force.mutateAdd(this.repelRoundWalls(r, location));
+            force.mutateAdd(this.attractDarkToCenter(color, location));
             // force.mutateAdd(this.attractCenter(r, location));
 
             if (this.props.colors.driftColors.size >= 2)
-                force.mutateAdd(this.bounceOtherBlobs(r, color, location));
+                force.mutateAdd(this.repelOtherBlobs(r, color, location));
             // moving 2 colors by color distance doesn't make sense
             if (this.props.colors.driftColors.size >= 3)
                 force.mutateAdd(this.attractRepelColors(
@@ -265,12 +266,17 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
         // distance outside inner radius, squared
         const d2 = location.mag2() - innerR * innerR;
         if (d2 > 0)
-            return location.copy().mutateScale(-Math.sqrt(d2) * 0.3);
+            return location.copy().mutateScale(-Math.sqrt(d2) * 0.6);
         else
             return new Coord();
     }
 
-    private bounceOtherBlobs(r: number, color: DriftColor, location: Coord) {
+    private attractDarkToCenter(color: DriftColor, location: Coord) {
+        const fromDark = DriftColor.MAX_BRIGHT - color.cie.hs[2];
+        return location.copy().mutateScale(-.3 * DriftColor.RECIP_BRIGHT * fromDark);
+    }
+
+    private repelOtherBlobs(r: number, color: DriftColor, location: Coord) {
         const diam = r + r;
         const result = new Coord();
         this.props.colors.driftColors.forEach((other: DriftColor) => {
@@ -288,7 +294,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
                     const centerDist = vec.mag();
                     vec.mutateScale(1 / centerDist); // unit vector
                     const overlap = diam - centerDist;
-                    result.mutateAdd(vec.mutateScale(0.3 * overlap));
+                    result.mutateAdd(vec.mutateScale(0.6 * overlap));
 
                     // const dist = Math.sqrt(dist2);
                     // const mag = diam - dist;
