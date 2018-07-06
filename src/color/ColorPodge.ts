@@ -100,7 +100,8 @@ export class ColorPodge {
             result = [Infinity, -Infinity];
             this.driftColors.forEach((dc: DriftColor) => {
                 if (dc !== color && dc !== ignore) {
-                    const pd = dc.perceptualDistance(color);
+                    // const pd = dc.normalizedDistance2(color);
+                    const pd = dc.perceptualDistance2(color);
                     ColorPodge.mutateMinMax2(result, [pd, pd]);
                 }
             });

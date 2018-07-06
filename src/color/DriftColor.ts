@@ -39,16 +39,12 @@ export class DriftColor {
 
     constructor(readonly cie: CieColor, readonly key: number = Math.random()) {}
 
-    d2(that: DriftColor) {
-        return this.cie.perceptualDistance2(that.cie);
-    }
-
     drift(f: number) {
         return new DriftColor(
             new CieColor([
-                (this.cie.hp[0] + Math.random() * f),
-                DriftColor.clamp_sat(this.cie.hp[1] + Math.random() * f),
-                DriftColor.clamp_bright(this.cie.hp[2] + Math.random() * f),
+                (this.cie.hsl[0] + Math.random() * f),
+                DriftColor.clamp_sat(this.cie.hsl[1] + Math.random() * f),
+                DriftColor.clamp_bright(this.cie.hsl[2] + Math.random() * f),
             ]),
             this.key
         );
@@ -58,15 +54,24 @@ export class DriftColor {
     shift(unit: number[], mag: number): DriftColor {
         return new DriftColor(
             new CieColor([
-                unit[0] * mag + this.cie.hs[0],
-                DriftColor.clamp_sat(unit[1] * mag + this.cie.hs[1]),
-                DriftColor.clamp_bright(unit[2] * mag + this.cie.hs[2]),
+                unit[0] * mag + this.cie.hsl[0],
+                DriftColor.clamp_sat(unit[1] * mag + this.cie.hsl[1]),
+                DriftColor.clamp_bright(unit[2] * mag + this.cie.hsl[2]),
             ]),
             this.key
         );
     }
 
-    perceptualDistance(that: DriftColor): number {
+    d2(that: DriftColor) {
+        return this.perceptualDistance2(that);
+    }
+
+    // sum of squares distance using
+    normalizedDistance2(that: DriftColor): number {
+        return this.cie.normalizedDistance2(that.cie);
+    }
+
+    perceptualDistance2(that: DriftColor): number {
         return this.cie.perceptualDistance2(that.cie);
     }
 
@@ -74,9 +79,9 @@ export class DriftColor {
         const newCie = this.cie.contrast();
         return new DriftColor(
             new CieColor([
-                newCie.hs[0],
+                newCie.hsl[0],
                 DriftColor.MAX_SAT,
-                newCie.hs[2] > DriftColor.MID_BRIGHT
+                newCie.hsl[2] > DriftColor.MID_BRIGHT
                     ? DriftColor.MIN_BRIGHT
                     : DriftColor.MAX_BRIGHT,
             ]),
@@ -89,9 +94,10 @@ export class DriftColor {
     }
 
     toHsluvString() { return this.cie.toHsluvString(); }
-    toHpluvString() { return this.cie.toHpluvString(); }
+    toLchString() { return this.cie.toLchString(); }
+    // toHpluvString() { return this.cie.toHpluvString(); }
 
     toString(): string {
-        return `${this.cie.hex()} - hs: ${this.toHsluvString()} - hp: ${this.toHpluvString()}`;
+        return `${this.cie.hex()} - hsl: ${this.toHsluvString()} - lch: ${this.toLchString()}`;
     }
 }

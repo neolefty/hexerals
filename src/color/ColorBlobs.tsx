@@ -218,7 +218,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
             if (other !== color) {
                 const otherLoc = this.getLocation(other.key);
                 if (otherLoc.d2(location) < neighborhood2) {
-                    const colorDist = Math.sqrt(color.perceptualDistance(other));
+                    const colorDist = Math.sqrt(color.perceptualDistance2(other));
                     colorDists.set(other.key, colorDist);
                     colorDistSum += colorDist;
                 }
@@ -272,7 +272,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
     }
 
     private attractDarkToCenter(color: DriftColor, location: Coord) {
-        const fromDark = DriftColor.MAX_BRIGHT - color.cie.hs[2];
+        const fromDark = DriftColor.MAX_BRIGHT - color.cie.hsl[2];
         return location.copy().mutateScale(-.3 * DriftColor.RECIP_BRIGHT * fromDark);
     }
 

@@ -10,9 +10,14 @@ it('color distance', () => {
     // console.log(`c0 = ${c0.toString()}`);
     // console.log(`c1 = ${c1.toString()}`);
     // console.log(`c2 = ${c2.toString()}`);
-    expect(c0.d2(c1)).toBeCloseTo(14);
-    expect(c0.d2(c2)).toBeCloseTo(14);
-    expect(c1.d2(c2)).toBeCloseTo(56);
+    expect(c0.normalizedDistance2(c1)).toBeCloseTo(14);
+    expect(c0.normalizedDistance2(c2)).toBeCloseTo(14);
+    expect(c1.normalizedDistance2(c2)).toBeCloseTo(56);
+
+    expect(c0.d2(c1)).toEqual(c0.perceptualDistance2(c1));
+    expect(c0.d2(c1)).toBeCloseTo(10.26, 2);
+    expect(c0.d2(c2)).toBeCloseTo(10.03, 2);
+    expect(c1.d2(c2)).toBeCloseTo(40.46, 2);
 
     expect(c0.key).toEqual(c0.drift(1).key);
     expect(c0.key).toEqual(c0.shift([1,1,1], 1).key);
@@ -73,9 +78,9 @@ it('color podge random tests', () => {
         const c = DriftColor.random();
         const cp = new ColorPodge(List([a, b, c]));
         const distances = [
-            a.perceptualDistance(b),
-            b.perceptualDistance(c),
-            c.perceptualDistance(a),
+            a.d2(b),
+            b.d2(c),
+            c.d2(a),
         ];
         expect(cp.closestTwo()).toEqual(Math.min(...distances));
         expect(cp.furthestTwo()).toEqual(Math.max(...distances));
