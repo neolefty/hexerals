@@ -49,10 +49,13 @@ it('color podge basics', () => {
     const c1: DriftColor = cp.driftColors.get(1);
     expect(cp.minDist(c0)).toBeCloseTo(cp.minDist(c1));
     expect(cp.minDist(c0)).toBeCloseTo(c0.d2(c1));
+    expect(cp.maxDist(c0)).toBeCloseTo(cp.maxDist(c1));
+    expect(cp.maxDist(c0)).toBeGreaterThan(cp.minDist(c0));
     expect(cp.closestTwo()).toEqual(c0.d2(c1));
 
     cp = cp.addRandomColor();
     cp = cp.addRandomColor();
+    expect(cp.maxDist(c0)).toBeGreaterThan(cp.minDist(c0));
     cpDispersed = cp.disperse(1);
     // console.log(`before: ${cp.closestTwo()}; after: ${cpDispersed.closestTwo()}`);
     expect(cpDispersed.closestTwo() + 0.01).toBeGreaterThan(cp.closestTwo());

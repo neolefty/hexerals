@@ -86,7 +86,7 @@ export class ColorPodge {
     }
 
     maxDist(color: DriftColor, ignore?: DriftColor, ignoreCache: boolean = false) {
-        return this.minMaxDist(color, ignore, ignoreCache)[0];
+        return this.minMaxDist(color, ignore, ignoreCache)[1];
     }
 
     /* tslint:disable:member-ordering */
