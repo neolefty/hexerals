@@ -5,8 +5,9 @@ import {DriftColor} from './DriftColor';
 export class ColorPodge {
 
     static readonly DELTAS: number[][] = [
-        // random number used as a hash
-        [-1, 0, 0], [0, -1, 0], [0, 0, -1], [1, 0, 0], [0, 1, 0], [0, 0, 1],
+        // index 1 is larger because LCh Chroma is scaled down
+        // and won't shift at all if we use 1.
+        [-1, 0, 0], [0, -3, 0], [0, 0, -1], [1, 0, 0], [0, 3, 0], [0, 0, 1],
     ];
 
     constructor(readonly driftColors: List<DriftColor> = List()) {}
@@ -27,10 +28,10 @@ export class ColorPodge {
     }
 
     // spread colors away from each other
-    disperse(f: number): ColorPodge {
+    disperse(stepSize: number): ColorPodge {
         // const before = this.closestTwo();
         const result = new ColorPodge(List(this.driftColors.map(
-            (color: DriftColor) => this.disperseOne(color, f)
+            (color: DriftColor) => this.disperseOne(color, stepSize)
         )));
         // console.log(`${Math.round(before)} -- drift ${f} -- ${result.toString()}`);
         // console.log(`${this.toString()} -- drift ${f} -- ${result.toString()}`);
