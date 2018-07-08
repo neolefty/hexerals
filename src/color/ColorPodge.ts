@@ -99,10 +99,10 @@ export class ColorPodge {
         let result: number[] = this.minMaxDistCache[color.key];
         if (ignoreCache || !result) {
             result = [Infinity, -Infinity];
-            this.driftColors.forEach((dc: DriftColor) => {
-                if (dc !== color && dc !== ignore) {
+            this.driftColors.forEach((otherColor: DriftColor) => {
+                if (otherColor !== color && otherColor !== ignore) {
                     // const pd = dc.normalizedDistance2(color);
-                    const pd = dc.perceptualDistance2(color);
+                    const pd = otherColor.perceptualDistance2(color);
                     ColorPodge.mutateMinMax2(result, [pd, pd]);
                 }
             });

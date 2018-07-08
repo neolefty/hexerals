@@ -172,7 +172,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
             if (useVel) {
                 const v = this.velocities.get(key);
                 v.mutateAdd(force.mutateScale(scale * 0.001));
-                v.mutateScale(0.9); // drag
+                v.mutateScale(0.95); // drag
                 this.locations.get(key).mutateAdd(v.copy().mutateScale(elapsed));
             }
             else

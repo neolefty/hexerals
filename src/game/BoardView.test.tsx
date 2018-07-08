@@ -4,14 +4,13 @@ import * as enzyme from 'enzyme';
 import {shallow} from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
 
-import {placeCursorAction, movePlayerAction, newGameAction} from './BoardActions';
+import {movePlayerAction, newGameAction, placeCursorAction} from './BoardActions';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
 import {GameReducer, GameState} from './BoardContainer';
-import {OldGridSpotView} from './OldGridView';
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants';
 import {HexCoord} from './Hex';
-import {OldGridView} from './OldGridView';
 import Dimension from "../Dimension";
+import {BoardViewBase} from "./BoardView";
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
@@ -99,7 +98,6 @@ it('clicks a spot to select it', () => {
         <OldGridSpotView spot={spot} selected={true} coord={coord}/>
     ).hasClass('active')).toBeTruthy();
 });
-
 it('controls game flow via react-redux', () => {
     const store = createStore<GameState>(GameReducer);
     // console.log(`before: board ${store.getState().board}; game.board ${store.getState().board.spots.size}`);
@@ -171,3 +169,63 @@ it('controls game flow via react-redux', () => {
 
     // TODO test that you can't move someone else's stuff?
 });
+
+interface OldGridSpotProps {
+    spot: Spot;
+    selected: boolean;
+    coord: HexCoord;
+
+    onSelect?: () => void;
+}
+
+const oldGridSpotStyle = (props: OldGridSpotProps) =>
+(props.selected ? 'active ' : '') + 'spot ' + props.spot.owner;
+
+export const OldGridSpotView = (props: OldGridSpotProps) => (
+    <span
+        className={oldGridSpotStyle(props)}
+        title={props.spot.owner + ' - ' + props.coord.toString(true)}
+        // onClick={props.onSelect}
+        onClick={(/*e*/) => props.onSelect && props.onSelect()}
+    >
+        {props.spot.pop}
+    </span>
+);
+
+export class OldGridView extends BoardViewBase {
+    render(): React.ReactNode {
+        return (
+            <div
+                className="board"
+                tabIndex={0}
+                onKeyDown={this.onKeyDown}
+            >
+                {
+                    this.props.board.edges.yRange().reverse().map((cy: number) => (
+                        <div key={cy}>
+                            {
+                                this.props.board.edges.xRange().filter( // remove nonexistent
+                                    (cx: number) => (cx + cy) % 2 === 0
+                                ).map( // turn cartesian into hex
+                                    (cx: number) => HexCoord.getCart(cx, cy)
+                                ).filter( // only in-bounds
+                                    (coord: HexCoord) => this.props.board.inBounds(coord)
+                                ).map(
+                                    (coord: HexCoord) => (
+                                        <OldGridSpotView
+                                            spot={this.props.board.getSpot(coord)}
+                                            key={coord.id}
+                                            selected={coord === this.props.cursor}
+                                            onSelect={() => this.props.onPlaceCursor(coord)}
+                                            coord={coord}
+                                        />
+                                    )
+                                )
+                            }
+                        </div>
+                    ))
+                }
+            </div>
+        );
+    }
+}
