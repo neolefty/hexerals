@@ -47,18 +47,33 @@ it('color podge basics', () => {
 
     const c0: DriftColor = cp.driftColors.get(0);
     const c1: DriftColor = cp.driftColors.get(1);
+    // size is still 2
     expect(cp.minDist(c0)).toBeCloseTo(cp.minDist(c1));
     expect(cp.minDist(c0)).toBeCloseTo(c0.d2(c1));
     expect(cp.maxDist(c0)).toBeCloseTo(cp.maxDist(c1));
-    expect(cp.maxDist(c0)).toBeGreaterThan(cp.minDist(c0));
+    expect(cp.maxDist(c0)).toBeCloseTo(cp.minDist(c0));
     expect(cp.closestTwo()).toEqual(c0.d2(c1));
 
     cp = cp.addRandomColor();
     cp = cp.addRandomColor();
-    expect(cp.maxDist(c0)).toBeGreaterThan(cp.minDist(c0));
+
+    expect(Math.abs(cp.minDist(c0) - cp.minDist(c1))).toBeGreaterThan(0);
+
+    // TODO why is maxDist(c0) == maxDist(c1) sometimes?
+    // with 4 colors, now the min & max dists from c0 and c1 should differ
+    // console.log(cp.minDist(c0));
+    // console.log(cp.minDist(c1));
+    // console.log(cp.maxDist(c0));
+    // console.log(cp.maxDist(c1));
+    // expect(Math.abs(cp.maxDist(c0) - cp.maxDist(c1))).toBeGreaterThan(0);
+
+    expect(cp.minDist(c0)).toBeLessThan(cp.maxDist(c0));
+    expect(cp.minDist(c1)).toBeLessThan(cp.maxDist(c1));
     cpDispersed = cp.disperse(1);
     // console.log(`before: ${cp.closestTwo()}; after: ${cpDispersed.closestTwo()}`);
     expect(cpDispersed.closestTwo() + 0.01).toBeGreaterThan(cp.closestTwo());
+    const cpDispersed3 = cp.disperse(3)
+    expect(cpDispersed3.closestTwo()).toBeGreaterThan(cpDispersed.closestTwo());
 });
 
 it('color podge math', () => {
