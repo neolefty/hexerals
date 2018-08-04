@@ -11,7 +11,7 @@ import {ColorsReducer} from './color/ColorsContainer';
 /* eslint-disable no-underscore-dangle */
 const store = createStore<AppState>(
     combineReducers({
-        game: GameReducer,
+        localGame: GameReducer,
         colors: ColorsReducer,
         /* perf: PerfReducer,*/
     }),

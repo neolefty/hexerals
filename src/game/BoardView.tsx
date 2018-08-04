@@ -34,7 +34,7 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
 const OUTER_BOARD_MARGIN = 1; // space between bounding rect and hex viewbox
 const INNER_BOARD_MARGIN = 1; // space between hex viewbox and hexes
 
-export const GameView = (props: BoardViewProps) => {
+export const BoardView = (props: BoardViewProps) => {
     return (
         <div>
             {

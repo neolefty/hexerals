@@ -4,10 +4,10 @@ import {Dispatch} from 'redux';
 import {HexCoord} from './Hex';
 import {Board} from './Board';
 import {
-    movePlayerAction, newGameAction, placeCursorAction,
+    movePlayerAction, placeCursorAction, newGameAction,
     BoardReducerImpl,
 } from './BoardActions';
-import {GameView} from './BoardView';
+import {BoardView} from './BoardView';
 import {AppState} from '../App';
 import Dimension from "../Dimension";
 
@@ -16,14 +16,14 @@ export interface GameState {
     cursor: HexCoord;
 }
 
-export interface GameContainerProps {
+export interface BoardContainerProps {
     displaySize: Dimension;
 }
 
 const mapStateToBoardViewProps = (
-    state: AppState, ownProps: GameContainerProps
+    state: AppState, ownProps: BoardContainerProps
 ) => ({
-    ...state.game,
+    ...state.localGame,
     displaySize: ownProps.displaySize,
 });
 
@@ -41,8 +41,8 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
 
 export const GameReducer = BoardReducerImpl;
 
-export const GameContainer = connect(
+export const BoardContainer = connect(
     mapStateToBoardViewProps, mapDispatchToBoardViewProps
 )(
-    GameView
+    BoardView
 );

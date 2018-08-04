@@ -1,9 +1,11 @@
 import * as React from 'react';
 import './App.css';
-import {GameContainer, GameState} from './game/BoardContainer';
+import {BoardContainer} from './game/BoardContainer';
 import {MIN_HEIGHT, MIN_WIDTH} from './game/BoardConstants';
 import Dimension from './Dimension';
 import {ColorsContainer, ColorsState} from './color/ColorsContainer';
+import {Board} from "./game/Board";
+import {HexCoord} from "./game/Hex";
 
 export interface GenericAction {
     type: string;
@@ -12,7 +14,10 @@ export interface GenericAction {
 export interface AppProps {}
 
 export interface AppState {
-    game: GameState;
+    localGame: {
+        board: Board;
+        cursor: HexCoord;
+    };
     colors: ColorsState;
     displaySize: Dimension;
 }
@@ -47,7 +52,7 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <div className="App">
-                <GameContainer
+                <BoardContainer
                     displaySize={this.getDisplaySize()}
                 />
                 <ColorsContainer
