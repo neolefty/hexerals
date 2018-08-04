@@ -10,7 +10,6 @@ export interface BoardViewActions {
     onMovePlayer: (delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
     onNewGame: (board: Board) => void;
-    onChangeDisplaySize: (dim: Dimension) => void;
 }
 
 interface BoardViewProps extends BoardViewActions {
@@ -92,6 +91,8 @@ export class HexBoardView extends BoardViewBase {
     }
 
     render(): React.ReactNode {
+        if (Math.random() < 0.01)
+            console.log(this.props);
         // calculate board size
         const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN;
         const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN;

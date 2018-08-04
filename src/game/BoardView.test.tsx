@@ -38,7 +38,6 @@ it('renders a board with no selection', () => {
             onMovePlayer={() => {}}
             onPlaceCursor={() => {}}
             onNewGame={() => {}}
-            onChangeDisplaySize={() => {}}
         />
     );
     expect(view.children().length).toEqual(n);  // n rows
@@ -66,7 +65,6 @@ it('renders a board with a selection', () => {
             onPlaceCursor={() => {}}
             onMovePlayer={() => {}}
             onNewGame={() => {}}
-            onChangeDisplaySize={() => {}}
         />
     );
     const active = view.find('.active');

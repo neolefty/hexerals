@@ -1,6 +1,5 @@
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import Dimension from '../Dimension';
 
 import {HexCoord} from './Hex';
 import {Board} from './Board';
@@ -8,39 +7,24 @@ import {
     movePlayerAction, newGameAction, placeCursorAction,
     BoardReducerImpl,
 } from './BoardActions';
-import {BoardViewActions, GameView} from './BoardView';
+import {GameView} from './BoardView';
 import {AppState} from '../App';
+import Dimension from "../Dimension";
 
 export interface GameState {
     board: Board;
     cursor: HexCoord;
 }
 
-export interface GameProps {
+export interface GameContainerProps {
     displaySize: Dimension;
 }
 
 const mapStateToBoardViewProps = (
-    state: AppState
+    state: AppState, ownProps: GameContainerProps
 ) => ({
     ...state.game,
-});
-
-// const mergeProps = (
-//     state: Object,
-//     actions: Object,
-//     parentProps: Object,
-// ) => Object.assign({}, state, actions, parentProps);
-const mergeProps = (
-    state: GameState,
-    actions: BoardViewActions,
-    /* tslint:disable:no-any */
-    parentProps: any,
-    /* tslint:enable */
-) => ({
-    ...state,
-    ...actions,
-    displaySize: parentProps.displaySize,
+    displaySize: ownProps.displaySize,
 });
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
@@ -58,7 +42,7 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
 export const GameReducer = BoardReducerImpl;
 
 export const GameContainer = connect(
-    mapStateToBoardViewProps, mapDispatchToBoardViewProps, mergeProps/* , options,*/
+    mapStateToBoardViewProps, mapDispatchToBoardViewProps
 )(
     GameView
 );
