@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import {Map} from 'immutable';
 import {RectEdges, BoardConstraints, HexCoord, RectangularConstraints} from './Hex';
+import {INITIAL_POP} from './BoardConstants';
 
 export enum Player {
     Nobody = 'Nobody',
@@ -9,15 +10,23 @@ export enum Player {
     Two = 'Two',
     Three = 'Three',
     Four = 'Four',
+    Five = 'Five',
+    Six = 'Six',
+    Seven = 'Seven',
+    Eight = 'Eight',
 }
 
 export const PLAYERS: Map<number, Player> = Map([
-    [ -1, Player.Nobody],
-    [ 0, Player.Zero],
-    [ 1, Player.One],
-    [ 2, Player.Two],
-    [ 3, Player.Three],
-    [ 4, Player.Four],
+    [ -1, Player.Nobody ],
+    [ 0, Player.Zero ],
+    [ 1, Player.One ],
+    [ 2, Player.Two ],
+    [ 3, Player.Three ],
+    [ 4, Player.Four ],
+    [ 5, Player.Five ],
+    [ 6, Player.Six ],
+    [ 7, Player.Seven ],
+    [ 8, Player.Eight ],
 ]);
 
 export const PLAYABLE_PLAYERS = [
@@ -62,6 +71,13 @@ export interface StartingArranger {
 }
 
 export class RandomArranger implements StartingArranger {
+    public static construct(numPlayers: number) {
+        return new RandomArranger(
+            INITIAL_POP,
+            PLAYABLE_PLAYERS.slice(0, numPlayers),
+        );
+    }
+
     constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {}
 
     public arrange(board: Board): Map<HexCoord, Spot> {
@@ -84,10 +100,10 @@ export class CornersArranger implements StartingArranger {
     public arrange(board: Board): Map<HexCoord, Spot> {
         let starts = Map<HexCoord, Spot>();
         const corners = [
-            (b: Board) => board.edges.lowerLeft,
-            (b: Board) => board.edges.upperRight,
-            (b: Board) => board.edges.upperLeft,
-            (b: Board) => board.edges.lowerRight,
+            (b: Board) => b.edges.lowerLeft,
+            (b: Board) => b.edges.upperRight,
+            (b: Board) => b.edges.upperLeft,
+            (b: Board) => b.edges.lowerRight,
         ];
         let i = 0;
         for (let p in this.players) { // not sure why we can't use of instead of in

@@ -1,9 +1,9 @@
 import * as assert from 'assert';
-import {Board, Move} from './Board';
-import {INITIAL_GAME_STATE} from './BoardConstants';
+import {Board, Move, PLAYABLE_PLAYERS, RandomArranger} from './Board';
 import {HexCoord} from './Hex';
-import {GameState} from './BoardContainer';
 import {GenericAction} from '../App';
+import {BoardState} from './BoardState';
+import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -11,14 +11,23 @@ import {GenericAction} from '../App';
 
 export type GameAction = NewGame | MovePlayer | PlaceCursor;
 
-export function BoardReducerImpl(
-    state: GameState = INITIAL_GAME_STATE, action: GameAction
-): GameState {
+export const INITIAL_BOARD_STATE: BoardState = {
+    board: Board.constructRectangular(
+        INITIAL_WIDTH,
+        INITIAL_HEIGHT,
+        new RandomArranger(INITIAL_POP, PLAYABLE_PLAYERS),
+    ),
+    cursor: HexCoord.NONE,
+};
+
+export function BoardReducer(
+    state: BoardState = INITIAL_BOARD_STATE, action: GameAction
+): BoardState {
     if (isNewGame(action))
         state = newGameReducer(state, action);
-    if (isPlaceCursor(action))
+    else if (isPlaceCursor(action))
         state = placeCursorReducer(state, action);
-    if (isMovePlayer(action))
+    else if (isMovePlayer(action))
         state = movePlayerReducer(state, action);
     return state;
 }
@@ -38,7 +47,7 @@ export function newGameAction(board: Board): NewGame {
         board: board,
     };
 }
-function newGameReducer(state: GameState, action: NewGame): GameState {
+function newGameReducer(state: BoardState, action: NewGame): BoardState {
     return {
         ...state,
         cursor: HexCoord.NONE,
@@ -65,7 +74,7 @@ export function movePlayerAction(
         alsoCursor: alsoCursor,
     };
 }
-function movePlayerReducer(state: GameState, action: MovePlayer): GameState {
+function movePlayerReducer(state: BoardState, action: MovePlayer): BoardState {
     const move = new Move(state.cursor, action.delta);
     assert(state.board.inBounds(move.dest));
     return {
@@ -90,7 +99,7 @@ export function placeCursorAction(position: HexCoord): PlaceCursor {
         position: position,
     };
 }
-function placeCursorReducer(state: GameState, action: PlaceCursor): GameState {
+function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState {
     assert(state.board.inBounds(action.position));
     return {
         ...state,

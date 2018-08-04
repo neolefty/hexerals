@@ -4,30 +4,24 @@ import {Dispatch} from 'redux';
 import {HexCoord} from './Hex';
 import {Board} from './Board';
 import {
-    movePlayerAction, placeCursorAction, newGameAction,
-    BoardReducerImpl,
-} from './BoardActions';
+    movePlayerAction, placeCursorAction, newGameAction, } from './BoardReducer';
 import {BoardView} from './BoardView';
 import {AppState} from '../App';
-import Dimension from "../Dimension";
+import Dimension from '../Dimension';
+import {BoardState} from './BoardState';
 
-export interface GameState {
-    board: Board;
-    cursor: HexCoord;
-}
-
-export interface BoardContainerProps {
+export interface LocalGameProps {
     displaySize: Dimension;
 }
 
 const mapStateToBoardViewProps = (
-    state: AppState, ownProps: BoardContainerProps
+    state: AppState, ownProps: LocalGameProps
 ) => ({
-    ...state.localGame,
+    ...state.cycle.localGame as BoardState,  // assertion that it's not undefined
     displaySize: ownProps.displaySize,
 });
 
-const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
+const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
     onMovePlayer: (delta: HexCoord) => {
         dispatch(movePlayerAction(delta, true));
     },
@@ -39,9 +33,7 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<GameState>) => ({
     },
 });
 
-export const GameReducer = BoardReducerImpl;
-
-export const BoardContainer = connect(
+export const LocalGameContainer = connect(
     mapStateToBoardViewProps, mapDispatchToBoardViewProps
 )(
     BoardView

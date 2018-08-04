@@ -3,16 +3,16 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
 import App, {AppState} from './App';
-import {GameReducer} from './game/BoardContainer';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import {ColorsReducer} from './color/ColorsContainer';
+import {CycleReducer} from './cycle/CycleReducer';
 
 /* eslint-disable no-underscore-dangle */
 const store = createStore<AppState>(
     combineReducers({
-        localGame: GameReducer,
         colors: ColorsReducer,
+        cycle: CycleReducer,
         /* perf: PerfReducer,*/
     }),
     // preloadedState,

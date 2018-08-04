@@ -4,13 +4,16 @@ import * as enzyme from 'enzyme';
 import {shallow} from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
 
-import {movePlayerAction, newGameAction, placeCursorAction} from './BoardActions';
+import {
+    BoardReducer, movePlayerAction, newGameAction, placeCursorAction
+} from './BoardReducer';
 import {Board, Player, Spot, TwoCornersArranger} from './Board';
-import {GameReducer, GameState} from './BoardContainer';
-import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants';
+import {INITIAL_POP} from './BoardConstants';
 import {HexCoord} from './Hex';
 import Dimension from "../Dimension";
 import {BoardViewBase} from "./BoardView";
+import {BoardState} from './BoardState';
+import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()});
@@ -97,7 +100,7 @@ it('clicks a spot to select it', () => {
     ).hasClass('active')).toBeTruthy();
 });
 it('controls game flow via react-redux', () => {
-    const store = createStore<GameState>(GameReducer);
+    const store = createStore<BoardState>(BoardReducer);
     // console.log(`before: board ${store.getState().board}; game.board ${store.getState().board.spots.size}`);
     store.dispatch(newGameAction(Board.constructRectangular(
         INITIAL_WIDTH, INITIAL_HEIGHT, new TwoCornersArranger(INITIAL_POP))));

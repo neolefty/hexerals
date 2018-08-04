@@ -1,11 +1,11 @@
 import * as React from 'react';
 import './App.css';
-import {BoardContainer} from './game/BoardContainer';
-import {MIN_HEIGHT, MIN_WIDTH} from './game/BoardConstants';
+import {MIN_HEIGHT} from './game/BoardConstants';
 import Dimension from './Dimension';
 import {ColorsContainer, ColorsState} from './color/ColorsContainer';
-import {Board} from "./game/Board";
-import {HexCoord} from "./game/Hex";
+import {CycleState} from './cycle/CycleState';
+import {CycleContainer} from './cycle/CycleContainer';
+import {MIN_WIDTH} from './game/BoardConstants';
 
 export interface GenericAction {
     type: string;
@@ -14,11 +14,11 @@ export interface GenericAction {
 export interface AppProps {}
 
 export interface AppState {
-    localGame: {
-        board: Board;
-        cursor: HexCoord;
-    };
     colors: ColorsState;
+    cycle: CycleState;
+
+    // displaySize is only needed here so that setState in updateDimensions()
+    // will trigger rendering of children
     displaySize: Dimension;
 }
 
@@ -33,7 +33,6 @@ class App extends React.Component<AppProps, AppState> {
             Math.max(window.innerWidth, MIN_WIDTH),
             Math.max(window.innerHeight - 25, MIN_HEIGHT)
         );
-        // console.log(`${dim.toString()} -- ${window.innerWidth} x ${window.innerHeight}`);
         this.setState({
             ...this.state,
             displaySize: dim,
@@ -52,7 +51,7 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         return (
             <div className="App">
-                <BoardContainer
+                <CycleContainer
                     displaySize={this.getDisplaySize()}
                 />
                 <ColorsContainer

@@ -34,19 +34,8 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
 const OUTER_BOARD_MARGIN = 1; // space between bounding rect and hex viewbox
 const INNER_BOARD_MARGIN = 1; // space between hex viewbox and hexes
 
-export const BoardView = (props: BoardViewProps) => {
-    return (
-        <div>
-            {
-                props.board ? (
-                    <HexBoardView {...props}/>
-                ) : (
-                    <button>New Game</button>
-                )
-            }
-        </div>
-    );
-};
+export const BoardView = (props: BoardViewProps) =>
+    <HexBoardView {...props}/>;
 
 export class BoardViewBase extends Component<BoardViewProps> {
     constructor(props: BoardViewProps) {
@@ -91,8 +80,6 @@ export class HexBoardView extends BoardViewBase {
     }
 
     render(): React.ReactNode {
-        if (Math.random() < 0.01)
-            console.log(this.props);
         // calculate board size
         const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN;
         const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN;

@@ -16,4 +16,9 @@ export default class Dimension {
     get min() {
         return Math.min(this.w, this.h);
     }
+
+    // for destructuring calls e.g. [x,y] = dim.wh
+    get wh() {
+        return [this.w, this.h];
+    }
 }
