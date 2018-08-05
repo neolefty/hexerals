@@ -76,12 +76,15 @@ export function movePlayerAction(
 }
 function movePlayerReducer(state: BoardState, action: MovePlayer): BoardState {
     const move = new Move(state.cursor, action.delta);
-    assert(state.board.inBounds(move.dest));
-    return {
-        ...state,
-        cursor: (action.alsoCursor ? move.dest : state.cursor),
-        board: state.board.apply(move),
-    };
+    // sometimes moves can pile up, and two are in flight
+    if (!state.board.inBounds(move.dest))
+        return state;
+    else
+        return {
+            ...state,
+            cursor: (action.alsoCursor ? move.dest : state.cursor),
+            board: state.board.apply(move),
+        };
 }
 
 const PLACE_CURSOR = 'PLACE_CURSOR';

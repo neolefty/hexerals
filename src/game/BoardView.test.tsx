@@ -111,12 +111,17 @@ it('controls game flow via react-redux', () => {
     // mover steps moves 1 space down
     const mover = (alsoCursor=true) =>
         store.dispatch(movePlayerAction(HexCoord.DOWN, alsoCursor));
-    const curSpot = () => store.getState()
-        .board.getSpot(store.getState().cursor);
+    const curSpot = () => store.getState().board.getSpot(store.getState().cursor);
+    expect(curSpot).toThrowError();  // no cursor
 
-    expect(mover).toThrowError();  // no cursor
+    // try to move when there's no cursor
+    const stateBefore = store.getState();
+    mover();
+    expect(stateBefore).toBe(store.getState());  // should have no effect
+
     // place cursor outside bounds
-    expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT_UP))).toThrowError();
+    expect(() => store.dispatch(placeCursorAction(HexCoord.LEFT_UP)))
+        .toThrowError();
 
     // place cursor at upper right
     const ur = store.getState().board.edges.upperRight;
