@@ -5,6 +5,7 @@ import {Board, Player} from './Board';
 import './Board.css';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
+import {CieColor} from '../color/CieColor';
 
 export interface BoardViewActions {
     onMovePlayer: (delta: HexCoord) => void;
@@ -16,6 +17,9 @@ interface BoardViewProps extends BoardViewActions {
     board: Board;
     cursor: HexCoord;
     displaySize: Dimension;
+    // colors?: List<DriftColor>;
+    // this would be more appropos, but it slows things down with recomputations
+    colors?: Map<Player, CieColor>;
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
