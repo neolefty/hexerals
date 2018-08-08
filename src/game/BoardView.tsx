@@ -1,11 +1,11 @@
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
 import {Board, Player} from './Board';
 import './Board.css';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
-import {CieColor} from '../color/CieColor';
+import {DriftColor} from '../color/DriftColor';
 
 export interface BoardViewActions {
     onMovePlayer: (delta: HexCoord) => void;
@@ -17,9 +17,9 @@ interface BoardViewProps extends BoardViewActions {
     board: Board;
     cursor: HexCoord;
     displaySize: Dimension;
-    // colors?: List<DriftColor>;
+    colors?: List<DriftColor>;
     // this would be more appropos, but it slows things down with recomputations
-    colors?: Map<Player, CieColor>;
+    // colors?: Map<Player, CieColor>;
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({

@@ -1,23 +1,21 @@
 import {connect} from 'react-redux';
 import {Dispatch} from 'redux';
-import {Map} from 'immutable';
 
 import {HexCoord} from './Hex';
-import {Board, Player, PLAYERS} from './Board';
+import {Board} from './Board';
 import {
     movePlayerAction, placeCursorAction, newGameAction, } from './BoardReducer';
 import {BoardView} from './BoardView';
 import {AppState} from '../App';
 import Dimension from '../Dimension';
 import {BoardState} from './BoardState';
-import {ColorsState} from '../color/ColorsContainer';
-import {CieColor} from '../color/CieColor';
-import {DriftColor} from '../color/DriftColor';
 
 export interface LocalGameProps {
     displaySize: Dimension;
 }
 
+// TODO stop updating if colors stabilize
+/*
 const playerColors = (colors: ColorsState): Map<Player, CieColor> => {
     const im: Map<Player, CieColor> = Map();
     const result = im.asMutable();
@@ -27,14 +25,15 @@ const playerColors = (colors: ColorsState): Map<Player, CieColor> => {
     );
     return result.asImmutable();
 };
+*/
 
 const mapStateToBoardViewProps = (
     state: AppState, ownProps: LocalGameProps
 ) => ({
     ...state.cycle.localGame as BoardState,  // assertion that it's not undefined
     displaySize: ownProps.displaySize,
-    colors: playerColors(state.colors),
-    // colors: state.colors.colors.driftColors,
+    // colors: playerColors(state.colors),
+    colors: state.colors.colors.driftColors,
 });
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
