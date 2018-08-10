@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+import {Map} from 'immutable';
 import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
 import {Board, Player} from './Board';
@@ -17,9 +17,9 @@ interface BoardViewProps extends BoardViewActions {
     board: Board;
     cursor: HexCoord;
     displaySize: Dimension;
-    colors?: List<DriftColor>;
-    // this would be more appropos, but it slows things down with recomputations
-    // colors?: Map<Player, CieColor>;
+    // colors?: List<DriftColor>;
+    // this would be more apropos, but it slows things down with recomputations
+    colors?: Map<Player, DriftColor>;
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
@@ -64,6 +64,7 @@ export class BoardViewBase extends Component<BoardViewProps> {
 export class HexBoardView extends BoardViewBase {
     constructor(props: BoardViewProps) {
         super(props);
+        // console.log(`colors: ${props.colors}`);
         this.filterNobody = this.filterNobody.bind(this);
         this.filterPlayers = this.filterPlayers.bind(this);
         this.filterCursor = this.filterCursor.bind(this);
@@ -169,9 +170,12 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                     const spot = this.props.board.getSpot(hex);
                     const centerX = hex.cartX() * 45 + 30;
                     const centerY = height - (hex.cartY() + 1) * 26;
+                    const color: DriftColor | undefined
+                        = this.props.colors && this.props.colors.get(spot.owner);
                     return (
                         <FlatTopHex
                             key={hex.id}
+                            color={color}
                             owner={spot.owner}
                             selected={hex === this.props.cursor}
                             centerX={centerX}
@@ -188,6 +192,7 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                                         fontFamily="Sans-Serif"
                                         fontSize={27}
                                         textAnchor="middle"
+                                        fill={color ? color.contrast().toHexString() : '#fff'}
                                     >
                                         {spot.pop}
                                     </text>
@@ -203,6 +208,7 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
 
 interface FlatTopHexProps {
     owner: Player;
+    color?: DriftColor;
     selected: boolean;
     centerX: number;
     centerY: number;
@@ -236,6 +242,11 @@ const FlatTopHex = (props: FlatTopHexProps) => (
     >
         <polygon
             points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
+            style={
+                props.color && {
+                    fill: props.color.toHexString()
+                }
+            }
         />
         {props.children && <g>{props.children}</g>}
     </g>

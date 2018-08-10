@@ -115,7 +115,7 @@ export class ColorPodge {
     toString(): string {
         let result = `${Math.round(this.closestTwo())}`;
         this.driftColors.forEach(
-            (dc) => result = result + `; ${dc.toHsluvString()}`
+            (dc) => result = result + `; ${dc.toHslString()}`
         );
         return result;
     }

@@ -67,7 +67,7 @@ export const ColorBlob = (props: ColorBlobProps) => (
         r={props.radius}
         cx={props.coord.x}
         cy={props.coord.y}
-        style={{fill: props.color.toHex()}}
+        style={{fill: props.color.toHexString()}}
         onClick={() => props.onRemove()}
     />
 );
@@ -140,7 +140,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
         // walls
         this.log(`*** cycle: ${closestColors.toFixed(this.f)} to ${furthestColors.toFixed(this.f)}`);
         this.props.colors.driftColors.forEach((color: DriftColor) => {
-            this.log(`${color.toHsluvString()}`);
+            this.log(`${color.toHslString()}`);
 
             const force = new Coord();
             forces.set(color.key, force);
@@ -236,7 +236,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
                     // the more other colors, the more we need to scale down the forces
                     const unit = location.diff(otherLoc).mutateUnit();
                     // roughly -1 (attract) to 1 (repel)
-                    this.log(`     - to ${other.toHsluvString()}: norm ${cdNorm} (unit ${unit}) | raw ${colorDist} | `);
+                    this.log(`     - to ${other.toHslString()}: norm ${cdNorm} (unit ${unit}) | raw ${colorDist} | `);
                     const vec = unit.mutateScale(cdNorm * nRecipActual * VELOCITY_MAX * 300);
                     result.mutateAdd(vec);
                 }

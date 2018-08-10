@@ -76,12 +76,11 @@ export class DriftColor {
     }
 
     contrast(): DriftColor {
-        const newCie = this.cie.contrast();
         return new DriftColor(
             new CieColor([
-                newCie.hsl[0],
+                this.cie.hsl[0] + 180,
                 DriftColor.MAX_SAT,
-                newCie.hsl[2] > DriftColor.MID_BRIGHT
+                this.cie.hsl[2] > DriftColor.MID_BRIGHT
                     ? DriftColor.MIN_BRIGHT
                     : DriftColor.MAX_BRIGHT,
             ]),
@@ -89,15 +88,11 @@ export class DriftColor {
         );
     }
 
-    toHex(): string {
-        return this.cie.hex();
-    }
-
-    toHsluvString() { return this.cie.toHsluvString(); }
+    toHexString(): string { return this.cie.toHexString(); }
+    toHslString() { return this.cie.toHslString(); }
     toLchString() { return this.cie.toLchString(); }
-    // toHpluvString() { return this.cie.toHpluvString(); }
 
     toString(): string {
-        return `${this.cie.hex()} - hsl: ${this.toHsluvString()} - lch: ${this.toLchString()}`;
+        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - cie: ${this.toLchString()}`;
     }
 }

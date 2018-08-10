@@ -29,13 +29,13 @@ $playerColors: (
 @each $name, $bg in $playerColors {
     g.#{$name} {
         polygon {
-            fill: #{$bg};
+            //fill: #{$bg};
             //stroke: darken($bg, 40%);
             stroke: #555;
         }
-        text {
-            fill: darken($bg, 60%);
-        }
+        //text {
+        //    fill: darken($bg, 60%);
+        //}
     }
 }
 
