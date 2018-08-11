@@ -3,25 +3,36 @@ import {DriftColor} from './DriftColor';
 
 // A collection of colors in CIE space
 export class ColorPodge {
-
     static readonly DELTAS: number[][] = [
-        // index 1 is larger because LCh Chroma is scaled down
-        // and won't shift at all if we use 1.
+        // index 1 is larger because LCh Chroma is scaled down saturation
+        // and won't shift at all if we use 1 -- shifts happen in HSV space.
         [-1, 0, 0], [0, -3, 0], [0, 0, -1], [1, 0, 0], [0, 3, 0], [0, 0, 1],
     ];
 
-    constructor(readonly driftColors: List<DriftColor> = List()) {}
+    static MAX_DISPERSION_HISTORY = 18;
+    static SETTLED_THRESHOLD = 6;
+
+    constructor(
+        readonly driftColors: List<DriftColor> = List(),
+        // if these aren't set, tracking settling is reset
+        readonly settled: boolean = false,  // has dispersion settled down?
+        // history of the last few closestTwo score
+        readonly dispersionHistory: List<number> = List(),
+    ) {}
 
     addRandomColor(): ColorPodge {
+        // reset settlement tracking because a new color is in the mix
         return new ColorPodge(this.driftColors.push(DriftColor.random()));
     }
 
     removeColor(idx: number): ColorPodge {
+        // reset settlement tracking because a color has been removed
         return new ColorPodge(this.driftColors.remove(idx));
     }
 
     // random walk
     drift(f: number): ColorPodge {
+        // reset settlement tracking because colors have been shuffled
         return new ColorPodge(List(this.driftColors.map(
             (color: DriftColor) => color.drift(f)
         )));
@@ -29,13 +40,27 @@ export class ColorPodge {
 
     // spread colors away from each other
     disperse(stepSize: number): ColorPodge {
-        // const before = this.closestTwo();
-        const result = new ColorPodge(List(this.driftColors.map(
-            (color: DriftColor) => this.disperseOne(color, stepSize)
-        )));
+        if (this.settled)
+            return this;
+
+        // if this closestTwo score appears twice in our history, we're settled.
+        const c = this.closestTwo();
+        const newSettled = this.dispersionHistory.count(
+            x => x === c
+        ) >= ColorPodge.SETTLED_THRESHOLD;
+        if (newSettled)
+            return new ColorPodge(this.driftColors, newSettled, this.dispersionHistory);
+
+        // not settled, so disperse again
+        let newDispHist: List<number> = this.dispersionHistory.push(this.closestTwo());
+        if (newDispHist.size > ColorPodge.MAX_DISPERSION_HISTORY)
+            newDispHist = newDispHist.remove(0);
+        const newColors: List<DriftColor> = List(
+            this.driftColors.map(
+                (color: DriftColor) => this.disperseOne(color, stepSize)));
+        return new ColorPodge(newColors, newSettled, newDispHist);
         // console.log(`${Math.round(before)} -- drift ${f} -- ${result.toString()}`);
         // console.log(`${this.toString()} -- drift ${f} -- ${result.toString()}`);
-        return result;
     }
 
     // The perceptual distance between the closest two colors

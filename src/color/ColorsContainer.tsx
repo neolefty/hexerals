@@ -66,7 +66,9 @@ const INITIAL_COLOR_PODGE = new ColorPodge(List([
 ]));
 
 export function ColorsReducer(
-    state: ColorsState = { colors: INITIAL_COLOR_PODGE },
+    state: ColorsState = {
+        colors: INITIAL_COLOR_PODGE,
+    },
     action: ColorsAction,
 ): ColorsState {
     if (isAddColor(action))
@@ -80,10 +82,11 @@ export function ColorsReducer(
             colors: state.colors.removeColor(action.x),
         };
     if (isDiverge(action))
-        state = {
-            ...state,
-            colors: state.colors.disperse(DRIFT),
-        };
+        if (!state.colors.settled)
+            state = {
+                ...state,
+                colors: state.colors.disperse(DRIFT),
+            };
     return state;
 }
 
