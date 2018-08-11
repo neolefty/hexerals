@@ -15,9 +15,10 @@ it('color distance', () => {
     expect(c1.normalizedDistance2(c2)).toBeCloseTo(56);
 
     expect(c0.d2(c1)).toEqual(c0.perceptualDistance2(c1));
-    expect(c0.d2(c1)).toBeCloseTo(10.26, 2);
-    expect(c0.d2(c2)).toBeCloseTo(10.03, 2);
-    expect(c1.d2(c2)).toBeCloseTo(40.46, 2);
+    // expect to tweak these numbers if the color comparison metric changes
+    expect(c0.d2(c1)).toBeCloseTo(9.26, 2);
+    expect(c0.d2(c2)).toBeCloseTo(9.03, 2);
+    expect(c1.d2(c2)).toBeCloseTo(36.46, 2);
 
     expect(c0.key).toEqual(c0.drift(1).key);
     expect(c0.key).toEqual(c0.shift([1,1,1], 1).key);
@@ -52,7 +53,7 @@ it('color podge basics', () => {
     expect(cp.minDist(c0)).toBeCloseTo(c0.d2(c1));
     expect(cp.maxDist(c0)).toBeCloseTo(cp.maxDist(c1));
     expect(cp.maxDist(c0)).toBeCloseTo(cp.minDist(c0));
-    expect(cp.closestTwo()).toEqual(c0.d2(c1));
+    expect(cp.closestTwo()).toBeCloseTo(c0.d2(c1));
 
     cp = cp.addRandomColor();
     cp = cp.addRandomColor();
@@ -100,8 +101,8 @@ it('color podge random tests', () => {
             b.d2(c),
             c.d2(a),
         ];
-        expect(cp.closestTwo()).toEqual(Math.min(...distances));
-        expect(cp.furthestTwo()).toEqual(Math.max(...distances));
+        expect(cp.closestTwo()).toBeCloseTo(Math.min(...distances));
+        expect(cp.furthestTwo()).toBeCloseTo(Math.max(...distances));
 
         const cp2 = cp.disperse(2);
         expect(cp.closestTwo() < cp2.closestTwo()).toBeTruthy();
