@@ -33,7 +33,6 @@ export class CieColor {
         return CieColor.d2(this.hsl, that.hsl);
     }
 
-    // TODO reduce perceptual distance between dark blue & green
     perceptualDistance2(that: CieColor) {
         const [
             light1, light2, // brightness
@@ -51,7 +50,7 @@ export class CieColor {
         const dHue = dHueRaw < 180 ? dHueRaw : 360 - dHueRaw;
         // attempt to compensate for low brightness / saturation
         const result = dHue * dHue * chroma1 * chroma2 * light1 * light2
-            + dSat * dSat * 1e8
+            + dSat * dSat * 1e8 * 0.4  // de-emphasize saturation
             + dLight * dLight * 1e8;
         // console.log(`${result.toFixed(2)} -- delta ${[dBright.toFixed(2), dSat.toFixed(2), dHueRaw.toFixed(2)]} --from-- ${this.toLchString()} -to- ${that.toLchString()} = `);
         return result / 1e8;

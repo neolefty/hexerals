@@ -16,9 +16,9 @@ it('color distance', () => {
 
     expect(c0.d2(c1)).toEqual(c0.perceptualDistance2(c1));
     // expect to tweak these numbers if the color comparison metric changes
-    expect(c0.d2(c1)).toBeCloseTo(9.26, 2);
-    expect(c0.d2(c2)).toBeCloseTo(9.03, 2);
-    expect(c1.d2(c2)).toBeCloseTo(36.46, 2);
+    expect(c0.d2(c1)).toBeCloseTo(9.10, 2);
+    expect(c0.d2(c2)).toBeCloseTo(9.01, 2);
+    expect(c1.d2(c2)).toBeCloseTo(36.18, 2);
 
     expect(c0.key).toEqual(c0.drift(1).key);
     expect(c0.key).toEqual(c0.shift([1,1,1], 1).key);
