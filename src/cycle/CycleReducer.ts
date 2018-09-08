@@ -6,6 +6,9 @@ import {GenericAction} from '../App';
 import {HexCoord} from '../game/Hex';
 import {GameAction, BoardReducer} from '../game/BoardReducer';
 import {CycleState} from './CycleState';
+import {EMPTY_MOVEMENT_QUEUE} from '../game/MovementQueue';
+import {pickNPlayers, PlayerManager} from '../game/Players';
+import {List} from 'immutable';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
@@ -42,16 +45,19 @@ const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
     const [w, h] = state.localOptions.boardSize.wh;
+    const players = pickNPlayers(state.localOptions.numPlayers);
     const newBoard = Board.constructRectangular(
-        w, h, RandomArranger.construct(state.localOptions.numPlayers)
+        w, h, players, RandomArranger.construct(players),
     );
     return {
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
-        // TODO pull in colors from Podge
         localGame: {
             board: newBoard,
+            players: new PlayerManager(players),
             cursor: HexCoord.NONE,
+            moveQueue: EMPTY_MOVEMENT_QUEUE,
+            messages: List(),
         },
     };
 };

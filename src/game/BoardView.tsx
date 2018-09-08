@@ -1,14 +1,15 @@
 import {Map} from 'immutable';
 import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
-import {Board, Player} from './Board';
+import {Board} from './Board';
 import './Board.css';
 import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 import {DriftColor} from '../color/DriftColor';
+import {Player} from './Players';
 
 export interface BoardViewActions {
-    onMovePlayer: (delta: HexCoord) => void;
+    onQueueMove: (source: HexCoord, delta: HexCoord) => void;
     onPlaceCursor: (position: HexCoord) => void;
     onNewGame: (board: Board) => void;
 }
@@ -48,14 +49,12 @@ export class BoardViewBase extends Component<BoardViewProps> {
     }
 
     onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
-        if (this.props.onMovePlayer && this.props.cursor !== HexCoord.NONE) {
+        if (this.props.cursor !== HexCoord.NONE) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
             if (delta !== HexCoord.NONE) {
-                const dest = this.props.cursor.plus(delta);
-                if (this.props.board.inBounds(dest)) {
-                    this.props.onMovePlayer(delta);
-                    e.preventDefault();
-                }
+                this.props.onQueueMove(this.props.cursor, delta);
+                this.props.onPlaceCursor(this.props.cursor.plus(delta));
+                e.preventDefault();
             }
         }
     }

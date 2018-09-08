@@ -108,8 +108,10 @@ export class HexCoord {
     // convert to rectangular Y, assuming flat-topped hexagons twice as wide as high
     cartY(): number { return this.y - this.z; } // was z
 
-    toString(includeCart: boolean = true) {
-        return `[${ this.x },${ this.y },${ this.z }]${ includeCart ? ' ' + this.toCartString() : '' }`;
+    toString(includeCart: boolean = true): string {
+        return `[${ this.x },${ this.y },${ this.z }]${
+            includeCart ? ' ' + this.toCartString() : '' 
+        }`;
     }
 
     toCartString() {
@@ -170,6 +172,10 @@ export class RectEdges {
     yRange(): Seq.Indexed<number> {
         return Range(this.bottom, this.top + 1);
     }
+
+    toString(): string {
+        return `left ${this.left}, right ${this.right}, top ${this.top}, bottom ${this.bottom}`;
+    }
 }
 
 // The shape of a board -- what hexes are in and not in the board?
@@ -188,6 +194,8 @@ export abstract class BoardConstraints {
     start(): HexCoord {
         return HexCoord.ORIGIN;
     }
+
+    toString = (): string => 'BoardConstraints';
 
     // is coord within the constrained area?
     abstract inBounds(coord: HexCoord): boolean;
@@ -276,4 +284,6 @@ export class RectangularConstraints extends BoardConstraints {
             && x >= 0 && x < this.w * 2 - 1
         );
     }
+
+    toString = (): string => `${this.w} x ${this.h}`;
 }

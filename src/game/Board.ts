@@ -1,36 +1,10 @@
 import * as assert from 'assert';
-import {Map} from 'immutable';
-import {RectEdges, BoardConstraints, HexCoord, RectangularConstraints} from './Hex';
+import {List, Map} from 'immutable';
+import {BoardConstraints, HexCoord, RectangularConstraints, RectEdges} from './Hex';
 import {INITIAL_POP} from './BoardConstants';
-
-export enum Player {
-    Nobody = 'Nobody',
-    Zero = 'Zero',
-    One = 'One',
-    Two = 'Two',
-    Three = 'Three',
-    Four = 'Four',
-    Five = 'Five',
-    Six = 'Six',
-    Seven = 'Seven',
-    Eight = 'Eight',
-}
-
-export const PLAYERS: Map<number, Player> = Map([
-    [ -1, Player.Nobody ],
-    [ 0, Player.Zero ],
-    [ 1, Player.One ],
-    [ 2, Player.Two ],
-    [ 3, Player.Three ],
-    [ 4, Player.Four ],
-    [ 5, Player.Five ],
-    [ 6, Player.Six ],
-    [ 7, Player.Seven ],
-    [ 8, Player.Eight ],
-]);
-
-export const PLAYABLE_PLAYERS = [
-    Player.Zero, Player.One, Player.Two, Player.Three, Player.Four ];
+import {PlayerMove} from './MovementQueue';
+import {Player} from './Players';
+import {StatusMessage} from '../StatusMessage';
 
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?
@@ -62,7 +36,8 @@ export class Spot {
     }
 
     toString(): string {
-        return `Terrain: ${ this.terrain }, Owner: ${ this.owner }, Population: ${ this.pop }`;
+        return (this.terrain === Terrain.Empty ? '' : `Terrain: ${ this.terrain }, `)
+        + `Owner: ${ this.owner }, Pop: ${ this.pop }`;
     }
 }
 
@@ -71,19 +46,16 @@ export interface StartingArranger {
 }
 
 export class RandomArranger implements StartingArranger {
-    public static construct(numPlayers: number) {
-        return new RandomArranger(
-            INITIAL_POP,
-            PLAYABLE_PLAYERS.slice(0, numPlayers),
-        );
+    public static construct(players: List<Player>) {
+        return new RandomArranger(INITIAL_POP, players);
     }
 
-    constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {}
+    constructor(readonly startingArmy: number, readonly players: List<Player>) {}
 
     public arrange(board: Board): Map<HexCoord, Spot> {
         const allHexes: HexCoord[] = board.constraints.all().toArray();
         let starts = Map<HexCoord, Spot>();
-        PLAYERS.map((player: Player) => {
+        this.players.forEach((player: Player) => {
             if (player !== Player.Nobody && allHexes.length > 0) {
                 const i = Math.floor(Math.random() * allHexes.length);
                 const hex = allHexes.splice(i, 1)[0];
@@ -122,31 +94,52 @@ export class TwoCornersArranger extends CornersArranger {
     }
 }
 
+export class BoardAndMessages {
+    constructor(
+        readonly board: Board,
+        readonly messages: List<StatusMessage>,
+    ) {}
+
+    addToMessages = (curMessages: List<StatusMessage>): List<StatusMessage> =>
+        this.messages.size > 0
+            ? List(curMessages.concat(this.messages))
+            : curMessages;
+}
+
 export class Board {
     static construct(
         constraints: BoardConstraints,
-        spots: Map<HexCoord, Spot> = Map()
+        players: List<Player>,
+        spots: Map<HexCoord, Spot> = Map(),
     ) {
-        return new Board(constraints, spots, new RectEdges(constraints));
+        return new Board(constraints, players, spots, new RectEdges(constraints));
     }
 
-    static constructSquare(size: number, arranger: StartingArranger) {
-        return Board.constructRectangular(size, size, arranger);
+    static constructSquare(
+        size: number,
+        players: List<Player>,
+        arranger: StartingArranger,
+    ) {
+        return Board.constructRectangular(size, size, players, arranger);
     }
 
     static constructRectangular(
-        w: number, h: number, arranger: StartingArranger
+        w: number,
+        h: number,
+        players: List<Player>,
+        arranger: StartingArranger,
     ): Board {
         const constraints = new RectangularConstraints(w, h);
-        const blank = Board.construct(constraints);
+        const blank = Board.construct(constraints, players);
         const starts = arranger.arrange(blank);
 
-        return new Board(blank.constraints, starts, blank.edges);
+        return new Board(blank.constraints, players, starts, blank.edges);
     }
 
     // keep constructor private so that edges doesn't get mis-constructed
     private constructor(
         readonly constraints: BoardConstraints,
+        readonly players: List<Player>,
         // non-blank spots on the map
         readonly spots: Map<HexCoord, Spot>,
         readonly edges: RectEdges
@@ -180,43 +173,76 @@ export class Board {
         return this.getSpot(HexCoord.getCart(cx, cy));
     }
 
-    // do a move
-    apply(move: Move): Board {
-        const origin = this.getSpot(move.coord);
-
-        if (origin.pop <= 1)
-            // no effect if 1 or less population in origin
-            return this;
-
-        else {
-            const dest = this.getSpot(move.dest);
-            assert(move.step.maxAbs() === 1);  // a move has distance 1
-            const from = new Spot(origin.owner, 1);
-            const march = new Spot(origin.owner, origin.pop - 1);
-            const to = dest.settle(march);
-
-            return new Board(
-                this.constraints,
-                this.spots.withMutations((mMap: Map<HexCoord, Spot>) =>
-                    mMap.set(move.coord, from).set(move.dest, to)
-                ),
-                this.edges
-            );
-        }
+    applyMove(move: PlayerMove): BoardAndMessages {
+        return this.applyMoves(List([move]));
     }
 
-    // TODO proper toString()
+    /**
+     * Do some moves.
+     *
+     * @param {List<PlayerMove>} moves the moves to do. If in the course of
+     * moving, a player who no longer controls a square has a move queued from that
+     * square, that move is skipped and has no effect.
+     * @returns {Board} updated
+     */
+    applyMoves(moves: List<PlayerMove>): BoardAndMessages {
+        // note that messages is left unchanged if no messages are added
+        let messages: List<StatusMessage> = List();
+        // likewise, spots is left unchanged if no spots are added
+        let updatedSpots = this.spots;
+
+        moves.forEach((move: PlayerMove) => {
+            const player = this.players.get(move.playerIndex);
+            const origin = updatedSpots.get(move.source);
+            if (origin.pop > 1 && origin.owner === player) {
+
+                // TODO move out into validation func?
+                if (move.delta.maxAbs() !== 1)
+                    messages = messages.push(
+                        new StatusMessage(
+                            'illegal move', // TODO use constants for tags
+                            `Can't move ${move.delta.maxAbs()} steps.`,
+                            `${move}`,
+                        ));
+
+                else {
+                    const newSourceSpot = new Spot(origin.owner, 1);
+                    // TODO support moving only part of a stack (half etc)
+                    const oldDestSpot = this.getSpot(move.dest);
+                    const march = new Spot(origin.owner, origin.pop - 1);
+                    const newDestSpot = oldDestSpot.settle(march);
+                    updatedSpots = updatedSpots.withMutations(
+                        (m: Map<HexCoord, Spot>) => {
+                            m.set(move.source, newSourceSpot);
+                            m.set(move.dest, newDestSpot);
+                    });
+                }
+            }
+        });
+
+        const board = (this.spots === updatedSpots)
+            ? this
+            : new Board(
+                this.constraints,
+                this.players,
+                updatedSpots,
+                this.edges,
+            );
+        return new BoardAndMessages(board, messages);
+    }
+
     toString(): string {
-        let result = '';
-        this.spots.map((spot) => result += spot.pop + ' ');
+        let result = `Constraints: ${this.constraints.toString()}\n`
+            + `Edges: ${ this.edges.toString()}\n`
+            + `Spots: (`;
+        this.spots.map((spot, coord) =>
+            result += spot.pop ? `${coord} -- ${spot}; ` : ''
+        );
+        result += ')';
         return result;
     }
-}
 
-export class Move {
-    // where will this Move end?
-    readonly dest: HexCoord;
-    constructor(readonly coord: HexCoord, readonly step: HexCoord) {
-        this.dest = this.coord.plus(this.step);
+    playerIndex(player: Player) {
+        return this.players.indexOf(player);
     }
 }

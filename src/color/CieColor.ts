@@ -49,6 +49,7 @@ export class CieColor {
             dLight = light1 - light2;
         const dHue = dHueRaw < 180 ? dHueRaw : 360 - dHueRaw;
         // attempt to compensate for low brightness / saturation
+        // -- hue that is dark or desaturated is less important
         const result = dHue * dHue * chroma1 * chroma2 * light1 * light2
             + dSat * dSat * 1e8 * 0.4  // de-emphasize saturation
             + dLight * dLight * 1e8;

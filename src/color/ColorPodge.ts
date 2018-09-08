@@ -9,8 +9,8 @@ export class ColorPodge {
         [-1, 0, 0], [0, -3, 0], [0, 0, -1], [1, 0, 0], [0, 3, 0], [0, 0, 1],
     ];
 
-    static MAX_DISPERSION_HISTORY = 32;
-    static SETTLED_THRESHOLD = 15;
+    static MAX_DISPERSION_HISTORY = 320;
+    static SETTLED_THRESHOLD = 150;
 
     constructor(
         readonly driftColors: List<DriftColor> = List(),

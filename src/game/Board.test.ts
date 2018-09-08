@@ -1,7 +1,8 @@
 import * as assert from 'assert';
 import {List} from 'immutable';
-import {Board, Player, Spot, TwoCornersArranger} from './Board';
+import {Board, Spot, TwoCornersArranger} from './Board';
 import {BoardConstraints, HexCoord} from './Hex';
+import {pickNPlayers, Player} from './Players';
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -31,12 +32,13 @@ it('passes', () => {});
 
 it('checks rectangular board geometry', () => {
     const arr = new TwoCornersArranger();
-    expect(Board.constructSquare(5, arr).constraints.all().size)
+    const twoPlayers = pickNPlayers(2);
+    expect(Board.constructSquare(5, twoPlayers, arr).constraints.all().size)
         .toBe(5 * 3 + 4 * 2);
 
-    expect(Board.constructRectangular(10, 20, arr).constraints.all().size)
+    expect(Board.constructRectangular(10, 20, twoPlayers, arr).constraints.all().size)
         .toBe(10 * 10 + 10 * 9);
-    const fiveByFour = Board.constructRectangular(5, 4, arr);
+    const fiveByFour = Board.constructRectangular(5, 4, twoPlayers, arr);
     // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
     // _ - _ - _ - _ - _
     expect(fiveByFour.constraints.extreme(x => x.cartX()).cartX()).toBe(0);  // left 0
@@ -72,7 +74,8 @@ it('checks rectangular board geometry', () => {
 
 it('converts between hex and cartesian coords', () => {
     const w = 11, h = 5;
-    const tenByFive = Board.constructRectangular(w, h, new TwoCornersArranger());
+    const tenByFive = Board.constructRectangular(
+        w, h, pickNPlayers(2), new TwoCornersArranger());
     // h x w, but every other row (that is, h/2 rows) is short by 1
     expect(tenByFive.constraints.all().size == w * h - Math.trunc(h/2));
 
@@ -95,7 +98,7 @@ it('converts between hex and cartesian coords', () => {
 
 it('navigates around a board', () => {
     const sixByTen = Board.constructRectangular(
-        6, 10, new TwoCornersArranger(20));
+        6, 10, pickNPlayers(2), new TwoCornersArranger(20));
     expect(sixByTen.inBounds(HexCoord.ORIGIN)).toBeTruthy();
     expect(sixByTen.constraints.all().contains(HexCoord.ORIGIN)).toBeTruthy();
     expect(sixByTen.inBounds(HexCoord.NONE)).toBeFalsy();
