@@ -123,7 +123,7 @@ export const doMovesReducer = (state: BoardState): BoardState => {
             messages: boardAndMessages.addToMessages(state.messages),
             moveQueue: movesAndQ.queue,
             board: boardAndMessages.board,
-        }
+        };
     }
     else
         return state;

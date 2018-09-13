@@ -103,7 +103,7 @@ export class BoardAndMessages {
     addToMessages = (curMessages: List<StatusMessage>): List<StatusMessage> =>
         this.messages.size > 0
             ? List(curMessages.concat(this.messages))
-            : curMessages;
+            : curMessages
 }
 
 export class Board {

@@ -131,5 +131,5 @@ export class QueueAndMoves {
     ) {}
 
     toString = (): string =>
-        `queue: ${this.queue}; moves: ${this.moves}`;
+        `queue: ${this.queue}; moves: ${this.moves}`
 }
