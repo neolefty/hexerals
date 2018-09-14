@@ -38,7 +38,6 @@ const mapStateToBoardViewProps = (
     ...state.cycle.localGame as BoardState,  // assertion that it's not undefined
     displaySize: ownProps.displaySize,
     colors: playerColors(state.colors.colors),
-    // colors: state.colors.colors.driftColors,
 });
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({

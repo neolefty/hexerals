@@ -16,7 +16,7 @@ import {BoardViewBase} from "./BoardView";
 import {BoardState} from './BoardState';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants';
 import {pickNPlayers, Player} from './Players';
-import {MovementQueue} from './MovementQueue';
+import {EMPTY_MOVEMENT_QUEUE, MovementQueue} from './MovementQueue';
 import {StatusMessage} from '../StatusMessage';
 
 it('renders a spot', () => {
@@ -45,6 +45,7 @@ it('renders a board with no selection', () => {
             board={board}
             cursor={HexCoord.NONE}
             displaySize={new Dimension(1000, 1000)}
+            moves={EMPTY_MOVEMENT_QUEUE}
             onQueueMove={() => {}}
             onPlaceCursor={() => {}}
             onNewGame={() => {}}
@@ -73,6 +74,7 @@ it('renders a board with a selection', () => {
             board={board}
             cursor={ur}
             displaySize={new Dimension(1000, 1000)}
+            moves={EMPTY_MOVEMENT_QUEUE}
             onPlaceCursor={() => {}}
             onQueueMove={() => {}}
             onNewGame={() => {}}
@@ -134,7 +136,7 @@ class storeTester {
     getSpot = (coord: HexCoord): Spot => this.board.getSpot(coord);
     get cursorRawSpot(): Spot | undefined { return this.getRawSpot(this.cursor); }
     get cursorSpot(): Spot { return this.getSpot(this.cursor); }
-    get moveQueue(): MovementQueue { return this.state.moveQueue; }
+    get moves(): MovementQueue { return this.state.moves; }
 
     // Action: Queue a move
     queueMove = (delta: HexCoord, alsoCursor=true) => {
@@ -172,10 +174,10 @@ it('blocks illegal moves', () => {
 
     // try to move when there's no cursor -- should have no effect
     const boardBefore = st.board;
-    expect(st.moveQueue.size).toEqual(0);
+    expect(st.moves.size).toEqual(0);
     st.queueMoveDown(false);
     expect(st.cursor).toBe(HexCoord.NONE);
-    expect(st.moveQueue.size).toEqual(0);
+    expect(st.moves.size).toEqual(0);
 
     // trying to move the cursor relative to a nonexistent cursor should throw
     expect(() => st.queueMoveDown(true)).toThrowError();
@@ -183,7 +185,7 @@ it('blocks illegal moves', () => {
     expect(boardBefore).toBe(st.board);  // no moves executed
     st.doMoves(); // still no legit moves requested, so no effective moves
     expect(st.cursor).toBe(HexCoord.NONE);
-    expect(st.moveQueue.size).toEqual(0);
+    expect(st.moves.size).toEqual(0);
 
     // through all this, the board should be unchanged
     expect(boardBefore === st.board).toBeTruthy();
@@ -229,10 +231,10 @@ it('makes real moves', () => {
     // even though the destination is in bounds
     expect((st.board.inBounds(dest2)));
     st.queueMove(down2);
-    expect(st.moveQueue.size).toEqual(1);
+    expect(st.moves.size).toEqual(1);
     expect(st.messages.size).toEqual(0);
     st.doMoves();
-    expect(st.moveQueue.size).toEqual(0);
+    expect(st.moves.size).toEqual(0);
     expect(st.messages.size).toEqual(1);
     // TODO use constants in tags
     expect(st.messages.get(0).tag).toEqual('illegal move');

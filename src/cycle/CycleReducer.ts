@@ -56,7 +56,7 @@ const openLocalGameReducer =
             board: newBoard,
             players: new PlayerManager(players),
             cursor: HexCoord.NONE,
-            moveQueue: EMPTY_MOVEMENT_QUEUE,
+            moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(),
         },
     };

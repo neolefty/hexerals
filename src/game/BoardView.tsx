@@ -1,4 +1,4 @@
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 import * as React from 'react';
 import {Component, KeyboardEvent} from 'react';
 import {Board} from './Board';
@@ -7,6 +7,7 @@ import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 import {DriftColor} from '../color/DriftColor';
 import {Player} from './Players';
+import {MovementQueue} from './MovementQueue';
 
 export interface BoardViewActions {
     onQueueMove: (source: HexCoord, delta: HexCoord) => void;
@@ -17,6 +18,7 @@ export interface BoardViewActions {
 interface BoardViewProps extends BoardViewActions {
     board: Board;
     cursor: HexCoord;
+    moves: MovementQueue;
     displaySize: Dimension;
     // colors?: List<DriftColor>;
     // this would be more apropos, but it slows things down with recomputations
@@ -47,6 +49,21 @@ export class BoardViewBase extends Component<BoardViewProps> {
         super(props);
         this.onKeyDown = this.onKeyDown.bind(this);
     }
+
+/*
+    shouldComponentUpdate(
+        nextProps: Readonly<BoardViewProps>,
+        nextState: Readonly<{}>,
+        nextContext: any,
+    ): boolean {
+        return (
+            nextProps.cursor !== this.props.cursor
+            || nextProps.colors !== this.props.colors
+            || !nextProps.displaySize.equals(this.props.displaySize)
+            || nextProps.board !== this.props.board
+        );
+    }
+*/
 
     onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
         if (this.props.cursor !== HexCoord.NONE) {
@@ -143,11 +160,38 @@ export class HexBoardView extends BoardViewBase {
                         filter={this.filterCursor}
                         {...this.props}
                     />
+                    <MovesView
+                        moves={this.props.moves}
+                        colors={this.props.colors as Map<Player, DriftColor>}
+                        players={this.props.board.players}
+                    />
                 </svg>
             </div>
         );
     }
 }
+
+interface MovesViewProps {
+    moves: MovementQueue;
+    colors: Map<Player, DriftColor>;
+    players: List<Player>;
+}
+
+const MovesView = (props: MovesViewProps) =>
+    <div />
+
+/*
+class MovesView extends Component<MovesViewProps> {
+    constructor(props: MovesViewProps) {
+        super(props);
+    }
+    render(): React.ReactNode {
+        return (
+            <div></div>
+        );
+    }
+}
+*/
 
 interface FilterBoardViewProps extends BoardViewProps {
     filter: (hex: HexCoord) => boolean;

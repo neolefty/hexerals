@@ -24,7 +24,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     ),
     cursor: HexCoord.NONE,
     players: new PlayerManager(INITIAL_PLAYERS),
-    moveQueue: EMPTY_MOVEMENT_QUEUE,
+    moves: EMPTY_MOVEMENT_QUEUE,
     messages: List([
         // new StatusMessage('foo', 'bar', 'baz'),
         // new StatusMessage('moo', 'mar', 'maz'),
@@ -97,7 +97,7 @@ const queueMoveReducer = (state: BoardState, action: QueueMove): BoardState => {
 
     return {
         ...state,
-        moveQueue: state.moveQueue.add(
+        moves: state.moves.add(
             state.board.playerIndex(fromSpot.owner),
             move,
         )
@@ -113,7 +113,7 @@ const isDoMoves = (action: GameAction): action is DoMoves =>
 export const doMovesAction = (): DoMoves => ({ type: DO_MOVES });
 export const doMovesReducer = (state: BoardState): BoardState => {
     // TODO rotate startPlayerIndex
-    const movesAndQ = state.moveQueue.popEach(0, state.board.players.size);
+    const movesAndQ = state.moves.popEach(0, state.board.players.size);
     // console.log(`reducing moves ... ${movesAndQ}`);
     if (movesAndQ) { // undefined if no moves to apply
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves);
@@ -121,7 +121,7 @@ export const doMovesReducer = (state: BoardState): BoardState => {
         return {
             ...state,
             messages: boardAndMessages.addToMessages(state.messages),
-            moveQueue: movesAndQ.queue,
+            moves: movesAndQ.queue,
             board: boardAndMessages.board,
         };
     }
