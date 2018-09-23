@@ -1,5 +1,5 @@
-import {List, Map} from 'immutable';
 import * as React from 'react';
+import {List, Map} from 'immutable';
 import {Component, KeyboardEvent} from 'react';
 import {Board} from './Board';
 import './Board.css';
@@ -7,7 +7,7 @@ import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 import {DriftColor} from '../color/DriftColor';
 import {Player} from './Players';
-import {MovementQueue} from './MovementQueue';
+import {HexMove, MovementQueue} from './MovementQueue';
 
 export interface BoardViewActions {
     onQueueMove: (source: HexCoord, delta: HexCoord) => void;
@@ -21,7 +21,7 @@ interface BoardViewProps extends BoardViewActions {
     moves: MovementQueue;
     displaySize: Dimension;
     // colors?: List<DriftColor>;
-    // this would be more apropos, but it slows things down with recomputations
+    // this would be more apropos, but it slows things down with re-computations
     colors?: Map<Player, DriftColor>;
 }
 
@@ -144,7 +144,12 @@ export class HexBoardView extends BoardViewBase {
                         scaleHeight + INNER_BOARD_MARGIN
                     ].join(',')}
                 >
-                    <rect width={scaleWidth} height={scaleHeight} stroke="white" strokeWidth="3"/>
+                    <rect
+                        width={scaleWidth}
+                        height={scaleHeight}
+                        stroke="white"
+                        strokeWidth="3"
+                    />
                     <HexFilterBoardView
                         key={'nobody'}
                         filter={this.filterNobody}
@@ -160,10 +165,11 @@ export class HexBoardView extends BoardViewBase {
                         filter={this.filterCursor}
                         {...this.props}
                     />
-                    <MovesView
+                    <MovementQueueView
                         moves={this.props.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
                         players={this.props.board.players}
+                        boardHeight={this.props.board.edges.height}
                     />
                 </svg>
             </div>
@@ -171,31 +177,13 @@ export class HexBoardView extends BoardViewBase {
     }
 }
 
-interface MovesViewProps {
-    moves: MovementQueue;
-    colors: Map<Player, DriftColor>;
-    players: List<Player>;
-}
-
-const MovesView = (props: MovesViewProps) =>
-    <div />
-
-/*
-class MovesView extends Component<MovesViewProps> {
-    constructor(props: MovesViewProps) {
-        super(props);
-    }
-    render(): React.ReactNode {
-        return (
-            <div></div>
-        );
-    }
-}
-*/
-
 interface FilterBoardViewProps extends BoardViewProps {
     filter: (hex: HexCoord) => boolean;
 }
+
+const centerX = (cartX: number): number => 45 * cartX + 30;
+const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26;
+const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26;
 
 class HexFilterBoardView extends Component<FilterBoardViewProps> {
     constructor(props: FilterBoardViewProps) {
@@ -203,7 +191,7 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
     }
 
     render(): React.ReactNode {
-        const height = (this.props.board.edges.height + 1) * 26;
+        const height = viewBoxHeight(this.props.board.edges.height);
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
@@ -211,8 +199,8 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                     this.props.filter
                 ).map(hex => {
                     const spot = this.props.board.getSpot(hex);
-                    const centerX = hex.cartX() * 45 + 30;
-                    const centerY = height - (hex.cartY() + 1) * 26;
+                    const ox = centerX(hex.cartX());
+                    const oy = centerY(height, hex.cartY());
                     const color: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(spot.owner);
                     return (
@@ -221,8 +209,8 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                             color={color}
                             owner={spot.owner}
                             selected={hex === this.props.cursor}
-                            centerX={centerX}
-                            centerY={centerY}
+                            centerX={ox}
+                            centerY={oy}
                             hexRadius={30}
                             onSelect={() => this.props.onPlaceCursor(hex)}
                             contents={spot.pop === 0 ? '' : `${spot.pop}`}
@@ -230,8 +218,8 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                             {
                                 spot.pop === 0 ? undefined :
                                     <text
-                                        x={centerX}
-                                        y={centerY + 0.35 * 26}
+                                        x={ox}
+                                        y={oy + 0.35 * 26}
                                         fontFamily="Sans-Serif"
                                         fontSize={27}
                                         textAnchor="middle"
@@ -294,3 +282,71 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         {props.children && <g>{props.children}</g>}
     </g>
 );
+
+interface MovementQueueViewProps {
+    moves: MovementQueue;
+    colors: Map<Player, DriftColor>;
+    players: List<Player>;
+    boardHeight: number;
+}
+
+const MovementQueueView = (props: MovementQueueViewProps) =>
+    <g id="movementQueue"> {
+        props.moves.playerQueues.map(
+            (moveList: List<HexMove>, playerIndex: number) => {
+                const player = props.players.get(playerIndex, Player.Nobody);
+                return (
+                    <g key={playerIndex}>
+                        <MoveListView
+                            moveList={moveList}
+                            color={props.colors.get(player)}
+                            boardHeight={props.boardHeight}
+                        />
+                    </g>
+                )
+            }
+        )
+    }
+    </g>;
+
+interface MoveListViewProps {
+    moveList: List<HexMove>;
+    color?: DriftColor;
+    boardHeight: number;
+}
+
+const MoveListView = (props: MoveListViewProps) =>
+     <g> {
+         props.moveList.map((move: HexMove, key: number) =>
+             <MoveView
+                 key={key}
+                 color={props.color}
+                 boardHeight={props.boardHeight}
+                 move={move}
+             />
+         )
+     }
+     </g>;
+
+interface MoveViewProps {
+    move: HexMove;
+    color?: DriftColor;
+    boardHeight: number;
+}
+
+const MoveView = (props: MoveViewProps) => {
+    const x1 = centerX(props.move.source.cartX());
+    const x2 = centerX(props.move.dest.cartX());
+    const h = viewBoxHeight(props.boardHeight);
+    const y1 = centerY(h, props.move.source.cartY());
+    const y2 = centerY(h, props.move.dest.cartY());
+    return (
+        <polygon
+            points={`${x1},${y1} ${x2},${y2}`}
+            style={props.color && {
+                stroke: props.color.toHexString(),
+                strokeWidth: 3,
+            }}
+        />
+    )
+};

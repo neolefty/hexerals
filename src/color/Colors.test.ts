@@ -108,9 +108,9 @@ it('color podge random tests', () => {
 
         const cp2 = cp.disperse(2);
         expect(cp.closestTwo() < cp2.closestTwo()).toBeTruthy();
-        const cp5then2 = cp.disperse(5).disperse(2);
+        const cp521 = cp.disperse(5).disperse(2).disperse(1);
         // doing 5 then 2 should be better than doing just 2
-        expect(cp2.closestTwo() < cp5then2.closestTwo()).toBeTruthy();
+        expect(cp2.closestTwo() < cp521.closestTwo()).toBeTruthy();
 
         // can't count on this though--we're only maximizing min dist,
         // not trying to do anything about max dist.

@@ -17,13 +17,13 @@ g.spot {
 
 g.Nobody polygon {}
 
-$playerColors: (
-    Zero: #adf,
-    One: #6b6,
-    Two: #fff,
-    Three: #e8f,
-    Four: #fc8,
-);
+//$playerColors: (
+//    Zero: #adf,
+//    One: #6b6,
+//    Two: #fff,
+//    Three: #e8f,
+//    Four: #fc8,
+//);
 /* Could be cool to have a reverse one, #533 & #faa */
 
 @each $name, $bg in $playerColors {
