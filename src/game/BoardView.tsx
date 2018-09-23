@@ -290,7 +290,7 @@ interface MovementQueueViewProps {
     boardHeight: number;
 }
 
-const MovementQueueView = (props: MovementQueueViewProps) =>
+const MovementQueueView = (props: MovementQueueViewProps) => (
     <g id="movementQueue"> {
         props.moves.playerQueues.map(
             (moveList: List<HexMove>, playerIndex: number) => {
@@ -303,11 +303,12 @@ const MovementQueueView = (props: MovementQueueViewProps) =>
                             boardHeight={props.boardHeight}
                         />
                     </g>
-                )
+                );
             }
-        )
+        ).toArray() // is there a direct way to map to an iterator (like a list) rather than a map?
     }
-    </g>;
+    </g>
+);
 
 interface MoveListViewProps {
     moveList: List<HexMove>;
@@ -315,7 +316,7 @@ interface MoveListViewProps {
     boardHeight: number;
 }
 
-const MoveListView = (props: MoveListViewProps) =>
+const MoveListView = (props: MoveListViewProps) => (
      <g> {
          props.moveList.map((move: HexMove, key: number) =>
              <MoveView
@@ -326,7 +327,8 @@ const MoveListView = (props: MoveListViewProps) =>
              />
          )
      }
-     </g>;
+     </g>
+);
 
 interface MoveViewProps {
     move: HexMove;
@@ -348,5 +350,5 @@ const MoveView = (props: MoveViewProps) => {
                 strokeWidth: 3,
             }}
         />
-    )
+    );
 };
