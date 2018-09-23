@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import {Board, RandomArranger} from './Board';
 import {HexCoord} from './Hex';
 import {GenericAction} from '../App';
@@ -145,8 +144,9 @@ export function placeCursorAction(position: HexCoord): PlaceCursor {
     };
 }
 function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState {
-    assert(state.board.inBounds(action.position));
-    return {
+    if (!state.board.inBounds(action.position)) // out of bounds --> no effect
+        return state;
+    else return {
         ...state,
         cursor: action.position,
     };

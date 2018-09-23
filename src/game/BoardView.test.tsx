@@ -179,8 +179,8 @@ it('blocks illegal moves', () => {
     expect(st.cursor).toBe(HexCoord.NONE);
     expect(st.moves.size).toEqual(0);
 
-    // trying to move the cursor relative to a nonexistent cursor should throw
-    expect(() => st.queueMoveDown(true)).toThrowError();
+    // trying to move the cursor relative to a nonexistent cursor should have no effect
+    st.queueMoveDown(true);
     expect(st.cursor).toBe(HexCoord.NONE);
     expect(boardBefore).toBe(st.board);  // no moves executed
     st.doMoves(); // still no legit moves requested, so no effective moves
@@ -192,8 +192,8 @@ it('blocks illegal moves', () => {
     // this was causing memory errors for some reason but is working now?
     expect(boardBefore).toBe(st.board);  // no effect on board
 
-    // place cursor outside bounds
-    expect(() => st.placeCursor(HexCoord.LEFT_UP)).toThrowError();
+    // place cursor outside bounds -- no effect
+    st.placeCursor(HexCoord.LEFT_UP);
     expect(st.cursor).toBe(HexCoord.NONE);
 });
 
