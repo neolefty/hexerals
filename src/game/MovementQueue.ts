@@ -1,6 +1,7 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable';
 import {HexCoord} from './Hex';
+import {Player} from './Players';
 
 export class HexMove {
     constructor(
@@ -18,9 +19,13 @@ export class HexMove {
 }
 
 export class PlayerMove {
+    static construct(player: Player, source: HexCoord, delta: HexCoord): PlayerMove {
+        return new PlayerMove(player, new HexMove(source, delta));
+    }
+
     constructor(
+        readonly player: Player,
         readonly  move: HexMove,
-        readonly playerIndex: number,
     ) {}
 
     get source(): HexCoord { return this.move.source; }
@@ -28,34 +33,34 @@ export class PlayerMove {
     get dest(): HexCoord { return this.move.dest; }
 
     public toString(): string {
-        return `Player #${this.playerIndex} ${this.move}`;
+        return `${this.player} ${this.move}`;
     }
 }
 
 export class MovementQueue {
     constructor(
-        readonly playerQueues: Map<number, List<HexMove>>
+        readonly playerQueues: Map<Player, List<PlayerMove>> = Map()
     ) {}
 
-    public add(playerIndex: number, move: HexMove): MovementQueue {
-        if (this.playerQueues.has(playerIndex))
+    public addMove(move: PlayerMove): MovementQueue {
+        if (this.playerQueues.has(move.player))
             return new MovementQueue(
                 // add move to the end of this player's queue
                 this.playerQueues.set(
-                    playerIndex,
-                    this.playerQueues.get(playerIndex).push(move),
+                    move.player,
+                    this.playerQueues.get(move.player).push(move),
                 )
             );
         else
             return new MovementQueue(
                 // create a new queue for this player, with 1 move in it
-                this.playerQueues.set(playerIndex, List([move]))
+                this.playerQueues.set(move.player, List([move]))
             );
     }
 
     public get size(): number {
         return this.playerQueues.reduce(
-            (n: number, q: List<HexMove>): number => n + q.size,
+            (n: number, q: List<PlayerMove>): number => n + q.size,
             0,
         );
     }
@@ -85,30 +90,44 @@ export class MovementQueue {
     }
 */
 
-    // pop moves of each player in sequence, starting with startPlayerIndex and
-    // going in a circle to startPlayerIndex - 1.
-    public popEach(startPlayerIndex: number, numPlayers: number):
+    // pop moves of all players; invalid moves are skipped (they can arise
+    // from out-of-date queueing, so discard them and move on)
+    public popEach(validator: ((move: PlayerMove) => boolean)):
         QueueAndMoves | undefined
     {
         const c: List<PlayerMove> = List();
         const mutMap = this.playerQueues.asMutable();
-        const playerMoves = c.withMutations(result => {
-            for (let playerIdx = 0; playerIdx < numPlayers; ++playerIdx)
-                if (mutMap.has(playerIdx)) {
-                    const moves = mutMap.get(playerIdx);
-                    if (moves.size > 0) {
-                        result.push(new PlayerMove(moves.get(0), playerIdx));
-                        mutMap.set(playerIdx, moves.remove(0));
+        let mutated = false;
+        const playerMoves = c.withMutations(result =>
+            this.playerQueues.forEach(
+                (moves: List<PlayerMove>, player: Player) => {
+                    const mutMoves: List<PlayerMove> = moves.asMutable();
+                    mutMap.set(player, mutMoves);
+                    while (mutMoves.size > 0) {
+                        mutated = true;
+                        const move: PlayerMove = mutMoves.get(0);
+                        mutMoves.remove(0);
+                        if (validator(move)) {
+                            result.push(move);
+                            break;
+                        }
                     }
-                }
-        });
-        if (playerMoves.size === 0)
-            return undefined; // no change
-        else
+                })
+        );
+        if (mutated)
             return new QueueAndMoves(
                 new MovementQueue(mutMap.asImmutable()),
                 playerMoves,
             );
+        else // no change
+            return undefined;
+    }
+
+    playerIsQueuedTo(player: Player, hex: HexCoord): boolean {
+        const moves: List<PlayerMove> | undefined = this.playerQueues.get(player);
+        return !!(moves && moves.find(
+            (move: PlayerMove) => move.dest === hex)
+        );
     }
 }
 

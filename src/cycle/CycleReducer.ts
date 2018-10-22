@@ -7,7 +7,7 @@ import {HexCoord} from '../game/Hex';
 import {GameAction, BoardReducer} from '../game/BoardReducer';
 import {CycleState} from './CycleState';
 import {EMPTY_MOVEMENT_QUEUE} from '../game/MovementQueue';
-import {pickNPlayers, PlayerManager} from '../game/Players';
+import {pickNPlayers, Player, PlayerManager} from '../game/Players';
 import {List} from 'immutable';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
@@ -58,6 +58,7 @@ const openLocalGameReducer =
             cursor: HexCoord.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(),
+            curPlayer: Player.One,
         },
     };
 };

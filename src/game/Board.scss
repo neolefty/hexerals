@@ -26,18 +26,18 @@ g.Nobody polygon {}
 //);
 /* Could be cool to have a reverse one, #533 & #faa */
 
-@each $name, $bg in $playerColors {
-    g.#{$name} {
-        polygon {
-            //fill: #{$bg};
-            //stroke: darken($bg, 40%);
-            stroke: #555;
-        }
-        //text {
-        //    fill: darken($bg, 60%);
-        //}
-    }
-}
+//@each $name, $bg in $playerColors {
+//    g.#{$name} {
+//        polygon {
+//            //fill: #{$bg};
+//            //stroke: darken($bg, 40%);
+//            stroke: #555;
+//        }
+//        //text {
+//        //    fill: darken($bg, 60%);
+//        //}
+//    }
+//}
 
 g.spot:hover polygon {
     stroke: #a22;

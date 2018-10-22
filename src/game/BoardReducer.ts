@@ -3,15 +3,17 @@ import {HexCoord} from './Hex';
 import {GenericAction} from '../App';
 import {BoardState} from './BoardState';
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants';
-import {EMPTY_MOVEMENT_QUEUE, HexMove} from './MovementQueue';
+import {EMPTY_MOVEMENT_QUEUE, PlayerMove} from './MovementQueue';
 import {pickNPlayers, Player, PlayerManager} from './Players';
 import {List} from 'immutable';
+import {StatusMessage} from '../StatusMessage';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
 // TODO: figure out immutable approach too, maybe with immutable.js
 
-export type GameAction = NewGame | QueueMove | PlaceCursor | DoMoves;
+export type GameAction
+    = NewGame | QueueMove | PlaceCursor | DoMoves | SetPlayer;
 
 const INITIAL_PLAYERS = pickNPlayers(0);
 export const INITIAL_BOARD_STATE: BoardState = {
@@ -23,6 +25,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     ),
     cursor: HexCoord.NONE,
     players: new PlayerManager(INITIAL_PLAYERS),
+    curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
     messages: List([
         // new StatusMessage('foo', 'bar', 'baz'),
@@ -42,6 +45,8 @@ export function BoardReducer(
         state = queueMoveReducer(state, action);
     else if (isDoMoves(action))
         state = doMovesReducer(state);
+    else if (isSetPlayer(action))
+        state = setPlayerReducer(state, action);
     return state;
 }
 
@@ -73,34 +78,44 @@ const QUEUE_MOVE = 'QUEUE_MOVE';
 type QUEUE_MOVE = typeof QUEUE_MOVE;
 interface QueueMove extends GenericAction {
     type: QUEUE_MOVE;
-    source: HexCoord;
-    delta: HexCoord;
+    move: PlayerMove;
 }
 const isQueueMove = (action: GameAction): action is QueueMove =>
     action.type === QUEUE_MOVE;
 export const queueMoveAction = (
-    source: HexCoord, delta: HexCoord
+    move: PlayerMove
 ): QueueMove => ({
     type: QUEUE_MOVE,
-    source: source,
-    delta: delta,
+    move: move,
 });
-const queueMoveReducer = (state: BoardState, action: QueueMove): BoardState => {
-    const move = new HexMove(state.cursor, action.delta);
-    if (!state.board.inBounds(move.dest))
-        return state;
+const queueMoveReducer = (
+    state: BoardState, action: QueueMove
+): BoardState => {
 
-    const fromSpot = state.board.getSpot(move.source);
-    if (fromSpot.owner === Player.Nobody || fromSpot.pop === 1)
-        return state;
+    const newMessages: StatusMessage[] = [];
+    const queuedTo = state.moves
+        .playerIsQueuedTo(action.move.player, action.move.source);
+    const options = state.board.validateOptions(newMessages);
+    options.ignoreSmallPop = true;
+    if (queuedTo) // if the player hopes to have already taken that spot, let them try
+        options.ignoreSpotOwner = true;
+    const valid = state.board.validate(action.move, options);
+    const updatedMessages = newMessages.length > 0
+        ? state.messages.push(...newMessages)
+        : state.messages;
 
-    return {
+    if (valid) return {
         ...state,
-        moves: state.moves.add(
-            state.board.playerIndex(fromSpot.owner),
-            move,
-        )
+        messages: updatedMessages,
+        moves: state.moves.addMove(action.move),
     };
+    // TODO assert state.messages !== updatedMessages
+    else if (state.messages !== updatedMessages) return {
+        ...state,
+        messages: updatedMessages,
+    };
+    else
+        return state; // probably shouldn't happen -- always have a message instead?
 };
 
 // advance one step in the queue of moves for each player
@@ -112,7 +127,8 @@ const isDoMoves = (action: GameAction): action is DoMoves =>
 export const doMovesAction = (): DoMoves => ({ type: DO_MOVES });
 export const doMovesReducer = (state: BoardState): BoardState => {
     // TODO rotate startPlayerIndex
-    const movesAndQ = state.moves.popEach(0, state.board.players.size);
+    const movesAndQ = state.moves.popEach(
+        (move: PlayerMove) => state.board.validate(move));
     // console.log(`reducing moves ... ${movesAndQ}`);
     if (movesAndQ) { // undefined if no moves to apply
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves);
@@ -138,10 +154,7 @@ function isPlaceCursor(action: GameAction): action is PlaceCursor {
     return (action.type === PLACE_CURSOR);
 }
 export function placeCursorAction(position: HexCoord): PlaceCursor {
-    return {
-        type: PLACE_CURSOR,
-        position: position,
-    };
+    return { type: PLACE_CURSOR, position: position };
 }
 function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState {
     if (!state.board.inBounds(action.position)) // out of bounds --> no effect
@@ -151,3 +164,22 @@ function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState 
         cursor: action.position,
     };
 }
+
+const SET_PLAYER = 'SET_PLAYER';
+type SET_PLAYER = typeof SET_PLAYER;
+interface SetPlayer extends GenericAction {
+    type: SET_PLAYER;
+    player: Player;
+}
+function isSetPlayer(action: GameAction): action is SetPlayer {
+    return (action.type === SET_PLAYER);
+}
+export function setPlayerAction(player: Player): SetPlayer {
+    return { type: SET_PLAYER, player: player };
+}
+const setPlayerReducer = (state: BoardState, action: SetPlayer): BoardState => {
+    return {
+        ...state,
+        curPlayer: action.player,
+    };
+};

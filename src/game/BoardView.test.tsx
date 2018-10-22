@@ -6,7 +6,7 @@ import {shallow} from 'enzyme';
 import * as Adapter from 'enzyme-adapter-react-16';
 
 import {
-    BoardReducer, queueMoveAction, newGameAction, placeCursorAction, doMovesAction
+    BoardReducer, queueMoveAction, newGameAction, placeCursorAction, doMovesAction, setPlayerAction
 } from './BoardReducer';
 import {Board, Spot, TwoCornersArranger} from './Board';
 import {INITIAL_POP} from './BoardConstants';
@@ -16,7 +16,7 @@ import {BoardViewBase} from "./BoardView";
 import {BoardState} from './BoardState';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants';
 import {pickNPlayers, Player} from './Players';
-import {EMPTY_MOVEMENT_QUEUE, MovementQueue} from './MovementQueue';
+import {EMPTY_MOVEMENT_QUEUE, MovementQueue, PlayerMove} from './MovementQueue';
 import {StatusMessage} from '../StatusMessage';
 
 it('renders a spot', () => {
@@ -44,6 +44,7 @@ it('renders a board with no selection', () => {
         <OldGridView
             board={board}
             cursor={HexCoord.NONE}
+            curPlayer={Player.One}
             displaySize={new Dimension(1000, 1000)}
             moves={EMPTY_MOVEMENT_QUEUE}
             onQueueMove={() => {}}
@@ -73,6 +74,7 @@ it('renders a board with a selection', () => {
         <OldGridView
             board={board}
             cursor={ur}
+            curPlayer={Player.One}
             displaySize={new Dimension(1000, 1000)}
             moves={EMPTY_MOVEMENT_QUEUE}
             onPlaceCursor={() => {}}
@@ -139,15 +141,18 @@ class storeTester {
     get moves(): MovementQueue { return this.state.moves; }
 
     // Action: Queue a move
-    queueMove = (delta: HexCoord, alsoCursor=true) => {
-        this.store.dispatch(queueMoveAction(this.cursor, delta));
+    queueMove = (player: Player, delta: HexCoord, alsoCursor=true) => {
+        this.store.dispatch(
+            queueMoveAction(PlayerMove.construct(player, this.cursor, delta))
+        );
         if (alsoCursor)
             this.placeCursor(this.cursor.plus(delta));
     };
 
     // Action: Queue a move one space down
     queueMoveDown = (alsoCursor=true) => {
-        this.queueMove(HexCoord.DOWN, alsoCursor);
+        if (this.state.curPlayer)
+            this.queueMove(this.state.curPlayer, HexCoord.DOWN, alsoCursor);
     };
 
     // Action: Place the cursor
@@ -157,6 +162,10 @@ class storeTester {
 
     // Action: execute a round of queued moves
     doMoves = () => this.store.dispatch(doMovesAction());
+
+    setPlayer = (player: Player) => {
+        this.store.dispatch(setPlayerAction(player));
+    }
 }
 
 it('creates game via react-redux', () => {
@@ -197,14 +206,14 @@ it('blocks illegal moves', () => {
     expect(st.cursor).toBe(HexCoord.NONE);
 });
 
-it('moves the cursor', () => {
-    const st = new storeTester();
-    const ul = st.board.edges.upperLeft;
-    st.placeCursor(ul);
-    st.queueMoveDown();
-    expect(st.cursor).toBe(ul.getDown());
-    expect(st.cursorRawSpot).toBeUndefined();
-});
+// it('moves the cursor', () => {
+//     const st = new storeTester();
+//     const ul = st.board.edges.upperLeft;
+//     st.placeCursor(ul);
+//     st.queueMoveDown();
+//     expect(st.cursor).toBe(ul.getDown());
+//     expect(st.cursorRawSpot).toBeUndefined();
+// });
 
 it('makes real moves', () => {
     const st = new storeTester();
@@ -217,11 +226,16 @@ it('makes real moves', () => {
     expect(st.getRawSpot(ur.getDown())).toBeUndefined();
 
     st.queueMoveDown();
+    expect(st.moves.size).toBe(0); // no current player yet
+    st.setPlayer(Player.One); // cursor is on One's starting point, UR corner
+    st.queueMoveDown();
+    expect(st.moves.size).toBe(1);
     expect(boardBefore).toBe(st.board); // only queued -- no board updates yet
+    // console.log(`-- queued --\n${boardStateToString(st.state)}`);
     st.doMoves();
     const boardAfter1 = st.board;
-    // console.log(`-- moved --\n${boardStateToString(store.getState())}`);
-    expect(boardBefore).not.toBe(boardAfter1);  // board updated
+    // console.log(`-- moved --\n${boardStateToString(st.state)}`);
+    expect(boardBefore !== boardAfter1).toBeTruthy();  // board updated
     expect(st.cursor).toBe(ur.getDown());
     expect(st.cursorRawSpot).toEqual(new Spot(Player.One, INITIAL_POP - 1));
 
@@ -230,10 +244,7 @@ it('makes real moves', () => {
     const dest2 = st.cursor.plus(down2);
     // even though the destination is in bounds
     expect((st.board.inBounds(dest2)));
-    st.queueMove(down2);
-    expect(st.moves.size).toEqual(1);
-    expect(st.messages.size).toEqual(0);
-    st.doMoves();
+    st.queueMove(Player.One, down2, true);
     expect(st.moves.size).toEqual(0);
     expect(st.messages.size).toEqual(1);
     // TODO use constants in tags
@@ -245,11 +256,22 @@ it('makes real moves', () => {
     const down3 = ur.getDown().plus(down2);
     expect(st.cursor).toBe(down3);
 
+    // TODO queue from queued-to spot
+
     // make a second move down
     st.placeCursor(ur.getDown());
     st.queueMoveDown(false);
     st.doMoves();
     expect(st.cursor === ur.getDown()).toBeTruthy(); // didn't move cursor this time
+
+    // queue two moves down-left
+    st.placeCursor(ur);
+    console.log(st.messages);
+    st.queueMove(Player.One, HexCoord.LEFT_DOWN);
+    console.log(st.messages);
+    st.queueMove(Player.One, HexCoord.LEFT_DOWN);
+    console.log(st.messages);
+    expect(st.moves.size).toBe(2);
 
     const downFromUR = (n: number) =>
         st.getSpot(ur.plus(HexCoord.DOWN.times(n)));

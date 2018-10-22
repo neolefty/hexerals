@@ -7,10 +7,10 @@ import {HexCoord} from './Hex';
 import Dimension from '../Dimension';
 import {DriftColor} from '../color/DriftColor';
 import {Player} from './Players';
-import {HexMove, MovementQueue} from './MovementQueue';
+import {HexMove, MovementQueue, PlayerMove} from './MovementQueue';
 
 export interface BoardViewActions {
-    onQueueMove: (source: HexCoord, delta: HexCoord) => void;
+    onQueueMove: (move: PlayerMove) => void;
     onPlaceCursor: (position: HexCoord) => void;
     onNewGame: (board: Board) => void;
 }
@@ -20,6 +20,8 @@ interface BoardViewProps extends BoardViewActions {
     cursor: HexCoord;
     moves: MovementQueue;
     displaySize: Dimension;
+    curPlayer: Player | undefined;
+    // messages: List<StatusMessage>; // TODO this is provided, but is it relevant to BoardView?
     // colors?: List<DriftColor>;
     // this would be more apropos, but it slows things down with re-computations
     colors?: Map<Player, DriftColor>;
@@ -66,10 +68,12 @@ export class BoardViewBase extends Component<BoardViewProps> {
 */
 
     onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
-        if (this.props.cursor !== HexCoord.NONE) {
+        if (this.props.cursor !== HexCoord.NONE && this.props.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
             if (delta !== HexCoord.NONE) {
-                this.props.onQueueMove(this.props.cursor, delta);
+                this.props.onQueueMove(
+                    PlayerMove.construct(this.props.curPlayer, this.props.cursor, delta)
+                );
                 this.props.onPlaceCursor(this.props.cursor.plus(delta));
                 e.preventDefault();
             }
@@ -293,10 +297,9 @@ interface MovementQueueViewProps {
 const MovementQueueView = (props: MovementQueueViewProps) => (
     <g id="movementQueue"> {
         props.moves.playerQueues.map(
-            (moveList: List<HexMove>, playerIndex: number) => {
-                const player = props.players.get(playerIndex, Player.Nobody);
+            (moveList: List<HexMove>, player: Player) => {
                 return (
-                    <g key={playerIndex}>
+                    <g key={player.valueOf()}>
                         <MoveListView
                             moveList={moveList}
                             color={props.colors.get(player)}

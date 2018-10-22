@@ -66,6 +66,7 @@ export class RandomArranger implements StartingArranger {
     }
 }
 
+// place starting population in lower left, upper right, upper left, and lower right
 export class CornersArranger implements StartingArranger {
     constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {}
 
@@ -88,6 +89,7 @@ export class CornersArranger implements StartingArranger {
     }
 }
 
+// place starting population in lower left & upper right
 export class TwoCornersArranger extends CornersArranger {
     constructor(startingArmy: number = 1) {
         super(startingArmy, [Player.Zero, Player.One]);
@@ -104,6 +106,13 @@ export class BoardAndMessages {
         this.messages.size > 0
             ? List(curMessages.concat(this.messages))
             : curMessages
+}
+
+export interface MoveValidationOptions {
+    status: StatusMessage[] | undefined; // status messages to add to
+    spots: Map<HexCoord, Spot>; // by default this board's current spots
+    ignoreSpotOwner: boolean; // does it matter who is the spot's owner?
+    ignoreSmallPop: boolean;
 }
 
 export class Board {
@@ -187,48 +196,37 @@ export class Board {
      */
     applyMoves(moves: List<PlayerMove>): BoardAndMessages {
         // note that messages is left unchanged if no messages are added
-        let messages: List<StatusMessage> = List();
         // likewise, spots is left unchanged if no spots are added
-        let updatedSpots = this.spots;
+        const status: StatusMessage[] = [];
+        const options = this.validateOptions(status, this.spots);
 
         moves.forEach((move: PlayerMove) => {
-            const player = this.players.get(move.playerIndex);
-            const origin = updatedSpots.get(move.source);
-            if (origin.pop > 1 && origin.owner === player) {
-
-                // TODO move out into validation func?
-                if (move.delta.maxAbs() !== 1)
-                    messages = messages.push(
-                        new StatusMessage(
-                            'illegal move', // TODO use constants for tags
-                            `Can't move ${move.delta.maxAbs()} steps.`,
-                            `${move}`,
-                        ));
-
-                else {
-                    const newSourceSpot = new Spot(origin.owner, 1);
-                    // TODO support moving only part of a stack (half etc)
-                    const oldDestSpot = this.getSpot(move.dest);
-                    const march = new Spot(origin.owner, origin.pop - 1);
-                    const newDestSpot = oldDestSpot.settle(march);
-                    updatedSpots = updatedSpots.withMutations(
-                        (m: Map<HexCoord, Spot>) => {
-                            m.set(move.source, newSourceSpot);
-                            m.set(move.dest, newDestSpot);
-                    });
-                }
+            const valid = this.validate(move, options);
+            if (valid) {
+                const origin = options.spots.get(move.source);
+                assert(origin);
+                const newSourceSpot = new Spot(origin.owner, 1);
+                // TODO support moving only part of a stack (half etc)
+                const oldDestSpot = this.getSpot(move.dest);
+                const march = new Spot(origin.owner, origin.pop - 1);
+                const newDestSpot = oldDestSpot.settle(march);
+                options.spots = options.spots.withMutations(
+                    (m: Map<HexCoord, Spot>) => {
+                        m.set(move.source, newSourceSpot);
+                        m.set(move.dest, newDestSpot);
+                });
             }
         });
 
-        const board = (this.spots === updatedSpots)
+        const board = (this.spots === options.spots)
             ? this
             : new Board(
                 this.constraints,
                 this.players,
-                updatedSpots,
+                options.spots,
                 this.edges,
             );
-        return new BoardAndMessages(board, messages);
+        return new BoardAndMessages(board, List(status));
     }
 
     toString(): string {
@@ -244,5 +242,84 @@ export class Board {
 
     playerIndex(player: Player) {
         return this.players.indexOf(player);
+    }
+
+    validateOptions(
+        status: StatusMessage[] | undefined = undefined,
+        spots: Map<HexCoord, Spot> = this.spots,
+        ignoreCurPlayer: boolean = false,
+        ignoreSpotOwner: boolean = false,
+    ): MoveValidationOptions {
+        return {
+            status: status,
+            spots: spots,
+            ignoreSpotOwner: ignoreSpotOwner,
+            ignoreSmallPop: false,
+        };
+    }
+
+    validate(
+        move: PlayerMove,
+        options: MoveValidationOptions = this.validateOptions(),
+    ): boolean {
+        // in bounds
+        if (!this.inBounds(move.source)) {
+            if (options && options.status)
+                options.status.push(
+                    new StatusMessage(
+                        'out of bounds',
+                        `start ${move.source} is out of bounds`,
+                        `${move}`,
+                    ));
+            return false;
+        }
+        if (!this.inBounds(move.dest)) {
+            if (options && options.status)
+                options.status.push(
+                    new StatusMessage(
+                        'out of bounds',
+                        `destination ${move.dest} is out of bounds`,
+                        `${move}`,
+                    ));
+            return false;
+        }
+
+        // move distance == 1
+        if (move.delta.maxAbs() !== 1) {
+            if (options && options.status)
+                options.status.push(
+                    new StatusMessage(
+                        'illegal move', /* TODO use constants for tags*/
+                        `Can't move ${move.delta.maxAbs()} steps.`,
+                        `${move}`,
+                    ));
+            return false;
+        }
+
+        // owner === player making the move
+        const origin = options.spots.get(move.source, Spot.BLANK);
+        if (!options.ignoreSpotOwner && origin.owner !== move.player) {
+            if (options && options.status)
+                options.status.push(new StatusMessage(
+                    'wrong player', // TODO use constant
+                    `${move.player} cannot move from ${move.source} `
+                    + `because it is held by ${origin.owner}.`,
+                    `${move}`,
+                ));
+            return false;
+        }
+
+        // population >= 1
+        if (!options.ignoreSmallPop && origin.pop <= 1) {
+            if (options && options.status)
+                options.status.push(new StatusMessage(
+                    'insufficient population',
+                    `${move.source} has population of ${origin.pop}`,
+                    `${move}`,
+                ));
+            return false;
+        }
+
+        return true;
     }
 }

@@ -4,8 +4,7 @@ import {Dispatch} from 'redux';
 
 import {HexCoord} from './Hex';
 import {Board} from './Board';
-import {
-    queueMoveAction, placeCursorAction, newGameAction, } from './BoardReducer';
+import {queueMoveAction, placeCursorAction, newGameAction} from './BoardReducer';
 import {BoardView} from './BoardView';
 import {AppState} from '../App';
 import Dimension from '../Dimension';
@@ -13,6 +12,7 @@ import {BoardState} from './BoardState';
 import {DriftColor} from '../color/DriftColor';
 import {ColorPodge} from '../color/ColorPodge';
 import {Player, PLAYERS} from './Players';
+import {PlayerMove} from './MovementQueue';
 
 export interface LocalGameProps {
     displaySize: Dimension;
@@ -41,8 +41,8 @@ const mapStateToBoardViewProps = (
 });
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
-    onQueueMove: (source: HexCoord, delta: HexCoord) => {
-        dispatch(queueMoveAction(source, delta));
+    onQueueMove: (move: PlayerMove) => {
+        dispatch(queueMoveAction(move));
     },
     onPlaceCursor: (position: HexCoord) => {
         dispatch(placeCursorAction(position));

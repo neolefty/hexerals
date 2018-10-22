@@ -3,6 +3,8 @@ import {List} from 'immutable';
 import {Board, Spot, TwoCornersArranger} from './Board';
 import {BoardConstraints, HexCoord} from './Hex';
 import {pickNPlayers, Player} from './Players';
+import {StatusMessage} from '../StatusMessage';
+import {PlayerMove} from './MovementQueue';
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -27,8 +29,6 @@ export function printBoard(board: Board) {
     });
     console.log(out);
 }
-
-it('passes', () => {});
 
 it('checks rectangular board geometry', () => {
     const arr = new TwoCornersArranger();
@@ -127,4 +127,58 @@ it('navigates around a board', () => {
     // expect(
     //     HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
     // ).toBe(HexCoord.getCart(1, 5));
+});
+
+it('validates moves', () => {
+    const threeByFour = Board.constructRectangular(
+        3, 4, pickNPlayers(2), new TwoCornersArranger(20));
+    const messages: StatusMessage[] = [];
+    const options = threeByFour.validateOptions(messages);
+
+    expect(threeByFour.validate(PlayerMove.construct(
+        Player.Zero, threeByFour.edges.lowerLeft, HexCoord.UP))).toBeTruthy();
+    expect(threeByFour.edges.lowerLeft).toEqual(HexCoord.ORIGIN);
+    expect(threeByFour.validate(PlayerMove.construct(
+        Player.One, threeByFour.edges.upperRight, HexCoord.DOWN))).toBeTruthy();
+
+    // would go off the board
+    expect(threeByFour.validate(PlayerMove.construct(
+        Player.One, threeByFour.edges.upperRight, HexCoord.UP
+    ), options)).toBeFalsy();
+    expect(messages[messages.length-1].tag).toBe('out of bounds');
+    expect(messages[messages.length-1].msg.startsWith('destination')).toBeTruthy();
+
+    // would start off the board
+    expect(threeByFour.validate(PlayerMove.construct(
+        Player.Zero, HexCoord.DOWN, HexCoord.UP
+    ), options)).toBeFalsy();
+    expect(messages[messages.length-1].tag).toBe('out of bounds');
+    expect(messages[messages.length-1].msg.startsWith('start')).toBeTruthy();
+
+    // too far
+    expect(threeByFour.validate(PlayerMove.construct(
+        Player.Zero, HexCoord.ORIGIN, HexCoord.RIGHT_UP.plus(HexCoord.RIGHT_UP)
+    ), options)).toBeFalsy();
+    expect(messages[messages.length-1].tag).toBe('illegal move');
+    expect(messages[messages.length-1].msg.includes('2')).toBeTruthy();
+
+    // wrong owner
+    const oneOriginUp = PlayerMove.construct(
+        Player.One, HexCoord.ORIGIN, HexCoord.UP);
+    expect(threeByFour.validate(oneOriginUp, options)).toBeFalsy();
+    expect(messages[messages.length-1].tag).toBe('wrong player');
+    expect(threeByFour.validate(oneOriginUp)).toBeFalsy();
+
+    // pop of only 1
+    const moved = threeByFour.applyMove(PlayerMove.construct(
+        Player.Zero, HexCoord.ORIGIN, HexCoord.UP)).board;
+    const movedOptions = moved.validateOptions(messages);
+    expect(moved.validate(PlayerMove.construct(
+        Player.Zero, HexCoord.ORIGIN, HexCoord.UP
+    ), movedOptions)).toBeFalsy();
+    expect(messages[messages.length-1].tag).toBe('insufficient population');
+    movedOptions.ignoreSmallPop = true;
+    expect(moved.validate(PlayerMove.construct(
+        Player.Zero, HexCoord.ORIGIN, HexCoord.UP
+    ), movedOptions)).toBeTruthy();
 });
