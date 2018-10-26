@@ -25,14 +25,20 @@ export const CycleReducer =
     (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
 {
     if (isOpenLocalGame(action))
-        state = openLocalGameReducer(state, action);
+        return openLocalGameReducer(state, action);
     else if (isCloseGame(action))
-        state = closeGameReducer(state, action);
+        return closeGameReducer(state, action);
     else if (isChangeNumPlayers(action))
-        state = changeNumPlayersReducer(state, action);
-    else
-        state.localGame = (BoardReducer(state.localGame, action));
-    return state;
+        return changeNumPlayersReducer(state, action);
+    else {
+        const newLocalGame = BoardReducer(state.localGame, action);
+        if (newLocalGame === state.localGame)
+            return state;
+        else return {
+            ...state,
+            localGame: newLocalGame,
+        };
+    }
 };
 
 const OPEN_LOCAL_GAME = 'OPEN_LOCAL_GAME';
@@ -41,6 +47,7 @@ interface OpenLocalGame extends GenericAction { type: OPEN_LOCAL_GAME; }
 const isOpenLocalGame = (action: CycleAction): action is OpenLocalGame =>
     action.type === OPEN_LOCAL_GAME;
 export const openLocalGameAction = (): OpenLocalGame => ({ type: OPEN_LOCAL_GAME });
+// noinspection JSUnusedLocalSymbols
 const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
@@ -58,7 +65,7 @@ const openLocalGameReducer =
             cursor: HexCoord.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(),
-            curPlayer: Player.One,
+            curPlayer: Player.Zero,
         },
     };
 };
@@ -69,6 +76,7 @@ interface CloseGame extends GenericAction { type: CLOSE_GAME; }
 const isCloseGame = (action: CycleAction): action is CloseGame =>
     action.type === CLOSE_GAME;
 export const closeGameAction = (): CloseGame => ({ type: CLOSE_GAME });
+// noinspection JSUnusedLocalSymbols
 const closeGameReducer =
     (state: CycleState, action: CloseGame): CycleState => ({
         ...state,

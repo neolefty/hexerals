@@ -34,9 +34,9 @@ export const INITIAL_BOARD_STATE: BoardState = {
     ]), // empty
 };
 
-export function BoardReducer(
-    state: BoardState = INITIAL_BOARD_STATE, action: GameAction
-): BoardState {
+export const BoardReducer = (
+    state: BoardState = INITIAL_BOARD_STATE, action: GameAction,
+): BoardState => {
     if (isNewGame(action))
         state = newGameReducer(state, action);
     else if (isPlaceCursor(action))
@@ -48,7 +48,7 @@ export function BoardReducer(
     else if (isSetPlayer(action))
         state = setPlayerReducer(state, action);
     return state;
-}
+};
 
 const NEW_GAME = 'NEW_GAME';
 type NEW_GAME = typeof NEW_GAME;
@@ -56,22 +56,15 @@ interface NewGame extends GenericAction {
     type: NEW_GAME;
     board: Board;
 }
-function isNewGame(action: GameAction): action is NewGame {
-    return (action.type === NEW_GAME);
-}
-export function newGameAction(board: Board): NewGame {
-    return {
-        type: NEW_GAME,
-        board: board,
-    };
-}
-function newGameReducer(state: BoardState, action: NewGame): BoardState {
-    return {
-        ...state,
-        cursor: HexCoord.NONE,
-        board: action.board,
-    };
-}
+const isNewGame = (action: GameAction): action is NewGame =>
+    action.type === NEW_GAME;
+export const newGameAction = (board: Board): NewGame =>
+    ({ type: NEW_GAME, board: board });
+const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
+    ...state,
+    cursor: HexCoord.NONE,
+    board: action.board,
+});
 
 // add to the player's movement queue
 const QUEUE_MOVE = 'QUEUE_MOVE';
@@ -82,12 +75,8 @@ interface QueueMove extends GenericAction {
 }
 const isQueueMove = (action: GameAction): action is QueueMove =>
     action.type === QUEUE_MOVE;
-export const queueMoveAction = (
-    move: PlayerMove
-): QueueMove => ({
-    type: QUEUE_MOVE,
-    move: move,
-});
+export const queueMoveAction = (move: PlayerMove): QueueMove =>
+    ({ type: QUEUE_MOVE, move: move });
 const queueMoveReducer = (
     state: BoardState, action: QueueMove
 ): BoardState => {
@@ -125,7 +114,7 @@ interface DoMoves extends GenericAction { type: DO_MOVES; }
 const isDoMoves = (action: GameAction): action is DoMoves =>
     action.type === DO_MOVES;
 export const doMovesAction = (): DoMoves => ({ type: DO_MOVES });
-export const doMovesReducer = (state: BoardState): BoardState => {
+const doMovesReducer = (state: BoardState): BoardState => {
     // TODO rotate startPlayerIndex
     const movesAndQ = state.moves.popEach(
         (move: PlayerMove) => state.board.validate(move));
@@ -150,20 +139,17 @@ interface PlaceCursor extends GenericAction {
     type: PLACE_CURSOR;
     position: HexCoord;
 }
-function isPlaceCursor(action: GameAction): action is PlaceCursor {
-    return (action.type === PLACE_CURSOR);
-}
-export function placeCursorAction(position: HexCoord): PlaceCursor {
-    return { type: PLACE_CURSOR, position: position };
-}
-function placeCursorReducer(state: BoardState, action: PlaceCursor): BoardState {
-    if (!state.board.inBounds(action.position)) // out of bounds --> no effect
-        return state;
-    else return {
-        ...state,
-        cursor: action.position,
-    };
-}
+const isPlaceCursor = (action: GameAction): action is PlaceCursor =>
+    action.type === PLACE_CURSOR;
+export const placeCursorAction = (position: HexCoord): PlaceCursor =>
+    ({ type: PLACE_CURSOR, position: position });
+const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState =>
+    (action.position === state.cursor || !state.board.inBounds(action.position))
+        ? state
+        : {
+            ...state,
+            cursor: action.position,
+        };
 
 const SET_PLAYER = 'SET_PLAYER';
 type SET_PLAYER = typeof SET_PLAYER;
@@ -171,15 +157,11 @@ interface SetPlayer extends GenericAction {
     type: SET_PLAYER;
     player: Player;
 }
-function isSetPlayer(action: GameAction): action is SetPlayer {
-    return (action.type === SET_PLAYER);
-}
-export function setPlayerAction(player: Player): SetPlayer {
-    return { type: SET_PLAYER, player: player };
-}
-const setPlayerReducer = (state: BoardState, action: SetPlayer): BoardState => {
-    return {
-        ...state,
-        curPlayer: action.player,
-    };
-};
+const isSetPlayer = (action: GameAction): action is SetPlayer =>
+    action.type === SET_PLAYER;
+export const setPlayerAction = (player: Player): SetPlayer =>
+    ({ type: SET_PLAYER, player: player });
+const setPlayerReducer = (state: BoardState, action: SetPlayer): BoardState => ({
+    ...state,
+    curPlayer: action.player,
+});
