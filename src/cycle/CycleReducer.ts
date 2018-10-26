@@ -14,12 +14,14 @@ export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
         numPlayers: 4,
+        tickMillis: 500,
         boardSize: INITIAL_DIMENSION,
     },
     localGame: undefined,
 };
 
-export type CycleAction = GameAction | OpenLocalGame | CloseGame | ChangeNumPlayers;
+export type CycleAction = GameAction
+    | OpenLocalGame | CloseGame | ChangeNumPlayers | ChangeTickMillis;
 
 export const CycleReducer =
     (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
@@ -30,7 +32,9 @@ export const CycleReducer =
         return closeGameReducer(state, action);
     else if (isChangeNumPlayers(action))
         return changeNumPlayersReducer(state, action);
-    else {
+    else if (isChangeTickMillis(action))
+        return changeTickMillisReducer(state, action);
+    else { // must be a GameAction, by process of elimination
         const newLocalGame = BoardReducer(state.localGame, action);
         if (newLocalGame === state.localGame)
             return state;
@@ -102,5 +106,26 @@ const changeNumPlayersReducer =
         localOptions: {
             ...state.localOptions,
             numPlayers: action.numPlayers,
+        }
+    });
+
+const CHANGE_TICK_MILLIS = 'CHANGE_TICK_MILLIS';
+type CHANGE_TICK_MILLIS = typeof CHANGE_TICK_MILLIS;
+interface ChangeTickMillis extends GenericAction {
+    type: CHANGE_TICK_MILLIS;
+    ms: number;
+}
+const isChangeTickMillis = (action: CycleAction): action is ChangeTickMillis =>
+    action.type === CHANGE_TICK_MILLIS;
+export const changeTickMillisAction = (ms: number): ChangeTickMillis => ({
+    type: CHANGE_TICK_MILLIS,
+    ms: ms,
+});
+const changeTickMillisReducer =
+    (state: CycleState, action: ChangeTickMillis): CycleState => ({
+        ...state,
+        localOptions: {
+            ...state.localOptions,
+            tickMillis: action.ms,
         }
     });

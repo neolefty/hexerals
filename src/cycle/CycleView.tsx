@@ -11,6 +11,7 @@ export interface CycleViewProps extends CycleState {
     onOpenLocalGame: () => void;
     onCloseGame: () => void;
     onChangeNumPlayers: (n: number) => void;
+    onChangeTickMillis: (ms: number) => void;
 }
 
 export const CycleView = (props: CycleViewProps) => {
@@ -23,8 +24,10 @@ export const CycleView = (props: CycleViewProps) => {
             return (
                 <LocalGameOptionsView
                     numPlayers={props.localOptions.numPlayers}
+                    tickMillis={props.localOptions.tickMillis}
                     newGame={props.onOpenLocalGame}
                     changeNumPlayers={props.onChangeNumPlayers}
+                    changeTickMillis={props.onChangeTickMillis}
                 />
             );
         default:
