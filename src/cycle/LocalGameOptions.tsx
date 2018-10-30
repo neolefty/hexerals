@@ -2,16 +2,15 @@ import * as React from 'react';
 import Dimension from '../Dimension';
 
 export interface LocalGameOptions {
-    boardSize: Dimension;
     numPlayers: number;
     tickMillis: number;
+    boardSize: Dimension;
 }
 
-export interface LocalGameOptionsViewProps {
-    numPlayers: number;
-    tickMillis: number;
+export interface LocalGameOptionsViewProps extends LocalGameOptions {
     changeNumPlayers: (x: number) => void;
     changeTickMillis: (x: number) => void;
+    changeBoardSize: (d: Dimension) => void;
     newGame: () => void;
 }
 
@@ -32,6 +31,26 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             max={4000}
             onChange={x => props.changeTickMillis(x)}
         />
+        <br/>
+        <IntInput
+            label="Width"
+            value={props.boardSize.w}
+            min={3}
+            max={40}
+            onChange={
+                w => props.changeBoardSize(new Dimension(w, props.boardSize.h))
+            }
+        />
+        <br/>
+        <IntInput
+            label="Height"
+            value={props.boardSize.h}
+            min={3}
+            max={20}
+            onChange={
+                h => props.changeBoardSize(new Dimension(props.boardSize.w, h))
+            }
+        />
         <button onClick={props.newGame}>Start Game</button>
     </div>
 );
@@ -40,8 +59,8 @@ interface IntInputProps {
     label: string;
     value: number;
     onChange: (x: number) => void;
-    min: number,
-    max: number,
+    min: number;
+    max: number;
 }
 
 const IntInput = (props: IntInputProps) => (

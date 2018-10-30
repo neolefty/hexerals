@@ -9,6 +9,7 @@ import {CycleState} from './CycleState';
 import {EMPTY_MOVEMENT_QUEUE} from '../game/MovementQueue';
 import {pickNPlayers, Player, PlayerManager} from '../game/Players';
 import {List} from 'immutable';
+import Dimension from '../Dimension';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
@@ -21,7 +22,8 @@ export const INITIAL_CYCLE_STATE: CycleState = {
 };
 
 export type CycleAction = GameAction
-    | OpenLocalGame | CloseGame | ChangeNumPlayers | ChangeTickMillis;
+    | OpenLocalGame | CloseGame
+    | ChangeNumPlayers | ChangeTickMillis | ChangeBoardSize;
 
 export const CycleReducer =
     (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
@@ -34,6 +36,8 @@ export const CycleReducer =
         return changeNumPlayersReducer(state, action);
     else if (isChangeTickMillis(action))
         return changeTickMillisReducer(state, action);
+    else if (isChangeBoardSize(action))
+        return changeBoardSizeReducer(state, action);
     else { // must be a GameAction, by process of elimination
         const newLocalGame = BoardReducer(state.localGame, action);
         if (newLocalGame === state.localGame)
@@ -127,5 +131,26 @@ const changeTickMillisReducer =
         localOptions: {
             ...state.localOptions,
             tickMillis: action.ms,
+        }
+    });
+
+const CHANGE_BOARD_SIZE = 'CHANGE_BOARD_SIZE';
+type CHANGE_BOARD_SIZE = typeof CHANGE_BOARD_SIZE;
+interface ChangeBoardSize extends GenericAction {
+    type: CHANGE_BOARD_SIZE;
+    d: Dimension;
+}
+const isChangeBoardSize = (action: CycleAction): action is ChangeBoardSize =>
+    action.type === CHANGE_BOARD_SIZE;
+export const changeBoardSizeAction = (d: Dimension): ChangeBoardSize => ({
+    type: CHANGE_BOARD_SIZE,
+    d: d,
+});
+const changeBoardSizeReducer =
+    (state: CycleState, action: ChangeBoardSize): CycleState => ({
+        ...state,
+        localOptions: {
+            ...state.localOptions,
+            boardSize: action.d,
         }
     });
