@@ -266,11 +266,11 @@ it('makes real moves', () => {
 
     // queue two moves down-left
     st.placeCursor(ur);
-    console.log(st.messages);
+    // console.log(st.messages);
     st.queueMove(Player.One, HexCoord.LEFT_DOWN);
-    console.log(st.messages);
+    // console.log(st.messages);
     st.queueMove(Player.One, HexCoord.LEFT_DOWN);
-    console.log(st.messages);
+    // console.log(st.messages);
     expect(st.moves.size).toBe(2);
 
     const downFromUR = (n: number) =>
