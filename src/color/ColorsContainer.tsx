@@ -9,7 +9,7 @@ import {ColorsDiv} from './ColorsDiv';
 
 const TICK = 100; // milliseconds
 // TODO simulate annealing by progressing from large ticks down
-const DRIFT = 1;
+const DRIFT = 5;
 
 export interface ColorsState {
     colors: ColorPodge;
