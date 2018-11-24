@@ -8,6 +8,7 @@ import Dimension from '../Dimension';
 import {DriftColor} from '../color/DriftColor';
 import {Player} from './Players';
 import {HexMove, MovementQueue, PlayerMove} from './MovementQueue';
+import {BoardState} from './BoardState';
 
 export interface BoardViewActions {
     onQueueMove: (move: PlayerMove) => void;
@@ -15,15 +16,9 @@ export interface BoardViewActions {
     onNewGame: (board: Board) => void;
 }
 
-interface BoardViewProps extends BoardViewActions {
-    board: Board;
-    cursor: HexCoord;
-    moves: MovementQueue;
+export interface BoardViewProps extends BoardViewActions {
+    boardState: BoardState;
     displaySize: Dimension;
-    curPlayer: Player | undefined;
-    // messages: List<StatusMessage>; // TODO this is provided, but is it relevant to BoardView?
-    // colors?: List<DriftColor>;
-    // this would be more apropos, but it slows things down with re-computations
     colors?: Map<Player, DriftColor>;
 }
 
@@ -52,29 +47,15 @@ export class BoardViewBase extends Component<BoardViewProps> {
         this.onKeyDown = this.onKeyDown.bind(this);
     }
 
-/*
-    shouldComponentUpdate(
-        nextProps: Readonly<BoardViewProps>,
-        nextState: Readonly<{}>,
-        nextContext: any,
-    ): boolean {
-        return (
-            nextProps.cursor !== this.props.cursor
-            || nextProps.colors !== this.props.colors
-            || !nextProps.displaySize.equals(this.props.displaySize)
-            || nextProps.board !== this.props.board
-        );
-    }
-*/
-
     onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
-        if (this.props.cursor !== HexCoord.NONE && this.props.curPlayer) {
+        const bs = this.props.boardState;
+        if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
             if (delta !== HexCoord.NONE) {
                 this.props.onQueueMove(
-                    PlayerMove.construct(this.props.curPlayer, this.props.cursor, delta)
+                    PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
                 );
-                this.props.onPlaceCursor(this.props.cursor.plus(delta));
+                this.props.onPlaceCursor(bs.cursor.plus(delta));
                 e.preventDefault();
             }
         }
@@ -91,25 +72,25 @@ export class HexBoardView extends BoardViewBase {
     }
 
     filterNobody(hex: HexCoord): boolean {
-        return this.props.cursor !== hex
-            && this.props.board.getSpot(hex).owner === Player.Nobody;
+        return this.props.boardState.cursor !== hex
+            && this.props.boardState.board.getSpot(hex).owner === Player.Nobody;
     }
 
     filterPlayers(hex: HexCoord): boolean {
-        return this.props.cursor !== hex
-            && this.props.board.getSpot(hex).owner !== Player.Nobody;
+        return this.props.boardState.cursor !== hex
+            && this.props.boardState.board.getSpot(hex).owner !== Player.Nobody;
     }
 
     filterCursor(hex: HexCoord): boolean {
-        return this.props.cursor === hex;
+        return this.props.boardState.cursor === hex;
     }
 
     render(): React.ReactNode {
         // calculate board size
         const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN;
         const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN;
-        const coordsWidth = this.props.board.edges.width;
-        const coordsHeight = this.props.board.edges.height;
+        const coordsWidth = this.props.boardState.board.edges.width;
+        const coordsHeight = this.props.boardState.board.edges.height;
 
         // integer approximation of hexes -- half of sqrt 3 ~= 13 / 15
         // coords inside viewport -- hex radius is 15, hex half-height is 13
@@ -170,10 +151,10 @@ export class HexBoardView extends BoardViewBase {
                         {...this.props}
                     />
                     <MovementQueueView
-                        moves={this.props.moves}
+                        moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
-                        players={this.props.board.players}
-                        boardHeight={this.props.board.edges.height}
+                        players={this.props.boardState.board.players}
+                        boardHeight={this.props.boardState.board.edges.height}
                     />
                 </svg>
             </div>
@@ -195,14 +176,15 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
     }
 
     render(): React.ReactNode {
-        const height = viewBoxHeight(this.props.board.edges.height);
+        const bs = this.props.boardState;
+        const height = viewBoxHeight(bs.board.edges.height);
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
-                this.props.board.constraints.all().filter(
+                bs.board.constraints.all().filter(
                     this.props.filter
                 ).map(hex => {
-                    const spot = this.props.board.getSpot(hex);
+                    const spot = bs.board.getSpot(hex);
                     const ox = centerX(hex.cartX());
                     const oy = centerY(height, hex.cartY());
                     const color: DriftColor | undefined
@@ -212,7 +194,7 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                             key={hex.id}
                             color={color}
                             owner={spot.owner}
-                            selected={hex === this.props.cursor}
+                            selected={hex === bs.cursor}
                             centerX={ox}
                             centerY={oy}
                             hexRadius={30}

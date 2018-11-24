@@ -9,20 +9,6 @@ export interface ColorWheelProps extends ColorsState, ColorsActions, ColorsProps
 }
 
 export class ColorWheel extends Component<ColorWheelProps> {
-    private timer?: NodeJS.Timer;
-
-    componentWillMount(): void {
-        if (!this.timer)
-            this.timer = global.setInterval(this.props.onDiverge, this.props.tick);
-    }
-
-    componentWillUnmount(): void {
-        if (this.timer) {
-            global.clearInterval(this.timer);
-            this.timer = undefined;
-        }
-    }
-
     render(): React.ReactNode {
         const onlyOne = this.props.colors.driftColors.size === 1;
         return (
