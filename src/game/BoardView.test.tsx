@@ -15,7 +15,7 @@ import Dimension from "../Dimension";
 import {BoardViewBase} from "./BoardView";
 import {BoardState} from './BoardState';
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants';
-import {pickNPlayers, Player} from './Players';
+import {pickNPlayers, Player, PlayerManager} from './Players';
 import {EMPTY_MOVEMENT_QUEUE, MovementQueue, PlayerMove} from './MovementQueue';
 import {StatusMessage} from '../StatusMessage';
 
@@ -40,13 +40,18 @@ it('renders a board with no selection', () => {
     const n = 3; // ++* / ++ / *++
     const board = Board.constructSquare(
         n, pickNPlayers(2), new TwoCornersArranger(3));
+    const boardState: BoardState = {
+        board: board,
+        cursor: HexCoord.NONE,
+        moves: EMPTY_MOVEMENT_QUEUE,
+        players: new PlayerManager(board.players),
+        curPlayer: Player.One,
+        messages: List(),
+    }
     const view = enzyme.render(
         <OldGridView
-            board={board}
-            cursor={HexCoord.NONE}
-            curPlayer={Player.One}
+            boardState={boardState}
             displaySize={new Dimension(1000, 1000)}
-            moves={EMPTY_MOVEMENT_QUEUE}
             onQueueMove={() => {}}
             onPlaceCursor={() => {}}
             onNewGame={() => {}}
@@ -70,13 +75,18 @@ it('renders a board with a selection', () => {
     const board = Board.constructSquare(
         3, pickNPlayers(2), new TwoCornersArranger(2));
     const ur = board.edges.upperRight;
+    const bs: BoardState = {
+        board: board,
+        cursor: ur,
+        moves: EMPTY_MOVEMENT_QUEUE,
+        players: new PlayerManager(board.players),
+        curPlayer: Player.One,
+        messages: List(),
+    }
     const view = enzyme.render(
         <OldGridView
-            board={board}
-            cursor={ur}
-            curPlayer={Player.One}
+            boardState={bs}
             displaySize={new Dimension(1000, 1000)}
-            moves={EMPTY_MOVEMENT_QUEUE}
             onPlaceCursor={() => {}}
             onQueueMove={() => {}}
             onNewGame={() => {}}
@@ -320,6 +330,7 @@ export const OldGridSpotView = (props: OldGridSpotProps) => (
 
 export class OldGridView extends BoardViewBase {
     render(): React.ReactNode {
+        const bs: BoardState = this.props.boardState
         return (
             <div
                 className="board"
@@ -327,21 +338,21 @@ export class OldGridView extends BoardViewBase {
                 onKeyDown={this.onKeyDown}
             >
                 {
-                    this.props.board.edges.yRange().reverse().map((cy: number) => (
+                    bs.board.edges.yRange().reverse().map((cy: number) => (
                         <div key={cy}>
                             {
-                                this.props.board.edges.xRange().filter( // remove nonexistent
+                                bs.board.edges.xRange().filter( // remove nonexistent
                                     (cx: number) => (cx + cy) % 2 === 0
                                 ).map( // turn cartesian into hex
                                     (cx: number) => HexCoord.getCart(cx, cy)
                                 ).filter( // only in-bounds
-                                    (coord: HexCoord) => this.props.board.inBounds(coord)
+                                    (coord: HexCoord) => bs.board.inBounds(coord)
                                 ).map(
                                     (coord: HexCoord) => (
                                         <OldGridSpotView
-                                            spot={this.props.board.getSpot(coord)}
+                                            spot={bs.board.getSpot(coord)}
                                             key={coord.id}
-                                            selected={coord === this.props.cursor}
+                                            selected={coord === bs.cursor}
                                             onSelect={() => this.props.onPlaceCursor(coord)}
                                             coord={coord}
                                         />

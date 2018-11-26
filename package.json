@@ -2,6 +2,7 @@
   "name": "hexerals",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://neolefty.org/hexerals",
   "dependencies": {
     "collectable": "^0.27.0",
     "enzyme": "^3.2.0",
