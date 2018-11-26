@@ -3,18 +3,18 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
 import {HexCoord} from './Hex'
-import {Board} from './Board'
+import {Board} from './board/Board'
 import {
     queueMoveAction, placeCursorAction, newGameAction, doMovesAction
-} from './BoardReducer'
+} from './board/BoardReducer'
 import {AppState} from '../App'
 import Dimension from '../Dimension'
-import {BoardState} from './BoardState'
+import {BoardState} from './board/BoardState'
 import {DriftColor} from '../color/DriftColor'
 import {ColorPodge} from '../color/ColorPodge'
 import {Player, PLAYERS} from './Players'
 import {PlayerMove} from './MovementQueue'
-import {TickerBoardView} from './TickerBoardView';
+import {TickerBoardView} from './board/TickerBoardView';
 
 export interface LocalGameProps {
     displaySize: Dimension

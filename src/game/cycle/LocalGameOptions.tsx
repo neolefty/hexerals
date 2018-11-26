@@ -1,5 +1,6 @@
-import * as React from 'react';
-import Dimension from '../Dimension';
+import * as React from 'react'
+import Dimension from '../../Dimension'
+import './LocalGameOptions.css'
 
 export interface LocalGameOptions {
     numPlayers: number;
@@ -8,6 +9,7 @@ export interface LocalGameOptions {
 }
 
 export interface LocalGameOptionsViewProps extends LocalGameOptions {
+    displaySize: Dimension;
     changeNumPlayers: (x: number) => void;
     changeTickMillis: (x: number) => void;
     changeBoardSize: (d: Dimension) => void;
@@ -15,7 +17,13 @@ export interface LocalGameOptionsViewProps extends LocalGameOptions {
 }
 
 export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
-    <div>
+    <div
+        className="LocalGameOptionsView"
+        style={{
+            width: props.displaySize.w,
+            height: props.displaySize.h,
+        }}
+    >
         <IntInput
             label="Players"
             value={props.numPlayers}
@@ -23,7 +31,6 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             max={10}
             onChange={x => props.changeNumPlayers(x)}
         />
-        <br/>
         <IntInput
             label="Tick"
             value={props.tickMillis}
@@ -31,7 +38,6 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             max={4000}
             onChange={x => props.changeTickMillis(x)}
         />
-        <br/>
         <IntInput
             label="Width"
             value={props.boardSize.w}
@@ -41,7 +47,6 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
                 w => props.changeBoardSize(new Dimension(w, props.boardSize.h))
             }
         />
-        <br/>
         <IntInput
             label="Height"
             value={props.boardSize.h}
@@ -51,7 +56,11 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
                 h => props.changeBoardSize(new Dimension(props.boardSize.w, h))
             }
         />
-        <button onClick={props.newGame}>Start Game</button>
+        <button
+            onClick={props.newGame}
+        >
+            Start Game
+        </button>
     </div>
 );
 
@@ -64,7 +73,10 @@ interface IntInputProps {
 }
 
 const IntInput = (props: IntInputProps) => (
-    <label>{props.label}:
+    <label
+        className="IntInput"
+    >
+        {props.label}:
         <input
             type="number"
             min={props.min}

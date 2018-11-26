@@ -1,7 +1,7 @@
 import {Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import {CycleView} from './CycleView';
-import Dimension from '../Dimension';
+import Dimension from '../../Dimension';
 import {
     changeBoardSizeAction,
     changeNumPlayersAction,
@@ -9,7 +9,7 @@ import {
     closeGameAction,
     openLocalGameAction
 } from './CycleReducer';
-import {AppState} from '../App';
+import {AppState} from '../../App';
 import {CycleState} from './CycleState';
 
 export interface CycleContainerProps {

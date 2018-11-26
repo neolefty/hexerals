@@ -1,7 +1,7 @@
-import Dimension from '../Dimension';
+import Dimension from '../../Dimension';
 import {LocalGameOptionsView} from './LocalGameOptions';
 import {CycleMode} from './CycleState';
-import {LocalGameContainer} from '../game/LocalGameContainer';
+import {LocalGameContainer} from '../LocalGameContainer';
 import * as React from 'react';
 import {CycleState} from './CycleState';
 
@@ -27,6 +27,8 @@ export const CycleView = (props: CycleViewProps) => {
                     numPlayers={props.localOptions.numPlayers}
                     tickMillis={props.localOptions.tickMillis}
                     boardSize={props.localOptions.boardSize}
+                    displaySize={props.displaySize}
+
                     newGame={props.onOpenLocalGame}
                     changeNumPlayers={props.onChangeNumPlayers}
                     changeTickMillis={props.onChangeTickMillis}

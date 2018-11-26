@@ -122,7 +122,9 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
 
     private log(s: string) {
         if (this.debug)
+            /* tslint:disable:no-console */
             console.log(s);
+            /* tslint:enable */
     }
 
     private evolve(elapsed: number) {

@@ -1,5 +1,5 @@
 import {LocalGameOptions} from './LocalGameOptions';
-import {BoardState} from '../game/BoardState';
+import {BoardState} from '../board/BoardState';
 
 export enum CycleMode {
     IN_LOCAL_GAME = 'in local game',

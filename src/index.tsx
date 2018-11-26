@@ -6,7 +6,7 @@ import App, {AppState} from './App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import {ColorsReducer} from './color/ColorsContainer';
-import {CycleReducer} from './cycle/CycleReducer';
+import {CycleReducer} from './game/cycle/CycleReducer';
 
 /* eslint-disable no-underscore-dangle */
 const store = createStore<AppState>(

@@ -1,0 +1,19 @@
+.IntInput {
+  margin: 0.3em;
+  input {
+    border: 1px solid white;
+    margin-left: 0.3em;
+  }
+}
+
+.LocalGameOptionsView {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #ccc;
+
+  button {
+    margin: 0.3em;
+  }
+}

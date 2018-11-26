@@ -1,11 +1,11 @@
 import * as React from 'react';
 import './App.css';
-import {MIN_HEIGHT} from './game/BoardConstants';
+import {MIN_HEIGHT} from './game/board/BoardConstants';
 import Dimension from './Dimension';
 import {ColorsContainer, ColorsState} from './color/ColorsContainer';
-import {CycleState} from './cycle/CycleState';
-import {CycleContainer} from './cycle/CycleContainer';
-import {MIN_WIDTH} from './game/BoardConstants';
+import {CycleState} from './game/cycle/CycleState';
+import {CycleContainer} from './game/cycle/CycleContainer';
+import {MIN_WIDTH} from './game/board/BoardConstants';
 
 export interface GenericAction {
     type: string;

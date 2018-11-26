@@ -1,25 +1,25 @@
-import * as React from 'react';
-import {List, Map} from 'immutable';
-import {Component, KeyboardEvent} from 'react';
-import {Board} from './Board';
-import './Board.css';
-import {HexCoord} from './Hex';
-import Dimension from '../Dimension';
-import {DriftColor} from '../color/DriftColor';
-import {Player} from './Players';
-import {HexMove, MovementQueue, PlayerMove} from './MovementQueue';
-import {BoardState} from './BoardState';
+import * as React from 'react'
+import {List, Map} from 'immutable'
+import {Component, KeyboardEvent} from 'react'
+import {Board} from './Board'
+import './Board.css'
+import {HexCoord} from '../Hex'
+import Dimension from '../../Dimension'
+import {DriftColor} from '../../color/DriftColor'
+import {Player} from '../Players'
+import {HexMove, MovementQueue, PlayerMove} from '../MovementQueue'
+import {BoardState} from './BoardState'
 
 export interface BoardViewActions {
-    onQueueMove: (move: PlayerMove) => void;
-    onPlaceCursor: (position: HexCoord) => void;
-    onNewGame: (board: Board) => void;
+    onQueueMove: (move: PlayerMove) => void
+    onPlaceCursor: (position: HexCoord) => void
+    onNewGame: (board: Board) => void
 }
 
 export interface BoardViewProps extends BoardViewActions {
-    boardState: BoardState;
-    displaySize: Dimension;
-    colors?: Map<Player, DriftColor>;
+    boardState: BoardState
+    displaySize: Dimension
+    colors?: Map<Player, DriftColor>
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
@@ -33,30 +33,30 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
     's': HexCoord.DOWN,
     'e': HexCoord.RIGHT_UP,
     'd': HexCoord.RIGHT_DOWN,
-});
+})
 
-const OUTER_BOARD_MARGIN = 1; // space between bounding rect and hex viewbox
-const INNER_BOARD_MARGIN = 1; // space between hex viewbox and hexes
+const OUTER_BOARD_MARGIN = 1 // space between bounding rect and hex viewbox
+const INNER_BOARD_MARGIN = 1 // space between hex viewbox and hexes
 
 export const BoardView = (props: BoardViewProps) =>
-    <HexBoardView {...props}/>;
+    <HexBoardView {...props}/>
 
 export class BoardViewBase extends Component<BoardViewProps> {
     constructor(props: BoardViewProps) {
-        super(props);
-        this.onKeyDown = this.onKeyDown.bind(this);
+        super(props)
+        this.onKeyDown = this.onKeyDown.bind(this)
     }
 
     onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
-        const bs = this.props.boardState;
+        const bs = this.props.boardState
         if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
-            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE);
+            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
             if (delta !== HexCoord.NONE) {
                 this.props.onQueueMove(
                     PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
-                );
-                this.props.onPlaceCursor(bs.cursor.plus(delta));
-                e.preventDefault();
+                )
+                this.props.onPlaceCursor(bs.cursor.plus(delta))
+                e.preventDefault()
             }
         }
     }
@@ -64,56 +64,56 @@ export class BoardViewBase extends Component<BoardViewProps> {
 
 export class HexBoardView extends BoardViewBase {
     constructor(props: BoardViewProps) {
-        super(props);
-        // console.log(`colors: ${props.colors}`);
-        this.filterNobody = this.filterNobody.bind(this);
-        this.filterPlayers = this.filterPlayers.bind(this);
-        this.filterCursor = this.filterCursor.bind(this);
+        super(props)
+        // console.log(`colors: ${props.colors}`)
+        this.filterNobody = this.filterNobody.bind(this)
+        this.filterPlayers = this.filterPlayers.bind(this)
+        this.filterCursor = this.filterCursor.bind(this)
     }
 
     filterNobody(hex: HexCoord): boolean {
         return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getSpot(hex).owner === Player.Nobody;
+            && this.props.boardState.board.getSpot(hex).owner === Player.Nobody
     }
 
     filterPlayers(hex: HexCoord): boolean {
         return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getSpot(hex).owner !== Player.Nobody;
+            && this.props.boardState.board.getSpot(hex).owner !== Player.Nobody
     }
 
     filterCursor(hex: HexCoord): boolean {
-        return this.props.boardState.cursor === hex;
+        return this.props.boardState.cursor === hex
     }
 
     render(): React.ReactNode {
         // calculate board size
-        const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN;
-        const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN;
-        const coordsWidth = this.props.boardState.board.edges.width;
-        const coordsHeight = this.props.boardState.board.edges.height;
+        const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN
+        const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN
+        const coordsWidth = this.props.boardState.board.edges.width
+        const coordsHeight = this.props.boardState.board.edges.height
 
         // integer approximation of hexes -- half of sqrt 3 ~= 13 / 15
         // coords inside viewport -- hex radius is 15, hex half-height is 13
         // row height is 26, hex diameter is 30
 
         // horizontally, hex centers are 1.5 diameters apart
-        const scaleWidth = coordsWidth * 45 + 15;
+        const scaleWidth = coordsWidth * 45 + 15
         // vertically, hex centers are half a row apart
-        const scaleHeight = (coordsHeight + 1) * 26; // hex
+        const scaleHeight = (coordsHeight + 1) * 26 // hex
 
         // figure out whether height or width is constraining factor
-        const boardAspectRatio = scaleHeight / scaleWidth;
-        const screenAspectRatio = innerH / innerW;
-        let boardHeight, boardWidth;
+        const boardAspectRatio = scaleHeight / scaleWidth
+        const screenAspectRatio = innerH / innerW
+        let boardHeight, boardWidth
 
         if (boardAspectRatio > screenAspectRatio) {
             // board taller than screen, so constrained by height
-            boardHeight = innerH;
-            boardWidth = boardHeight / boardAspectRatio;
+            boardHeight = innerH
+            boardWidth = boardHeight / boardAspectRatio
         } else {
             // constrained by width
-            boardWidth = innerW;
-            boardHeight = boardWidth * boardAspectRatio;
+            boardWidth = innerW
+            boardHeight = boardWidth * boardAspectRatio
         }
 
         return (
@@ -158,37 +158,37 @@ export class HexBoardView extends BoardViewBase {
                     />
                 </svg>
             </div>
-        );
+        )
     }
 }
 
 interface FilterBoardViewProps extends BoardViewProps {
-    filter: (hex: HexCoord) => boolean;
+    filter: (hex: HexCoord) => boolean
 }
 
-const centerX = (cartX: number): number => 45 * cartX + 30;
-const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26;
-const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26;
+const centerX = (cartX: number): number => 45 * cartX + 30
+const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
+const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
 class HexFilterBoardView extends Component<FilterBoardViewProps> {
     constructor(props: FilterBoardViewProps) {
-        super(props);
+        super(props)
     }
 
     render(): React.ReactNode {
-        const bs = this.props.boardState;
-        const height = viewBoxHeight(bs.board.edges.height);
+        const bs = this.props.boardState
+        const height = viewBoxHeight(bs.board.edges.height)
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
                 bs.board.constraints.all().filter(
                     this.props.filter
                 ).map(hex => {
-                    const spot = bs.board.getSpot(hex);
-                    const ox = centerX(hex.cartX());
-                    const oy = centerY(height, hex.cartY());
+                    const spot = bs.board.getSpot(hex)
+                    const ox = centerX(hex.cartX())
+                    const oy = centerY(height, hex.cartY())
                     const color: DriftColor | undefined
-                        = this.props.colors && this.props.colors.get(spot.owner);
+                        = this.props.colors && this.props.colors.get(spot.owner)
                     return (
                         <FlatTopHex
                             key={hex.id}
@@ -215,38 +215,38 @@ class HexFilterBoardView extends Component<FilterBoardViewProps> {
                                     </text>
                             }
                         </FlatTopHex>
-                    );
+                    )
                 })
             }
             </g>
-        );
+        )
     }
 }
 
 interface FlatTopHexProps {
-    owner: Player;
-    color?: DriftColor;
-    selected: boolean;
-    centerX: number;
-    centerY: number;
-    hexRadius: number;
-    onSelect: () => void;
-    contents: string;
-    children?: JSX.Element | JSX.Element[]; // could user "any?" instead
+    owner: Player
+    color?: DriftColor
+    selected: boolean
+    centerX: number
+    centerY: number
+    hexRadius: number
+    onSelect: () => void
+    contents: string
+    children?: JSX.Element | JSX.Element[] // could user "any?" instead
 }
 
 // a hexagon centered at (x, y)
 const hexPoints = (x: number, y: number, hexRadius: number) => {
-    const hexMid = 15;
-    const hexHalfHeight = 26;
+    const hexMid = 15
+    const hexHalfHeight = 26
     return ''
         + (x - hexRadius) + ',' + y + ' ' // left
         + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
         + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
         + (x + hexRadius) + ',' + y + ' ' // right
         + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
-        + (x - hexMid) + ',' + (y + hexHalfHeight); // down left
-};
+        + (x - hexMid) + ',' + (y + hexHalfHeight) // down left
+}
 
 const FlatTopHex = (props: FlatTopHexProps) => (
     <g
@@ -267,13 +267,13 @@ const FlatTopHex = (props: FlatTopHexProps) => (
         />
         {props.children && <g>{props.children}</g>}
     </g>
-);
+)
 
 interface MovementQueueViewProps {
-    moves: MovementQueue;
-    colors: Map<Player, DriftColor>;
-    players: List<Player>;
-    boardHeight: number;
+    moves: MovementQueue
+    colors: Map<Player, DriftColor>
+    players: List<Player>
+    boardHeight: number
 }
 
 const MovementQueueView = (props: MovementQueueViewProps) => (
@@ -288,17 +288,17 @@ const MovementQueueView = (props: MovementQueueViewProps) => (
                             boardHeight={props.boardHeight}
                         />
                     </g>
-                );
+                )
             }
         ).toArray() // is there a direct way to map to an iterator (like a list) rather than a map?
     }
     </g>
-);
+)
 
 interface MoveListViewProps {
-    moveList: List<HexMove>;
-    color?: DriftColor;
-    boardHeight: number;
+    moveList: List<HexMove>
+    color?: DriftColor
+    boardHeight: number
 }
 
 const MoveListView = (props: MoveListViewProps) => (
@@ -313,20 +313,20 @@ const MoveListView = (props: MoveListViewProps) => (
          )
      }
      </g>
-);
+)
 
 interface MoveViewProps {
-    move: HexMove;
-    color?: DriftColor;
-    boardHeight: number;
+    move: HexMove
+    color?: DriftColor
+    boardHeight: number
 }
 
 const MoveView = (props: MoveViewProps) => {
-    const x1 = centerX(props.move.source.cartX());
-    const x2 = centerX(props.move.dest.cartX());
-    const h = viewBoxHeight(props.boardHeight);
-    const y1 = centerY(h, props.move.source.cartY());
-    const y2 = centerY(h, props.move.dest.cartY());
+    const x1 = centerX(props.move.source.cartX())
+    const x2 = centerX(props.move.dest.cartX())
+    const h = viewBoxHeight(props.boardHeight)
+    const y1 = centerY(h, props.move.source.cartY())
+    const y2 = centerY(h, props.move.dest.cartY())
     return (
         <polygon
             points={`${x1},${y1} ${x2},${y2}`}
@@ -335,5 +335,5 @@ const MoveView = (props: MoveViewProps) => {
                 strokeWidth: 3,
             }}
         />
-    );
-};
+    )
+}
