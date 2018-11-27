@@ -7,7 +7,7 @@ import Dimension from '../Dimension';
 
 const SPACE_FILL = 0.65;
 const MIN_STEP_MILLIS = 16; // no faster than 60 fps
-const MAX_STEP_MILLS = 250; // anything longer than 1/4 sec was probably suspension
+const MAX_STEP_MILLIS = 250; // anything longer than 1/4 sec was probably suspension
 const VELOCITY_MAX = 0.25 / 100; // per ms; whole space is 1x1 square
 const COLOR_NEIGHBORHOOD = 20; // multiple of radius
 // const VELOCITY_MAX = 0.25 / 1000; // per ms; whole space is 1x1 square
@@ -109,7 +109,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
         const elapsed = now.getTime() - this.lastStep.getTime();
         if (elapsed >= MIN_STEP_MILLIS) { // limit the recalculations per second
             this.lastStep = now;
-            this.evolve(Math.min(MAX_STEP_MILLS, elapsed));
+            this.evolve(Math.min(MAX_STEP_MILLIS, elapsed));
         }
     }
 

@@ -14,6 +14,7 @@ export class ColorPodge {
 
     constructor(
         readonly driftColors: List<DriftColor> = List(),
+        readonly neverSettle: boolean = false,
         // if these aren't set, tracking settling is reset
         readonly settled: boolean = false,  // has dispersion settled down?
         // history of the last few closestTwo score
@@ -22,20 +23,27 @@ export class ColorPodge {
 
     addRandomColor(): ColorPodge {
         // reset settlement tracking because a new color is in the mix
-        return new ColorPodge(this.driftColors.push(DriftColor.random()));
+        return new ColorPodge(
+            this.driftColors.push(DriftColor.random()),
+            this.neverSettle,
+        );
     }
 
     removeColor(idx: number): ColorPodge {
         // reset settlement tracking because a color has been removed
-        return new ColorPodge(this.driftColors.remove(idx));
+        return new ColorPodge(
+            this.driftColors.remove(idx),
+            this.neverSettle,
+        );
     }
 
     // random walk
     drift(f: number): ColorPodge {
         // reset settlement tracking because colors have been shuffled
-        return new ColorPodge(List(this.driftColors.map(
-            (color: DriftColor) => color.drift(f)
-        )));
+        return new ColorPodge(
+            List(this.driftColors.map((color: DriftColor) => color.drift(f))),
+            this.neverSettle,
+        );
     }
 
     // spread colors away from each other
@@ -45,11 +53,16 @@ export class ColorPodge {
 
         // if this closestTwo score appears twice in our history, we're settled.
         const c = this.closestTwo();
-        const newSettled = this.dispersionHistory.count(
+        const newSettled = (!this.neverSettle) && this.dispersionHistory.count(
             x => x === c
         ) >= ColorPodge.SETTLED_THRESHOLD;
         if (newSettled)
-            return new ColorPodge(this.driftColors, newSettled, this.dispersionHistory);
+            return new ColorPodge(
+                this.driftColors,
+                this.neverSettle,
+                newSettled,
+                this.dispersionHistory,
+            );
 
         // not settled, so disperse again
         let newDispHist: List<number> = this.dispersionHistory.push(this.closestTwo());
@@ -58,7 +71,12 @@ export class ColorPodge {
         const newColors: List<DriftColor> = List(
             this.driftColors.map(
                 (color: DriftColor) => this.disperseOne(color, stepSize)));
-        return new ColorPodge(newColors, newSettled, newDispHist);
+        return new ColorPodge(
+            newColors,
+            this.neverSettle,
+            newSettled,
+            newDispHist,
+        );
         // console.log(`${Math.round(before)} -- drift ${f} -- ${result.toString()}`);
         // console.log(`${this.toString()} -- drift ${f} -- ${result.toString()}`);
     }

@@ -10,6 +10,7 @@ import {ColorsDiv} from './ColorsDiv';
 const TICK = 100; // milliseconds
 // TODO simulate annealing by progressing from large ticks down
 const DRIFT = 5;
+const NEVER_SETTLE = true;
 
 export interface ColorsState {
     colors: ColorPodge;
@@ -60,10 +61,13 @@ function removeColorAction(x: number): RemoveColor {
     };
 }
 
-const INITIAL_COLOR_PODGE = new ColorPodge(List([
-    DriftColor.random(), DriftColor.random(), DriftColor.random(),
-    DriftColor.random(), DriftColor.random(), DriftColor.random()
-]));
+const INITIAL_COLOR_PODGE = new ColorPodge(
+    List([
+        DriftColor.random(), DriftColor.random(), DriftColor.random(),
+        DriftColor.random(), DriftColor.random(), DriftColor.random()
+    ]),
+    NEVER_SETTLE,
+);
 
 export function ColorsReducer(
     state: ColorsState = {

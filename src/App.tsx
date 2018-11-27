@@ -62,7 +62,7 @@ class App extends React.Component<AppProps, AppState> {
                         <CycleContainer displaySize={displaySize}/>
                     </TabPanel>
                     <TabPanel>
-                        <ColorsContainer displaySize={displaySize.scale(0.5)}/>
+                        <ColorsContainer displaySize={displaySize}/>
                     </TabPanel>
                 </Tabs>
             </div>
