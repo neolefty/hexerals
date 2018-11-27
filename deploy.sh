@@ -34,6 +34,8 @@ if [ $SHOULD_BUILD == true ]; then
     PASS=$?
 
     if [[ $PASS == 0 ]]; then
+	# rm -rf node_modules  # overkill
+	yarn install
 	yarn build
 	BUILD_EXIT=$?
 	if [[ $BUILD_EXIT == 0 ]]; then
