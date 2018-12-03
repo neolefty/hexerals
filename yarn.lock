@@ -5406,10 +5406,10 @@ react-scripts-ts@2.8.0:
   optionalDependencies:
     fsevents "1.1.2"
 
-react-tabs@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/react-tabs/-/react-tabs-2.3.0.tgz#0c37e786f288d369824acd06a96bd1818ab8b0dc"
-  integrity sha512-pYaefgVy76/36AMEP+B8YuVVzDHa3C5UFZ3REU78zolk0qMxEhKvUFofvDCXyLZwf0RZjxIfiwok1BEb18nHyA==
+react-tabs@2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-tabs/-/react-tabs-2.2.1.tgz#0331d26173c56e7af4fdbfb6225e62683cfdda52"
+  integrity sha512-Fu1frsfsGUUwxsNQsjQDo1ZuNwyLCXoZcu7jaaeWAP9HlwPpYsUzNQaquA6+6jd4E/uPlBGyBTFW3PpEUOwkVw==
   dependencies:
     classnames "^2.2.0"
     prop-types "^15.5.0"
