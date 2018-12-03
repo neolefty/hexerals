@@ -50,7 +50,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     render() {
-        const displaySize = this.getDisplaySize().plus(0,-30)
+        const displaySize = this.getDisplaySize().plus(0, -30)
         return (
             <div className="App">
                 <Tabs>

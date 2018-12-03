@@ -1,9 +1,9 @@
 import * as React from 'react'
 import {List, Map} from 'immutable'
 import {createStore, Store} from 'redux'
+import * as Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {shallow} from 'enzyme'
-import * as Adapter from 'enzyme-adapter-react-16'
 
 import {
     BoardReducer, queueMoveAction, newGameAction, placeCursorAction,
@@ -57,7 +57,7 @@ it('renders a board with no selection', () => {
             displaySize={new Dimension(1000, 1000)}
             onQueueMove={() => {}}
             onPlaceCursor={() => {}}
-            onNewGame={() => {}}
+            onEndGame={() => {}}
         />
     )
     expect(view.children().length).toEqual(n)  // n rows
@@ -92,7 +92,7 @@ it('renders a board with a selection', () => {
             displaySize={new Dimension(1000, 1000)}
             onPlaceCursor={() => {}}
             onQueueMove={() => {}}
-            onNewGame={() => {}}
+            onEndGame={() => {}}
         />
     )
     const active = view.find('.active')

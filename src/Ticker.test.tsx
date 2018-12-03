@@ -1,7 +1,7 @@
 import * as React from 'react';
+import * as Adapter from 'enzyme-adapter-react-16';
 import * as enzyme from 'enzyme';
 import {Ticker} from './Ticker';
-import * as Adapter from 'enzyme-adapter-react-16';
 
 jest.useRealTimers()
 

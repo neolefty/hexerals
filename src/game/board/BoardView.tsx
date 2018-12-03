@@ -1,7 +1,6 @@
 import * as React from 'react'
 import {List, Map} from 'immutable'
 import {Component, KeyboardEvent} from 'react'
-import {Board} from './Board'
 import './Board.css'
 import {HexCoord} from '../Hex'
 import Dimension from '../../Dimension'
@@ -13,7 +12,7 @@ import {BoardState} from './BoardState'
 export interface BoardViewActions {
     onQueueMove: (move: PlayerMove) => void
     onPlaceCursor: (position: HexCoord) => void
-    onNewGame: (board: Board) => void
+    onEndGame: () => void
 }
 
 export interface BoardViewProps extends BoardViewActions {
@@ -57,7 +56,13 @@ export class BoardViewBase extends Component<BoardViewProps> {
                 )
                 this.props.onPlaceCursor(bs.cursor.plus(delta))
                 e.preventDefault()
+                return
             }
+        }
+
+        if (e.key == 'Escape') {
+            this.props.onEndGame()
+            e.preventDefault()
         }
     }
 }

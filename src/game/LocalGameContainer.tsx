@@ -3,9 +3,8 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
 import {HexCoord} from './Hex'
-import {Board} from './board/Board'
 import {
-    queueMoveAction, placeCursorAction, newGameAction, doMovesAction
+    queueMoveAction, placeCursorAction, doMovesAction
 } from './board/BoardReducer'
 import {AppState} from '../App'
 import Dimension from '../Dimension'
@@ -18,6 +17,7 @@ import {TickerBoardView} from './board/TickerBoardView';
 
 export interface LocalGameProps {
     displaySize: Dimension
+    onEndGame: () => void
 }
 
 // TODO stop updating if colors stabilize
@@ -41,6 +41,7 @@ const mapStateToTickerBoardViewProps = (
     displaySize: ownProps.displaySize,
     colors: playerColors(state.colors.colors),
     tickMillis: state.cycle.localOptions.tickMillis,
+    onEndGame: ownProps.onEndGame,
 })
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
@@ -52,9 +53,6 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
     },
     onDoMoves: () => {
         dispatch(doMovesAction())
-    },
-    onNewGame: (board: Board) => {
-        dispatch(newGameAction(board))
     },
 })
 
