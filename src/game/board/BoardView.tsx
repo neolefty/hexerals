@@ -11,6 +11,7 @@ import {BoardState} from './BoardState'
 
 export interface BoardViewActions {
     onQueueMove: (move: PlayerMove) => void
+    onCancelMove: (player: Player) => void
     onPlaceCursor: (position: HexCoord) => void
     onEndGame: () => void
 }
@@ -60,10 +61,14 @@ export class BoardViewBase extends Component<BoardViewProps> {
             }
         }
 
-        if (e.key == 'Escape') {
+        if (e.key === 'Escape') {
             this.props.onEndGame()
             e.preventDefault()
+            return
         }
+
+        if (e.key === 'z' && bs.curPlayer)
+            this.props.onCancelMove(bs.curPlayer)
     }
 }
 

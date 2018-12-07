@@ -7,7 +7,7 @@ import {shallow} from 'enzyme'
 
 import {
     BoardReducer, queueMoveAction, newGameAction, placeCursorAction,
-    doMovesAction, setPlayerAction,
+    doMovesAction, setPlayerAction, cancelMoveAction,
 } from './BoardReducer'
 import {Board, Spot, TwoCornersArranger} from './Board'
 import {INITIAL_POP} from './BoardConstants'
@@ -55,8 +55,9 @@ it('renders a board with no selection', () => {
         <OldGridView
             boardState={boardState}
             displaySize={new Dimension(1000, 1000)}
-            onQueueMove={() => {}}
             onPlaceCursor={() => {}}
+            onQueueMove={() => {}}
+            onCancelMove={() => {}}
             onEndGame={() => {}}
         />
     )
@@ -92,6 +93,7 @@ it('renders a board with a selection', () => {
             displaySize={new Dimension(1000, 1000)}
             onPlaceCursor={() => {}}
             onQueueMove={() => {}}
+            onCancelMove={() => {}}
             onEndGame={() => {}}
         />
     )
@@ -173,6 +175,11 @@ class storeTester {
         this.store.dispatch(placeCursorAction(coord))
     }
 
+    // Action: Unqueue a move
+    cancelMove = (player: Player) => {
+        this.store.dispatch(cancelMoveAction(player))
+    }
+
     // Action: execute a round of queued moves
     doMoves = () => this.store.dispatch(doMovesAction())
 
@@ -234,6 +241,7 @@ it('makes real moves', () => {
     // place cursor at upper right
     const boardBefore = st.board
     const ur = st.board.edges.upperRight
+    const ul = st.board.edges.upperLeft
     st.placeCursor(ur)
     expect(st.cursor).toBe(ur)
     expect(st.getRawSpot(ur.getDown())).toBeUndefined()
@@ -242,7 +250,26 @@ it('makes real moves', () => {
     expect(st.moves.size).toBe(0) // no current player yet
     st.setPlayer(Player.One) // cursor is on One's starting point, UR corner
     st.queueMoveDown()
+    expect(st.cursor).toBe(ur.plus(HexCoord.DOWN))
     expect(st.moves.size).toBe(1)
+
+    // interlude: queue and cancel a move UP
+    st.queueMove(Player.One, HexCoord.UP)
+    expect(st.moves.size).toBe(2)
+    expect(st.cursor).toBe(ur)
+    st.cancelMove(Player.One)
+    expect(st.moves.size).toBe(1)
+    // cancel moved the cursor back intelligently
+    expect(st.cursor).toBe(ur.plus(HexCoord.DOWN))
+
+    // also check that cancelling doesn't move the cursor back stupidly
+    st.queueMove(Player.One, HexCoord.UP)
+    st.placeCursor(ul)
+    st.cancelMove(Player.One)
+    expect(st.moves.size).toBe(1)
+    expect(st.cursor).toBe(ul)
+    st.placeCursor(ur.plus(HexCoord.DOWN)) // back where we should be
+
     expect(boardBefore).toBe(st.board) // only queued -- no board updates yet
     // console.log(`-- queued --\n${boardStateToString(st.state)}`)
     st.doMoves()

@@ -13,7 +13,7 @@ import {StatusMessage} from '../../StatusMessage'
 // TODO: figure out immutable approach too, maybe with immutable.js
 
 export type GameAction
-    = NewGame | QueueMove | PlaceCursor | DoMoves | SetPlayer
+    = NewGame | QueueMove | PlaceCursor | DoMoves | CancelMove | SetPlayer
 
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
@@ -43,6 +43,8 @@ export const BoardReducer = (
         state = placeCursorReducer(state, action)
     else if (isQueueMove(action))
         state = queueMoveReducer(state, action)
+    else if (isCancelMove(action))
+        state = cancelMoveReducer(state, action)
     else if (isDoMoves(action))
         state = doMovesReducer(state)
     else if (isSetPlayer(action))
@@ -127,6 +129,42 @@ const doMovesReducer = (state: BoardState): BoardState => {
             messages: boardAndMessages.addToMessages(state.messages),
             moves: movesAndQ.queue,
             board: boardAndMessages.board,
+        }
+    }
+    else
+        return state
+}
+
+// forget the last move in the queue
+const CANCEL_MOVE = 'CANCEL_MOVE'
+type CANCEL_MOVE = typeof CANCEL_MOVE
+interface CancelMove extends GenericAction {
+    type: CANCEL_MOVE,
+    player: Player,
+}
+const isCancelMove = (action: GameAction): action is CancelMove =>
+    action.type === CANCEL_MOVE
+export const cancelMoveAction = (player: Player): CancelMove => ({
+    type: CANCEL_MOVE,
+    player: player,
+})
+const cancelMoveReducer = (
+    state: BoardState, action: CancelMove
+): BoardState => {
+    const newQueueAndCancelledMove = state.moves.cancelLastMove(action.player)
+    if (newQueueAndCancelledMove) {
+        const cancelledMove = newQueueAndCancelledMove.moves.get(0) as PlayerMove
+        // Cancel cursor movement too if it looks like the current player just queued this move.
+        const cursor = (
+            state.curPlayer === cancelledMove.player
+            && state.cursor === cancelledMove.dest
+        )
+            ? cancelledMove.source
+            : state.cursor
+        return {
+            ...state,
+            moves: newQueueAndCancelledMove.queue,
+            cursor: cursor,
         }
     }
     else

@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 
 import {HexCoord} from './Hex'
 import {
-    queueMoveAction, placeCursorAction, doMovesAction
+    queueMoveAction, placeCursorAction, doMovesAction, cancelMoveAction
 } from './board/BoardReducer'
 import {AppState} from '../App'
 import Dimension from '../Dimension'
@@ -45,15 +45,10 @@ const mapStateToTickerBoardViewProps = (
 })
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
-    onQueueMove: (move: PlayerMove) => {
-        dispatch(queueMoveAction(move))
-    },
-    onPlaceCursor: (position: HexCoord) => {
-        dispatch(placeCursorAction(position))
-    },
-    onDoMoves: () => {
-        dispatch(doMovesAction())
-    },
+    onQueueMove: (move: PlayerMove) => dispatch(queueMoveAction(move)),
+    onCancelMove: (player: Player) => dispatch(cancelMoveAction(player)),
+    onPlaceCursor: (position: HexCoord) => dispatch(placeCursorAction(position)),
+    onDoMoves: () => dispatch(doMovesAction()),
 })
 
 export const LocalGameContainer = connect(
