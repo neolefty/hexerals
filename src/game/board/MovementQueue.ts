@@ -1,41 +1,8 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable'
-import {HexCoord} from './Hex'
+import {HexCoord} from './HexCoord'
 import {Player} from '../players/Players'
-
-export class HexMove {
-    constructor(
-        readonly source: HexCoord,
-        readonly delta: HexCoord,
-    ) {}
-
-    get dest(): HexCoord {
-        return this.source.plus(this.delta)
-    }
-
-    public toString(): string {
-        return `move from ${this.source} to ${this.dest}`
-    }
-}
-
-export class PlayerMove {
-    static construct(player: Player, source: HexCoord, delta: HexCoord): PlayerMove {
-        return new PlayerMove(player, new HexMove(source, delta))
-    }
-
-    constructor(
-        readonly player: Player,
-        readonly  move: HexMove,
-    ) {}
-
-    get source(): HexCoord { return this.move.source }
-    get delta(): HexCoord { return this.move.delta }
-    get dest(): HexCoord { return this.move.dest }
-
-    public toString(): string {
-        return `${this.player} ${this.move}`
-    }
-}
+import {PlayerMove} from './Move';
 
 export class MovementQueue {
     constructor(
@@ -69,29 +36,9 @@ export class MovementQueue {
         return this.playerQueues.toString()
     }
 
-/*
-    public pop(playerIndex: number): MoveAndQueue {
-        if (!this.playerQueues.has(playerIndex))
-            // no queue for that player (no worries though -- just means no moves)
-            return new MoveAndQueue(this, undefined)
-        else {
-            const playerQueue: List<HexMove> = this.playerQueues.get(playerIndex)
-            if (playerQueue.size == 0)
-                // no moves in that player's queue
-                return new MoveAndQueue(this, undefined)
-            else
-                return new MoveAndQueue(
-                    new MovementQueue(
-                        this.playerQueues.set(playerIndex, playerQueue.remove(0))
-                    ),
-                    playerQueue.get(0),
-                )
-        }
-    }
-*/
-
-    // pop moves of all players invalid moves are skipped (they can arise
-    // from out-of-date queueing, so discard them and move on)
+    // Pop moves of all players.
+    // Invalid moves are skipped -- they can arise from out-of-date queueing,
+    // so discard them and move on.
     public popEach(validator: ((move: PlayerMove) => boolean)):
         QueueAndMoves | undefined
     {

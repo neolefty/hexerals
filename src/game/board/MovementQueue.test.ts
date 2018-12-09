@@ -1,6 +1,7 @@
-import {MovementQueue, PlayerMove, QueueAndMoves} from './MovementQueue';
+import {MovementQueue, QueueAndMoves} from './MovementQueue';
 import {Player} from '../players/Players';
-import {HexCoord} from './Hex';
+import {HexCoord} from './HexCoord';
+import {PlayerMove} from './Move';
 
 it('checks sanity', () => {
     const q0 = new MovementQueue();

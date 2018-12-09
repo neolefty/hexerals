@@ -1,5 +1,5 @@
 import {Board} from './Board'
-import {HexCoord} from './Hex'
+import {HexCoord} from './HexCoord'
 import {MovementQueue} from './MovementQueue'
 import {Player, PlayerManager} from '../players/Players'
 import {StatusMessage} from '../../StatusMessage'

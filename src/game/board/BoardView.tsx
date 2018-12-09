@@ -2,11 +2,11 @@ import * as React from 'react'
 
 import {Map} from 'immutable'
 import './Board.css'
-import {HexCoord} from './Hex'
+import {HexCoord} from './HexCoord'
 import Dimension from '../../Dimension'
 import {DriftColor} from '../../color/DriftColor'
 import {Player} from '../players/Players'
-import {PlayerMove} from './MovementQueue'
+import {PlayerMove} from './Move'
 import {BoardState} from './BoardState'
 import {FilterBoardView} from './HexBoardView';
 import {MovementQueueView} from './MovementView';

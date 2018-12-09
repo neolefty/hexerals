@@ -1,10 +1,13 @@
 import * as assert from 'assert'
 import {List} from 'immutable'
-import {Board, Spot, TwoCornersArranger} from './Board'
-import {BoardConstraints, HexCoord} from './Hex'
+import {Board} from './Board'
+import {BoardConstraints} from './Constraints'
 import {pickNPlayers, Player} from '../players/Players'
 import {StatusMessage} from '../../StatusMessage'
-import {PlayerMove} from './MovementQueue'
+import {PlayerMove} from './Move'
+import {TwoCornersArranger} from './Arranger';
+import {Spot} from './Spot';
+import {HexCoord} from './HexCoord';
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -133,32 +136,38 @@ it('validates moves', () => {
     const threeByFour = Board.constructRectangular(
         3, 4, pickNPlayers(2), new TwoCornersArranger(20))
     const messages: StatusMessage[] = []
-    const options = threeByFour.validateOptions(messages)
+    const options = threeByFour.validationOptions(messages)
 
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.Zero, threeByFour.edges.lowerLeft, HexCoord.UP))).toBeTruthy()
+        Player.Zero, threeByFour.edges.lowerLeft, HexCoord.UP
+    ))).toBeTruthy()
     expect(threeByFour.edges.lowerLeft).toEqual(HexCoord.ORIGIN)
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.One, threeByFour.edges.upperRight, HexCoord.DOWN))).toBeTruthy()
+        Player.One, threeByFour.edges.upperRight, HexCoord.DOWN
+    ))).toBeTruthy()
 
     // would go off the board
-    expect(threeByFour.validate(PlayerMove.construct(
-        Player.One, threeByFour.edges.upperRight, HexCoord.UP
-    ), options)).toBeFalsy()
+    expect(threeByFour.validate(
+        PlayerMove.construct(Player.One, threeByFour.edges.upperRight, HexCoord.UP),
+        options,
+    )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
     expect(messages[messages.length-1].msg.startsWith('destination')).toBeTruthy()
 
     // would start off the board
-    expect(threeByFour.validate(PlayerMove.construct(
-        Player.Zero, HexCoord.DOWN, HexCoord.UP
-    ), options)).toBeFalsy()
+    expect(threeByFour.validate(
+        PlayerMove.construct(Player.Zero, HexCoord.DOWN, HexCoord.UP),
+        options,
+    )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
     expect(messages[messages.length-1].msg.startsWith('start')).toBeTruthy()
 
     // too far
+    const rightUp2 = HexCoord.RIGHT_UP.plus(HexCoord.RIGHT_UP)
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.RIGHT_UP.plus(HexCoord.RIGHT_UP)
-    ), options)).toBeFalsy()
+        Player.Zero, HexCoord.ORIGIN, rightUp2),
+        options,
+    )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('illegal move')
     expect(messages[messages.length-1].msg.includes('2')).toBeTruthy()
 
@@ -171,11 +180,13 @@ it('validates moves', () => {
 
     // pop of only 1
     const moved = threeByFour.applyMove(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.UP)).board
-    const movedOptions = moved.validateOptions(messages)
-    expect(moved.validate(PlayerMove.construct(
         Player.Zero, HexCoord.ORIGIN, HexCoord.UP
-    ), movedOptions)).toBeFalsy()
+    )).board
+    const movedOptions = moved.validationOptions(messages)
+    expect(moved.validate(
+        PlayerMove.construct(Player.Zero, HexCoord.ORIGIN, HexCoord.UP),
+        movedOptions,
+    )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('insufficient population')
     movedOptions.ignoreSmallPop = true
     expect(moved.validate(PlayerMove.construct(

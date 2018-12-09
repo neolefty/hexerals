@@ -1,15 +1,16 @@
 // the meta-game
 import {CycleMode} from './CycleState';
-import {Board, RandomArranger} from '../board/Board';
+import {Board} from '../board/Board';
 import {INITIAL_DIMENSION} from '../board/BoardConstants';
 import {GenericAction} from '../../App';
-import {HexCoord} from '../board/Hex';
+import {HexCoord} from '../board/HexCoord';
 import {GameAction, BoardReducer} from '../board/BoardReducer';
 import {CycleState} from './CycleState';
 import {EMPTY_MOVEMENT_QUEUE} from '../board/MovementQueue';
 import {pickNPlayers, Player, PlayerManager} from '../players/Players';
 import {List} from 'immutable';
 import Dimension from '../../Dimension';
+import {RandomArranger} from '../board/Arranger';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,

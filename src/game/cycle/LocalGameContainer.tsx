@@ -2,7 +2,7 @@ import {Map} from 'immutable'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {HexCoord} from '../board/Hex'
+import {HexCoord} from '../board/HexCoord'
 import {
     queueMoveAction, placeCursorAction, doMovesAction, cancelMoveAction
 } from '../board/BoardReducer'
@@ -12,7 +12,7 @@ import {BoardState} from '../board/BoardState'
 import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'
 import {Player, PLAYERS} from '../players/Players'
-import {PlayerMove} from '../board/MovementQueue'
+import {PlayerMove} from '../board/Move'
 import {TickerBoardView} from '../board/TickerBoardView';
 
 export interface LocalGameProps {

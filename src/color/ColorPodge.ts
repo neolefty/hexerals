@@ -3,7 +3,7 @@ import {DriftColor} from './DriftColor';
 
 // A collection of colors in CIE space
 export class ColorPodge {
-    static readonly DELTAS: number[][] = [
+    static readonly HSV_DELTAS: number[][] = [
         // index 1 is larger because LCh Chroma is scaled down saturation
         // and won't shift at all if we use 1 -- shifts happen in HSV space.
         [-1, 0, 0], [0, -3, 0], [0, 0, -1], [1, 0, 0], [0, 3, 0], [0, 0, 1],
@@ -113,7 +113,7 @@ export class ColorPodge {
     disperseOne(color: DriftColor, f: number): DriftColor {
         let result = color;
         let maxMinDist = this.minDist(color);
-        ColorPodge.DELTAS.forEach(delta => {
+        ColorPodge.HSV_DELTAS.forEach(delta => {
             const candidate = color.shift(delta, f);
             const dist = this.minDist(candidate, color, true);
             // console.log(`${color} -- consider ${c} -- ${d}`);

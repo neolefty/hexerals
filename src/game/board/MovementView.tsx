@@ -1,10 +1,11 @@
 import * as React from 'react';
 import {List, Map} from 'immutable';
 
-import {HexMove, MovementQueue} from './MovementQueue';
+import {MovementQueue} from './MovementQueue';
 import {DriftColor} from '../../color/DriftColor';
 import {Player} from '../players/Players';
 import {centerX, centerY, viewBoxHeight} from './HexBoardView';
+import {HexMove} from './Move';
 
 interface MovementQueueViewProps {
     moves: MovementQueue

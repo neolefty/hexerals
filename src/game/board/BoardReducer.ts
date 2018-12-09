@@ -1,12 +1,14 @@
-import {Board, RandomArranger} from './Board'
-import {HexCoord} from './Hex'
+import {Board} from './Board'
+import {HexCoord} from './HexCoord'
 import {GenericAction} from '../../App'
 import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants'
-import {EMPTY_MOVEMENT_QUEUE, PlayerMove} from './MovementQueue'
+import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
 import {StatusMessage} from '../../StatusMessage'
+import {RandomArranger} from './Arranger';
+import {PlayerMove} from './Move';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -86,7 +88,7 @@ const queueMoveReducer = (
     const newMessages: StatusMessage[] = []
     const queuedTo = state.moves
         .playerIsQueuedTo(action.move.player, action.move.source)
-    const options = state.board.validateOptions(newMessages)
+    const options = state.board.validationOptions(newMessages)
     options.ignoreSmallPop = true
     if (queuedTo) // if the player hopes to have already taken that spot, let them try
         options.ignoreSpotOwner = true

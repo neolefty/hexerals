@@ -1,4 +1,5 @@
-import {HexCoord, RectangularConstraints} from './Hex';
+import {RectangularConstraints} from './Constraints';
+import {HexCoord} from './HexCoord';
 
 it('checks hex neighbors', () => {
     expect(HexCoord.ORIGIN.getRightDown()).toBe(HexCoord.RIGHT_DOWN);
