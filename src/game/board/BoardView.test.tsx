@@ -11,15 +11,15 @@ import {
 } from './BoardReducer'
 import {Board, Spot, TwoCornersArranger} from './Board'
 import {INITIAL_POP} from './BoardConstants'
-import {HexCoord} from '../Hex'
+import {HexCoord} from './Hex'
 import Dimension from "../../Dimension"
 import {BoardViewBase} from "./BoardView"
 import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
-import {pickNPlayers, Player, PlayerManager} from '../Players'
+import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {
     EMPTY_MOVEMENT_QUEUE, MovementQueue, PlayerMove
-} from '../MovementQueue'
+} from './MovementQueue'
 import {StatusMessage} from '../../StatusMessage'
 
 it('renders a spot', () => {
@@ -129,7 +129,7 @@ it('clicks a spot to select it', () => {
 })
 
 // helper class for react-redux testing
-class storeTester {
+class StoreTester {
     readonly store: Store<BoardState>
     constructor() {
         this.store = createStore<BoardState>(BoardReducer)
@@ -169,6 +169,10 @@ class storeTester {
         if (this.state.curPlayer)
             this.queueMove(this.state.curPlayer, HexCoord.DOWN, alsoCursor)
     }
+    queueMoveUp = (alsoCursor=true) => {
+        if (this.state.curPlayer)
+            this.queueMove(this.state.curPlayer, HexCoord.UP, alsoCursor)
+    }
 
     // Action: Place the cursor
     placeCursor = (coord: HexCoord) => {
@@ -176,8 +180,12 @@ class storeTester {
     }
 
     // Action: Unqueue a move
-    cancelMove = (player: Player) => {
-        this.store.dispatch(cancelMoveAction(player))
+    cancelMove = (player: Player | undefined = undefined) => {
+        const actualPlayer = player || this.state.curPlayer
+        if (actualPlayer)
+            this.store.dispatch(cancelMoveAction(actualPlayer))
+        else
+            throw Error('current player is undefined')
     }
 
     // Action: execute a round of queued moves
@@ -189,7 +197,7 @@ class storeTester {
 }
 
 it('creates game via react-redux', () => {
-    const st = new storeTester()
+    const st = new StoreTester()
     expect(st.board.spots.size).toEqual(2)
     expect(st.messages.size).toEqual(0)
     const lowLeft = HexCoord.ORIGIN
@@ -197,7 +205,7 @@ it('creates game via react-redux', () => {
 })
 
 it('blocks illegal moves', () => {
-    const st = new storeTester()
+    const st = new StoreTester()
     expect(st.cursor).toBe(HexCoord.NONE)
     expect(st.cursorRawSpot).toBeUndefined()
 
@@ -235,8 +243,38 @@ it('blocks illegal moves', () => {
 //     expect(st.cursorRawSpot).toBeUndefined()
 // })
 
+it('cancels moves', () => {
+    const st = new StoreTester()
+    const boardBefore = st.state.board
+
+    st.setPlayer(Player.One)
+    st.placeCursor(st.board.edges.upperRight)
+    st.queueMoveDown()
+    st.queueMoveDown()
+
+    st.setPlayer(Player.Zero)
+    st.placeCursor(st.board.edges.lowerLeft)
+    st.queueMoveUp()
+    st.queueMoveUp()
+    expect(st.moves.size).toBe(4)
+
+    st.cancelMove()
+    expect(st.moves.playerHasMove(Player.Zero)).toBeTruthy()
+    st.cancelMove()
+    expect(st.moves.playerHasMove(Player.Zero)).toBeFalsy()
+    expect(st.moves.size).toBe(2)
+    expect(st.state.board).toBe(boardBefore)
+    st.setPlayer(Player.One)
+    st.cancelMove()
+    st.cancelMove()
+    expect(st.moves.size).toBe(0)
+
+    st.doMoves()
+    expect(st.state.board).toBe(boardBefore)
+})
+
 it('makes real moves', () => {
-    const st = new storeTester()
+    const st = new StoreTester()
 
     // place cursor at upper right
     const boardBefore = st.board

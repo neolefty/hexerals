@@ -1,13 +1,15 @@
 import * as React from 'react'
-import {List, Map} from 'immutable'
-import {Component, KeyboardEvent} from 'react'
+
+import {Map} from 'immutable'
 import './Board.css'
-import {HexCoord} from '../Hex'
+import {HexCoord} from './Hex'
 import Dimension from '../../Dimension'
 import {DriftColor} from '../../color/DriftColor'
-import {Player} from '../Players'
-import {HexMove, MovementQueue, PlayerMove} from '../MovementQueue'
+import {Player} from '../players/Players'
+import {PlayerMove} from './MovementQueue'
 import {BoardState} from './BoardState'
+import {FilterBoardView} from './HexBoardView';
+import {MovementQueueView} from './MovementView';
 
 export interface BoardViewActions {
     onQueueMove: (move: PlayerMove) => void
@@ -35,19 +37,16 @@ const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'd': HexCoord.RIGHT_DOWN,
 })
 
-const OUTER_BOARD_MARGIN = 1 // space between bounding rect and hex viewbox
-const INNER_BOARD_MARGIN = 1 // space between hex viewbox and hexes
+const OUTER_BOARD_MARGIN = 1
+const INNER_BOARD_MARGIN = 1
 
-export const BoardView = (props: BoardViewProps) =>
-    <HexBoardView {...props}/>
-
-export class BoardViewBase extends Component<BoardViewProps> {
+export class BoardViewBase extends React.Component<BoardViewProps> {
     constructor(props: BoardViewProps) {
         super(props)
         this.onKeyDown = this.onKeyDown.bind(this)
     }
 
-    onKeyDown(e: KeyboardEvent<HTMLDivElement>): void {
+    onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
         const bs = this.props.boardState
         if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
@@ -72,7 +71,7 @@ export class BoardViewBase extends Component<BoardViewProps> {
     }
 }
 
-export class HexBoardView extends BoardViewBase {
+export class BoardView extends BoardViewBase {
     constructor(props: BoardViewProps) {
         super(props)
         // console.log(`colors: ${props.colors}`)
@@ -133,8 +132,8 @@ export class HexBoardView extends BoardViewBase {
                     width={boardWidth}
                     height={boardHeight}
                     viewBox={[
-                        - INNER_BOARD_MARGIN,
-                        - INNER_BOARD_MARGIN,
+                        -INNER_BOARD_MARGIN,
+                        -INNER_BOARD_MARGIN,
                         scaleWidth + INNER_BOARD_MARGIN,
                         scaleHeight + INNER_BOARD_MARGIN
                     ].join(',')}
@@ -145,17 +144,17 @@ export class HexBoardView extends BoardViewBase {
                         stroke="white"
                         strokeWidth="3"
                     />
-                    <HexFilterBoardView
+                    <FilterBoardView
                         key={'nobody'}
                         filter={this.filterNobody}
                         {...this.props}
                     />
-                    <HexFilterBoardView
+                    <FilterBoardView
                         key={'players'}
                         filter={this.filterPlayers}
                         {...this.props}
                     />
-                    <HexFilterBoardView
+                    <FilterBoardView
                         key={'cursor'}
                         filter={this.filterCursor}
                         {...this.props}
@@ -170,180 +169,4 @@ export class HexBoardView extends BoardViewBase {
             </div>
         )
     }
-}
-
-interface FilterBoardViewProps extends BoardViewProps {
-    filter: (hex: HexCoord) => boolean
-}
-
-const centerX = (cartX: number): number => 45 * cartX + 30
-const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
-const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
-
-class HexFilterBoardView extends Component<FilterBoardViewProps> {
-    constructor(props: FilterBoardViewProps) {
-        super(props)
-    }
-
-    render(): React.ReactNode {
-        const bs = this.props.boardState
-        const height = viewBoxHeight(bs.board.edges.height)
-        // TODO look into SVGFactory / SVGElement
-        return (
-            <g id="hexMap"> {
-                bs.board.constraints.all().filter(
-                    this.props.filter
-                ).map(hex => {
-                    const spot = bs.board.getSpot(hex)
-                    const ox = centerX(hex.cartX())
-                    const oy = centerY(height, hex.cartY())
-                    const color: DriftColor | undefined
-                        = this.props.colors && this.props.colors.get(spot.owner)
-                    return (
-                        <FlatTopHex
-                            key={hex.id}
-                            color={color}
-                            owner={spot.owner}
-                            selected={hex === bs.cursor}
-                            centerX={ox}
-                            centerY={oy}
-                            hexRadius={30}
-                            onSelect={() => this.props.onPlaceCursor(hex)}
-                            contents={spot.pop === 0 ? '' : `${spot.pop}`}
-                        >
-                            {
-                                spot.pop === 0 ? undefined :
-                                    <text
-                                        x={ox}
-                                        y={oy + 0.35 * 26}
-                                        fontFamily="Sans-Serif"
-                                        fontSize={27}
-                                        textAnchor="middle"
-                                        fill={color ? color.contrast().toHexString() : '#fff'}
-                                    >
-                                        {spot.pop}
-                                    </text>
-                            }
-                        </FlatTopHex>
-                    )
-                })
-            }
-            </g>
-        )
-    }
-}
-
-interface FlatTopHexProps {
-    owner: Player
-    color?: DriftColor
-    selected: boolean
-    centerX: number
-    centerY: number
-    hexRadius: number
-    onSelect: () => void
-    contents: string
-    children?: JSX.Element | JSX.Element[] // could user "any?" instead
-}
-
-// a hexagon centered at (x, y)
-const hexPoints = (x: number, y: number, hexRadius: number) => {
-    const hexMid = 15
-    const hexHalfHeight = 26
-    return ''
-        + (x - hexRadius) + ',' + y + ' ' // left
-        + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
-        + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
-        + (x + hexRadius) + ',' + y + ' ' // right
-        + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
-        + (x - hexMid) + ',' + (y + hexHalfHeight) // down left
-}
-
-const FlatTopHex = (props: FlatTopHexProps) => (
-    <g
-        onClick={(/*e*/) => props.onSelect()}
-        className={
-            props.owner
-            + ' spot'
-            + (props.selected ? ' active' : '')
-        }
-    >
-        <polygon
-            points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
-            style={
-                props.color && {
-                    fill: props.color.toHexString()
-                }
-            }
-        />
-        {props.children && <g>{props.children}</g>}
-    </g>
-)
-
-interface MovementQueueViewProps {
-    moves: MovementQueue
-    colors: Map<Player, DriftColor>
-    players: List<Player>
-    boardHeight: number
-}
-
-const MovementQueueView = (props: MovementQueueViewProps) => (
-    <g id="movementQueue"> {
-        props.moves.playerQueues.map(
-            (moveList: List<HexMove>, player: Player) => {
-                return (
-                    <g key={player.valueOf()}>
-                        <MoveListView
-                            moveList={moveList}
-                            color={props.colors.get(player)}
-                            boardHeight={props.boardHeight}
-                        />
-                    </g>
-                )
-            }
-        ).toArray() // is there a direct way to map to an iterator (like a list) rather than a map?
-    }
-    </g>
-)
-
-interface MoveListViewProps {
-    moveList: List<HexMove>
-    color?: DriftColor
-    boardHeight: number
-}
-
-const MoveListView = (props: MoveListViewProps) => (
-     <g> {
-         props.moveList.map((move: HexMove, key: number) =>
-             <MoveView
-                 key={key}
-                 color={props.color}
-                 boardHeight={props.boardHeight}
-                 move={move}
-             />
-         )
-     }
-     </g>
-)
-
-interface MoveViewProps {
-    move: HexMove
-    color?: DriftColor
-    boardHeight: number
-}
-
-const MoveView = (props: MoveViewProps) => {
-    const x1 = centerX(props.move.source.cartX())
-    const x2 = centerX(props.move.dest.cartX())
-    const h = viewBoxHeight(props.boardHeight)
-    const y1 = centerY(h, props.move.source.cartY())
-    const y2 = centerY(h, props.move.dest.cartY())
-    return (
-        <polygon
-            points={`${x1},${y1} ${x2},${y2}`}
-            style={props.color && {
-                stroke: props.color.toHexString(),
-                strokeWidth: 3,
-            }}
-        />
-    )
 }

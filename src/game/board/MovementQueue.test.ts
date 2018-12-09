@@ -1,5 +1,5 @@
 import {MovementQueue, PlayerMove, QueueAndMoves} from './MovementQueue';
-import {Player} from './Players';
+import {Player} from '../players/Players';
 import {HexCoord} from './Hex';
 
 it('checks sanity', () => {

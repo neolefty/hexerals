@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import {List} from 'immutable'
 import {Board, Spot, TwoCornersArranger} from './Board'
-import {BoardConstraints, HexCoord} from '../Hex'
-import {pickNPlayers, Player} from '../Players'
+import {BoardConstraints, HexCoord} from './Hex'
+import {pickNPlayers, Player} from '../players/Players'
 import {StatusMessage} from '../../StatusMessage'
-import {PlayerMove} from '../MovementQueue'
+import {PlayerMove} from './MovementQueue'
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {

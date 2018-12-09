@@ -1,10 +1,10 @@
 import {Board, RandomArranger} from './Board'
-import {HexCoord} from '../Hex'
+import {HexCoord} from './Hex'
 import {GenericAction} from '../../App'
 import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants'
-import {EMPTY_MOVEMENT_QUEUE, PlayerMove} from '../MovementQueue'
-import {pickNPlayers, Player, PlayerManager} from '../Players'
+import {EMPTY_MOVEMENT_QUEUE, PlayerMove} from './MovementQueue'
+import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
 import {StatusMessage} from '../../StatusMessage'
 

@@ -3,11 +3,11 @@ import {CycleMode} from './CycleState';
 import {Board, RandomArranger} from '../board/Board';
 import {INITIAL_DIMENSION} from '../board/BoardConstants';
 import {GenericAction} from '../../App';
-import {HexCoord} from '../Hex';
+import {HexCoord} from '../board/Hex';
 import {GameAction, BoardReducer} from '../board/BoardReducer';
 import {CycleState} from './CycleState';
-import {EMPTY_MOVEMENT_QUEUE} from '../MovementQueue';
-import {pickNPlayers, Player, PlayerManager} from '../Players';
+import {EMPTY_MOVEMENT_QUEUE} from '../board/MovementQueue';
+import {pickNPlayers, Player, PlayerManager} from '../players/Players';
 import {List} from 'immutable';
 import Dimension from '../../Dimension';
 

@@ -1,7 +1,7 @@
 import {Board} from './Board'
-import {HexCoord} from '../Hex'
-import {MovementQueue} from '../MovementQueue'
-import {Player, PlayerManager} from '../Players'
+import {HexCoord} from './Hex'
+import {MovementQueue} from './MovementQueue'
+import {Player, PlayerManager} from '../players/Players'
 import {StatusMessage} from '../../StatusMessage'
 import {List} from 'immutable'
 

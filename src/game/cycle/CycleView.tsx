@@ -1,7 +1,7 @@
 import Dimension from '../../Dimension'
 import {LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from './CycleState'
-import {LocalGameContainer} from '../LocalGameContainer'
+import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
 import {CycleState} from './CycleState'
 

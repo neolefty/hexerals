@@ -1,7 +1,7 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable'
 import {HexCoord} from './Hex'
-import {Player} from './Players'
+import {Player} from '../players/Players'
 
 export class HexMove {
     constructor(

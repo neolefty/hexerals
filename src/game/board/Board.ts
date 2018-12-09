@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import {List, Map} from 'immutable';
-import {BoardConstraints, HexCoord, RectangularConstraints, RectEdges} from '../Hex';
+import {BoardConstraints, HexCoord, RectangularConstraints, RectEdges} from './Hex';
 import {INITIAL_POP} from './BoardConstants';
-import {PlayerMove} from '../MovementQueue';
-import {Player} from '../Players';
+import {PlayerMove} from './MovementQueue';
+import {Player} from '../players/Players';
 import {StatusMessage} from '../../StatusMessage';
 
 export enum Terrain {
