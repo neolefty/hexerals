@@ -1,4 +1,4 @@
-import Dimension from '../../Dimension'
+import Dimension from '../../common/Dimension'
 import {LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from './CycleState'
 import {LocalGameContainer} from './LocalGameContainer'

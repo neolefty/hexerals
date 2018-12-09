@@ -12,14 +12,14 @@ import {
 import {Board} from './Board'
 import {INITIAL_POP} from './BoardConstants'
 import {HexCoord} from './HexCoord'
-import Dimension from "../../Dimension"
+import Dimension from "../../common/Dimension"
 import {BoardViewBase} from "./BoardView"
 import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {
     EMPTY_MOVEMENT_QUEUE, MovementQueue} from './MovementQueue'
-import {StatusMessage} from '../../StatusMessage'
+import {StatusMessage} from '../../common/StatusMessage'
 import {TwoCornersArranger} from './Arranger';
 import {Spot} from './Spot';
 import {PlayerMove} from './Move';

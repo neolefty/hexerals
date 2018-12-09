@@ -3,7 +3,7 @@ import {List} from 'immutable'
 import {Board} from './Board'
 import {BoardConstraints} from './Constraints'
 import {pickNPlayers, Player} from '../players/Players'
-import {StatusMessage} from '../../StatusMessage'
+import {StatusMessage} from '../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {TwoCornersArranger} from './Arranger';
 import {Spot} from './Spot';

@@ -6,8 +6,8 @@ import {HexCoord} from '../board/HexCoord'
 import {
     queueMoveAction, placeCursorAction, doMovesAction, cancelMoveAction
 } from '../board/BoardReducer'
-import {AppState} from '../../App'
-import Dimension from '../../Dimension'
+import {AppState} from '../../common/App'
+import Dimension from '../../common/Dimension'
 import {BoardState} from '../board/BoardState'
 import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'

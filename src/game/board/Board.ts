@@ -3,7 +3,7 @@ import {List, Map} from 'immutable';
 import {RectEdges} from './Constraints';
 import {PlayerMove} from './Move';
 import {Player} from '../players/Players';
-import {StatusMessage} from '../../StatusMessage';
+import {StatusMessage} from '../../common/StatusMessage';
 import {StartingArranger} from './Arranger';
 import {Spot} from './Spot';
 import {HexCoord} from './HexCoord';

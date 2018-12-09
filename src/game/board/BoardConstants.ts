@@ -1,4 +1,4 @@
-import Dimension from '../../Dimension'
+import Dimension from '../../common/Dimension'
 
 export const INITIAL_WIDTH = 7
 export const INITIAL_HEIGHT = 17

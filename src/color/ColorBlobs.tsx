@@ -3,7 +3,7 @@ import {Component} from 'react';
 import {Map} from 'immutable';
 import {ColorPodge} from './ColorPodge';
 import {DriftColor} from './DriftColor';
-import Dimension from '../Dimension';
+import Dimension from '../common/Dimension';
 
 const SPACE_FILL = 0.65;
 const MIN_STEP_MILLIS = 16; // no faster than 60 fps

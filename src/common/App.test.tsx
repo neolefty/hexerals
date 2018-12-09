@@ -3,9 +3,9 @@ import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
 import Dimension from "./Dimension";
-import {CycleReducer, openLocalGameAction} from './game/cycle/CycleReducer';
-import {CycleState} from './game/cycle/CycleState';
-import {CycleContainer} from './game/cycle/CycleContainer';
+import {CycleReducer, openLocalGameAction} from '../game/cycle/CycleReducer';
+import {CycleState} from '../game/cycle/CycleState';
+import {CycleContainer} from '../game/cycle/CycleContainer';
 
 it('renders without crashing', () => {
     const store = createStore<CycleState>(CycleReducer);

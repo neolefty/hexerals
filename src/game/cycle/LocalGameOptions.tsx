@@ -1,5 +1,5 @@
 import * as React from 'react'
-import Dimension from '../../Dimension'
+import Dimension from '../../common/Dimension'
 import './LocalGameOptions.css'
 
 export interface LocalGameOptions {
