@@ -1,6 +1,6 @@
-import {Player} from '../players/Players';
+import {Player} from '../../players/Players';
 import {List, Map} from 'immutable';
-import {INITIAL_POP} from './BoardConstants';
+import {INITIAL_POP} from '../BoardConstants';
 import {HexCoord} from './HexCoord';
 import {Board} from './Board';
 import {Spot} from './Spot';

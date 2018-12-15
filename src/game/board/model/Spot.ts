@@ -1,4 +1,4 @@
-import {Player} from '../players/Players';
+import {Player} from '../../players/Players';
 
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?

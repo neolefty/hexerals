@@ -1,8 +1,8 @@
 import {Board} from './Board'
 import {HexCoord} from './HexCoord'
 import {MovementQueue} from './MovementQueue'
-import {Player, PlayerManager} from '../players/Players'
-import {StatusMessage} from '../../common/StatusMessage'
+import {Player, PlayerManager} from '../../players/Players'
+import {StatusMessage} from '../../../common/StatusMessage'
 import {List} from 'immutable'
 
 export interface BoardState {

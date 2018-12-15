@@ -1,6 +1,7 @@
 import * as React from 'react'
-import {BoardView, BoardViewProps} from './BoardView'
+import {HexBoardView} from './HexBoardView'
 import {Ticker} from '../../../common/Ticker'
+import {BoardViewProps} from './BoardViewBase';
 
 export interface TickerBoardViewProps extends BoardViewProps {
     tickMillis: number,
@@ -12,7 +13,7 @@ export const TickerBoardView = (props: TickerBoardViewProps) => (
         tick={props.onDoMoves}
         tickMillis={props.tickMillis}
     >
-        <BoardView
+        <HexBoardView
             {...props}
         />
     </Ticker>

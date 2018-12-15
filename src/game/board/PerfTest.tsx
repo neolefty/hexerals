@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
 import {GenericAction} from '../../common/App'
-import { RectangularConstraints } from './Constraints'
+import { RectangularConstraints } from './model/Constraints'
 
 export interface PerfState {
     history: List<PerfRecord>

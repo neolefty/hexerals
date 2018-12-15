@@ -1,9 +1,9 @@
 import {List, Map} from 'immutable';
 import * as React from 'react';
 
-import {HexCoord} from './HexCoord';
-import {PlayerMove} from './Move';
-import {BoardViewBase} from './hexview/BoardView';
+import {HexCoord} from '../model/HexCoord';
+import {PlayerMove} from '../model/Move';
+import {BoardViewBase} from './BoardViewBase';
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'ArrowLeft': HexCoord.LEFT_DOWN,

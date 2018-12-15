@@ -9,21 +9,21 @@ import {
     BoardReducer, queueMovesAction, newGameAction, placeCursorAction,
     doMovesAction, setPlayerAction, cancelMovesAction,
 } from '../BoardReducer'
-import {Board} from '../Board'
+import {Board} from '../model/Board'
 import {INITIAL_POP} from '../BoardConstants'
-import {HexCoord} from '../HexCoord'
+import {HexCoord} from '../model/HexCoord'
 import Dimension from "../../../common/Dimension"
-import {BoardViewBase} from "./BoardView"
-import {BoardState} from '../BoardState'
+import {BoardViewBase} from "./BoardViewBase"
+import {BoardState} from '../model/BoardState'
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from '../BoardConstants'
 import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
 import {
     EMPTY_MOVEMENT_QUEUE, MovementQueue, QueueAndMoves
-} from '../MovementQueue'
+} from '../model/MovementQueue'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {TwoCornersArranger} from '../Arranger';
-import {Spot} from '../Spot';
-import {PlayerMove} from '../Move';
+import {TwoCornersArranger} from '../model/Arranger';
+import {Spot} from '../model/Spot';
+import {PlayerMove} from '../model/Move';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()})

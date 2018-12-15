@@ -2,18 +2,18 @@ import {List, Map} from 'immutable'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {HexCoord} from '../board/HexCoord'
+import {HexCoord} from '../board/model/HexCoord'
 import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction
 } from '../board/BoardReducer'
 import {AppState} from '../../common/App'
 import Dimension from '../../common/Dimension'
-import {BoardState} from '../board/BoardState'
+import {BoardState} from '../board/model/BoardState'
 import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'
 import {Player, PLAYERS} from '../players/Players'
-import {PlayerMove} from '../board/Move'
-import {TickerBoardView} from '../board/hexview/TickerBoardView';
+import {PlayerMove} from '../board/model/Move'
+import {TickerBoardView} from '../board/view/TickerBoardView';
 
 export interface LocalGameProps {
     displaySize: Dimension

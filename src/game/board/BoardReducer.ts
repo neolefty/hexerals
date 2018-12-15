@@ -1,14 +1,14 @@
-import {Board} from './Board'
-import {HexCoord} from './HexCoord'
+import {Board} from './model/Board'
+import {HexCoord} from './model/HexCoord'
 import {GenericAction} from '../../common/App'
-import {BoardState} from './BoardState'
+import {BoardState} from './model/BoardState'
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants'
-import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
+import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
 import {StatusMessage} from '../../common/StatusMessage'
-import {RandomArranger} from './Arranger';
-import {PlayerMove} from './Move';
+import {RandomArranger} from './model/Arranger';
+import {PlayerMove} from './model/Move';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions

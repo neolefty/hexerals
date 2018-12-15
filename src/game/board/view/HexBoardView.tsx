@@ -1,44 +1,20 @@
 import * as React from 'react'
-import {List, Map} from 'immutable'
+import {Map} from 'immutable'
 
-import '../Board.css'
-import {HexCoord} from '../HexCoord'
-import Dimension from '../../../common/Dimension'
+import './Board.css'
+import {HexCoord} from '../model/HexCoord'
 import {DriftColor} from '../../../color/DriftColor'
 import {Player} from '../../players/Players'
-import {PlayerMove} from '../Move'
-import {BoardState} from '../BoardState'
-import {FilterBoardView} from './HexBoardView';
-import {MovementQueueView} from './MovementView';
-import {BoardKeyboardController} from '../BoardKeyboardController';
+import {FilterBoardView} from './FilterBoardView';
+import {MoveQueueView} from './MoveQueueView';
+import {BoardViewBase, BoardViewProps} from './BoardViewBase';
 
-export interface BoardViewActions {
-    onQueueMoves: (moves: List<PlayerMove>) => void
-    onCancelMoves: (player: Player, count: number) => void
-    onPlaceCursor: (position: HexCoord) => void
-    onEndGame: () => void
-}
-
-export interface BoardViewProps extends BoardViewActions {
-    boardState: BoardState
-    displaySize: Dimension
-    colors?: Map<Player, DriftColor>
-}
-
+// space between bounding rect and hex viewbox
 const OUTER_BOARD_MARGIN = 1
+// space between hex viewbox and hexes
 const INNER_BOARD_MARGIN = 1
 
-export class BoardViewBase extends React.Component<BoardViewProps> {
-    protected readonly keyboardController: BoardKeyboardController
-
-    constructor(props: BoardViewProps) {
-        super(props)
-        this.keyboardController = new BoardKeyboardController(this)
-    }
-
-}
-
-export class BoardView extends BoardViewBase {
+export class HexBoardView extends BoardViewBase {
     constructor(props: BoardViewProps) {
         super(props)
         this.filterNobody = this.filterNobody.bind(this)
@@ -125,7 +101,7 @@ export class BoardView extends BoardViewBase {
                         filter={this.filterCursor}
                         {...this.props}
                     />
-                    <MovementQueueView
+                    <MoveQueueView
                         moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
                         players={this.props.boardState.board.players}

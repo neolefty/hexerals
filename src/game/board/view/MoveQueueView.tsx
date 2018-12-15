@@ -1,20 +1,20 @@
 import * as React from 'react';
 import {List, Map} from 'immutable';
 
-import {MovementQueue} from '../MovementQueue';
+import {MovementQueue} from '../model/MovementQueue';
 import {DriftColor} from '../../../color/DriftColor';
 import {Player} from '../../players/Players';
-import {centerX, centerY, viewBoxHeight} from './HexBoardView';
-import {HexMove} from '../Move';
+import {centerX, centerY, viewBoxHeight} from './FilterBoardView';
+import {HexMove} from '../model/Move';
 
-interface MovementQueueViewProps {
+interface MoveQueueViewProps {
     moves: MovementQueue
     colors: Map<Player, DriftColor>
     players: List<Player>
     boardHeight: number
 }
 
-export const MovementQueueView = (props: MovementQueueViewProps) => (
+export const MoveQueueView = (props: MoveQueueViewProps) => (
     <g id="movementQueue"> {
         props.moves.playerQueues.map(
             (moveList: List<HexMove>, player: Player) => {

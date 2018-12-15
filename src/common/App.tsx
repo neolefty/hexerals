@@ -1,12 +1,14 @@
 import * as React from 'react'
+import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
+
 import './App.css'
-import {MIN_HEIGHT} from '../game/board/BoardConstants'
 import Dimension from '../common/Dimension'
 import {ColorsContainer, ColorsState} from '../color/ColorsContainer'
 import {CycleState} from '../game/cycle/CycleState'
 import {CycleContainer} from '../game/cycle/CycleContainer'
-import {MIN_WIDTH} from '../game/board/BoardConstants'
-import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
+
+const MIN_WIDTH = 420
+const MIN_HEIGHT = 120
 
 export interface GenericAction {
     type: string
