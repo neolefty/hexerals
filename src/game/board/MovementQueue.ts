@@ -42,10 +42,10 @@ export class MovementQueue {
     public popEach(validator: ((move: PlayerMove) => boolean)):
         QueueAndMoves | undefined
     {
-        const c: List<PlayerMove> = List()
+        const tmp: List<PlayerMove> = List()
         const mutMap = this.playerQueues.asMutable()
         let mutated = false
-        const playerMoves = c.withMutations(result =>
+        const playerMoves = tmp.withMutations(result =>
             this.playerQueues.forEach(
                 (moves: List<PlayerMove>, player: Player) => {
                     const mutMoves: List<PlayerMove> = moves.asMutable()
@@ -81,18 +81,40 @@ export class MovementQueue {
         return this.playerQueues.has(player) && this.playerQueues.get(player).size > 0
     }
 
-    // If there are no moves to cancel, return undefined;
-    // otherwise return the updated movement queue plus a single-element list
-    // containing the cancelled move
-    cancelLastMove(player: Player): QueueAndMoves | undefined {
+    // Cancel most recent moves -- count = -1 to cancel all of a player's moves.
+    // If there are no moves to cancel, return undefined.
+    // Otherwise return the updated movement queue plus a single-element list
+    // containing the cancelled move.
+    cancelMoves(player: Player, count: number): QueueAndMoves | undefined {
         const moves: List<PlayerMove> | undefined = this.playerQueues.get(player)
-        if (moves && moves.size > 0) {
-            const cancelledMove = moves.get(moves.size - 1)
+        if (moves && moves.size > 0 && count !== 0) {
+            // bug workaround
+            // TODO check immutable.js future versions - does cancel work with line removed?
+            moves.asImmutable()
+            // console.log(`--> immutable? ${moves.asImmutable() === moves}`)
+            // console.log(`--> mutable? ${moves.asMutable() === moves}`)
+            const actualCount = (count < 0 || count > moves.size) ? moves.size : count
+            // console.log(`*** actual count ${actualCount} out of ${moves.size} -- ${moves}`)
+            // console.log(`  * Still here? ${moves}`)
+            const cancelledMoves: List<PlayerMove> = List(moves.slice(-actualCount))
+            // console.log(`  * Still here? ${moves}`)
+            const remainingMoves: List<PlayerMove> = List(moves.slice(0, -actualCount))
+            // console.log(`  * Still here? ${moves}`)
+            // console.log(`  * filtered true: ${moves.filter(() => true)}`)
+            // const cancelledMoves = moves.slice(-1)
+            // const remainingMoves = moves.slice(0, -1)
+            // console.log(`  * cancelling: ${cancelledMoves}`)
+            // console.log(`  * remaining: ${remainingMoves}`)
+
+            // const a: List<string> = List(['a', 'b', 'c', 'd', 'e'])
+            // console.log(`--- all: ${a}`)
+            // console.log(`--- slice -1: ${a.slice(-1)}`)
+
             return new QueueAndMoves(
                 new MovementQueue(
-                    this.playerQueues.set(player, moves.pop())
+                    this.playerQueues.set(player, List(remainingMoves))
                 ),
-                List([cancelledMove])
+                cancelledMoves
             )
         }
         else

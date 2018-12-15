@@ -6,8 +6,8 @@ import * as enzyme from 'enzyme'
 import {shallow} from 'enzyme'
 
 import {
-    BoardReducer, queueMoveAction, newGameAction, placeCursorAction,
-    doMovesAction, setPlayerAction, cancelMoveAction,
+    BoardReducer, queueMovesAction, newGameAction, placeCursorAction,
+    doMovesAction, setPlayerAction, cancelMovesAction,
 } from './BoardReducer'
 import {Board} from './Board'
 import {INITIAL_POP} from './BoardConstants'
@@ -18,7 +18,8 @@ import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {
-    EMPTY_MOVEMENT_QUEUE, MovementQueue} from './MovementQueue'
+    EMPTY_MOVEMENT_QUEUE, MovementQueue, QueueAndMoves
+} from './MovementQueue'
 import {StatusMessage} from '../../common/StatusMessage'
 import {TwoCornersArranger} from './Arranger';
 import {Spot} from './Spot';
@@ -58,8 +59,8 @@ it('renders a board with no selection', () => {
             boardState={boardState}
             displaySize={new Dimension(1000, 1000)}
             onPlaceCursor={() => {}}
-            onQueueMove={() => {}}
-            onCancelMove={() => {}}
+            onQueueMoves={() => {}}
+            onCancelMoves={() => {}}
             onEndGame={() => {}}
         />
     )
@@ -94,8 +95,8 @@ it('renders a board with a selection', () => {
             boardState={bs}
             displaySize={new Dimension(1000, 1000)}
             onPlaceCursor={() => {}}
-            onQueueMove={() => {}}
-            onCancelMove={() => {}}
+            onQueueMoves={() => {}}
+            onCancelMoves={() => {}}
             onEndGame={() => {}}
         />
     )
@@ -133,11 +134,11 @@ it('clicks a spot to select it', () => {
 // helper class for react-redux testing
 class StoreTester {
     readonly store: Store<BoardState>
-    constructor() {
+    constructor(width = INITIAL_WIDTH, height = INITIAL_HEIGHT) {
         this.store = createStore<BoardState>(BoardReducer)
         // console.log(`before: board ${store.getState().board} game.board ${store.getState().board.spots.size}`)
         this.store.dispatch(newGameAction(Board.constructRectangular(
-            INITIAL_WIDTH, INITIAL_HEIGHT,
+            width, height,
             pickNPlayers(2),
             new TwoCornersArranger(INITIAL_POP),
         )))
@@ -157,10 +158,17 @@ class StoreTester {
     get cursorSpot(): Spot { return this.getSpot(this.cursor) }
     get moves(): MovementQueue { return this.state.moves }
 
+    get ll() { return this.state.board.edges.lowerLeft }
+    get ul() { return this.state.board.edges.upperLeft }
+    get ur() { return this.state.board.edges.upperRight }
+    get lr() { return this.state.board.edges.lowerRight }
+
     // Action: Queue a move
     queueMove = (player: Player, delta: HexCoord, alsoCursor=true) => {
         this.store.dispatch(
-            queueMoveAction(PlayerMove.construct(player, this.cursor, delta))
+            queueMovesAction(
+                List([PlayerMove.construct(player, this.cursor, delta)])
+            )
         )
         if (alsoCursor)
             this.placeCursor(this.cursor.plus(delta))
@@ -182,10 +190,13 @@ class StoreTester {
     }
 
     // Action: Unqueue a move
-    cancelMove = (player: Player | undefined = undefined) => {
+    cancelMoves = (
+        player: Player | undefined = undefined,
+        count: number = 1,
+    ) => {
         const actualPlayer = player || this.state.curPlayer
         if (actualPlayer)
-            this.store.dispatch(cancelMoveAction(actualPlayer))
+            this.store.dispatch(cancelMovesAction(actualPlayer, count))
         else
             throw Error('current player is undefined')
     }
@@ -198,12 +209,68 @@ class StoreTester {
     }
 }
 
+it('ensures things are not mutable', () => {
+    // check our assumptions
+    const testList: List<number> = List([0, 1, 2, 3])
+    expect(testList.asImmutable() === testList).toBeTruthy()
+    expect(testList.asMutable() === testList).toBeFalsy()
+    expect(testList.asMutable().asImmutable() === testList).toBeFalsy()
+
+    const st = new StoreTester()
+    st.setPlayer(Player.Zero)
+    st.placeCursor(st.ll)
+    st.queueMoveUp()
+    st.queueMoveUp()
+    st.queueMoveDown()
+    st.setPlayer(Player.One)
+    st.placeCursor(st.ur)
+    st.queueMoveDown()
+    st.queueMoveDown()
+    st.queueMoveUp()
+
+    const pqBefore = st.moves.playerQueues
+    expect(pqBefore.asImmutable() === pqBefore).toBeTruthy()
+    const zeroBefore = pqBefore.get(Player.Zero)
+    expect(zeroBefore.size).toBe(3)
+    expect(zeroBefore.asImmutable() === zeroBefore).toBeTruthy()
+
+    const qAndM = st.moves.popEach(() => true) as QueueAndMoves
+    const pqAfter = qAndM.queue.playerQueues
+    expect(pqBefore === pqAfter).toBeFalsy()
+
+    expect(pqAfter.asImmutable() === pqAfter).toBeTruthy()
+    const zeroAfter = pqAfter.get(Player.Zero)
+    expect(zeroBefore === zeroAfter).toBeFalsy()
+    expect(zeroAfter.size).toBe(2)
+    expect(zeroAfter.asImmutable() === zeroAfter).toBeTruthy()
+})
+
 it('creates game via react-redux', () => {
     const st = new StoreTester()
     expect(st.board.spots.size).toEqual(2)
     expect(st.messages.size).toEqual(0)
     const lowLeft = HexCoord.ORIGIN
     expect(st.getSpot(lowLeft)).toEqual(new Spot(Player.Zero, INITIAL_POP))
+})
+
+it('queues multiple moves at once', () => {
+    const st = new StoreTester()
+    const moves: List<PlayerMove> = List([
+        PlayerMove.construct(Player.Zero, st.ll, HexCoord.UP),
+        PlayerMove.construct(Player.One, st.ur, HexCoord.DOWN),
+        PlayerMove.construct(Player.Zero, st.ll.plus(HexCoord.UP), HexCoord.UP),
+        PlayerMove.construct(Player.One, st.lr, HexCoord.RIGHT_UP), // invalid
+        PlayerMove.construct(Player.One, st.lr, HexCoord.RIGHT_UP), // invalid
+        PlayerMove.construct(Player.Zero, st.ll, HexCoord.UP),
+    ])
+    // console.log('Moves:')
+    // moves.forEach((move, idx) => console.log(`${idx}: ${move.toString()}`))
+    st.store.dispatch(queueMovesAction(moves))
+    // console.log('Messages:')
+    // st.messages.forEach((msg, idx) => console.log(`${idx}: ${msg.toString()}`))
+    expect(st.moves.size).toBe(4)
+    expect(st.moves.playerQueues.get(Player.Zero).size).toBe(3)
+    expect(st.messages.size).toBe(2)
 })
 
 it('blocks illegal moves', () => {
@@ -246,33 +313,63 @@ it('blocks illegal moves', () => {
 // })
 
 it('cancels moves', () => {
-    const st = new StoreTester()
+    const st = new StoreTester(6, 21)
     const boardBefore = st.state.board
 
     st.setPlayer(Player.One)
-    st.placeCursor(st.board.edges.upperRight)
+    st.placeCursor(st.ur)
     st.queueMoveDown()
     st.queueMoveDown()
 
     st.setPlayer(Player.Zero)
-    st.placeCursor(st.board.edges.lowerLeft)
+    st.placeCursor(st.ll)
     st.queueMoveUp()
     st.queueMoveUp()
     expect(st.moves.size).toBe(4)
+    const up2 = st.ll.plus(HexCoord.UP).plus(HexCoord.UP)
+    expect(st.cursor).toBe(up2)
 
-    st.cancelMove()
+    // cancel a move and expect the cursor to retreat
+    st.cancelMoves()
     expect(st.moves.playerHasMove(Player.Zero)).toBeTruthy()
-    st.cancelMove()
-    expect(st.moves.playerHasMove(Player.Zero)).toBeFalsy()
+    expect(st.cursor).toBe(st.ll.plus(HexCoord.UP))
+    expect(st.moves.size).toBe(3)
+
+    // now cancel one of the other player's moves -- away from the cursor
+    st.cancelMoves(Player.One)
+    expect(st.moves.playerQueues.get(Player.One).size).toBe(1)
+    expect(st.cursor).toBe(st.ll.plus(HexCoord.UP))
     expect(st.moves.size).toBe(2)
+
+    // cancel the current player's remaining move
+    st.cancelMoves()
+    expect(st.cursor).toBe(st.ll)
+    expect(st.moves.playerHasMove(Player.Zero)).toBeFalsy()
+    expect(st.moves.size).toBe(1)
+
     expect(st.state.board).toBe(boardBefore)
     st.setPlayer(Player.One)
-    st.cancelMove()
-    st.cancelMove()
+    st.cancelMoves()
+    expect(st.moves.size).toBe(0)
+    st.cancelMoves()
     expect(st.moves.size).toBe(0)
 
+    // check we're avoiding unnecessary mutation
     st.doMoves()
     expect(st.state.board).toBe(boardBefore)
+
+    // cancel multiple moves
+    st.setPlayer(Player.Zero)
+    st.placeCursor(st.board.edges.lowerLeft)
+    for (let i: number = 0; i < 7; i++)
+        st.queueMoveUp()
+    expect(st.moves.size).toBe(7)
+    st.cancelMoves(Player.Zero, 5)
+    expect(st.moves.size).toBe(2)
+    expect(st.cursor).toBe(up2)
+    st.cancelMoves(Player.Zero, -1)
+    expect(st.moves.size).toBe(0)
+    expect(st.cursor).toBe(st.ll)
 })
 
 it('makes real moves', () => {
@@ -280,35 +377,33 @@ it('makes real moves', () => {
 
     // place cursor at upper right
     const boardBefore = st.board
-    const ur = st.board.edges.upperRight
-    const ul = st.board.edges.upperLeft
-    st.placeCursor(ur)
-    expect(st.cursor).toBe(ur)
-    expect(st.getRawSpot(ur.getDown())).toBeUndefined()
+    st.placeCursor(st.ur)
+    expect(st.cursor).toBe(st.ur)
+    expect(st.getRawSpot(st.ur.getDown())).toBeUndefined()
 
     st.queueMoveDown()
     expect(st.moves.size).toBe(0) // no current player yet
     st.setPlayer(Player.One) // cursor is on One's starting point, UR corner
     st.queueMoveDown()
-    expect(st.cursor).toBe(ur.plus(HexCoord.DOWN))
+    expect(st.cursor).toBe(st.ur.plus(HexCoord.DOWN))
     expect(st.moves.size).toBe(1)
 
     // interlude: queue and cancel a move UP
     st.queueMove(Player.One, HexCoord.UP)
     expect(st.moves.size).toBe(2)
-    expect(st.cursor).toBe(ur)
-    st.cancelMove(Player.One)
+    expect(st.cursor).toBe(st.ur)
+    st.cancelMoves(Player.One)
     expect(st.moves.size).toBe(1)
     // cancel moved the cursor back intelligently
-    expect(st.cursor).toBe(ur.plus(HexCoord.DOWN))
+    expect(st.cursor).toBe(st.ur.plus(HexCoord.DOWN))
 
     // also check that cancelling doesn't move the cursor back stupidly
     st.queueMove(Player.One, HexCoord.UP)
-    st.placeCursor(ul)
-    st.cancelMove(Player.One)
+    st.placeCursor(st.ul)
+    st.cancelMoves(Player.One)
     expect(st.moves.size).toBe(1)
-    expect(st.cursor).toBe(ul)
-    st.placeCursor(ur.plus(HexCoord.DOWN)) // back where we should be
+    expect(st.cursor).toBe(st.ul)
+    st.placeCursor(st.ur.plus(HexCoord.DOWN)) // back where we should be
 
     expect(boardBefore).toBe(st.board) // only queued -- no board updates yet
     // console.log(`-- queued --\n${boardStateToString(st.state)}`)
@@ -316,7 +411,7 @@ it('makes real moves', () => {
     const boardAfter1 = st.board
     // console.log(`-- moved --\n${boardStateToString(st.state)}`)
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
-    expect(st.cursor).toBe(ur.getDown())
+    expect(st.cursor).toBe(st.ur.getDown())
     expect(st.cursorRawSpot).toEqual(new Spot(Player.One, INITIAL_POP - 1))
 
     // can't move more than 1 space at a time (can't jump)
@@ -333,19 +428,19 @@ it('makes real moves', () => {
     expect(st.board).toBe(boardAfter1)
     // expect(st.board === boardAfter1).toBeTruthy()
     // but we DID move the cursor
-    const down3 = ur.getDown().plus(down2)
+    const down3 = st.ur.getDown().plus(down2)
     expect(st.cursor).toBe(down3)
 
     // TODO queue from queued-to spot
 
     // make a second move down
-    st.placeCursor(ur.getDown())
+    st.placeCursor(st.ur.getDown())
     st.queueMoveDown(false)
     st.doMoves()
-    expect(st.cursor === ur.getDown()).toBeTruthy() // didn't move cursor this time
+    expect(st.cursor === st.ur.getDown()).toBeTruthy() // didn't move cursor this time
 
     // queue two moves down-left
-    st.placeCursor(ur)
+    st.placeCursor(st.ur)
     // console.log(st.messages)
     st.queueMove(Player.One, HexCoord.LEFT_DOWN)
     // console.log(st.messages)
@@ -354,7 +449,7 @@ it('makes real moves', () => {
     expect(st.moves.size).toBe(2)
 
     const downFromUR = (n: number) =>
-        st.getSpot(ur.plus(HexCoord.DOWN.times(n)))
+        st.getSpot(st.ur.plus(HexCoord.DOWN.times(n)))
     const human1 = new Spot(Player.One, 1)
     expect(downFromUR(0)).toEqual(human1)
     expect(downFromUR(1)).toEqual(human1)
@@ -363,12 +458,12 @@ it('makes real moves', () => {
     expect(downFromUR(3)).toBe(Spot.BLANK)
 
     // moving contents 1 has no effect
-    st.placeCursor(ur.getDown())
+    st.placeCursor(st.ur.getDown())
     expect(st.cursorSpot.owner).toBe(Player.One)
     const before2 = st.board
     st.queueMoveDown(false)
     st.doMoves()
-    expect(st.getSpot(ur.getDown()).pop).toEqual(1)
+    expect(st.getSpot(st.ur.getDown()).pop).toEqual(1)
     // move had no effect, so board not updated
     expect(st.board).toBe(before2)
 

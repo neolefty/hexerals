@@ -3,7 +3,7 @@ import {HexCoord} from './HexCoord'
 import {GenericAction} from '../../common/App'
 import {BoardState} from './BoardState'
 import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants'
-import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
+import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
 import {StatusMessage} from '../../common/StatusMessage'
@@ -15,7 +15,7 @@ import {PlayerMove} from './Move';
 // TODO: figure out immutable approach too, maybe with immutable.js
 
 export type GameAction
-    = NewGame | QueueMove | PlaceCursor | DoMoves | CancelMove | SetPlayer
+    = NewGame | QueueMoves | PlaceCursor | DoMoves | CancelMoves | SetPlayer
 
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
@@ -44,8 +44,8 @@ export const BoardReducer = (
     else if (isPlaceCursor(action))
         state = placeCursorReducer(state, action)
     else if (isQueueMove(action))
-        state = queueMoveReducer(state, action)
-    else if (isCancelMove(action))
+        state = queueMovesReducer(state, action)
+    else if (isCancelMoves(action))
         state = cancelMoveReducer(state, action)
     else if (isDoMoves(action))
         state = doMovesReducer(state)
@@ -71,44 +71,48 @@ const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
 })
 
 // add to the player's movement queue
-const QUEUE_MOVE = 'QUEUE_MOVE'
-type QUEUE_MOVE = typeof QUEUE_MOVE
-interface QueueMove extends GenericAction {
-    type: QUEUE_MOVE
-    move: PlayerMove
+const QUEUE_MOVES = 'QUEUE_MOVES'
+type QUEUE_MOVES = typeof QUEUE_MOVES
+interface QueueMoves extends GenericAction {
+    type: QUEUE_MOVES
+    moves: List<PlayerMove>
 }
-const isQueueMove = (action: GameAction): action is QueueMove =>
-    action.type === QUEUE_MOVE
-export const queueMoveAction = (move: PlayerMove): QueueMove =>
-    ({ type: QUEUE_MOVE, move: move })
-const queueMoveReducer = (
-    state: BoardState, action: QueueMove
+const isQueueMove = (action: GameAction): action is QueueMoves =>
+    action.type === QUEUE_MOVES
+export const queueMovesAction = (moves: List<PlayerMove>): QueueMoves =>
+    ({ type: QUEUE_MOVES, moves: moves })
+const queueMovesReducer = (
+    state: BoardState, action: QueueMoves
 ): BoardState => {
-
-    const newMessages: StatusMessage[] = []
-    const queuedTo = state.moves
-        .playerIsQueuedTo(action.move.player, action.move.source)
-    const options = state.board.validationOptions(newMessages)
-    options.ignoreSmallPop = true
-    if (queuedTo) // if the player hopes to have already taken that spot, let them try
-        options.ignoreSpotOwner = true
-    const valid = state.board.validate(action.move, options)
-    const updatedMessages = newMessages.length > 0
-        ? state.messages.push(...newMessages)
-        : state.messages
-
-    if (valid) return {
-        ...state,
-        messages: updatedMessages,
-        moves: state.moves.addMove(action.move),
-    }
-    // TODO assert state.messages !== updatedMessages
-    else if (state.messages !== updatedMessages) return {
-        ...state,
-        messages: updatedMessages,
-    }
-    else
-        return state // probably shouldn't happen -- always have a message instead?
+    let result = state
+    action.moves.forEach((move: PlayerMove) => {
+        const newMessages: StatusMessage[] = []
+        const queuedTo = result.moves
+            .playerIsQueuedTo(move.player, move.source)
+        const options = result.board.validationOptions(newMessages)
+        options.ignoreSmallPop = true
+        if (queuedTo) // if the player hopes to have already taken that spot, let them try
+            options.ignoreSpotOwner = true
+        const valid = result.board.validate(move, options)
+        const updatedMessages = newMessages.length > 0
+            ? result.messages.push(...newMessages)
+            : result.messages
+        if (valid)
+            result = {
+                ...result,
+                messages: updatedMessages,
+                moves: result.moves.addMove(move),
+            }
+        // TODO assert state.messages !== updatedMessages
+        else if (result.messages !== updatedMessages)
+            result = {
+                ...result,
+                messages: updatedMessages,
+            }
+        // else not valid but no messages, so state doesn't change
+        // -- probably shouldn't happen -- always have a message instead?
+    })
+    return result
 }
 
 // advance one step in the queue of moves for each player
@@ -138,34 +142,44 @@ const doMovesReducer = (state: BoardState): BoardState => {
 }
 
 // forget the last move in the queue
-const CANCEL_MOVE = 'CANCEL_MOVE'
-type CANCEL_MOVE = typeof CANCEL_MOVE
-interface CancelMove extends GenericAction {
-    type: CANCEL_MOVE,
+const CANCEL_MOVES = 'CANCEL_MOVES'
+type CANCEL_MOVES = typeof CANCEL_MOVES
+interface CancelMoves extends GenericAction {
+    type: CANCEL_MOVES,
     player: Player,
+    count: number,
 }
-const isCancelMove = (action: GameAction): action is CancelMove =>
-    action.type === CANCEL_MOVE
-export const cancelMoveAction = (player: Player): CancelMove => ({
-    type: CANCEL_MOVE,
+const isCancelMoves = (action: GameAction): action is CancelMoves =>
+    action.type === CANCEL_MOVES
+export const cancelMovesAction = (
+    player: Player, count: number
+): CancelMoves => ({
+    type: CANCEL_MOVES,
     player: player,
+    count: count,
 })
 const cancelMoveReducer = (
-    state: BoardState, action: CancelMove
+    state: BoardState, action: CancelMoves
 ): BoardState => {
-    const newQueueAndCancelledMove = state.moves.cancelLastMove(action.player)
-    if (newQueueAndCancelledMove) {
-        const cancelledMove = newQueueAndCancelledMove.moves.get(0) as PlayerMove
+    const updated: QueueAndMoves | undefined
+        = state.moves.cancelMoves(action.player, action.count)
+    if (updated) {
+        // console.log(`Cancelled moves: ${updated}`)
+        const cancelled = updated.moves
+        // cancelled.forEach((move, idx) => console.log(` - ${idx}: ${move.toString()}`))
+        const oldest = cancelled.first() as PlayerMove
+        const newest = cancelled.last() as PlayerMove
+        // console.log(` --> oldest ${oldest} / newest ${newest}`)
         // Cancel cursor movement too if it looks like the current player just queued this move.
         const cursor = (
-            state.curPlayer === cancelledMove.player
-            && state.cursor === cancelledMove.dest
+            state.curPlayer === oldest.player
+            && state.cursor === newest.dest
         )
-            ? cancelledMove.source
+            ? oldest.source
             : state.cursor
         return {
             ...state,
-            moves: newQueueAndCancelledMove.queue,
+            moves: updated.queue,
             cursor: cursor,
         }
     }

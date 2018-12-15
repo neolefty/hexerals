@@ -1,10 +1,10 @@
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
 import {HexCoord} from '../board/HexCoord'
 import {
-    queueMoveAction, placeCursorAction, doMovesAction, cancelMoveAction
+    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction
 } from '../board/BoardReducer'
 import {AppState} from '../../common/App'
 import Dimension from '../../common/Dimension'
@@ -45,9 +45,15 @@ const mapStateToTickerBoardViewProps = (
 })
 
 const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
-    onQueueMove: (move: PlayerMove) => dispatch(queueMoveAction(move)),
-    onCancelMove: (player: Player) => dispatch(cancelMoveAction(player)),
-    onPlaceCursor: (position: HexCoord) => dispatch(placeCursorAction(position)),
+    onQueueMoves: (moves: List<PlayerMove>) => dispatch(
+        queueMovesAction(moves)
+    ),
+    onCancelMoves: (player: Player, count: number) => dispatch(
+        cancelMovesAction(player, count)
+    ),
+    onPlaceCursor: (position: HexCoord) => dispatch(
+        placeCursorAction(position)
+    ),
     onDoMoves: () => dispatch(doMovesAction()),
 })
 

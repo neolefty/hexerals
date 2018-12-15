@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 import './Board.css'
 import {HexCoord} from './HexCoord'
 import Dimension from '../../common/Dimension'
@@ -12,8 +12,8 @@ import {FilterBoardView} from './HexBoardView';
 import {MovementQueueView} from './MovementView';
 
 export interface BoardViewActions {
-    onQueueMove: (move: PlayerMove) => void
-    onCancelMove: (player: Player) => void
+    onQueueMoves: (moves: List<PlayerMove>) => void
+    onCancelMoves: (player: Player, count: number) => void
     onPlaceCursor: (position: HexCoord) => void
     onEndGame: () => void
 }
@@ -25,8 +25,10 @@ export interface BoardViewProps extends BoardViewActions {
 }
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
-    'ArrowLeft': HexCoord.LEFT_UP,
+    'ArrowLeft': HexCoord.LEFT_DOWN,
+    'Home': HexCoord.LEFT_UP,
     'ArrowRight': HexCoord.RIGHT_DOWN,
+    'PageUp': HexCoord.RIGHT_UP,
     'ArrowUp': HexCoord.UP,
     'ArrowDown': HexCoord.DOWN,
     'q': HexCoord.LEFT_UP,
@@ -51,8 +53,10 @@ export class BoardViewBase extends React.Component<BoardViewProps> {
         if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
             if (delta !== HexCoord.NONE) {
-                this.props.onQueueMove(
-                    PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
+                this.props.onQueueMoves(
+                    List([
+                        PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
+                    ])
                 )
                 this.props.onPlaceCursor(bs.cursor.plus(delta))
                 e.preventDefault()
@@ -67,7 +71,9 @@ export class BoardViewBase extends React.Component<BoardViewProps> {
         }
 
         if (e.key === 'z' && bs.curPlayer)
-            this.props.onCancelMove(bs.curPlayer)
+            this.props.onCancelMoves(bs.curPlayer, 1)
+        if (e.key === 'x' && bs.curPlayer)
+            this.props.onCancelMoves(bs.curPlayer, -1)
     }
 }
 
