@@ -1,15 +1,16 @@
 import * as React from 'react'
-
 import {List, Map} from 'immutable'
-import './Board.css'
-import {HexCoord} from './HexCoord'
-import Dimension from '../../common/Dimension'
-import {DriftColor} from '../../color/DriftColor'
-import {Player} from '../players/Players'
-import {PlayerMove} from './Move'
-import {BoardState} from './BoardState'
+
+import '../Board.css'
+import {HexCoord} from '../HexCoord'
+import Dimension from '../../../common/Dimension'
+import {DriftColor} from '../../../color/DriftColor'
+import {Player} from '../../players/Players'
+import {PlayerMove} from '../Move'
+import {BoardState} from '../BoardState'
 import {FilterBoardView} from './HexBoardView';
 import {MovementQueueView} from './MovementView';
+import {BoardKeyboardController} from '../BoardKeyboardController';
 
 export interface BoardViewActions {
     onQueueMoves: (moves: List<PlayerMove>) => void
@@ -24,63 +25,22 @@ export interface BoardViewProps extends BoardViewActions {
     colors?: Map<Player, DriftColor>
 }
 
-const KEY_CONTROLS: Map<string, HexCoord> = Map({
-    'ArrowLeft': HexCoord.LEFT_DOWN,
-    'Home': HexCoord.LEFT_UP,
-    'ArrowRight': HexCoord.RIGHT_DOWN,
-    'PageUp': HexCoord.RIGHT_UP,
-    'ArrowUp': HexCoord.UP,
-    'ArrowDown': HexCoord.DOWN,
-    'q': HexCoord.LEFT_UP,
-    'a': HexCoord.LEFT_DOWN,
-    'w': HexCoord.UP,
-    's': HexCoord.DOWN,
-    'e': HexCoord.RIGHT_UP,
-    'd': HexCoord.RIGHT_DOWN,
-})
-
 const OUTER_BOARD_MARGIN = 1
 const INNER_BOARD_MARGIN = 1
 
 export class BoardViewBase extends React.Component<BoardViewProps> {
+    protected readonly keyboardController: BoardKeyboardController
+
     constructor(props: BoardViewProps) {
         super(props)
-        this.onKeyDown = this.onKeyDown.bind(this)
+        this.keyboardController = new BoardKeyboardController(this)
     }
 
-    onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
-        const bs = this.props.boardState
-        if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
-            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
-            if (delta !== HexCoord.NONE) {
-                this.props.onQueueMoves(
-                    List([
-                        PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
-                    ])
-                )
-                this.props.onPlaceCursor(bs.cursor.plus(delta))
-                e.preventDefault()
-                return
-            }
-        }
-
-        if (e.key === 'Escape') {
-            this.props.onEndGame()
-            e.preventDefault()
-            return
-        }
-
-        if (e.key === 'z' && bs.curPlayer)
-            this.props.onCancelMoves(bs.curPlayer, 1)
-        if (e.key === 'x' && bs.curPlayer)
-            this.props.onCancelMoves(bs.curPlayer, -1)
-    }
 }
 
 export class BoardView extends BoardViewBase {
     constructor(props: BoardViewProps) {
         super(props)
-        // console.log(`colors: ${props.colors}`)
         this.filterNobody = this.filterNobody.bind(this)
         this.filterPlayers = this.filterPlayers.bind(this)
         this.filterCursor = this.filterCursor.bind(this)
@@ -132,7 +92,7 @@ export class BoardView extends BoardViewBase {
         }
 
         return (
-            <div tabIndex={0} onKeyDown={this.onKeyDown}>
+            <div tabIndex={0} onKeyDown={this.keyboardController.onKeyDown}>
                 <svg
                     className="board"
                     width={boardWidth}

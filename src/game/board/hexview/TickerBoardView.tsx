@@ -1,6 +1,6 @@
 import * as React from 'react'
 import {BoardView, BoardViewProps} from './BoardView'
-import {Ticker} from '../../common/Ticker'
+import {Ticker} from '../../../common/Ticker'
 
 export interface TickerBoardViewProps extends BoardViewProps {
     tickMillis: number,

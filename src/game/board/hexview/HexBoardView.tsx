@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import {Player} from '../players/Players';
-import {DriftColor} from '../../color/DriftColor';
-import {HexCoord} from './HexCoord';
+import {Player} from '../../players/Players';
+import {DriftColor} from '../../../color/DriftColor';
+import {HexCoord} from '../HexCoord';
 import {BoardViewProps} from './BoardView'; // space between bounding rect and hex viewbox
  // space between hex viewbox and hexes
 

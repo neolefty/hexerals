@@ -8,22 +8,22 @@ import {shallow} from 'enzyme'
 import {
     BoardReducer, queueMovesAction, newGameAction, placeCursorAction,
     doMovesAction, setPlayerAction, cancelMovesAction,
-} from './BoardReducer'
-import {Board} from './Board'
-import {INITIAL_POP} from './BoardConstants'
-import {HexCoord} from './HexCoord'
-import Dimension from "../../common/Dimension"
+} from '../BoardReducer'
+import {Board} from '../Board'
+import {INITIAL_POP} from '../BoardConstants'
+import {HexCoord} from '../HexCoord'
+import Dimension from "../../../common/Dimension"
 import {BoardViewBase} from "./BoardView"
-import {BoardState} from './BoardState'
-import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
-import {pickNPlayers, Player, PlayerManager} from '../players/Players'
+import {BoardState} from '../BoardState'
+import {INITIAL_HEIGHT, INITIAL_WIDTH} from '../BoardConstants'
+import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
 import {
     EMPTY_MOVEMENT_QUEUE, MovementQueue, QueueAndMoves
-} from './MovementQueue'
-import {StatusMessage} from '../../common/StatusMessage'
-import {TwoCornersArranger} from './Arranger';
-import {Spot} from './Spot';
-import {PlayerMove} from './Move';
+} from '../MovementQueue'
+import {StatusMessage} from '../../../common/StatusMessage'
+import {TwoCornersArranger} from '../Arranger';
+import {Spot} from '../Spot';
+import {PlayerMove} from '../Move';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()})
@@ -500,7 +500,7 @@ export class OldGridView extends BoardViewBase {
             <div
                 className="board"
                 tabIndex={0}
-                onKeyDown={this.onKeyDown}
+                onKeyDown={this.keyboardController.onKeyDown}
             >
                 {
                     bs.board.edges.yRange().reverse().map((cy: number) => (

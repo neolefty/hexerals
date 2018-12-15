@@ -13,7 +13,7 @@ import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'
 import {Player, PLAYERS} from '../players/Players'
 import {PlayerMove} from '../board/Move'
-import {TickerBoardView} from '../board/TickerBoardView';
+import {TickerBoardView} from '../board/hexview/TickerBoardView';
 
 export interface LocalGameProps {
     displaySize: Dimension
