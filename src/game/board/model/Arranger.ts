@@ -3,7 +3,7 @@ import {List, Map} from 'immutable';
 import {INITIAL_POP} from '../BoardConstants';
 import {HexCoord} from './HexCoord';
 import {Board} from './Board';
-import {Spot} from './Spot';
+import {Spot, Terrain} from './Spot';
 
 export interface StartingArranger {
     arrange(board: Board): Map<HexCoord, Spot>;
@@ -24,7 +24,11 @@ export class RandomArranger implements StartingArranger {
             if (player !== Player.Nobody && allHexes.length > 0) {
                 const i = Math.floor(Math.random() * allHexes.length);
                 const hex = allHexes.splice(i, 1)[0];
-                starts = starts.set(hex, new Spot(player, this.startingArmy));
+                starts = starts.set(hex, new Spot(
+                    player,
+                    this.startingArmy,
+                    Terrain.City,
+                ));
             }
         });
         return starts;

@@ -37,6 +37,7 @@ export class FilterBoardView extends React.Component<FilterBoardViewProps> {
                             key={hex.id}
                             color={color}
                             owner={spot.owner}
+                            terrain={spot.terrain}
                             selected={hex === bs.cursor}
                             centerX={ox}
                             centerY={oy}

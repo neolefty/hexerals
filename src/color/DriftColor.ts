@@ -1,22 +1,24 @@
-import {CieColor} from './CieColor';
+import {CieColor} from './CieColor'
+
+const TEXTURE_VALUE_DIFF = 20
 
 export class DriftColor {
     // allowed limits on brightness & saturation when drifting (hsluv)
-    static readonly MIN_BRIGHT = 30;
-    static readonly MAX_BRIGHT = 80;
-    static readonly SPAN_BRIGHT = DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT;
-    static readonly RECIP_BRIGHT = 1 / DriftColor.SPAN_BRIGHT;
-    static readonly MID_BRIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2;
-    static readonly MIN_SAT = 60;
-    static readonly MAX_SAT = 100;
-    static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT;
-    // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2;
+    static readonly MIN_BRIGHT = 30
+    static readonly MAX_BRIGHT = 80
+    static readonly SPAN_BRIGHT = DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT
+    static readonly RECIP_BRIGHT = 1 / DriftColor.SPAN_BRIGHT
+    static readonly MID_BRIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2
+    static readonly MIN_SAT = 60
+    static readonly MAX_SAT = 100
+    static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT
+    // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2
 
     static clamp_bright(b: number): number {
-        return DriftColor.clamp(b, DriftColor.MIN_BRIGHT, DriftColor.MAX_BRIGHT);
+        return DriftColor.clamp(b, DriftColor.MIN_BRIGHT, DriftColor.MAX_BRIGHT)
     }
     static clamp_sat(s: number): number {
-        return DriftColor.clamp(s, DriftColor.MIN_SAT, DriftColor.MAX_SAT);
+        return DriftColor.clamp(s, DriftColor.MIN_SAT, DriftColor.MAX_SAT)
     }
 
     static random(): DriftColor {
@@ -30,11 +32,11 @@ export class DriftColor {
                     + DriftColor.MIN_BRIGHT,
             ]),
             Math.random()
-        );
+        )
     }
 
     static clamp(x: number, min: number, max: number): number {
-        return Math.max(min, Math.min(x, max));
+        return Math.max(min, Math.min(x, max))
     }
 
     constructor(readonly cie: CieColor, readonly key: number = Math.random()) {}
@@ -47,7 +49,7 @@ export class DriftColor {
                 DriftColor.clamp_bright(this.cie.hsl[2] + Math.random() * f),
             ]),
             this.key
-        );
+        )
     }
 
     // shift a certain amount (mag) in a given direction (unit), in hsluv space.
@@ -59,40 +61,64 @@ export class DriftColor {
                 DriftColor.clamp_bright(unit[2] * mag + this.cie.hsl[2]),
             ]),
             this.key
-        );
+        )
     }
 
     d2(that: DriftColor) {
-        return this.perceptualDistance2(that);
+        return this.perceptualDistance2(that)
     }
 
     // sum of squares distance using
     normalizedDistance2(that: DriftColor): number {
-        return this.cie.normalizedDistance2(that.cie);
+        return this.cie.normalizedDistance2(that.cie)
     }
 
     perceptualDistance2(that: DriftColor): number {
-        return this.cie.perceptualDistance2(that.cie);
+        return this.cie.perceptualDistance2(that.cie)
     }
 
+    // tslint:disable-next-line:member-ordering
+    private _contrast: DriftColor | undefined = undefined
+    // A color with the opposite hue and maximum saturation
     contrast(): DriftColor {
-        return new DriftColor(
-            new CieColor([
-                this.cie.hsl[0] + 180,
-                DriftColor.MAX_SAT,
-                this.cie.hsl[2] > DriftColor.MID_BRIGHT
-                    ? DriftColor.MIN_BRIGHT
-                    : DriftColor.MAX_BRIGHT,
-            ]),
-            1 - this.key
-        );
+        if (!this._contrast)
+            this._contrast = new DriftColor(
+                new CieColor([
+                    this.cie.hsl[0] + 180,
+                    DriftColor.MAX_SAT,
+                    this.cie.hsl[2] > DriftColor.MID_BRIGHT
+                        ? DriftColor.MIN_BRIGHT
+                        : DriftColor.MAX_BRIGHT,
+                ]),
+                1 - this.key
+            )
+        return this._contrast
     }
 
-    toHexString(): string { return this.cie.toHexString(); }
-    toHslString() { return this.cie.toHslString(); }
-    toLchString() { return this.cie.toLchString(); }
+    // tslint:disable-next-line:member-ordering
+    private _texture: DriftColor | undefined = undefined
+    // A color with same hue, and slightly darker or brighter
+    texture(): DriftColor {
+        if (!this._texture)
+            this._texture = new DriftColor(
+                new CieColor([
+                    this.cie.hsl[0],
+                    this.cie.hsl[1],
+                    // if bright, slightly darker; if dark, slightly brighter
+                    this.cie.hsl[2] > DriftColor.MID_BRIGHT
+                        ? this.cie.hsl[2] - TEXTURE_VALUE_DIFF
+                        : this.cie.hsl[2] + TEXTURE_VALUE_DIFF,
+                ]),
+                this.key * (1 - TEXTURE_VALUE_DIFF / 100)
+            )
+        return this._texture
+    }
+
+    toHexString(): string { return this.cie.toHexString() }
+    toHslString() { return this.cie.toHslString() }
+    toLchString() { return this.cie.toLchString() }
 
     toString(): string {
-        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - cie: ${this.toLchString()}`;
+        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - cie: ${this.toLchString()}`
     }
 }
