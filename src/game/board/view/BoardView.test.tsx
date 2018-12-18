@@ -10,7 +10,6 @@ import {
     doMovesAction, setPlayerAction, cancelMovesAction,
 } from '../BoardReducer'
 import {Board} from '../model/Board'
-import {INITIAL_POP} from '../BoardConstants'
 import {HexCoord} from '../model/HexCoord'
 import Dimension from "../../../common/Dimension"
 import {BoardViewBase} from "./BoardViewBase"
@@ -24,6 +23,8 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {TwoCornersArranger} from '../model/Arranger';
 import {Spot, Terrain} from '../model/Spot';
 import {PlayerMove} from '../model/Move';
+
+const INITIAL_POP = 50
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()})

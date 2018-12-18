@@ -15,6 +15,8 @@ const OUTER_BOARD_MARGIN = 1
 const INNER_BOARD_MARGIN = 1
 
 export class HexBoardView extends BoardViewBase {
+    private focusRef = React.createRef<HTMLDivElement>()
+
     constructor(props: BoardViewProps) {
         super(props)
         this.filterNobody = this.filterNobody.bind(this)
@@ -34,6 +36,15 @@ export class HexBoardView extends BoardViewBase {
 
     filterCursor(hex: HexCoord): boolean {
         return this.props.boardState.cursor === hex
+    }
+
+    componentDidMount() {this.focusDiv()}
+    componentDidUpdate() {this.focusDiv()}
+
+    focusDiv() {
+        const node = this.focusRef.current
+        if (node)
+            node.focus()
     }
 
     render(): React.ReactNode {
@@ -68,7 +79,11 @@ export class HexBoardView extends BoardViewBase {
         }
 
         return (
-            <div tabIndex={0} onKeyDown={this.keyboardController.onKeyDown}>
+            <div
+                tabIndex={0}
+                onKeyDown={this.keyboardController.onKeyDown}
+                ref={this.focusRef}
+            >
                 <svg
                     className="board"
                     width={boardWidth}

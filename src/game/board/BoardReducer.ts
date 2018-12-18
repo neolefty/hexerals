@@ -2,7 +2,7 @@ import {Board} from './model/Board'
 import {HexCoord} from './model/HexCoord'
 import {GenericAction} from '../../common/App'
 import {BoardState} from './model/BoardState'
-import {INITIAL_HEIGHT, INITIAL_POP, INITIAL_WIDTH} from './BoardConstants'
+import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
@@ -24,18 +24,14 @@ export const INITIAL_BOARD_STATE: BoardState = {
         INITIAL_WIDTH,
         INITIAL_HEIGHT,
         INITIAL_PLAYERS,
-        new RandomArranger(INITIAL_POP, INITIAL_PLAYERS),
+        RandomArranger.construct(INITIAL_PLAYERS),
     ),
     turn: 0,
     cursor: HexCoord.NONE,
     players: new PlayerManager(INITIAL_PLAYERS),
     curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
-    messages: List([
-        // new StatusMessage('foo', 'bar', 'baz'),
-        // new StatusMessage('moo', 'mar', 'maz'),
-        // new StatusMessage('zoo', 'zar', 'zaz'),
-    ]), // empty
+    messages: List([]),
 }
 
 export const BoardReducer = (

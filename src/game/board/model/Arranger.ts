@@ -1,6 +1,5 @@
 import {Player} from '../../players/Players'
 import {List, Map} from 'immutable'
-import {INITIAL_POP} from '../BoardConstants'
 import {HexCoord} from './HexCoord'
 import {Board} from './Board'
 import {Spot, Terrain} from './Spot'
@@ -11,7 +10,7 @@ export interface StartingArranger {
 
 export class RandomArranger implements StartingArranger {
     public static construct(players: List<Player>) {
-        return new RandomArranger(INITIAL_POP, players)
+        return new RandomArranger(0, players)
     }
 
     constructor(readonly startingArmy: number, readonly players: List<Player>) {

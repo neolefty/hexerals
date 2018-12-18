@@ -36,7 +36,10 @@ const hexPoints = (x: number, y: number, hexRadius: number) => {
 // a hexagon centered at (x, y)
 export const FlatTopHex = (props: FlatTopHexProps) => (
     <g
-        onClick={(/*e*/) => props.onSelect()}
+        onMouseDown={(e) => {
+            e.preventDefault()
+            props.onSelect()
+        }}
         className={
             props.owner
             + ' spot'
