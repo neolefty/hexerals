@@ -55,7 +55,8 @@ type OPEN_LOCAL_GAME = typeof OPEN_LOCAL_GAME;
 interface OpenLocalGame extends GenericAction { type: OPEN_LOCAL_GAME; }
 const isOpenLocalGame = (action: CycleAction): action is OpenLocalGame =>
     action.type === OPEN_LOCAL_GAME;
-export const openLocalGameAction = (): OpenLocalGame => ({ type: OPEN_LOCAL_GAME });
+export const openLocalGameAction = (): OpenLocalGame =>
+    ({ type: OPEN_LOCAL_GAME });
 // noinspection JSUnusedLocalSymbols
 const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
@@ -70,6 +71,7 @@ const openLocalGameReducer =
         mode: CycleMode.IN_LOCAL_GAME,
         localGame: {
             board: newBoard,
+            turn: 0,
             players: new PlayerManager(players),
             cursor: HexCoord.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,

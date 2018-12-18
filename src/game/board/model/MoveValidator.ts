@@ -1,6 +1,7 @@
+import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Spot} from './Spot';
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
 import {HexCoord} from './HexCoord';
 import {PlayerMove} from './Move';
 import {BoardConstraints} from './Constraints';
@@ -92,5 +93,28 @@ export class MoveValidator {
         }
 
         return true
+    }
+
+    // Do some moves.
+    // Mutates options.messages and options.spots.
+    // Invalid moves are skipped.
+    applyMoves(moves: List<PlayerMove>, options: MoveValidatorOptions) {
+        moves.forEach((move: PlayerMove) => {
+            const valid = this.validate(move, options)
+            if (valid) {
+                const origin = options.spots.get(move.source)
+                assert(origin)
+                const newSourceSpot = origin.setPop(1)
+                // TODO support moving only part of a stack (half etc)
+                const oldDestSpot = options.spots.get(move.dest, Spot.BLANK)
+                const march = new Spot(origin.owner, origin.pop - 1)
+                const newDestSpot = oldDestSpot.settle(march)
+                options.spots = options.spots.withMutations(
+                    (m: Map<HexCoord, Spot>) => {
+                        m.set(move.source, newSourceSpot)
+                        m.set(move.dest, newDestSpot)
+                    })
+            }
+        })
     }
 }

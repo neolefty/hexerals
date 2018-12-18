@@ -31,6 +31,14 @@ export class Spot {
         return new Spot(owner, this.pop, this.terrain)
     }
 
+    setTerrain(terrain: Terrain) {
+        return new Spot(this.owner, this.pop, terrain)
+    }
+
+    get isOwned(): boolean {
+        return this.owner !== Player.Nobody
+    }
+
     // settle a combination of this with that, keeping this.terrain
     settle(that: Spot): Spot {
         // same owner? combine them

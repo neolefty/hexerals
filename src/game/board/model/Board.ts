@@ -9,6 +9,7 @@ import {Spot} from './Spot'
 import {HexCoord} from './HexCoord'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
+import {PopStepper} from './PopStepper';
 
 export class BoardAndMessages {
     constructor(
@@ -22,6 +23,15 @@ export class BoardAndMessages {
             : curMessages
 }
 
+export class BoardRules {
+    constructor (
+        readonly constraints: BoardConstraints,
+        readonly edges: RectEdges = new RectEdges(constraints),
+        readonly validator: MoveValidator = new MoveValidator(constraints),
+        readonly stepper: PopStepper = new PopStepper(),
+    ) {}
+}
+
 export class Board {
     static construct(
         constraints: BoardConstraints,
@@ -29,10 +39,9 @@ export class Board {
         spots: Map<HexCoord, Spot> = Map(),
     ) {
         return new Board(
-            constraints,
+            new BoardRules(constraints),
             players,
             spots,
-            new RectEdges(constraints),
         )
     }
 
@@ -52,20 +61,21 @@ export class Board {
     ): Board {
         const constraints = new RectangularConstraints(w, h)
         const blank = Board.construct(constraints, players)
-        const starts = arranger.arrange(blank)
-
-        return new Board(blank.constraints, players, starts, blank.edges)
+        return blank.setSpots(arranger.arrange(blank))
     }
 
     // keep constructor private so that edges doesn't get mis-constructed
     private constructor(
-        readonly constraints: BoardConstraints,
+        readonly rules: BoardRules,
         readonly players: List<Player>,
         // non-blank spots on the map
         readonly spots: Map<HexCoord, Spot>,
-        readonly edges: RectEdges,
-        readonly moveValidator: MoveValidator = new MoveValidator(constraints),
     ) {}
+
+    get moveValidator(): MoveValidator { return this.rules.validator }
+    get constraints(): BoardConstraints { return this.rules.constraints }
+    get edges(): RectEdges { return this.rules.edges }
+    get popStepper(): PopStepper { return this.rules.stepper }
 
     inBounds(coord: HexCoord) {
         return this.constraints.inBounds(coord)
@@ -85,48 +95,25 @@ export class Board {
         return this.applyMoves(List([move]))
     }
 
-    /**
-     * Do some moves.
-     *
-     * @param {List<PlayerMove>} moves the moves to do. If in the course of
-     * moving, a player who no longer controls a square has a move queued from that
-     * square, that move is skipped and has no effect.
-     * @returns {Board} updated
-     */
-    applyMoves(moves: List<PlayerMove>): BoardAndMessages {
-        // note that messages is left unchanged if no messages are added
-        // likewise, spots is left unchanged if no spots are added
-        const status: StatusMessage[] = []
-        const options = new MoveValidatorOptions(this.spots, status)
-
-        moves.forEach((move: PlayerMove) => {
-            const valid = this.validate(move, options)
-            if (valid) {
-                const origin = options.spots.get(move.source)
-                assert(origin)
-                const newSourceSpot = origin.setPop(1)
-                // TODO support moving only part of a stack (half etc)
-                const oldDestSpot = this.getSpot(move.dest)
-                const march = new Spot(origin.owner, origin.pop - 1)
-                const newDestSpot = oldDestSpot.settle(march)
-                options.spots = options.spots.withMutations(
-                    (m: Map<HexCoord, Spot>) => {
-                        m.set(move.source, newSourceSpot)
-                        m.set(move.dest, newDestSpot)
-                })
-            }
-        })
-
-        const board = (this.spots === options.spots)
+    setSpots(spots: Map<HexCoord, Spot>): Board {
+        return (this.spots === spots)
             ? this
-            : new Board(
-                this.constraints,
-                this.players,
-                options.spots,
-                this.edges,
-                this.moveValidator,
-            )
-        return new BoardAndMessages(board, List(status))
+            : new Board(this.rules, this.players, spots)
+    }
+
+    // Do some moves.
+    // Illegal moves are skipped -- for example if a player no longer controls a hex.
+    applyMoves(moves: List<PlayerMove>): BoardAndMessages {
+        const options = new MoveValidatorOptions(this.spots, [])
+        this.moveValidator.applyMoves(moves, options)
+        return new BoardAndMessages(
+            this.setSpots(options.spots),
+            List(options.status || []),
+        )
+    }
+
+    stepPop(turn: number): Board {
+        return this.popStepper.step(this, turn)
     }
 
     validate(
@@ -136,6 +123,7 @@ export class Board {
         return this.moveValidator.validate(move, options)
     }
 
+    // factory method
     validationOptions(
         messages: StatusMessage[] | undefined = undefined
     ): MoveValidatorOptions {

@@ -7,6 +7,7 @@ import {List} from 'immutable'
 
 export interface BoardState {
     board: Board
+    turn: number
     cursor: HexCoord
     moves: MovementQueue
     players: PlayerManager
@@ -21,5 +22,6 @@ export const boardStateToString = (s: BoardState): string =>
     + `current: ${s.curPlayer}\n`
     + `board: ${s.board.toString()}\n`
     + `moves: ${s.moves}\n`
-    + `messages: ${s.messages}`
+    + `messages: ${s.messages}\n`
+    + `turn: ${s.turn}\n`
 

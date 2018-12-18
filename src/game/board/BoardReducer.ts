@@ -15,7 +15,8 @@ import {PlayerMove} from './model/Move';
 // TODO: figure out immutable approach too, maybe with immutable.js
 
 export type GameAction
-    = NewGame | QueueMoves | PlaceCursor | DoMoves | CancelMoves | SetPlayer
+    = NewGame | QueueMoves | PlaceCursor | SetPlayer
+        | DoMoves | CancelMoves | StepPop
 
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
@@ -25,6 +26,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
         INITIAL_PLAYERS,
         new RandomArranger(INITIAL_POP, INITIAL_PLAYERS),
     ),
+    turn: 0,
     cursor: HexCoord.NONE,
     players: new PlayerManager(INITIAL_PLAYERS),
     curPlayer: INITIAL_PLAYERS[0],
@@ -49,6 +51,8 @@ export const BoardReducer = (
         state = cancelMoveReducer(state, action)
     else if (isDoMoves(action))
         state = doMovesReducer(state)
+    else if (isStepPop(action))
+        state = stepPopReducer(state)
     else if (isSetPlayer(action))
         state = setPlayerReducer(state, action)
     return state
@@ -181,6 +185,18 @@ const cancelMoveReducer = (
     else
         return state
 }
+
+// TODO combine DO_MOVES and STEP_POP into STEP?
+const STEP_POP = 'STEP_POP'
+type STEP_POP = 'STEP_POP'
+interface StepPop extends GenericAction {type: STEP_POP}
+const isStepPop = (action: GameAction): action is StepPop => action.type === STEP_POP
+export const stepPopAction = (): StepPop => ({ type: STEP_POP })
+const stepPopReducer = (state: BoardState): BoardState => ({
+    ...state,
+    board: state.board.stepPop(state.turn),
+    turn: state.turn + 1,
+})
 
 const PLACE_CURSOR = 'PLACE_CURSOR'
 type PLACE_CURSOR = typeof PLACE_CURSOR

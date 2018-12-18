@@ -22,7 +22,7 @@ import {
 } from '../model/MovementQueue'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {TwoCornersArranger} from '../model/Arranger';
-import {Spot} from '../model/Spot';
+import {Spot, Terrain} from '../model/Spot';
 import {PlayerMove} from '../model/Move';
 
 it('renders a spot', () => {
@@ -48,6 +48,7 @@ it('renders a board with no selection', () => {
         n, pickNPlayers(2), new TwoCornersArranger(3))
     const boardState: BoardState = {
         board: board,
+        turn: 0,
         cursor: HexCoord.NONE,
         moves: EMPTY_MOVEMENT_QUEUE,
         players: new PlayerManager(board.players),
@@ -84,6 +85,7 @@ it('renders a board with a selection', () => {
     const ur = board.edges.upperRight
     const bs: BoardState = {
         board: board,
+        turn: 0,
         cursor: ur,
         moves: EMPTY_MOVEMENT_QUEUE,
         players: new PlayerManager(board.players),
@@ -250,7 +252,9 @@ it('creates game via react-redux', () => {
     expect(st.board.spots.size).toEqual(2)
     expect(st.messages.size).toEqual(0)
     const lowLeft = HexCoord.ORIGIN
-    expect(st.getSpot(lowLeft)).toEqual(new Spot(Player.Zero, INITIAL_POP))
+    expect(st.getSpot(lowLeft)).toEqual(
+        new Spot(Player.Zero, INITIAL_POP, Terrain.City)
+    )
 })
 
 it('queues multiple moves at once', () => {
@@ -451,7 +455,7 @@ it('makes real moves', () => {
     const downFromUR = (n: number) =>
         st.getSpot(st.ur.plus(HexCoord.DOWN.times(n)))
     const human1 = new Spot(Player.One, 1)
-    expect(downFromUR(0)).toEqual(human1)
+    expect(downFromUR(0)).toEqual(human1.setTerrain(Terrain.City))
     expect(downFromUR(1)).toEqual(human1)
     expect(downFromUR(2)).toEqual(new Spot(Player.One, INITIAL_POP-2))
     expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0))

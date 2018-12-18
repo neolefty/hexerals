@@ -6,7 +6,7 @@ import {pickNPlayers, Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {TwoCornersArranger} from './Arranger';
-import {Spot} from './Spot';
+import {Spot, Terrain} from './Spot';
 import {HexCoord} from './HexCoord';
 
 // noinspection JSUnusedGlobalSymbols
@@ -192,4 +192,42 @@ it('validates moves', () => {
     expect(moved.validate(PlayerMove.construct(
         Player.Zero, HexCoord.ORIGIN, HexCoord.UP
     ), movedOptions)).toBeTruthy()
+})
+
+it('steps population', () => {
+    const threeByFour = Board.constructRectangular(
+        3, 7, pickNPlayers(2), new TwoCornersArranger(20))
+    const ur = threeByFour.edges.upperRight
+    const urd = ur.getDown()
+    const urdd = urd.getDown()
+    expect(threeByFour.getSpot(ur).terrain).toBe(Terrain.City)
+    expect(threeByFour.getSpot(ur).pop).toBe(20)
+    expect(threeByFour.getSpot(ur).isOwned).toBeTruthy()
+    expect(threeByFour.getSpot(urd).isOwned).toBeFalsy()
+
+    // make a move
+    const moved = threeByFour.applyMove(
+        PlayerMove.construct(Player.One, ur, HexCoord.DOWN)
+    ).board
+    expect(moved.getSpot(ur).pop).toBe(1)
+    expect(moved.getSpot(urd).pop).toBe(19)
+    expect(moved.getSpot(urdd).pop).toBe(0)
+
+    // after turn 1, no changes in population
+    const one = moved.stepPop(1)
+    expect(one.getSpot(ur).pop).toBe(1)
+    expect(one.getSpot(urd).pop).toBe(19)
+    expect(one.getSpot(urdd).pop).toBe(0)
+
+    // after turn 2, city grows
+    const two = one.stepPop(2)
+    expect(two.getSpot(ur).pop).toBe(2)
+    expect(two.getSpot(urd).pop).toBe(19)
+    expect(two.getSpot(urdd).pop).toBe(0)
+
+    // after turn 50, both city and countryside grow
+    const fifty = two.stepPop(50)
+    expect(fifty.getSpot(ur).pop).toBe(3)
+    expect(fifty.getSpot(urd).pop).toBe(20)
+    expect(fifty.getSpot(urdd).pop).toBe(0)
 })
