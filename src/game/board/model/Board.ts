@@ -8,6 +8,7 @@ import {StartingArranger} from './Arranger'
 import {Spot} from './Spot'
 import {HexCoord} from './HexCoord'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
+import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
 
 export class BoardAndMessages {
     constructor(
@@ -21,22 +22,18 @@ export class BoardAndMessages {
             : curMessages
 }
 
-export interface MoveValidationOptions {
-    status: StatusMessage[] | undefined // status messages to add to
-    // the spots under consideration, which start out as the current board's spots
-    // but get speculatively reassigned in internal scratch values during validation
-    spots: Map<HexCoord, Spot> // by default this board's current spots
-    ignoreSpotOwner: boolean // does it matter who is the spot's owner?
-    ignoreSmallPop: boolean
-}
-
 export class Board {
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
         spots: Map<HexCoord, Spot> = Map(),
     ) {
-        return new Board(constraints, players, spots, new RectEdges(constraints))
+        return new Board(
+            constraints,
+            players,
+            spots,
+            new RectEdges(constraints),
+        )
     }
 
     static constructSquare(
@@ -66,22 +63,9 @@ export class Board {
         readonly players: List<Player>,
         // non-blank spots on the map
         readonly spots: Map<HexCoord, Spot>,
-        readonly edges: RectEdges
+        readonly edges: RectEdges,
+        readonly moveValidator: MoveValidator = new MoveValidator(constraints),
     ) {}
-
-    // // TODO test
-    // superimpose(positions: Map<HexCoord, Spot>): Board {
-    //     const newSpots = this.spots.withMutations((mSpots: Map<HexCoord, Spot>) => {
-    //         // add each Spot in startPositions
-    //         // TODO avoid conflicts? For now just overwrite
-    //         // TODO test that overwriting works, at least
-    //         positions.map((value: Spot, key: HexCoord) => {
-    //             const oldSpot: Spot = mSpots.get(key, Spot.BLANK)
-    //             mSpots.set(key, new Spot(value.owner, value.contents, oldSpot.terrain))
-    //         })
-    //     })
-    //     return new Board(this.constraints, newSpots, this.edges)
-    // }
 
     inBounds(coord: HexCoord) {
         return this.constraints.inBounds(coord)
@@ -113,7 +97,7 @@ export class Board {
         // note that messages is left unchanged if no messages are added
         // likewise, spots is left unchanged if no spots are added
         const status: StatusMessage[] = []
-        const options = this.validationOptions(status, this.spots)
+        const options = new MoveValidatorOptions(this.spots, status)
 
         moves.forEach((move: PlayerMove) => {
             const valid = this.validate(move, options)
@@ -140,8 +124,22 @@ export class Board {
                 this.players,
                 options.spots,
                 this.edges,
+                this.moveValidator,
             )
         return new BoardAndMessages(board, List(status))
+    }
+
+    validate(
+        move: PlayerMove,
+        options: MoveValidatorOptions = this.validationOptions(),
+    ): boolean {
+        return this.moveValidator.validate(move, options)
+    }
+
+    validationOptions(
+        messages: StatusMessage[] | undefined = undefined
+    ): MoveValidatorOptions {
+        return new MoveValidatorOptions(this.spots, messages)
     }
 
     toString(): string {
@@ -155,82 +153,17 @@ export class Board {
         return result
     }
 
-    validationOptions(
-        status: StatusMessage[] | undefined = undefined,
-        spots: Map<HexCoord, Spot> = this.spots,
-        ignoreCurPlayer: boolean = false,
-        ignoreSpotOwner: boolean = false,
-    ): MoveValidationOptions {
-        return {
-            status: status,
-            spots: spots,
-            ignoreSpotOwner: ignoreSpotOwner,
-            ignoreSmallPop: false,
-        }
-    }
-
-    validate(
-        move: PlayerMove,
-        options: MoveValidationOptions = this.validationOptions(),
-    ): boolean {
-        // in bounds
-        if (!this.inBounds(move.source)) {
-            if (options && options.status)
-                options.status.push(
-                    new StatusMessage(
-                        'out of bounds',
-                        `start ${move.source} is out of bounds`,
-                        `${move}`,
-                    ))
-            return false
-        }
-        if (!this.inBounds(move.dest)) {
-            if (options && options.status)
-                options.status.push(
-                    new StatusMessage(
-                        'out of bounds',
-                        `destination ${move.dest} is out of bounds`,
-                        `${move}`,
-                    ))
-            return false
-        }
-
-        // move distance == 1
-        if (move.delta.maxAbs() !== 1) {
-            if (options && options.status)
-                options.status.push(
-                    new StatusMessage(
-                        'illegal move', /* TODO use constants for tags*/
-                        `Can't move ${move.delta.maxAbs()} steps.`,
-                        `${move}`,
-                    ))
-            return false
-        }
-
-        // owner === player making the move
-        const origin = options.spots.get(move.source, Spot.BLANK)
-        if (!options.ignoreSpotOwner && origin.owner !== move.player) {
-            if (options && options.status)
-                options.status.push(new StatusMessage(
-                    'wrong player', // TODO use constant
-                    `${move.player} cannot move from ${move.source} `
-                    + `because it is held by ${origin.owner}.`,
-                    `${move}`,
-                ))
-            return false
-        }
-
-        // population >= 1
-        if (!options.ignoreSmallPop && origin.pop <= 1) {
-            if (options && options.status)
-                options.status.push(new StatusMessage(
-                    'insufficient population',
-                    `${move.source} has population of ${origin.pop}`,
-                    `${move}`,
-                ))
-            return false
-        }
-
-        return true
-    }
+    // // TODO test
+    // superimpose(positions: Map<HexCoord, Spot>): Board {
+    //     const newSpots = this.spots.withMutations((mSpots: Map<HexCoord, Spot>) => {
+    //         // add each Spot in startPositions
+    //         // TODO avoid conflicts? For now just overwrite
+    //         // TODO test that overwriting works, at least
+    //         positions.map((value: Spot, key: HexCoord) => {
+    //             const oldSpot: Spot = mSpots.get(key, Spot.BLANK)
+    //             mSpots.set(key, new Spot(value.owner, value.contents, oldSpot.terrain))
+    //         })
+    //     })
+    //     return new Board(this.constraints, newSpots, this.edges)
+    // }
 }

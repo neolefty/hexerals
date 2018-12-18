@@ -126,10 +126,8 @@ const doMovesReducer = (state: BoardState): BoardState => {
     // TODO rotate startPlayerIndex
     const movesAndQ = state.moves.popEach(
         (move: PlayerMove) => state.board.validate(move))
-    // console.log(`reducing moves ... ${movesAndQ}`)
     if (movesAndQ) { // undefined if no moves to apply
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves)
-        // console.log(`          ... ${boardAndMessages.messages}`)
         return {
             ...state,
             messages: boardAndMessages.addToMessages(state.messages),
@@ -164,12 +162,9 @@ const cancelMoveReducer = (
     const updated: QueueAndMoves | undefined
         = state.moves.cancelMoves(action.player, action.count)
     if (updated) {
-        // console.log(`Cancelled moves: ${updated}`)
         const cancelled = updated.moves
-        // cancelled.forEach((move, idx) => console.log(` - ${idx}: ${move.toString()}`))
         const oldest = cancelled.first() as PlayerMove
         const newest = cancelled.last() as PlayerMove
-        // console.log(` --> oldest ${oldest} / newest ${newest}`)
         // Cancel cursor movement too if it looks like the current player just queued this move.
         const cursor = (
             state.curPlayer === oldest.player

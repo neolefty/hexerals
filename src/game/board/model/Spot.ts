@@ -23,6 +23,10 @@ export class Spot {
         return new Spot(this.owner, pop, this.terrain)
     }
 
+    incrementPop(): Spot {
+        return this.setPop(this.pop + 1)
+    }
+
     setOwner(owner: Player): Spot {
         return new Spot(owner, this.pop, this.terrain)
     }
