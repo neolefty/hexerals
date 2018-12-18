@@ -10,8 +10,12 @@ export class MoveValidatorOptions {
     // but may get speculatively reassigned in internal scratch values during validation
     spots: Map<HexCoord, Spot>
 
+    // If true, don't invalidate just because there isn't enough population
+    // in the spot *now* to move -- there may be enough in the future.
     ignoreSmallPop: boolean = false
-    ignoreCurPlayer: boolean = false
+
+    // If true, don't invalidate because the current owner doesn't match the
+    // player planning the move -- ownership may change before this move happens.
     ignoreSpotOwner: boolean = false
 
     constructor(
