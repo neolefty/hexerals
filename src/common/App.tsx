@@ -58,8 +58,8 @@ class App extends React.Component<AppProps, AppState> {
             <div className="App">
                 <Tabs>
                     <TabList>
-                        <Tab>Local Game</Tab>
-                        <Tab>Color Wheel</Tab>
+                        <Tab>Game</Tab>
+                        <Tab>Colors</Tab>
                         <Tab>Controls</Tab>
                     </TabList>
                     <TabPanel>
