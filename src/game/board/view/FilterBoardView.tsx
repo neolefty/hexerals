@@ -3,10 +3,8 @@ import * as React from 'react';
 import {DriftColor} from '../../../color/DriftColor';
 import {HexCoord} from '../model/HexCoord';
 import {BoardViewProps} from './BoardViewBase';
-import {FlatTopHex} from './FlatTopHex';
+import {SpottedHex} from './SpottedHex';
 
-export const centerX = (cartX: number): number => 45 * cartX + 30
-export const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
 interface FilterBoardViewProps extends BoardViewProps {
@@ -19,46 +17,42 @@ export class FilterBoardView extends React.Component<FilterBoardViewProps> {
     }
 
     render(): React.ReactNode {
-        const bs = this.props.boardState
-        const height = viewBoxHeight(bs.board.edges.height)
+        const boardState = this.props.boardState
+        const h = viewBoxHeight(boardState.board.edges.height)
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
-                bs.board.constraints.all().filter(
+                boardState.board.constraints.all().filter(
                     this.props.filter
                 ).map(hex => {
-                    const spot = bs.board.getSpot(hex)
-                    const ox = centerX(hex.cartX())
-                    const oy = centerY(height, hex.cartY())
-                    const color: DriftColor | undefined
+                    const spot = boardState.board.getSpot(hex)
+                    const maybeColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(spot.owner)
+                    const color: DriftColor = maybeColor || DriftColor.BLACK
                     return (
-                        <FlatTopHex
+                        <SpottedHex
                             key={hex.id}
+                            spot={spot}
                             color={color}
-                            owner={spot.owner}
-                            terrain={spot.terrain}
-                            selected={hex === bs.cursor}
-                            centerX={ox}
-                            centerY={oy}
-                            hexRadius={30}
+                            hex={hex}
+                            selected={hex === boardState.cursor}
+                            viewBoxHeight={h}
                             onSelect={() => this.props.onPlaceCursor(hex)}
-                            contents={spot.pop === 0 ? '' : `${spot.pop}`}
-                        >
-                            {
-                                spot.pop === 0 ? undefined :
+                            render={(spot.pop === 0)
+                                ? undefined
+                                : (centerX: number, centerY: number) => (
                                     <text
-                                        x={ox}
-                                        y={oy + 0.35 * 26}
+                                        x={centerX}
+                                        y={centerY + 0.35 * 26}
                                         fontFamily="Sans-Serif"
                                         fontSize={27}
                                         textAnchor="middle"
-                                        fill={color ? color.contrast().toHexString() : '#fff'}
+                                        fill={color.contrast().toHexString()}
                                     >
                                         {spot.pop}
-                                    </text>
+                                    </text>)
                             }
-                        </FlatTopHex>
+                        />
                     )
                 })
             }

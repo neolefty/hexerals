@@ -13,8 +13,7 @@ export interface FlatTopHexProps {
     centerX: number
     centerY: number
     hexRadius: number
-    onSelect: () => void
-    contents: string
+    onSelect?: () => void
     children?: JSX.Element | JSX.Element[] // could use "any?" instead
 }
 
@@ -37,8 +36,10 @@ const hexPoints = (x: number, y: number, hexRadius: number) => {
 export const FlatTopHex = (props: FlatTopHexProps) => (
     <g
         onMouseDown={(e) => {
-            e.preventDefault()
-            props.onSelect()
+            if (props.onSelect) {
+                e.preventDefault()
+                props.onSelect()
+            }
         }}
         className={
             props.owner

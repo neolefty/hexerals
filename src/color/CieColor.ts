@@ -2,6 +2,10 @@ import * as hsluv from 'hsluv';
 
 export class CieColor {
     // for descriptions of color spaces, see http://www.hsluv.org/comparison/
+    static readonly WHITE: CieColor = new CieColor([0, 0, 100]);
+    static readonly GREY_20: CieColor = new CieColor([0, 0, 20]);
+    static readonly GREY_40: CieColor = new CieColor([0, 0, 40]);
+    static readonly BLACK: CieColor = new CieColor([0, 0, 0]);
 
     // readonly hpl: number[];  // pastels only, with uniformity and full range
 
@@ -35,7 +39,7 @@ export class CieColor {
 
     perceptualDistance2(that: CieColor) {
         const [
-            light1, light2, // brightness
+            light1, light2, // lightness
             chroma1, chroma2, // saturation
             hue1, hue2,
         ] = [
@@ -48,7 +52,7 @@ export class CieColor {
             dSat = chroma1 - chroma2,
             dLight = light1 - light2;
         const dHue = dHueRaw < 180 ? dHueRaw : 360 - dHueRaw;
-        // attempt to compensate for low brightness / saturation
+        // attempt to compensate for low lightness / saturation
         // -- hue that is dark or desaturated is less important
         const result = dHue * dHue * chroma1 * chroma2 * light1 * light2
             + dSat * dSat * 1e8 * 0.4  // de-emphasize saturation

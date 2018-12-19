@@ -42,7 +42,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             label="Width"
             value={props.boardSize.w}
             min={3}
-            max={40}
+            max={13}
             onChange={
                 w => props.changeBoardSize(new Dimension(w, props.boardSize.h))
             }
@@ -51,7 +51,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             label="Height"
             value={props.boardSize.h}
             min={3}
-            max={20}
+            max={25}
             onChange={
                 h => props.changeBoardSize(new Dimension(props.boardSize.w, h))
             }
@@ -76,7 +76,7 @@ const IntInput = (props: IntInputProps) => (
     <label
         className="IntInput"
     >
-        {props.label}:
+        {props.label}
         <input
             type="number"
             min={props.min}

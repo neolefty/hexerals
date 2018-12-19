@@ -1,0 +1,10 @@
+.Help {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  p {
+    font-size: 140%;
+    margin: 0.5em 0 0 0;
+  }
+}

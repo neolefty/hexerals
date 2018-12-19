@@ -6,6 +6,7 @@ import Dimension from '../common/Dimension'
 import {ColorsContainer, ColorsState} from '../color/ColorsContainer'
 import {CycleState} from '../game/cycle/CycleState'
 import {CycleContainer} from '../game/cycle/CycleContainer'
+import {Help} from '../game/board/view/Help';
 
 const MIN_WIDTH = 420
 const MIN_HEIGHT = 120
@@ -59,12 +60,16 @@ class App extends React.Component<AppProps, AppState> {
                     <TabList>
                         <Tab>Local Game</Tab>
                         <Tab>Color Wheel</Tab>
+                        <Tab>Controls</Tab>
                     </TabList>
                     <TabPanel>
                         <CycleContainer displaySize={displaySize}/>
                     </TabPanel>
                     <TabPanel>
                         <ColorsContainer displaySize={displaySize}/>
+                    </TabPanel>
+                    <TabPanel>
+                        <Help displaySize={displaySize}/>
                     </TabPanel>
                 </Tabs>
             </div>

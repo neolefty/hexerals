@@ -3,7 +3,7 @@ import {CieColor} from './CieColor'
 const TEXTURE_VALUE_DIFF = 20
 
 export class DriftColor {
-    // allowed limits on brightness & saturation when drifting (hsluv)
+    // allowed limits on lightness & saturation when drifting (hsluv)
     static readonly MIN_BRIGHT = 30
     static readonly MAX_BRIGHT = 80
     static readonly SPAN_BRIGHT = DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT
@@ -13,6 +13,11 @@ export class DriftColor {
     static readonly MAX_SAT = 100
     static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT
     // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2
+
+    static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
+    static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
+    static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
+    static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
 
     static clamp_bright(b: number): number {
         return DriftColor.clamp(b, DriftColor.MIN_BRIGHT, DriftColor.MAX_BRIGHT)
@@ -95,22 +100,34 @@ export class DriftColor {
         return this._contrast
     }
 
+    get hue() { return this.cie.hsl[0] }
+    get saturation() { return this.cie.hsl[1] }
+    get lightness() { return this.cie.hsl[2] }
+
     // tslint:disable-next-line:member-ordering
     private _texture: DriftColor | undefined = undefined
-    // A color with same hue, and slightly darker or brighter
+    // A color with same hue & sat, but slightly darker or brighter for texture
     texture(): DriftColor {
-        if (!this._texture)
+        if (!this._texture) {
+            // lightness 0-25 -- return brighter (too dark to get darker)
+            //   - 25-50 -- darker
+            //   - 50-75 -- brighter
+            //   - 75-100 -- darker (too bright to get brighter)
+            const darker: boolean = (
+                this.lightness > TEXTURE_VALUE_DIFF - 5
+                && this.lightness < DriftColor.MID_BRIGHT
+            ) || this.lightness > (95 - TEXTURE_VALUE_DIFF)
             this._texture = new DriftColor(
                 new CieColor([
                     this.cie.hsl[0],
                     this.cie.hsl[1],
-                    // if bright, slightly darker; if dark, slightly brighter
-                    this.cie.hsl[2] > DriftColor.MID_BRIGHT
+                    darker
                         ? this.cie.hsl[2] - TEXTURE_VALUE_DIFF
                         : this.cie.hsl[2] + TEXTURE_VALUE_DIFF,
                 ]),
-                this.key * (1 - TEXTURE_VALUE_DIFF / 100)
+                this.key * (1 + TEXTURE_VALUE_DIFF / 100)
             )
+        }
         return this._texture
     }
 

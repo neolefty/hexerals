@@ -275,7 +275,7 @@ export class ColorBlobs extends Component<ColorBlobsProps> {
     }
 
     private attractDarkToCenter(color: DriftColor, location: Coord) {
-        const fromDark = DriftColor.MAX_BRIGHT - color.cie.hsl[2];
+        const fromDark = DriftColor.MAX_BRIGHT - color.lightness;
         return location.copy().mutateScale(-.3 * DriftColor.RECIP_BRIGHT * fromDark);
     }
 
