@@ -3,32 +3,16 @@ import {Robot} from './Robot'
 
 export enum Player {
     Nobody = 'Nobody',
-    Zero = 'Zero',
-    One = 'One',
-    Two = 'Two',
-    Three = 'Three',
-    Four = 'Four',
-    Five = 'Five',
-    Six = 'Six',
-    Seven = 'Seven',
-    Eight = 'Eight',
-    Nine = 'Nine',
-    Ten = 'Ten',
+    Zero = 'Zero', One = 'One', Two = 'Two', Three = 'Three',
+    Four = 'Four', Five = 'Five', Six = 'Six', Seven = 'Seven',
+    Eight = 'Eight', Nine = 'Nine', Ten = 'Ten', Eleven = 'Eleven',
 }
 
 export const PLAYERS: Map<number, Player> = Map([
     [-1, Player.Nobody],
-    [0, Player.Zero],
-    [1, Player.One],
-    [2, Player.Two],
-    [3, Player.Three],
-    [4, Player.Four],
-    [5, Player.Five],
-    [6, Player.Six],
-    [7, Player.Seven],
-    [8, Player.Eight],
-    [9, Player.Nine],
-    [10, Player.Ten],
+    [0, Player.Zero], [1, Player.One], [2, Player.Two], [3, Player.Three],
+    [4, Player.Four], [5, Player.Five], [6, Player.Six], [7, Player.Seven],
+    [8, Player.Eight], [9, Player.Nine], [10, Player.Ten], [11, Player.Eleven],
 ])
 
 export const pickNPlayers = (n: number): List<Player> => {

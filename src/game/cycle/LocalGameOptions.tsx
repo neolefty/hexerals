@@ -29,7 +29,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             value={props.numPlayers}
             title="How many players? One will be you, and the others very stupid AIs."
             min={1}
-            max={10}
+            max={12}
             onChange={x => props.changeNumPlayers(x)}
         />
         <IntInput
@@ -37,7 +37,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             title="How many hexes across?"
             value={props.boardSize.w}
             min={3}
-            max={13}
+            max={21}
             onChange={
                 w => props.changeBoardSize(new Dimension(w, props.boardSize.h))
             }
@@ -47,7 +47,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
             title="How many hexes tall?"
             value={props.boardSize.h}
             min={3}
-            max={25}
+            max={15}
             onChange={
                 h => props.changeBoardSize(new Dimension(props.boardSize.w, h))
             }
