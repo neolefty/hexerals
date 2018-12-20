@@ -44,13 +44,13 @@ it('checks rectangular board geometry', () => {
     const fiveByFour = Board.constructRectangular(5, 4, twoPlayers, arr)
     // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
     // _ - _ - _ - _ - _
-    expect(fiveByFour.constraints.extreme(x => x.cartX()).cartX()).toBe(0)  // left 0
-    expect(fiveByFour.constraints.extreme(x => x.cartY()).cartY()).toBe(0)  // top 0
-    expect(fiveByFour.constraints.extreme(x => - x.cartX()).cartX()).toBe(8)  // right 8
-    expect(fiveByFour.constraints.extreme(x => - x.cartY()).cartY()).toBe(3)  // bottom 3
+    expect(fiveByFour.constraints.extreme(x => x.cartX).cartX).toBe(0)  // left 0
+    expect(fiveByFour.constraints.extreme(x => x.cartY).cartY).toBe(0)  // top 0
+    expect(fiveByFour.constraints.extreme(x => - x.cartX).cartX).toBe(8)  // right 8
+    expect(fiveByFour.constraints.extreme(x => - x.cartY).cartY).toBe(3)  // bottom 3
     expect(fiveByFour.constraints.extreme(
         // cartY is first digit, cartX is second digit
-        x => x.cartX() + 10 * x.cartY(), BoardConstraints.GT
+        x => x.cartX + 10 * x.cartY, BoardConstraints.GT
     )).toBe(HexCoord.getCart(7, 3)) // bottom right
 
     expect(fiveByFour.edges.width).toEqual(9)

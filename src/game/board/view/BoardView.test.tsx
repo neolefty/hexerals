@@ -111,7 +111,7 @@ it('renders a board with a selection', () => {
 it('clicks a spot to select it', () => {
     const board = Board.constructSquare(
         3, pickNPlayers(2), new TwoCornersArranger(6))
-    const coord = board.constraints.extreme(c => - c.cartX() - c.cartY())
+    const coord = board.constraints.extreme(c => - c.cartX - c.cartY)
     const spot = board.getSpot(coord)
     const state = {
         selected: false,

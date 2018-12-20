@@ -61,17 +61,17 @@ interface MoveViewProps {
 }
 
 const MoveView = (props: MoveViewProps) => {
-    const x1 = centerX(props.move.source.cartX())
-    const x2 = centerX(props.move.dest.cartX())
+    const x1 = centerX(props.move.source.cartX)
+    const x2 = centerX(props.move.dest.cartX)
     const h = viewBoxHeight(props.boardHeight)
-    const y1 = centerY(h, props.move.source.cartY())
-    const y2 = centerY(h, props.move.dest.cartY())
+    const y1 = centerY(h, props.move.source.cartY)
+    const y2 = centerY(h, props.move.dest.cartY)
     return (
         <polygon
             points={`${x1},${y1} ${x2},${y2}`}
             style={
                 props.color && {
-                    stroke: props.color.toHexString(),
+                    stroke: props.color.texture().toHexString(),
                     strokeWidth: 3,
                 }
             }

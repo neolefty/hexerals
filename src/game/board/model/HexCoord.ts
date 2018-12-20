@@ -123,24 +123,54 @@ export class HexCoord {
     }
 
     // TODO test consistency -- maybe randomly create coords and navigate nearby using both hex & cartesian coords
-    // convert to rectangular X, assuming flat-topped hexagons twice as wide as high
-    cartX(): number {
+    // convert to integer rectangular X
+    // assuming flat-topped hexagons twice as wide as high
+    get cartX(): number {
         return this.x;
     } // was x - y
 
-    // convert to rectangular Y, assuming flat-topped hexagons twice as wide as high
-    cartY(): number {
+    // convert to integer rectangular Y
+    // assuming flat-topped hexagons twice as wide as high
+    get cartY(): number {
         return this.y - this.z;
     } // was z
 
-    toString(includeCart: boolean = true): string {
+    // tslint:disable-next-line:member-ordering
+    static readonly COS_30 = Math.cos(Math.PI / 6)
+    // the actual y coordinate, corrected for hexagon heights
+    get cartYExact(): number {
+        return this.cartY * 0.5
+    }
+    get cartXExact(): number {
+        return this.cartX * HexCoord.COS_30
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _degrees: number = -1000
+    // angle from origin to this coordinate, corrected to be hexagonal
+    // the unit directions are each a multiple of 60%
+    // UP would be 90, UP_RIGHT 30, UP_LEFT 150, etc.
+    get degrees(): number {
+        if (this._degrees < 360)
+            this._degrees =
+                (Math.atan2(this.cartYExact, this.cartXExact) * 180 / Math.PI + 360) % 360
+        return this._degrees
+    }
+
+    toString(includeCart: boolean = true, includeExact: boolean = false): string {
         return `[${ this.x },${ this.y },${ this.z }]${
             includeCart ? ' ' + this.toCartString() : ''
-            }`;
+        }${
+            includeExact ? ' ' + this.toExactString() : ''
+        }`;
     }
 
     toCartString() {
-        return `(${this.cartX()},${this.cartY()})`;
+        return `(${this.cartX},${this.cartY})`;
+    }
+
+    toExactString() {
+        return `(${this.cartXExact},${this.cartYExact})`;
     }
 
     // Private constructor: access instances through get() or getCart().

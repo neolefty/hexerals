@@ -17,8 +17,8 @@ interface SpottedHexProps {
 export const centerX = (cartX: number): number => 45 * cartX + 30
 export const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
 export const SpottedHex = (props: SpottedHexProps) => {
-    const x: number = centerX(props.hex.cartX())
-    const y: number = centerY(props.viewBoxHeight, props.hex.cartY())
+    const x: number = centerX(props.hex.cartX)
+    const y: number = centerY(props.viewBoxHeight, props.hex.cartY)
     return (
         <FlatTopHex
             owner={props.spot.owner}
