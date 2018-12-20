@@ -31,7 +31,7 @@ export class StupidRobot implements Robot {
                 do {
                     result = result.push(new HexMove(pos, randomMove.delta))
                     pos = pos.plus(randomMove.delta)
-                } while(bs.board.inBounds(pos))
+                } while (bs.board.inBounds(pos))
                 return {
                     makeMoves: result
                 }
