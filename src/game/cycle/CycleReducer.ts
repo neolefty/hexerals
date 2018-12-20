@@ -11,6 +11,7 @@ import {pickNPlayers, Player, PlayerManager} from '../players/Players';
 import {List} from 'immutable';
 import Dimension from '../../common/Dimension';
 import {RandomArranger} from '../board/model/Arranger';
+import {StupidRobot} from '../players/StupidRobot';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
@@ -66,13 +67,20 @@ const openLocalGameReducer =
     const newBoard = Board.constructRectangular(
         w, h, players, RandomArranger.construct(players),
     );
+    // assign stupid AI to all non-humans
+    let pm: PlayerManager = PlayerManager.construct(players)
+    const stupid = new StupidRobot()
+    players.forEach((player: Player) => {
+        if (player !== Player.Zero) // human
+            pm = pm.setRobot(player, stupid)
+    })
     return {
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
         localGame: {
             board: newBoard,
             turn: 0,
-            players: new PlayerManager(players),
+            players: pm,
             cursor: HexCoord.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(),

@@ -1,4 +1,5 @@
-import {List, Map} from 'immutable';
+import {List, Map} from 'immutable'
+import {Robot} from './Robot'
 
 export enum Player {
     Nobody = 'Nobody',
@@ -28,44 +29,37 @@ export const PLAYERS: Map<number, Player> = Map([
     [8, Player.Eight],
     [9, Player.Nine],
     [10, Player.Ten],
-]);
+])
 
 export const pickNPlayers = (n: number): List<Player> => {
-    const result: List<Player> = List();
+    const result: List<Player> = List()
     return result.withMutations(m => {
         for (let i = 0; i < n; ++i)
-            m.push(PLAYERS.get(i));
-    });
-};
-
-function reverseMap<K, V>(map: Map<K, V>): Map<V, K> {
-    let result: Map<V, K> = Map();
-    result = result.asMutable();
-    map.forEach((v: V, k: K) => result.set(v, k));
-    return result.asImmutable();
+            m.push(PLAYERS.get(i))
+    })
 }
 
-export const PLAYER_INDEXES: Map<Player, number> = reverseMap(PLAYERS);
-export const PLAYABLE_PLAYERS = [
-    Player.Zero, Player.One, Player.Two, Player.Three, Player.Four];
-
 export class PlayerManager {
-    readonly playerIndexes: Map<Player, number>;
-
-    constructor(
-        readonly players: List<Player>
-    ) {
-        const pi: Map<Player, number> = Map();
-        this.playerIndexes = pi.withMutations(m =>
-            players.forEach((p, i) => m.set(p, i))
-        );
+    static construct(players: List<Player>) {
+        const pi: Map<Player, number> = Map()
+        const pr: Map<Player, Robot> = Map()
+        return new PlayerManager(
+            pi.withMutations(m =>
+                players.forEach((p, i) => m.set(p, i))
+            ),
+            pr
+        )
     }
 
-    public getPlayer(playerIndex: number): Player | undefined {
-        return this.players.get(playerIndex);
-    }
+    private constructor(
+        readonly playerIndexes: Map<Player, number>,
+        readonly playerRobots: Map<Player, Robot>,
+    ) {}
 
-    public getIndex(player: Player): number | undefined {
-        return this.playerIndexes.get(player);
+    setRobot(player: Player, robot: Robot): PlayerManager {
+        return new PlayerManager(
+            this.playerIndexes,
+            this.playerRobots.set(player, robot),
+        )
     }
 }

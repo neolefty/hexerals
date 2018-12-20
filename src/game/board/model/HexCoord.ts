@@ -74,6 +74,10 @@ export class HexCoord {
         return HexCoord.get(this.x + that.x, this.y + that.y, this.z + that.z);
     }
 
+    minus(that: HexCoord): HexCoord {
+        return HexCoord.get(this.x - that.x, this.y - that.y, this.z - that.z);
+    }
+
     times(n: number): HexCoord {
         return HexCoord.get(this.x * n, this.y * n, this.z * n);
     }

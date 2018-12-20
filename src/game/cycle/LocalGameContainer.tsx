@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 
 import {HexCoord} from '../board/model/HexCoord'
 import {
-    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction
+    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
 } from '../board/BoardReducer'
 import {AppState} from '../../common/App'
 import Dimension from '../../common/Dimension'
@@ -54,8 +54,11 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
     onPlaceCursor: (position: HexCoord) => dispatch(
         placeCursorAction(position)
     ),
-    onDoMoves: () => dispatch(doMovesAction()),
-    onStepPop: () => dispatch(stepPopAction()),
+    onStep: () => {
+        dispatch(robotsDecideAction())
+        dispatch(doMovesAction())
+        dispatch(stepPopAction())
+    }
 })
 
 export const LocalGameContainer = connect(

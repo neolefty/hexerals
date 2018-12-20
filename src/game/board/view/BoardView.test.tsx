@@ -52,7 +52,7 @@ it('renders a board with no selection', () => {
         turn: 0,
         cursor: HexCoord.NONE,
         moves: EMPTY_MOVEMENT_QUEUE,
-        players: new PlayerManager(board.players),
+        players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
         messages: List(),
     }
@@ -89,7 +89,7 @@ it('renders a board with a selection', () => {
         turn: 0,
         cursor: ur,
         moves: EMPTY_MOVEMENT_QUEUE,
-        players: new PlayerManager(board.players),
+        players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
         messages: List(),
     }

@@ -8,7 +8,8 @@ import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
 import {StatusMessage} from '../../common/StatusMessage'
 import {RandomArranger} from './model/Arranger';
-import {PlayerMove} from './model/Move';
+import {HexMove, PlayerMove} from './model/Move';
+import {GameDecision, Robot} from '../players/Robot';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -16,7 +17,7 @@ import {PlayerMove} from './model/Move';
 
 export type GameAction
     = NewGame | QueueMoves | PlaceCursor | SetPlayer
-        | DoMoves | CancelMoves | StepPop
+        | DoMoves | CancelMoves | StepPop | RobotsDecide
 
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
@@ -28,7 +29,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     ),
     turn: 0,
     cursor: HexCoord.NONE,
-    players: new PlayerManager(INITIAL_PLAYERS),
+    players: PlayerManager.construct(INITIAL_PLAYERS),
     curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
     messages: List([]),
@@ -51,6 +52,8 @@ export const BoardReducer = (
         state = stepPopReducer(state)
     else if (isSetPlayer(action))
         state = setPlayerReducer(state, action)
+    else if (isRobotsDecide(action))
+        state = robotsDecideReducer(state)
     return state
 }
 
@@ -226,3 +229,34 @@ const setPlayerReducer = (state: BoardState, action: SetPlayer): BoardState => (
     ...state,
     curPlayer: action.player,
 })
+
+// let robots make decisions
+const ROBOTS_DECIDE = 'ROBOTS_DECIDE'
+type ROBOTS_DECIDE = typeof ROBOTS_DECIDE
+interface RobotsDecide extends GenericAction { type: ROBOTS_DECIDE }
+const isRobotsDecide = (action: GameAction): action is RobotsDecide =>
+    action.type === ROBOTS_DECIDE
+export const robotsDecideAction = (): RobotsDecide => ({ type: ROBOTS_DECIDE })
+const robotsDecideReducer = (state: BoardState): BoardState => {
+    let result = state
+    state.players.playerRobots.forEach((robot: Robot, player: Player) => {
+        const decision: GameDecision | undefined = robot.decide(
+            player, state, state.moves.playerQueues.get(player)
+        )
+        if (decision && decision.cancelMoves)
+            result = cancelMoveReducer(
+                result,
+                cancelMovesAction(player, decision.cancelMoves)
+            )
+        if (decision && decision.makeMoves)
+            result = queueMovesReducer(
+                result,
+                queueMovesAction(
+                    List(decision.makeMoves.map((hex: HexMove) =>
+                        PlayerMove.construct(player, hex.source, hex.delta)
+                    ))
+                )
+            )
+    })
+    return result
+}

@@ -5,16 +5,13 @@ import {BoardViewProps} from './BoardViewBase';
 
 export interface TickerBoardViewProps extends BoardViewProps {
     tickMillis: number,
-    onDoMoves: () => void,
-    onStepPop: () => void,
+    onStep: () => void,
 }
 
 export const TickerBoardView = (props: TickerBoardViewProps) => (
     <Ticker
         tick={() => {
-            props.onDoMoves()
-            // TODO test that step pop comes after do moves
-            props.onStepPop()
+            props.onStep()
         }}
         tickMillis={props.tickMillis}
     >
