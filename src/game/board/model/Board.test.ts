@@ -36,43 +36,43 @@ export function printBoard(board: Board) {
 it('checks rectangular board geometry', () => {
     const arr = new TwoCornersArranger()
     const twoPlayers = pickNPlayers(2)
-    expect(Board.constructSquare(5, twoPlayers, arr).constraints.all().size)
+    expect(Board.constructRectangular(9, 3, twoPlayers, arr).constraints.all().size)
         .toBe(5 * 3 + 4 * 2)
 
-    expect(Board.constructRectangular(10, 20, twoPlayers, arr).constraints.all().size)
+    expect(Board.constructRectangular(19, 10.5, twoPlayers, arr).constraints.all().size)
         .toBe(10 * 10 + 10 * 9)
-    const fiveByFour = Board.constructRectangular(5, 4, twoPlayers, arr)
+    const nineByTwalf = Board.constructRectangular(9, 2.5, twoPlayers, arr)
     // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
     // _ - _ - _ - _ - _
-    expect(fiveByFour.constraints.extreme(x => x.cartX).cartX).toBe(0)  // left 0
-    expect(fiveByFour.constraints.extreme(x => x.cartY).cartY).toBe(0)  // top 0
-    expect(fiveByFour.constraints.extreme(x => - x.cartX).cartX).toBe(8)  // right 8
-    expect(fiveByFour.constraints.extreme(x => - x.cartY).cartY).toBe(3)  // bottom 3
-    expect(fiveByFour.constraints.extreme(
+    expect(nineByTwalf.constraints.extreme(x => x.cartX).cartX).toBe(0)  // left 0
+    expect(nineByTwalf.constraints.extreme(x => x.cartY).cartY).toBe(0)  // top 0
+    expect(nineByTwalf.constraints.extreme(x => - x.cartX).cartX).toBe(8)  // right 8
+    expect(nineByTwalf.constraints.extreme(x => - x.cartY).cartY).toBe(3)  // bottom 3
+    expect(nineByTwalf.constraints.extreme(
         // cartY is first digit, cartX is second digit
         x => x.cartX + 10 * x.cartY, BoardConstraints.GT
-    )).toBe(HexCoord.getCart(7, 3)) // bottom right
+    ) === HexCoord.getCart(7, 3)).toBeTruthy() // bottom right
 
-    expect(fiveByFour.edges.width).toEqual(9)
-    expect(fiveByFour.edges.height).toEqual(4)
-    expect(fiveByFour.edges.xRange().count()).toEqual(9)
-    expect(List<number>(fiveByFour.edges.xRange()))
+    expect(nineByTwalf.edges.width).toEqual(9)
+    expect(nineByTwalf.edges.height).toEqual(4)
+    expect(nineByTwalf.edges.xRange().count()).toEqual(9)
+    expect(List<number>(nineByTwalf.edges.xRange()))
         .toEqual(List<number>([0, 1, 2, 3, 4, 5, 6, 7, 8]))
-    expect(List<number>(fiveByFour.edges.yRange()))
+    expect(List<number>(nineByTwalf.edges.yRange()))
         .toEqual(List<number>([0, 1, 2, 3]))
 
     // for some reason, these both cause a stack overflow:
-    // expect(upperLeft).toBe(HexCoord.ORIGIN)
+    // expect(upperLeft === HexCoord.ORIGIN).toBeTruthy()
     // expect(upperLeft).toEqual(HexCoord.ORIGIN)
-    expect(fiveByFour.edges.upperLeft === HexCoord.ORIGIN).toBeFalsy()
-    expect(fiveByFour.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
-    expect(fiveByFour.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
-    expect(fiveByFour.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
-    expect(fiveByFour.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
-    // expect(fiveByFour.edges.upperLeft).toBe(HexCoord.getCart(1, 3))
-    // expect(fiveByFour.edges.upperRight).toBe(HexCoord.getCart(7, 3))
-    // expect(fiveByFour.edges.lowerRight).toBe(HexCoord.getCart(8, 0))
-    // expect(fiveByFour.edges.lowerLeft).toBe(HexCoord.ORIGIN)
+    expect(nineByTwalf.edges.upperLeft === HexCoord.ORIGIN).toBeFalsy()
+    expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
+    expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
+    expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
+    expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
+    // expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
+    // expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
+    // expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
+    // expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
 })
 
 it('converts between hex and cartesian coords', () => {
@@ -95,33 +95,33 @@ it('converts between hex and cartesian coords', () => {
 
     const midHex = HexCoord.getCart(6, 2)
     expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
-    // expect(midHex).toBe(HexCoord.get(6, -2, -4))
-    expect(tenByFive.getCartSpot(6, 2)).toBe(Spot.BLANK)
+    // expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
+    expect(tenByFive.getCartSpot(6, 2) === Spot.BLANK).toBeTruthy()
 })
 
 it('navigates around a board', () => {
-    const sixByTen = Board.constructRectangular(
-        6, 10, pickNPlayers(2), new TwoCornersArranger(20))
-    expect(sixByTen.inBounds(HexCoord.ORIGIN)).toBeTruthy()
-    expect(sixByTen.constraints.all().contains(HexCoord.ORIGIN)).toBeTruthy()
-    expect(sixByTen.inBounds(HexCoord.NONE)).toBeFalsy()
-    expect(sixByTen.constraints.all().contains(HexCoord.NONE)).toBeFalsy()
+    const elevenByFalf = Board.constructRectangular(
+        11, 5.5, pickNPlayers(2), new TwoCornersArranger(20))
+    expect(elevenByFalf.inBounds(HexCoord.ORIGIN)).toBeTruthy()
+    expect(elevenByFalf.constraints.all().contains(HexCoord.ORIGIN)).toBeTruthy()
+    expect(elevenByFalf.inBounds(HexCoord.NONE)).toBeFalsy()
+    expect(elevenByFalf.constraints.all().contains(HexCoord.NONE)).toBeFalsy()
 
     // staggered walk from origin to the right edge
     let c = HexCoord.ORIGIN
-    while (sixByTen.inBounds(c.getRightUp().getRightDown())) {
+    while (elevenByFalf.inBounds(c.getRightUp().getRightDown())) {
         c = c.getRightUp().getRightDown()
-        expect(sixByTen.constraints.all().contains(c))
+        expect(elevenByFalf.constraints.all().contains(c))
     }
-    expect(c === sixByTen.edges.lowerRight).toBeTruthy()
-    assert(c === sixByTen.edges.lowerRight)
-    expect(c).toEqual(sixByTen.edges.lowerRight)
-    expect(c).toBe(sixByTen.edges.lowerRight)
+    expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
+    assert(c === elevenByFalf.edges.lowerRight)
+    expect(c).toEqual(elevenByFalf.edges.lowerRight)
+    expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
     expect(c.x).toBe(10)
 
     expect(
         HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
-    ).toBe(HexCoord.getCart(1, 3))
+     === HexCoord.getCart(1, 3)).toBeTruthy()
     // This causes a stack overflow in V8, where === does not. Why?
     // See jest source code -- packages/expect/matchers.js and
     // possibly packages/jest-matcher-utils/src. Could stringification be
@@ -129,7 +129,8 @@ it('navigates around a board', () => {
     // Or is it something else (probably)?
     // expect(
     //     HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
-    // ).toBe(HexCoord.getCart(1, 5))
+    //     === HexCoord.getCart(1, 5)
+    // ).toBeTruthy()
 })
 
 it('validates moves', () => {

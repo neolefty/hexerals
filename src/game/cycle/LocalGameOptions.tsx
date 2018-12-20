@@ -27,19 +27,14 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
         <IntInput
             label="Players"
             value={props.numPlayers}
+            title="How many players? One will be you, and the others very stupid AIs."
             min={1}
             max={10}
             onChange={x => props.changeNumPlayers(x)}
         />
         <IntInput
-            label="Tick"
-            value={props.tickMillis}
-            min={1}
-            max={4000}
-            onChange={x => props.changeTickMillis(x)}
-        />
-        <IntInput
             label="Width"
+            title="How many hexes across?"
             value={props.boardSize.w}
             min={3}
             max={13}
@@ -49,12 +44,21 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
         />
         <IntInput
             label="Height"
+            title="How many hexes tall?"
             value={props.boardSize.h}
             min={3}
             max={25}
             onChange={
                 h => props.changeBoardSize(new Dimension(props.boardSize.w, h))
             }
+        />
+        <IntInput
+            label="Tick"
+            title="Milliseconds between turns."
+            value={props.tickMillis}
+            min={1}
+            max={4000}
+            onChange={x => props.changeTickMillis(x)}
         />
         <button
             onClick={props.newGame}
@@ -66,6 +70,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => (
 
 interface IntInputProps {
     label: string;
+    title: string;
     value: number;
     onChange: (x: number) => void;
     min: number;
@@ -75,6 +80,7 @@ interface IntInputProps {
 const IntInput = (props: IntInputProps) => (
     <label
         className="IntInput"
+        title={props.title}
     >
         {props.label}
         <input

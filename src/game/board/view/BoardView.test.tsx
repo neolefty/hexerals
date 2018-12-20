@@ -45,8 +45,8 @@ it('renders a spot', () => {
 // TODO write test of HexBoardView
 it('renders a board with no selection', () => {
     const n = 3 // ++* / ++ / *++
-    const board = Board.constructSquare(
-        n, pickNPlayers(2), new TwoCornersArranger(3))
+    const board = Board.constructRectangular(
+        5, 2, pickNPlayers(2), new TwoCornersArranger(3))
     const boardState: BoardState = {
         board: board,
         turn: 0,
@@ -280,32 +280,32 @@ it('queues multiple moves at once', () => {
 
 it('blocks illegal moves', () => {
     const st = new StoreTester()
-    expect(st.cursor).toBe(HexCoord.NONE)
+    expect(st.cursor === HexCoord.NONE).toBeTruthy()
     expect(st.cursorRawSpot).toBeUndefined()
 
     // try to move when there's no cursor -- should have no effect
     const boardBefore = st.board
     expect(st.moves.size).toEqual(0)
     st.queueMoveDown(false)
-    expect(st.cursor).toBe(HexCoord.NONE)
+    expect(st.cursor === HexCoord.NONE).toBeTruthy()
     expect(st.moves.size).toEqual(0)
 
     // trying to move the cursor relative to a nonexistent cursor should have no effect
     st.queueMoveDown(true)
-    expect(st.cursor).toBe(HexCoord.NONE)
-    expect(boardBefore).toBe(st.board)  // no moves executed
+    expect(st.cursor === HexCoord.NONE).toBeTruthy()
+    expect(boardBefore === st.board).toBeTruthy()  // no moves executed
     st.doMoves() // still no legit moves requested, so no effective moves
-    expect(st.cursor).toBe(HexCoord.NONE)
+    expect(st.cursor === HexCoord.NONE).toBeTruthy()
     expect(st.moves.size).toEqual(0)
 
     // through all this, the board should be unchanged
     expect(boardBefore === st.board).toBeTruthy()
     // this was causing memory errors for some reason but is working now?
-    expect(boardBefore).toBe(st.board)  // no effect on board
+    expect(boardBefore === st.board).toBeTruthy()  // no effect on board
 
     // place cursor outside bounds -- no effect
     st.placeCursor(HexCoord.LEFT_UP)
-    expect(st.cursor).toBe(HexCoord.NONE)
+    expect(st.cursor === HexCoord.NONE).toBeTruthy()
 })
 
 // it('moves the cursor', () => {
@@ -313,7 +313,7 @@ it('blocks illegal moves', () => {
 //     const ul = st.board.edges.upperLeft
 //     st.placeCursor(ul)
 //     st.queueMoveDown()
-//     expect(st.cursor).toBe(ul.getDown())
+//     expect(st.cursor === ul.getDown()).toBeTruthy()
 //     expect(st.cursorRawSpot).toBeUndefined()
 // })
 
@@ -332,27 +332,27 @@ it('cancels moves', () => {
     st.queueMoveUp()
     expect(st.moves.size).toBe(4)
     const up2 = st.ll.plus(HexCoord.UP).plus(HexCoord.UP)
-    expect(st.cursor).toBe(up2)
+    expect(st.cursor === up2).toBeTruthy()
 
     // cancel a move and expect the cursor to retreat
     st.cancelMoves()
     expect(st.moves.playerHasMove(Player.Zero)).toBeTruthy()
-    expect(st.cursor).toBe(st.ll.plus(HexCoord.UP))
+    expect(st.cursor === st.ll.plus(HexCoord.UP)).toBeTruthy()
     expect(st.moves.size).toBe(3)
 
     // now cancel one of the other player's moves -- away from the cursor
     st.cancelMoves(Player.One)
     expect(st.moves.playerQueues.get(Player.One).size).toBe(1)
-    expect(st.cursor).toBe(st.ll.plus(HexCoord.UP))
+    expect(st.cursor === st.ll.plus(HexCoord.UP)).toBeTruthy()
     expect(st.moves.size).toBe(2)
 
     // cancel the current player's remaining move
     st.cancelMoves()
-    expect(st.cursor).toBe(st.ll)
+    expect(st.cursor === st.ll).toBeTruthy()
     expect(st.moves.playerHasMove(Player.Zero)).toBeFalsy()
     expect(st.moves.size).toBe(1)
 
-    expect(st.state.board).toBe(boardBefore)
+    expect(st.state.board === boardBefore).toBeTruthy()
     st.setPlayer(Player.One)
     st.cancelMoves()
     expect(st.moves.size).toBe(0)
@@ -361,7 +361,7 @@ it('cancels moves', () => {
 
     // check we're avoiding unnecessary mutation
     st.doMoves()
-    expect(st.state.board).toBe(boardBefore)
+    expect(st.state.board === boardBefore).toBeTruthy()
 
     // cancel multiple moves
     st.setPlayer(Player.Zero)
@@ -371,10 +371,10 @@ it('cancels moves', () => {
     expect(st.moves.size).toBe(7)
     st.cancelMoves(Player.Zero, 5)
     expect(st.moves.size).toBe(2)
-    expect(st.cursor).toBe(up2)
+    expect(st.cursor === up2).toBeTruthy()
     st.cancelMoves(Player.Zero, -1)
     expect(st.moves.size).toBe(0)
-    expect(st.cursor).toBe(st.ll)
+    expect(st.cursor === st.ll).toBeTruthy()
 })
 
 it('makes real moves', () => {
@@ -383,40 +383,40 @@ it('makes real moves', () => {
     // place cursor at upper right
     const boardBefore = st.board
     st.placeCursor(st.ur)
-    expect(st.cursor).toBe(st.ur)
+    expect(st.cursor === st.ur).toBeTruthy()
     expect(st.getRawSpot(st.ur.getDown())).toBeUndefined()
 
     st.queueMoveDown()
     expect(st.moves.size).toBe(0) // no current player yet
     st.setPlayer(Player.One) // cursor is on One's starting point, UR corner
     st.queueMoveDown()
-    expect(st.cursor).toBe(st.ur.plus(HexCoord.DOWN))
+    expect(st.cursor === st.ur.plus(HexCoord.DOWN)).toBeTruthy()
     expect(st.moves.size).toBe(1)
 
     // interlude: queue and cancel a move UP
     st.queueMove(Player.One, HexCoord.UP)
     expect(st.moves.size).toBe(2)
-    expect(st.cursor).toBe(st.ur)
+    expect(st.cursor === st.ur).toBeTruthy()
     st.cancelMoves(Player.One)
     expect(st.moves.size).toBe(1)
     // cancel moved the cursor back intelligently
-    expect(st.cursor).toBe(st.ur.plus(HexCoord.DOWN))
+    expect(st.cursor === st.ur.plus(HexCoord.DOWN)).toBeTruthy()
 
     // also check that cancelling doesn't move the cursor back stupidly
     st.queueMove(Player.One, HexCoord.UP)
     st.placeCursor(st.ul)
     st.cancelMoves(Player.One)
     expect(st.moves.size).toBe(1)
-    expect(st.cursor).toBe(st.ul)
+    expect(st.cursor === st.ul).toBeTruthy()
     st.placeCursor(st.ur.plus(HexCoord.DOWN)) // back where we should be
 
-    expect(boardBefore).toBe(st.board) // only queued -- no board updates yet
+    expect(boardBefore === st.board).toBeTruthy() // only queued -- no board updates yet
     // console.log(`-- queued --\n${boardStateToString(st.state)}`)
     st.doMoves()
     const boardAfter1 = st.board
     // console.log(`-- moved --\n${boardStateToString(st.state)}`)
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
-    expect(st.cursor).toBe(st.ur.getDown())
+    expect(st.cursor === st.ur.getDown()).toBeTruthy()
     expect(st.cursorRawSpot).toEqual(new Spot(Player.One, INITIAL_POP - 1))
 
     // can't move more than 1 space at a time (can't jump)
@@ -430,11 +430,11 @@ it('makes real moves', () => {
     // TODO use constants in tags
     expect(st.messages.get(0).tag).toEqual('illegal move')
     // no change occurred due to rejected move
-    expect(st.board).toBe(boardAfter1)
+    expect(st.board === boardAfter1).toBeTruthy()
     // expect(st.board === boardAfter1).toBeTruthy()
     // but we DID move the cursor
     const down3 = st.ur.getDown().plus(down2)
-    expect(st.cursor).toBe(down3)
+    expect(st.cursor === down3).toBeTruthy()
 
     // TODO queue from queued-to spot
 
@@ -460,17 +460,17 @@ it('makes real moves', () => {
     expect(downFromUR(1)).toEqual(human1)
     expect(downFromUR(2)).toEqual(new Spot(Player.One, INITIAL_POP-2))
     expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0))
-    expect(downFromUR(3)).toBe(Spot.BLANK)
+    expect(downFromUR(3) === Spot.BLANK).toBeTruthy()
 
     // moving contents 1 has no effect
     st.placeCursor(st.ur.getDown())
-    expect(st.cursorSpot.owner).toBe(Player.One)
+    expect(st.cursorSpot.owner === Player.One).toBeTruthy()
     const before2 = st.board
     st.queueMoveDown(false)
     st.doMoves()
     expect(st.getSpot(st.ur.getDown()).pop).toEqual(1)
     // move had no effect, so board not updated
-    expect(st.board).toBe(before2)
+    expect(st.board === before2).toBeTruthy()
 
     // TODO test that you can't move someone else's stuff?
     // TODO test that multiple players' queued moves all work simultaneously

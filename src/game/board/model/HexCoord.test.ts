@@ -2,21 +2,21 @@ import {RectangularConstraints} from './Constraints'
 import {HexCoord} from './HexCoord'
 
 it('checks hex neighbors', () => {
-    expect(HexCoord.ORIGIN.getRightDown()).toBe(HexCoord.RIGHT_DOWN)
-    expect(HexCoord.ORIGIN.getUp()).toBe(HexCoord.UP)
+    expect(HexCoord.ORIGIN.getRightDown() === HexCoord.RIGHT_DOWN).toBeTruthy()
+    expect(HexCoord.ORIGIN.getUp() === HexCoord.UP).toBeTruthy()
 
     function checkHexNeighbors(c: HexCoord) {
-        expect(c.getRightUp()).toBe(c.plus(HexCoord.RIGHT_UP))
-        expect(c.getRightDown()).toBe(c.plus(HexCoord.RIGHT_DOWN))
-        expect(c.getDown()).toBe(c.plus(HexCoord.DOWN))
-        expect(c.getLeftDown()).toBe(c.plus(HexCoord.LEFT_DOWN))
-        expect(c.getLeftUp()).toBe(c.plus(HexCoord.LEFT_UP))
-        expect(c.getUp()).toBe(c.plus(HexCoord.UP))
+        expect(c.getRightUp() === c.plus(HexCoord.RIGHT_UP)).toBeTruthy()
+        expect(c.getRightDown() === c.plus(HexCoord.RIGHT_DOWN)).toBeTruthy()
+        expect(c.getDown() === c.plus(HexCoord.DOWN)).toBeTruthy()
+        expect(c.getLeftDown() === c.plus(HexCoord.LEFT_DOWN)).toBeTruthy()
+        expect(c.getLeftUp() === c.plus(HexCoord.LEFT_UP)).toBeTruthy()
+        expect(c.getUp() === c.plus(HexCoord.UP)).toBeTruthy()
 
-        expect(c.getRightDown().getUp().getLeftDown()).toBe(c) // triangle
-        expect(c.getLeftUp().getDown().getRightUp()).toBe(c) // triangle
+        expect(c.getRightDown().getUp().getLeftDown() === c).toBeTruthy() // triangle
+        expect(c.getLeftUp().getDown().getRightUp() === c).toBeTruthy() // triangle
         expect(c.getLeftUp().getLeftDown().getDown()
-            .getRightDown().getRightUp().getUp()).toBe(c) // hexagon loop
+            .getRightDown().getRightUp().getUp() === c).toBeTruthy() // hexagon loop
 
         expect(c.getUp().cartY).toBe(c.cartY + 2)
         expect(c.getUp().cartX).toBe(c.cartX)
@@ -28,7 +28,8 @@ it('checks hex neighbors', () => {
     checkHexNeighbors(HexCoord.ORIGIN)
     checkHexNeighbors(HexCoord.ORIGIN.getDown())
     checkHexNeighbors(HexCoord.ORIGIN.getRightUp())
-    expect(HexCoord.NONE.getRightUp()).toBe(HexCoord.NONE) // true, but is it what we want?
+    // true, but is this what we want?
+    expect(HexCoord.NONE.getRightUp() === HexCoord.NONE).toBeTruthy()
 
     function r() { return Math.floor(Math.random() * 20) } // 0 - 19
     for (let i = 0; i < 20; ++i) {

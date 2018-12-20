@@ -145,18 +145,13 @@ export class RectangularConstraints extends BoardConstraints {
         const x = coord.cartX
         const y = coord.cartY
         return (
-            // vertical: height of 3 means y = { 0, 1, 2 }
-            y >= 0 && y < this.h
-            // horizontal: make right edge same shape as left edge. E.g. 5x5 would be:
-            //   * * * * *
-            //    * * * *
-            //   * * * * *
-            //    * * * *
-            //   * * * * *
-            // - _ - _ - _ - _ -
-            // - _ - _ - _ - _ -
-            // -    -   -    -    -
-            && x >= 0 && x < this.w * 2 - 1
+            // 5x5 means cartesian coords 5 x 9:
+            // - _ - _ -
+            // - _ - _ -
+            // - _ - _ -
+            // - _ - _ -
+            // -    -   -
+            y >= 0 && y < this.h * 2 - 1 && x >= 0 && x < this.w
         )
     }
 
