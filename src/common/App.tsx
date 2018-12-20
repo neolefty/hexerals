@@ -58,7 +58,7 @@ class App extends React.Component<AppProps, AppState> {
             <div className="App">
                 <Tabs>
                     <TabList>
-                        <Tab>Game</Tab>
+                        <Tab>Practice</Tab>
                         <Tab>Colors</Tab>
                         <Tab>Controls</Tab>
                     </TabList>

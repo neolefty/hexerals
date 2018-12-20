@@ -38,7 +38,7 @@ const dirs = Map<HexCoord, SpotAndText>([
 ])
 
 export const Help = (props: HelpOptions) => {
-    const d = Math.min(props.displaySize.w - 50, props.displaySize.h - 100)
+    const d = Math.min(props.displaySize.w - 50, props.displaySize.h - 120)
     return (
         <div
             className="Help"
@@ -78,6 +78,7 @@ export const Help = (props: HelpOptions) => {
             </svg>
             <p>z — cancel 1 move</p>
             <p>x — cancel all moves</p>
+            <p>esc — end game</p>
         </div>
     )
 }
