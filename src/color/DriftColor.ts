@@ -8,13 +8,14 @@ export class DriftColor {
     static readonly MAX_BRIGHT = 80
     static readonly SPAN_BRIGHT = DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT
     static readonly RECIP_BRIGHT = 1 / DriftColor.SPAN_BRIGHT
-    static readonly MID_BRIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2
+    static readonly MID_LIGHT = (DriftColor.MIN_BRIGHT + DriftColor.MAX_BRIGHT) / 2
     static readonly MIN_SAT = 60
     static readonly MAX_SAT = 100
     static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT
     // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2
 
     static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
+    static readonly GREY_10: DriftColor = new DriftColor(CieColor.GREY_10);
     static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
     static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
     static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
@@ -91,7 +92,7 @@ export class DriftColor {
                 new CieColor([
                     this.cie.hsl[0] + 180,
                     DriftColor.MAX_SAT,
-                    this.cie.hsl[2] > DriftColor.MID_BRIGHT
+                    this.cie.hsl[2] > DriftColor.MID_LIGHT
                         ? DriftColor.MIN_BRIGHT
                         : DriftColor.MAX_BRIGHT,
                 ]),
@@ -115,7 +116,7 @@ export class DriftColor {
             //   - 75-100 -- darker (too bright to get brighter)
             const darker: boolean = (
                 this.lightness > TEXTURE_VALUE_DIFF - 5
-                && this.lightness < DriftColor.MID_BRIGHT
+                && this.lightness < DriftColor.MID_LIGHT
             ) || this.lightness > (95 - TEXTURE_VALUE_DIFF)
             this._texture = new DriftColor(
                 new CieColor([

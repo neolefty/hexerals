@@ -10,9 +10,7 @@ export interface CycleViewProps extends CycleState {
 
     onOpenLocalGame: () => void
     onCloseGame: () => void
-    onChangeNumPlayers: (n: number) => void
-    onChangeTickMillis: (ms: number) => void
-    onChangeBoardSize: (d: Dimension) => void
+    onChangeLocalOption: (name: string, n: number) => void
 }
 
 export const CycleView = (props: CycleViewProps) => {
@@ -32,15 +30,10 @@ export const CycleView = (props: CycleViewProps) => {
         case CycleMode.NOT_IN_GAME:
             return (
                 <LocalGameOptionsView
-                    numPlayers={props.localOptions.numPlayers}
-                    tickMillis={props.localOptions.tickMillis}
-                    boardSize={props.localOptions.boardSize}
+                    localOptions={props.localOptions}
                     displaySize={props.displaySize}
-
                     newGame={props.onOpenLocalGame}
-                    changeNumPlayers={props.onChangeNumPlayers}
-                    changeTickMillis={props.onChangeTickMillis}
-                    changeBoardSize={props.onChangeBoardSize}
+                    changeLocalOption={props.onChangeLocalOption}
                 />
             )
         default:

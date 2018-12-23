@@ -30,11 +30,11 @@ export class BoardKeyboardController {
         if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
             if (delta !== HexCoord.NONE) {
-                this.view.props.onQueueMoves(
-                    List([
-                        PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
-                    ])
-                )
+                const move = PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
+                this.view.props.onQueueMoves(List([move]))
+                // TODO don't move into known mountains but move right through unknown ones
+                // TODO differentiate between known & unknown mountains — add question mark to unknown, like generals does
+                // if (this.view.props.boardState.board.validate(move))
                 this.view.props.onPlaceCursor(bs.cursor.plus(delta))
                 e.preventDefault()
                 return

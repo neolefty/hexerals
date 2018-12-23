@@ -1,31 +1,33 @@
 // the meta-game
 import {CycleMode} from './CycleState'
 import {Board} from '../board/model/Board'
-import {INITIAL_DIMENSION} from '../board/BoardConstants'
 import {GenericAction} from '../../common/App'
 import {HexCoord} from '../board/model/HexCoord'
-import {GameAction, BoardReducer} from '../board/BoardReducer'
+import {GameAction, BoardReducer} from '../board/model/BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from '../board/model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
-import Dimension from '../../common/Dimension'
-import {RandomArranger} from '../board/model/Arranger'
+import {MountainArranger, RandomPlayerArranger} from '../board/model/Arranger'
 import {StupidRobot} from '../players/StupidRobot'
+import * as assert from 'assert';
+import {isNumber} from 'util';
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
-        numPlayers: 4,
+        numPlayers: 6,
         tickMillis: 500,
-        boardSize: INITIAL_DIMENSION,
+        boardWidth: 11,
+        boardHeight: 7,
+        mountainPercent: 10,
     },
     localGame: undefined,
 }
 
 export type CycleAction = GameAction
     | OpenLocalGame | CloseGame
-    | ChangeNumPlayers | ChangeTickMillis | ChangeBoardSize
+    | ChangeLocalOption
 
 export const CycleReducer =
     (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
@@ -34,12 +36,8 @@ export const CycleReducer =
         return openLocalGameReducer(state, action)
     else if (isCloseGame(action))
         return closeGameReducer(state, action)
-    else if (isChangeNumPlayers(action))
-        return changeNumPlayersReducer(state, action)
-    else if (isChangeTickMillis(action))
-        return changeTickMillisReducer(state, action)
-    else if (isChangeBoardSize(action))
-        return changeBoardSizeReducer(state, action)
+    else if (isChangeLocalOption(action))
+        return changeLocalOptionReducer(state, action)
     else { // must be a GameAction, by process of elimination
         const newLocalGame = BoardReducer(state.localGame, action)
         if (newLocalGame === state.localGame)
@@ -62,10 +60,16 @@ export const openLocalGameAction = (): OpenLocalGame =>
 const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
-    const [w, h] = state.localOptions.boardSize.wh
     const players = pickNPlayers(state.localOptions.numPlayers)
+    const mountainFrequency = state.localOptions.mountainPercent / 100
     const newBoard = Board.constructRectangular(
-        w, h, players, RandomArranger.construct(players),
+        state.localOptions.boardWidth,
+        state.localOptions.boardHeight,
+        players,
+        [
+            new RandomPlayerArranger(),
+            new MountainArranger(mountainFrequency),
+        ],
     )
     // assign stupid AI to all non-humans
     let pm: PlayerManager = PlayerManager.construct(players)
@@ -103,65 +107,32 @@ const closeGameReducer =
         localGame: undefined,
     })
 
-const CHANGE_NUM_PLAYERS = 'CHANGE_NUM_PLAYERS'
-type CHANGE_NUM_PLAYERS = typeof CHANGE_NUM_PLAYERS
-interface ChangeNumPlayers extends GenericAction {
-    type: CHANGE_NUM_PLAYERS
-    numPlayers: number
+const CHANGE_LOCAL_OPTION = 'CHANGE_LOCAL_OPTION'
+type CHANGE_LOCAL_OPTION = typeof CHANGE_LOCAL_OPTION
+interface ChangeLocalOption extends GenericAction {
+    type: CHANGE_LOCAL_OPTION
+    name: string
+    n: number  // TODO add string field
 }
-const isChangeNumPlayers = (action: CycleAction): action is ChangeNumPlayers =>
-    action.type === CHANGE_NUM_PLAYERS
-export const changeNumPlayersAction = (n: number): ChangeNumPlayers => ({
-    type: CHANGE_NUM_PLAYERS,
-    numPlayers: n,
+const isChangeLocalOption = (action: CycleAction): action is ChangeLocalOption =>
+    action.type === CHANGE_LOCAL_OPTION
+// TODO split into changeLocalOptionNumberAction and changeLocalOptionStringAction if necessary
+export const changeLocalOptionAction = (
+    name: string, n: number
+): ChangeLocalOption => ({
+    type: CHANGE_LOCAL_OPTION,
+    name: name,
+    n: n,
 })
-const changeNumPlayersReducer =
-    (state: CycleState, action: ChangeNumPlayers): CycleState => ({
+const changeLocalOptionReducer = (
+    state: CycleState, action: ChangeLocalOption
+): CycleState => {
+    const result = {...state.localOptions}
+    assert(result.hasOwnProperty(action.name))
+    assert(isNumber(result[action.name]))
+    result[action.name] = action.n
+    return {
         ...state,
-        localOptions: {
-            ...state.localOptions,
-            numPlayers: action.numPlayers,
-        }
-    })
-
-const CHANGE_TICK_MILLIS = 'CHANGE_TICK_MILLIS'
-type CHANGE_TICK_MILLIS = typeof CHANGE_TICK_MILLIS
-interface ChangeTickMillis extends GenericAction {
-    type: CHANGE_TICK_MILLIS
-    ms: number
+        localOptions: result,
+    }
 }
-const isChangeTickMillis = (action: CycleAction): action is ChangeTickMillis =>
-    action.type === CHANGE_TICK_MILLIS
-export const changeTickMillisAction = (ms: number): ChangeTickMillis => ({
-    type: CHANGE_TICK_MILLIS,
-    ms: ms,
-})
-const changeTickMillisReducer =
-    (state: CycleState, action: ChangeTickMillis): CycleState => ({
-        ...state,
-        localOptions: {
-            ...state.localOptions,
-            tickMillis: action.ms,
-        }
-    })
-
-const CHANGE_BOARD_SIZE = 'CHANGE_BOARD_SIZE'
-type CHANGE_BOARD_SIZE = typeof CHANGE_BOARD_SIZE
-interface ChangeBoardSize extends GenericAction {
-    type: CHANGE_BOARD_SIZE
-    d: Dimension
-}
-const isChangeBoardSize = (action: CycleAction): action is ChangeBoardSize =>
-    action.type === CHANGE_BOARD_SIZE
-export const changeBoardSizeAction = (d: Dimension): ChangeBoardSize => ({
-    type: CHANGE_BOARD_SIZE,
-    d: d,
-})
-const changeBoardSizeReducer =
-    (state: CycleState, action: ChangeBoardSize): CycleState => ({
-        ...state,
-        localOptions: {
-            ...state.localOptions,
-            boardSize: action.d,
-        }
-    })

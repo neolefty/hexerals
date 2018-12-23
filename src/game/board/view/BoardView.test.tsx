@@ -8,28 +8,25 @@ import {shallow} from 'enzyme'
 import {
     BoardReducer, queueMovesAction, newGameAction, placeCursorAction,
     doMovesAction, setPlayerAction, cancelMovesAction,
-} from '../BoardReducer'
+} from '../model/BoardReducer'
 import {Board} from '../model/Board'
 import {HexCoord} from '../model/HexCoord'
 import Dimension from "../../../common/Dimension"
 import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
-import {INITIAL_HEIGHT, INITIAL_WIDTH} from '../BoardConstants'
 import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
 import {
     EMPTY_MOVEMENT_QUEUE, MovementQueue, QueueAndMoves
 } from '../model/MovementQueue'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {TwoCornersArranger} from '../model/Arranger';
 import {Spot, Terrain} from '../model/Spot';
 import {PlayerMove} from '../model/Move';
-
-const INITIAL_POP = 50
+import {CornersPlayerArranger} from '../model/Arranger';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()})
     const board = Board.constructSquare(
-        3, pickNPlayers(2), new TwoCornersArranger(5)
+        3, pickNPlayers(2), [new CornersPlayerArranger(5)]
     )
     const view = enzyme.render(
         <OldGridSpotView
@@ -46,7 +43,7 @@ it('renders a spot', () => {
 it('renders a board with no selection', () => {
     const n = 3 // ++* / ++ / *++
     const board = Board.constructRectangular(
-        5, 2, pickNPlayers(2), new TwoCornersArranger(3))
+        5, 2, pickNPlayers(2), [new CornersPlayerArranger(3)])
     const boardState: BoardState = {
         board: board,
         turn: 0,
@@ -82,7 +79,7 @@ it('renders a board with no selection', () => {
 it('renders a board with a selection', () => {
     // select lower-right corner
     const board = Board.constructSquare(
-        3, pickNPlayers(2), new TwoCornersArranger(2))
+        3, pickNPlayers(2), [new CornersPlayerArranger(2)])
     const ur = board.edges.upperRight
     const bs: BoardState = {
         board: board,
@@ -110,7 +107,7 @@ it('renders a board with a selection', () => {
 
 it('clicks a spot to select it', () => {
     const board = Board.constructSquare(
-        3, pickNPlayers(2), new TwoCornersArranger(6))
+        3, pickNPlayers(2), [new CornersPlayerArranger(6)])
     const coord = board.constraints.extreme(c => - c.cartX - c.cartY)
     const spot = board.getSpot(coord)
     const state = {
@@ -136,14 +133,20 @@ it('clicks a spot to select it', () => {
 
 // helper class for react-redux testing
 class StoreTester {
+    static readonly INITIAL_POP = 50
+    static readonly INITIAL_WIDTH = 11
+    static readonly INITIAL_HEIGHT = 7
     readonly store: Store<BoardState>
-    constructor(width = INITIAL_WIDTH, height = INITIAL_HEIGHT) {
+    constructor(
+        width = StoreTester.INITIAL_WIDTH,
+        height = StoreTester.INITIAL_HEIGHT,
+    ) {
         this.store = createStore<BoardState>(BoardReducer)
         // console.log(`before: board ${store.getState().board} game.board ${store.getState().board.spots.size}`)
         this.store.dispatch(newGameAction(Board.constructRectangular(
             width, height,
             pickNPlayers(2),
-            new TwoCornersArranger(INITIAL_POP),
+            [new CornersPlayerArranger(StoreTester.INITIAL_POP)],
         )))
         // console.log(`after: board ${store.getState().board.spots.size} game.board ${store.getState().board.spots.size}`)
     }
@@ -254,7 +257,7 @@ it('creates game via react-redux', () => {
     expect(st.messages.size).toEqual(0)
     const lowLeft = HexCoord.ORIGIN
     expect(st.getSpot(lowLeft)).toEqual(
-        new Spot(Player.Zero, INITIAL_POP, Terrain.City)
+        new Spot(Player.Zero, StoreTester.INITIAL_POP, Terrain.City)
     )
 })
 
@@ -417,7 +420,9 @@ it('makes real moves', () => {
     // console.log(`-- moved --\n${boardStateToString(st.state)}`)
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
     expect(st.cursor === st.ur.getDown()).toBeTruthy()
-    expect(st.cursorRawSpot).toEqual(new Spot(Player.One, INITIAL_POP - 1))
+    expect(st.cursorRawSpot).toEqual(
+        new Spot(Player.One, StoreTester.INITIAL_POP - 1)
+    )
 
     // can't move more than 1 space at a time (can't jump)
     const down2 = HexCoord.DOWN.getDown()
@@ -458,7 +463,9 @@ it('makes real moves', () => {
     const human1 = new Spot(Player.One, 1)
     expect(downFromUR(0)).toEqual(human1.setTerrain(Terrain.City))
     expect(downFromUR(1)).toEqual(human1)
-    expect(downFromUR(2)).toEqual(new Spot(Player.One, INITIAL_POP-2))
+    expect(downFromUR(2)).toEqual(
+        new Spot(Player.One, StoreTester.INITIAL_POP-2)
+    )
     expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0))
     expect(downFromUR(3) === Spot.BLANK).toBeTruthy()
 

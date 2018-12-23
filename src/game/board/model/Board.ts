@@ -4,7 +4,7 @@ import {RectEdges} from './Constraints'
 import {PlayerMove} from './Move'
 import {Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {StartingArranger} from './Arranger'
+import {Arranger, RandomPlayerArranger} from './Arranger'
 import {Spot} from './Spot'
 import {HexCoord} from './HexCoord'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
@@ -33,6 +33,8 @@ export class BoardRules {
 }
 
 export class Board {
+    static readonly DEFAULT_ARRANGERS: Arranger[] = [new RandomPlayerArranger()]
+
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
@@ -48,20 +50,23 @@ export class Board {
     static constructSquare(
         size: number,
         players: List<Player>,
-        arranger: StartingArranger,
+        arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
     ) {
-        return Board.constructRectangular(size, size, players, arranger)
+        return Board.constructRectangular(size, size, players, arrangers)
     }
 
     static constructRectangular(
         w: number,
         h: number,
         players: List<Player>,
-        arranger: StartingArranger,
+        arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
     ): Board {
         const constraints = new RectangularConstraints(w, h)
-        const blank = Board.construct(constraints, players)
-        return blank.setSpots(arranger.arrange(blank))
+        let result = Board.construct(constraints, players)
+        arrangers.forEach(arranger =>
+            result = result.overlaySpots(arranger.arrange(result))
+        )
+        return result
     }
 
     // keep constructor private so that edges doesn't get mis-constructed
@@ -99,6 +104,17 @@ export class Board {
         return (this.spots === spots)
             ? this
             : new Board(this.rules, this.players, spots)
+    }
+
+    overlaySpots(overlay: Map<HexCoord, Spot>): Board {
+        return this.setSpots(
+            this.spots.withMutations(
+                (mSpots: Map<HexCoord, Spot>) => {
+                    overlay.forEach((value: Spot, key: HexCoord) => {
+                        mSpots.set(key, value)
+                    })
+                })
+        )
     }
 
     // Do some moves.
@@ -141,17 +157,7 @@ export class Board {
         return result
     }
 
-    // // TODO test
-    // superimpose(positions: Map<HexCoord, Spot>): Board {
-    //     const newSpots = this.spots.withMutations((mSpots: Map<HexCoord, Spot>) => {
-    //         // add each Spot in startPositions
-    //         // TODO avoid conflicts? For now just overwrite
-    //         // TODO test that overwriting works, at least
-    //         positions.map((value: Spot, key: HexCoord) => {
-    //             const oldSpot: Spot = mSpots.get(key, Spot.BLANK)
-    //             mSpots.set(key, new Spot(value.owner, value.contents, oldSpot.terrain))
-    //         })
-    //     })
-    //     return new Board(this.constraints, newSpots, this.edges)
-    // }
+    isEmpty(hex: HexCoord) {
+        return !this.spots.has(hex) || this.getSpot(hex).isBlank()
+    }
 }

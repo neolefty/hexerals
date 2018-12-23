@@ -1,11 +1,14 @@
 import * as assert from 'assert'
-import {List} from 'immutable'
+import {List, Map, Set} from 'immutable'
+
 import {Board} from './Board'
 import {BoardConstraints} from './Constraints'
 import {pickNPlayers, Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
-import {TwoCornersArranger} from './Arranger';
+import {
+    CornersPlayerArranger, MountainArranger, RandomPlayerArranger
+} from './Arranger';
 import {Spot, Terrain} from './Spot';
 import {HexCoord} from './HexCoord';
 
@@ -23,7 +26,7 @@ export function printBoard(board: Board) {
                 else if (spot.owner === Player.One)
                     c = spot.pop === 0 ? '=' : (spot.pop === 1 ? 'c' : 'C')
                 else
-                    c = '-'
+                    c = (spot.terrain == Terrain.Mountain) ? 'M' : '-'
             }
             line += c
         })
@@ -34,7 +37,7 @@ export function printBoard(board: Board) {
 }
 
 it('checks rectangular board geometry', () => {
-    const arr = new TwoCornersArranger()
+    const arr = [new CornersPlayerArranger()]
     const twoPlayers = pickNPlayers(2)
     expect(Board.constructRectangular(9, 3, twoPlayers, arr).constraints.all().size)
         .toBe(5 * 3 + 4 * 2)
@@ -75,14 +78,54 @@ it('checks rectangular board geometry', () => {
     // expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
 })
 
+it('places mountains randomly', () => {
+    // test that sets of the same HexCoords are the same
+    let setOfSame: Set<Set<HexCoord>> = Set()
+    // no randomness in this one, so should be the same set of HexCoords every time
+    for (let i = 0; i < 2; ++i)
+        // noinspection PointlessBooleanExpressionJS
+        setOfSame = setOfSame.add(Set(Board.constructSquare(
+                    5, pickNPlayers(4), [new CornersPlayerArranger()]
+                ).spots.filter(spot => !!(spot && !spot.isBlank())).keys()))
+    expect(setOfSame.size).toEqual(1)
+
+    // test that random placement is different every time (for a large enough board)
+    const nTrials = 5
+    let setOfMountainSets: Set<Set<HexCoord>> = Set()
+    // Expect each arrangement of mountains to be different
+    for (let i = 0; i < nTrials; ++i)
+        // noinspection PointlessBooleanExpressionJS -- convert undefined to false
+        setOfMountainSets = setOfMountainSets.add(
+            Set(
+                Board.constructSquare(
+                    10, pickNPlayers(10), [
+                        new RandomPlayerArranger(),
+                        new MountainArranger(0.5)
+                    ]
+                ).spots.filter(
+                    spot => !!(spot && spot.terrain === Terrain.Mountain)
+                ).keys()
+            )
+        )
+    // number of mountains is half of number of free spaces, rounded down
+    const expectedMountains = Math.floor((Board.constructSquare(10, pickNPlayers(10))
+        .rules.constraints.all().size - 10) * 0.5)
+    // each should be unique, so the set should contain all of them
+    expect(setOfMountainSets.size).toEqual(nTrials)
+    // all should have the same size
+    // noinspection PointlessBooleanExpressionJS -- convert undefined to false
+    expect(setOfMountainSets.filter(
+        s => !!(s && s.size === expectedMountains)).size
+    ).toBe(nTrials)
+})
+
 it('converts between hex and cartesian coords', () => {
     const w = 11, h = 5
     const tenByFive = Board.constructRectangular(
-        w, h, pickNPlayers(2), new TwoCornersArranger())
+        w, h, pickNPlayers(2), [new CornersPlayerArranger(1)])
     // h x w, but every other row (that is, h/2 rows) is short by 1
     expect(tenByFive.constraints.all().size == w * h - Math.trunc(h/2))
 
-    // returns a function that, when called,
     const metaCartSpot = (cx: number, cy: number) => (
         () => tenByFive.getCartSpot(cx, cy)
     )
@@ -99,9 +142,29 @@ it('converts between hex and cartesian coords', () => {
     expect(tenByFive.getCartSpot(6, 2) === Spot.BLANK).toBeTruthy()
 })
 
+it('overlays', () => {
+    const five = Board.constructSquare(
+        5,
+        pickNPlayers(4),
+        [new CornersPlayerArranger(10)],
+    )
+    expect(five.getSpot(HexCoord.ORIGIN))
+        .toEqual(new Spot(Player.Zero, 10, Terrain.City))
+    expect(five.getSpot(HexCoord.RIGHT_UP) === Spot.BLANK).toBeTruthy()
+    const emptyFive = new Spot(Player.Nobody, 5, Terrain.Empty)
+    const cityThree = new Spot(Player.One, 3, Terrain.City)
+    const overlayTemp: Map<HexCoord, Spot> = Map()
+    const overlay = overlayTemp
+        .set(HexCoord.ORIGIN, emptyFive)
+        .set(HexCoord.RIGHT_UP, cityThree)
+    const after = five.overlaySpots(overlay)
+    expect(after.getSpot(HexCoord.ORIGIN) === emptyFive).toBeTruthy()
+    expect(after.getSpot(HexCoord.RIGHT_UP) === cityThree).toBeTruthy()
+})
+
 it('navigates around a board', () => {
     const elevenByFalf = Board.constructRectangular(
-        11, 5.5, pickNPlayers(2), new TwoCornersArranger(20))
+        11, 5.5, pickNPlayers(2), [new CornersPlayerArranger(20)])
     expect(elevenByFalf.inBounds(HexCoord.ORIGIN)).toBeTruthy()
     expect(elevenByFalf.constraints.all().contains(HexCoord.ORIGIN)).toBeTruthy()
     expect(elevenByFalf.inBounds(HexCoord.NONE)).toBeFalsy()
@@ -135,7 +198,7 @@ it('navigates around a board', () => {
 
 it('validates moves', () => {
     const threeByFour = Board.constructRectangular(
-        3, 4, pickNPlayers(2), new TwoCornersArranger(20))
+        3, 4, pickNPlayers(2), [new CornersPlayerArranger(20)])
     const messages: StatusMessage[] = []
     const options = threeByFour.validationOptions(messages)
 
@@ -197,10 +260,12 @@ it('validates moves', () => {
 
 it('steps population', () => {
     const threeByFour = Board.constructRectangular(
-        3, 7, pickNPlayers(2), new TwoCornersArranger(20))
+        3, 7, pickNPlayers(2),
+        [new CornersPlayerArranger(20)],
+    )
     const ur = threeByFour.edges.upperRight
     const urd = ur.getDown()
-    const urdd = urd.getDown()
+    const urd2 = urd.getDown()
     expect(threeByFour.getSpot(ur).terrain).toBe(Terrain.City)
     expect(threeByFour.getSpot(ur).pop).toBe(20)
     expect(threeByFour.getSpot(ur).isOwned).toBeTruthy()
@@ -212,23 +277,23 @@ it('steps population', () => {
     ).board
     expect(moved.getSpot(ur).pop).toBe(1)
     expect(moved.getSpot(urd).pop).toBe(19)
-    expect(moved.getSpot(urdd).pop).toBe(0)
+    expect(moved.getSpot(urd2).pop).toBe(0)
 
     // after turn 1, no changes in population
     const one = moved.stepPop(1)
     expect(one.getSpot(ur).pop).toBe(1)
     expect(one.getSpot(urd).pop).toBe(19)
-    expect(one.getSpot(urdd).pop).toBe(0)
+    expect(one.getSpot(urd2).pop).toBe(0)
 
     // after turn 2, city grows
     const two = one.stepPop(2)
     expect(two.getSpot(ur).pop).toBe(2)
     expect(two.getSpot(urd).pop).toBe(19)
-    expect(two.getSpot(urdd).pop).toBe(0)
+    expect(two.getSpot(urd2).pop).toBe(0)
 
     // after turn 50, both city and countryside grow
     const fifty = two.stepPop(50)
     expect(fifty.getSpot(ur).pop).toBe(3)
     expect(fifty.getSpot(urd).pop).toBe(20)
-    expect(fifty.getSpot(urdd).pop).toBe(0)
+    expect(fifty.getSpot(urd2).pop).toBe(0)
 })

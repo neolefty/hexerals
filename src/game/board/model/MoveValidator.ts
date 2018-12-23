@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {Spot} from './Spot';
+import {Spot, Terrain} from './Spot';
 import {List, Map} from 'immutable';
 import {HexCoord} from './HexCoord';
 import {PlayerMove} from './Move';
@@ -19,6 +19,9 @@ export class MoveValidatorOptions {
     // player planning the move -- ownership may change before this move happens.
     ignoreSpotOwner: boolean = false
 
+    // If true, allow moving into a mountain since it might be a city due to fog of war.
+    ignoreMountains: boolean = false
+
     constructor(
         spots: Map<HexCoord, Spot>,
         // status messages to add to
@@ -36,7 +39,7 @@ export class MoveValidator {
     validate(move: PlayerMove, options: MoveValidatorOptions): boolean {
         // in bounds
         if (!this.constraints.inBounds(move.source)) {
-            if (options && options.status)
+            if (options.status)
                 options.status.push(
                     new StatusMessage(
                         'out of bounds',
@@ -46,7 +49,7 @@ export class MoveValidator {
             return false
         }
         if (!this.constraints.inBounds(move.dest)) {
-            if (options && options.status)
+            if (options.status)
                 options.status.push(
                     new StatusMessage(
                         'out of bounds',
@@ -56,9 +59,24 @@ export class MoveValidator {
             return false
         }
 
+        // not a mountain
+        if (!options.ignoreMountains) {
+            const dest = options.spots.get(move.dest)
+            if (dest && dest.terrain === Terrain.Mountain) {
+                if (options.status)
+                    options.status.push(
+                        new StatusMessage(
+                            'mountain',
+                            `destination ${move.dest} is a mountain`,
+                            `${move}`,
+                        ))
+                return false
+            }
+        }
+
         // move distance == 1
         if (move.delta.maxAbs() !== 1) {
-            if (options && options.status)
+            if (options.status)
                 options.status.push(
                     new StatusMessage(
                         'illegal move', /* TODO use constants for tags*/

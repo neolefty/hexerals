@@ -1,15 +1,14 @@
-import {Board} from './model/Board'
-import {HexCoord} from './model/HexCoord'
-import {GenericAction} from '../../common/App'
-import {BoardState} from './model/BoardState'
-import {INITIAL_HEIGHT, INITIAL_WIDTH} from './BoardConstants'
-import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './model/MovementQueue'
-import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
-import {StatusMessage} from '../../common/StatusMessage'
-import {RandomArranger} from './model/Arranger';
-import {HexMove, PlayerMove} from './model/Move';
-import {GameDecision, Robot} from '../players/Robot';
+
+import {HexCoord} from './HexCoord'
+import {HexMove, PlayerMove} from './Move';
+import {Board} from './Board'
+import {BoardState} from './BoardState'
+import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
+import {GenericAction} from '../../../common/App'
+import {StatusMessage} from '../../../common/StatusMessage'
+import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
+import {GameDecision, Robot} from '../../players/Robot';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -19,14 +18,10 @@ export type GameAction
     = NewGame | QueueMoves | PlaceCursor | SetPlayer
         | DoMoves | CancelMoves | StepPop | RobotsDecide
 
+// should never actually see this -- we just need a default for reducers
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
-    board: Board.constructRectangular(
-        INITIAL_WIDTH,
-        INITIAL_HEIGHT,
-        INITIAL_PLAYERS,
-        RandomArranger.construct(INITIAL_PLAYERS),
-    ),
+    board: Board.constructSquare(2, INITIAL_PLAYERS),
     turn: 0,
     cursor: HexCoord.NONE,
     players: PlayerManager.construct(INITIAL_PLAYERS),

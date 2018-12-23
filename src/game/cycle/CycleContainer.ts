@@ -3,11 +3,7 @@ import {connect} from 'react-redux';
 import {CycleView} from './CycleView';
 import Dimension from '../../common/Dimension';
 import {
-    changeBoardSizeAction,
-    changeNumPlayersAction,
-    changeTickMillisAction,
-    closeGameAction,
-    openLocalGameAction
+    changeLocalOptionAction, closeGameAction, openLocalGameAction,
 } from './CycleReducer';
 import {AppState} from '../../common/App';
 import {CycleState} from './CycleState';
@@ -25,9 +21,8 @@ const mapStateToCycleViewProps =
 const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleState>) => ({
     onOpenLocalGame: () => dispatch(openLocalGameAction()),
     onCloseGame: () => dispatch(closeGameAction()),
-    onChangeNumPlayers: (n: number) => dispatch(changeNumPlayersAction(n)),
-    onChangeTickMillis: (ms: number) => dispatch(changeTickMillisAction(ms)),
-    onChangeBoardSize: (d: Dimension) => dispatch(changeBoardSizeAction(d)),
+    onChangeLocalOption: (name: string, n: number) =>
+        dispatch(changeLocalOptionAction(name, n)),
 });
 
 export const CycleContainer = connect(

@@ -5,7 +5,7 @@ import {Dispatch} from 'redux'
 import {HexCoord} from '../board/model/HexCoord'
 import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
-} from '../board/BoardReducer'
+} from '../board/model/BoardReducer'
 import {AppState} from '../../common/App'
 import Dimension from '../../common/Dimension'
 import {BoardState} from '../board/model/BoardState'

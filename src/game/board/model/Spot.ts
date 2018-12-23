@@ -3,8 +3,8 @@ import {Player} from '../../players/Players'
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?
     City = 'City',
-    // Nonexistent = 'Nonexistent',  // not actually part of the map
-    /*, Mountain = 'Mountain', Swamp = 'Swamp', City = 'City' */
+    Mountain = 'Mountain',
+    Swamp = 'Swamp',
 }
 
 // contents of a space on the board
@@ -18,6 +18,13 @@ export class Spot {
         readonly pop: number,
         readonly terrain: Terrain = Terrain.Empty
     ) {}
+
+    // TODO check whether (this == BLANK) will work instead
+    isBlank() {
+        return this.owner === Player.Nobody
+            && this.pop === 0
+            && this.terrain === Terrain.Empty
+    }
 
     setPop(pop: number): Spot {
         return new Spot(this.owner, pop, this.terrain)

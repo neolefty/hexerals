@@ -3,12 +3,12 @@ import * as React from 'react';
 import {Player} from '../../players/Players';
 import {DriftColor} from '../../../color/DriftColor';
 import {Terrain} from '../model/Spot';
-import {cityPoints} from './TerrainView';
+import {TerrainView} from './TerrainView';
 
 export interface FlatTopHexProps {
     owner: Player
     terrain: Terrain
-    color?: DriftColor
+    color: DriftColor
     selected: boolean
     centerX: number
     centerY: number
@@ -16,9 +16,6 @@ export interface FlatTopHexProps {
     onSelect?: () => void
     children?: JSX.Element | JSX.Element[] // could use "any?" instead
 }
-
-export const HEX_MID = 15
-export const HEX_HALF_HEIGHT = 26
 
 const hexPoints = (x: number, y: number, hexRadius: number) => {
     const hexMid = 15
@@ -56,16 +53,15 @@ export const FlatTopHex = (props: FlatTopHexProps) => (
             }
         />
         {
-            props.terrain === Terrain.City
-                ? (<polygon
-                    points={cityPoints(props.centerX, props.centerY)}
-                    style={
-                        props.color && {
-                            stroke: 'none',
-                            fill: props.color.texture().toHexString(),
-                        }
-                    }
-                />)
+            props.terrain !== Terrain.Empty ? (
+                <TerrainView
+                    centerX={props.centerX}
+                    centerY={props.centerY}
+                    hexRadius={props.hexRadius}
+                    terrain={props.terrain}
+                    color={props.color}
+                />
+                )
                 : undefined
         }
 

@@ -69,12 +69,14 @@ const MoveView = (props: MoveViewProps) => {
 
     const delta = props.move.dest.minus(props.move.source)
 
+    // note: hex side is
     const a = 12  // arrow start
     const b = 20 // arrow length
     const c = 8 // arrow width
     const d = 8 // arrow head length
     const sw = 2 // stroke width
 
+    /* tslint:disable:whitespace */
     return (
         <g>
             <g
@@ -83,20 +85,16 @@ const MoveView = (props: MoveViewProps) => {
                     props.color && {
                         stroke: props.color.texture().toHexString(),
                         strokeWidth: sw,
-                        strokeLinecap: "square",
-                        fill: "none",
+                        strokeLinecap: 'square',
+                        fill: 'none',
                     }
                 }
             >
                 <polyline // arrow shaft
-                    // tslint:disable-next-line:whitespace
                     points={`${x1+a},${y1} ${x1+a+b-sw},${y1}`}
                 />
                 <polyline // arrow head
-                    points={
-                        // tslint:disable-next-line:whitespace
-                        `${x1+a+b-d},${y1-c} ${x1+a+b},${y1} ${x1+a+b-d},${y1+c}`
-                    }
+                    points={`${x1+a+b-d},${y1-c} ${x1+a+b},${y1} ${x1+a+b-d},${y1+c}`}
                 />
             </g>
         </g>

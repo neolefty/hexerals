@@ -10,7 +10,7 @@ interface SpottedHexProps {
     viewBoxHeight: number
     selected: boolean
     onSelect?: () => void | undefined
-    color?: DriftColor
+    color: DriftColor
     render?: (centerX: number, centerY: number) => JSX.Element | undefined
 }
 

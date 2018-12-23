@@ -127,13 +127,13 @@ export class HexCoord {
     // assuming flat-topped hexagons twice as wide as high
     get cartX(): number {
         return this.x;
-    } // was x - y
+    }
 
     // convert to integer rectangular Y
     // assuming flat-topped hexagons twice as wide as high
     get cartY(): number {
         return this.y - this.z;
-    } // was z
+    }
 
     // tslint:disable-next-line:member-ordering
     static readonly COS_30 = Math.cos(Math.PI / 6)

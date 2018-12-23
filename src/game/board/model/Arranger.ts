@@ -3,23 +3,21 @@ import {List, Map} from 'immutable'
 import {HexCoord} from './HexCoord'
 import {Board} from './Board'
 import {Spot, Terrain} from './Spot'
+import * as assert from 'assert';
 
-export interface StartingArranger {
+export interface Arranger {
     arrange(board: Board): Map<HexCoord, Spot>
 }
 
-export class RandomArranger implements StartingArranger {
-    public static construct(players: List<Player>) {
-        return new RandomArranger(0, players)
-    }
+// arranges players on a board
+export class RandomPlayerArranger implements Arranger {
+    constructor(readonly startingArmy: number = 0) {}
 
-    constructor(readonly startingArmy: number, readonly players: List<Player>) {
-    }
-
+    // return a map of starting spots
     public arrange(board: Board): Map<HexCoord, Spot> {
         const allHexes: HexCoord[] = board.constraints.all().toArray()
         let starts = Map<HexCoord, Spot>()
-        this.players.forEach((player: Player) => {
+        board.players.forEach((player: Player) => {
             if (player !== Player.Nobody && allHexes.length > 0) {
                 const i = Math.floor(Math.random() * allHexes.length)
                 const hex = allHexes.splice(i, 1)[0]
@@ -35,11 +33,11 @@ export class RandomArranger implements StartingArranger {
 }
 
 // place starting population in lower left, upper right, upper left, and lower right
-export class CornersArranger implements StartingArranger {
-    constructor(readonly startingArmy: number, readonly players: Iterable<Player>) {
-    }
+export class CornersPlayerArranger implements Arranger {
+    constructor(readonly startingArmy: number = 0) {}
 
     public arrange(board: Board): Map<HexCoord, Spot> {
+        assert(board.players.size <= 4)
         let starts = Map<HexCoord, Spot>()
         const corners = [
             (b: Board) => b.edges.lowerLeft,
@@ -47,23 +45,38 @@ export class CornersArranger implements StartingArranger {
             (b: Board) => b.edges.upperLeft,
             (b: Board) => b.edges.lowerRight,
         ]
-        let i = 0
-        for (let p in this.players) { // not sure why we can't use of instead of in
-            if (p && this.players[p]) {
-                const hex = corners[i++](board)
-                starts = starts.set(
-                    hex,
-                    new Spot(this.players[p], this.startingArmy, Terrain.City)
-                )
-            }
-        }
+        board.players.forEach((player, i) =>
+            starts = starts.set(
+                corners[i](board),
+                new Spot(player, this.startingArmy, Terrain.City),
+            )
+        )
         return starts
     }
 }
 
-// place starting population in lower left & upper right
-export class TwoCornersArranger extends CornersArranger {
-    constructor(startingArmy: number = 1) {
-        super(startingArmy, [Player.Zero, Player.One])
+export class MountainArranger implements Arranger {
+    constructor(
+        readonly mountainFraction: number,
+    ) {
+        assert(mountainFraction <= 1 && mountainFraction >= 0)
+    }
+
+    arrange(board: Board): Map<HexCoord, Spot> {
+        let emptyHexes: List<HexCoord> = List(board.constraints.all().filter(
+            (hex: HexCoord) => board.isEmpty(hex)
+        ))
+        const beforeEmpty = emptyHexes.size
+        const numMountains = Math.floor(this.mountainFraction * beforeEmpty)
+        const resultTemp: Map<HexCoord, Spot> = Map()
+        return resultTemp.withMutations(result => {
+            while (result.size < numMountains) {
+                const r = Math.floor(Math.random() * emptyHexes.size)
+                const hex = emptyHexes.get(r)
+                result.set(hex, board.getSpot(hex).setTerrain(Terrain.Mountain))
+                emptyHexes = emptyHexes.delete(r)
+            }
+            assert(emptyHexes.size === beforeEmpty - numMountains)
+        })
     }
 }
