@@ -61,8 +61,8 @@ export const TerrainView = (props: DrawTerrainProps): JSX.Element => {
                     }}
                 >
                     {
-                        mountainLines.map((line) => (
-                            <polyline points={line}/>
+                        mountainLines.map((line, index) => (
+                            <polyline points={line} key={index}/>
                         ))
                     }
                 </g>

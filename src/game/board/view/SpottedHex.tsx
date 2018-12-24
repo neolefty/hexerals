@@ -9,7 +9,8 @@ interface SpottedHexProps {
     hex: HexCoord
     viewBoxHeight: number
     selected: boolean
-    onSelect?: () => void | undefined
+    onSelect?: () => void
+    onDragInto?: () => void
     color: DriftColor
     render?: (centerX: number, centerY: number) => JSX.Element | undefined
 }
@@ -21,6 +22,7 @@ export const SpottedHex = (props: SpottedHexProps) => {
     const y: number = centerY(props.viewBoxHeight, props.hex.cartY)
     return (
         <FlatTopHex
+            hex={props.hex}
             owner={props.spot.owner}
             terrain={props.spot.terrain}
             color={props.color}
@@ -29,6 +31,7 @@ export const SpottedHex = (props: SpottedHexProps) => {
             centerY={y}
             hexRadius={30}
             onSelect={props.onSelect}
+            onDragInto={props.onDragInto}
         >
             {props.render && props.render(x, y)}
         </FlatTopHex>
