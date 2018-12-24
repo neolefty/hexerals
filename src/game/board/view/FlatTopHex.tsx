@@ -34,9 +34,10 @@ const hexPoints = (x: number, y: number, hexRadius: number) => {
 
 // a hexagon centered at (x, y)
 export const FlatTopHex = (props: FlatTopHexProps) => {
-    const logIt = (desc: string) => console.log(
-        `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
-    )
+    // const logIt = (desc: string) => console.log(
+    //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
+    // )
+    const logIt = (desc: string) => {}
     return (
         <g
             onMouseDown={(e) => {
