@@ -7,6 +7,14 @@ import {HexCoord} from '../board/model/HexCoord';
 import {Spot} from '../board/model/Spot';
 import {Board} from '../board/model/Board';
 
+// improvements
+// * parameterize intelligence -- a vector of booleans or numbers that can be randomly modified
+// * specify robot intelligence in options
+// * don't make losing moves
+// * if you're next to a city and can take it
+// * bias towards initial capture
+// * test that smarter always wins
+
 export class StupidRobot implements Robot {
     decide(
         player: Player, bs: BoardState, curMoves?: List<PlayerMove>
