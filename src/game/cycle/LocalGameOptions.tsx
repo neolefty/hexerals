@@ -67,7 +67,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 title="Percent of the map covered in mountains."
                 value={props.localOptions.mountainPercent}
                 min={0}
-                max={30}
+                max={50}
                 onChange={optionChanger('mountainPercent')}
             />
             <button
