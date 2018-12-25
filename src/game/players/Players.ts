@@ -40,10 +40,15 @@ export class PlayerManager {
         readonly playerRobots: Map<Player, Robot>,
     ) {}
 
-    setRobot(player: Player, robot: Robot): PlayerManager {
-        return new PlayerManager(
-            this.playerIndexes,
-            this.playerRobots.set(player, robot),
-        )
+    setRobot(player: Player, robot: Robot | undefined): PlayerManager {
+        return robot
+            ? new PlayerManager(
+                this.playerIndexes,
+                this.playerRobots.set(player, robot),
+            )
+            : new PlayerManager(
+                this.playerIndexes,
+                this.playerRobots.delete(player),
+            )
     }
 }

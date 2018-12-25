@@ -15,8 +15,9 @@ import {GameDecision, Robot} from '../../players/Robot';
 // TODO: figure out immutable approach too, maybe with immutable.js
 
 export type GameAction
-    = NewGame | QueueMoves | PlaceCursor | SetPlayer
-        | DoMoves | CancelMoves | StepPop | RobotsDecide
+    = NewGame | QueueMoves | PlaceCursor | SetCurPlayer
+        | DoMoves | CancelMoves | StepPop
+        | RobotsDecide | SetRobot
 
 // should never actually see this -- we just need a default for reducers
 const INITIAL_PLAYERS = pickNPlayers(0)
@@ -33,20 +34,22 @@ export const INITIAL_BOARD_STATE: BoardState = {
 export const BoardReducer = (
     state: BoardState = INITIAL_BOARD_STATE, action: GameAction,
 ): BoardState => {
-    if (isNewGame(action))
-        state = newGameReducer(state, action)
+    if (isQueueMove(action))  // most common first
+        state = queueMovesReducer(state, action)
     else if (isPlaceCursor(action))
         state = placeCursorReducer(state, action)
-    else if (isQueueMove(action))
-        state = queueMovesReducer(state, action)
-    else if (isCancelMoves(action))
-        state = cancelMoveReducer(state, action)
     else if (isDoMoves(action))
         state = doMovesReducer(state)
     else if (isStepPop(action))
         state = stepPopReducer(state)
-    else if (isSetPlayer(action))
-        state = setPlayerReducer(state, action)
+    else if (isCancelMoves(action))
+        state = cancelMoveReducer(state, action)
+    else if (isNewGame(action))
+        state = newGameReducer(state, action)
+    else if (isSetCurPlayer(action))
+        state = setCurPlayerReducer(state, action)
+    else if (isSetRobot(action))
+        state = setRobotReducer(state, action)
     else if (isRobotsDecide(action))
         state = robotsDecideReducer(state)
     return state
@@ -210,19 +213,35 @@ const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState 
             cursor: action.position,
         }
 
-const SET_PLAYER = 'SET_PLAYER'
-type SET_PLAYER = typeof SET_PLAYER
-interface SetPlayer extends GenericAction {
-    type: SET_PLAYER
+const SET_CUR_PLAYER = 'SET_CUR_PLAYER'
+type SET_CUR_PLAYER = typeof SET_CUR_PLAYER
+interface SetCurPlayer extends GenericAction {
+    type: SET_CUR_PLAYER
     player: Player
 }
-const isSetPlayer = (action: GameAction): action is SetPlayer =>
-    action.type === SET_PLAYER
-export const setPlayerAction = (player: Player): SetPlayer =>
-    ({ type: SET_PLAYER, player: player })
-const setPlayerReducer = (state: BoardState, action: SetPlayer): BoardState => ({
+const isSetCurPlayer = (action: GameAction): action is SetCurPlayer =>
+    action.type === SET_CUR_PLAYER
+export const setCurPlayerAction = (player: Player): SetCurPlayer =>
+    ({ type: SET_CUR_PLAYER, player: player })
+const setCurPlayerReducer = (state: BoardState, action: SetCurPlayer): BoardState => ({
     ...state,
     curPlayer: action.player,
+})
+
+const SET_ROBOT = 'SET_ROBOT'
+type SET_ROBOT = typeof SET_ROBOT
+interface SetRobot extends GenericAction {
+    type: SET_ROBOT
+    player: Player
+    robot: Robot | undefined
+}
+const isSetRobot = (action: GameAction): action is SetRobot =>
+    action.type === SET_ROBOT
+export const setRobotAction = (player: Player, robot: Robot | undefined): SetRobot =>
+    ({ type: SET_ROBOT, player: player, robot: robot })
+const setRobotReducer = (state: BoardState, action: SetRobot): BoardState => ({
+    ...state,
+    players: state.players.setRobot(action.player, action.robot)
 })
 
 // let robots make decisions

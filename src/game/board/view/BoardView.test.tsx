@@ -1,27 +1,21 @@
 import * as React from 'react'
-import {List, Map} from 'immutable'
-import {createStore, Store} from 'redux'
+import {List} from 'immutable'
 import * as Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {shallow} from 'enzyme'
 
-import {
-    BoardReducer, queueMovesAction, newGameAction, placeCursorAction,
-    doMovesAction, setPlayerAction, cancelMovesAction,
-} from '../model/BoardReducer'
+import {queueMovesAction,} from '../model/BoardReducer'
 import {Board} from '../model/Board'
 import {HexCoord} from '../model/HexCoord'
 import Dimension from "../../../common/Dimension"
 import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
-import {
-    EMPTY_MOVEMENT_QUEUE, MovementQueue, QueueAndMoves
-} from '../model/MovementQueue'
-import {StatusMessage} from '../../../common/StatusMessage'
+import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
 import {Spot, Terrain} from '../model/Spot';
 import {PlayerMove} from '../model/Move';
 import {CornersPlayerArranger} from '../model/Arranger';
+import {StoreTester} from './StoreTester';
 
 it('renders a spot', () => {
     enzyme.configure({adapter: new Adapter()})
@@ -132,88 +126,6 @@ it('clicks a spot to select it', () => {
 })
 
 // helper class for react-redux testing
-class StoreTester {
-    static readonly INITIAL_POP = 50
-    static readonly INITIAL_WIDTH = 11
-    static readonly INITIAL_HEIGHT = 7
-    readonly store: Store<BoardState>
-    constructor(
-        width = StoreTester.INITIAL_WIDTH,
-        height = StoreTester.INITIAL_HEIGHT,
-    ) {
-        this.store = createStore<BoardState>(BoardReducer)
-        // console.log(`before: board ${store.getState().board} game.board ${store.getState().board.spots.size}`)
-        this.store.dispatch(newGameAction(Board.constructRectangular(
-            width, height,
-            pickNPlayers(2),
-            [new CornersPlayerArranger(StoreTester.INITIAL_POP)],
-        )))
-        // console.log(`after: board ${store.getState().board.spots.size} game.board ${store.getState().board.spots.size}`)
-    }
-
-    // Getters
-    get state(): BoardState { return this.store.getState() }
-    get board(): Board { return this.state.board }
-    get spots(): Map<HexCoord, Spot> { return this.board.spots }
-    get cursor(): HexCoord { return this.state.cursor }
-    get messages(): List<StatusMessage> { return this.state.messages }
-    getRawSpot = (coord: HexCoord): Spot | undefined => this.spots.get(coord)
-    // interpolates "empty spot" for undefined
-    getSpot = (coord: HexCoord): Spot => this.board.getSpot(coord)
-    get cursorRawSpot(): Spot | undefined { return this.getRawSpot(this.cursor) }
-    get cursorSpot(): Spot { return this.getSpot(this.cursor) }
-    get moves(): MovementQueue { return this.state.moves }
-
-    get ll() { return this.state.board.edges.lowerLeft }
-    get ul() { return this.state.board.edges.upperLeft }
-    get ur() { return this.state.board.edges.upperRight }
-    get lr() { return this.state.board.edges.lowerRight }
-
-    // Action: Queue a move
-    queueMove = (player: Player, delta: HexCoord, alsoCursor=true) => {
-        this.store.dispatch(
-            queueMovesAction(
-                List([PlayerMove.construct(player, this.cursor, delta)])
-            )
-        )
-        if (alsoCursor)
-            this.placeCursor(this.cursor.plus(delta))
-    }
-
-    // Action: Queue a move one space down
-    queueMoveDown = (alsoCursor=true) => {
-        if (this.state.curPlayer)
-            this.queueMove(this.state.curPlayer, HexCoord.DOWN, alsoCursor)
-    }
-    queueMoveUp = (alsoCursor=true) => {
-        if (this.state.curPlayer)
-            this.queueMove(this.state.curPlayer, HexCoord.UP, alsoCursor)
-    }
-
-    // Action: Place the cursor
-    placeCursor = (coord: HexCoord) => {
-        this.store.dispatch(placeCursorAction(coord))
-    }
-
-    // Action: Unqueue a move
-    cancelMoves = (
-        player: Player | undefined = undefined,
-        count: number = 1,
-    ) => {
-        const actualPlayer = player || this.state.curPlayer
-        if (actualPlayer)
-            this.store.dispatch(cancelMovesAction(actualPlayer, count))
-        else
-            throw Error('current player is undefined')
-    }
-
-    // Action: execute a round of queued moves
-    doMoves = () => this.store.dispatch(doMovesAction())
-
-    setPlayer = (player: Player) => {
-        this.store.dispatch(setPlayerAction(player))
-    }
-}
 
 it('ensures things are not mutable', () => {
     // check our assumptions
@@ -223,12 +135,12 @@ it('ensures things are not mutable', () => {
     expect(testList.asMutable().asImmutable() === testList).toBeFalsy()
 
     const st = new StoreTester()
-    st.setPlayer(Player.Zero)
+    st.setCurPlayer(Player.Zero)
     st.placeCursor(st.ll)
     st.queueMoveUp()
     st.queueMoveUp()
     st.queueMoveDown()
-    st.setPlayer(Player.One)
+    st.setCurPlayer(Player.One)
     st.placeCursor(st.ur)
     st.queueMoveDown()
     st.queueMoveDown()
@@ -324,12 +236,12 @@ it('cancels moves', () => {
     const st = new StoreTester(6, 21)
     const boardBefore = st.state.board
 
-    st.setPlayer(Player.One)
+    st.setCurPlayer(Player.One)
     st.placeCursor(st.ur)
     st.queueMoveDown()
     st.queueMoveDown()
 
-    st.setPlayer(Player.Zero)
+    st.setCurPlayer(Player.Zero)
     st.placeCursor(st.ll)
     st.queueMoveUp()
     st.queueMoveUp()
@@ -356,7 +268,7 @@ it('cancels moves', () => {
     expect(st.moves.size).toBe(1)
 
     expect(st.state.board === boardBefore).toBeTruthy()
-    st.setPlayer(Player.One)
+    st.setCurPlayer(Player.One)
     st.cancelMoves()
     expect(st.moves.size).toBe(0)
     st.cancelMoves()
@@ -367,7 +279,7 @@ it('cancels moves', () => {
     expect(st.state.board === boardBefore).toBeTruthy()
 
     // cancel multiple moves
-    st.setPlayer(Player.Zero)
+    st.setCurPlayer(Player.Zero)
     st.placeCursor(st.board.edges.lowerLeft)
     for (let i: number = 0; i < 7; i++)
         st.queueMoveUp()
@@ -391,7 +303,7 @@ it('makes real moves', () => {
 
     st.queueMoveDown()
     expect(st.moves.size).toBe(0) // no current player yet
-    st.setPlayer(Player.One) // cursor is on One's starting point, UR corner
+    st.setCurPlayer(Player.One) // cursor is on One's starting point, UR corner
     st.queueMoveDown()
     expect(st.cursor === st.ur.plus(HexCoord.DOWN)).toBeTruthy()
     expect(st.moves.size).toBe(1)
