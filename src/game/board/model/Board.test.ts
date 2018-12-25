@@ -1,16 +1,13 @@
 import * as assert from 'assert'
-import {List, Map, Set} from 'immutable'
+import {Map} from 'immutable'
 
 import {Board} from './Board'
-import {BoardConstraints} from './Constraints'
 import {pickNPlayers, Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
-import {
-    CornersPlayerArranger, MountainArranger, RandomPlayerArranger
-} from './Arranger';
-import {Spot, Terrain} from './Spot';
-import {HexCoord} from './HexCoord';
+import {CornersPlayerArranger} from './Arranger'
+import {Spot, Terrain} from './Spot'
+import {HexCoord} from './HexCoord'
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -35,89 +32,6 @@ export function printBoard(board: Board) {
     })
     console.log(out)
 }
-
-it('checks rectangular board geometry', () => {
-    const arr = [new CornersPlayerArranger()]
-    const twoPlayers = pickNPlayers(2)
-    expect(Board.constructRectangular(9, 3, twoPlayers, arr).constraints.all().size)
-        .toBe(5 * 3 + 4 * 2)
-
-    expect(Board.constructRectangular(19, 10.5, twoPlayers, arr).constraints.all().size)
-        .toBe(10 * 10 + 10 * 9)
-    const nineByTwalf = Board.constructRectangular(9, 2.5, twoPlayers, arr)
-    // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
-    // _ - _ - _ - _ - _
-    expect(nineByTwalf.constraints.extreme(x => x.cartX).cartX).toBe(0)  // left 0
-    expect(nineByTwalf.constraints.extreme(x => x.cartY).cartY).toBe(0)  // top 0
-    expect(nineByTwalf.constraints.extreme(x => - x.cartX).cartX).toBe(8)  // right 8
-    expect(nineByTwalf.constraints.extreme(x => - x.cartY).cartY).toBe(3)  // bottom 3
-    expect(nineByTwalf.constraints.extreme(
-        // cartY is first digit, cartX is second digit
-        x => x.cartX + 10 * x.cartY, BoardConstraints.GT
-    ) === HexCoord.getCart(7, 3)).toBeTruthy() // bottom right
-
-    expect(nineByTwalf.edges.width).toEqual(9)
-    expect(nineByTwalf.edges.height).toEqual(4)
-    expect(nineByTwalf.edges.xRange().count()).toEqual(9)
-    expect(List<number>(nineByTwalf.edges.xRange()))
-        .toEqual(List<number>([0, 1, 2, 3, 4, 5, 6, 7, 8]))
-    expect(List<number>(nineByTwalf.edges.yRange()))
-        .toEqual(List<number>([0, 1, 2, 3]))
-
-    // for some reason, these both cause a stack overflow:
-    // expect(upperLeft === HexCoord.ORIGIN).toBeTruthy()
-    // expect(upperLeft).toEqual(HexCoord.ORIGIN)
-    expect(nineByTwalf.edges.upperLeft === HexCoord.ORIGIN).toBeFalsy()
-    expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
-    expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
-    expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
-    expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
-    // expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
-    // expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
-    // expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
-    // expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
-})
-
-it('places mountains randomly', () => {
-    // test that sets of the same HexCoords are the same
-    let setOfSame: Set<Set<HexCoord>> = Set()
-    // no randomness in this one, so should be the same set of HexCoords every time
-    for (let i = 0; i < 2; ++i)
-        // noinspection PointlessBooleanExpressionJS
-        setOfSame = setOfSame.add(Set(Board.constructSquare(
-                    5, pickNPlayers(4), [new CornersPlayerArranger()]
-                ).spots.filter(spot => !!(spot && !spot.isBlank())).keys()))
-    expect(setOfSame.size).toEqual(1)
-
-    // test that random placement is different every time (for a large enough board)
-    const nTrials = 5
-    let setOfMountainSets: Set<Set<HexCoord>> = Set()
-    // Expect each arrangement of mountains to be different
-    for (let i = 0; i < nTrials; ++i)
-        // noinspection PointlessBooleanExpressionJS -- convert undefined to false
-        setOfMountainSets = setOfMountainSets.add(
-            Set(
-                Board.constructSquare(
-                    10, pickNPlayers(10), [
-                        new RandomPlayerArranger(),
-                        new MountainArranger(0.5)
-                    ]
-                ).spots.filter(
-                    spot => !!(spot && spot.terrain === Terrain.Mountain)
-                ).keys()
-            )
-        )
-    // number of mountains is half of number of free spaces, rounded down
-    const expectedMountains = Math.floor((Board.constructSquare(10, pickNPlayers(10))
-        .rules.constraints.all().size - 10) * 0.5)
-    // each should be unique, so the set should contain all of them
-    expect(setOfMountainSets.size).toEqual(nTrials)
-    // all should have the same size
-    // noinspection PointlessBooleanExpressionJS -- convert undefined to false
-    expect(setOfMountainSets.filter(
-        s => !!(s && s.size === expectedMountains)).size
-    ).toBe(nTrials)
-})
 
 it('converts between hex and cartesian coords', () => {
     const w = 11, h = 5

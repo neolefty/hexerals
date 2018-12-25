@@ -1,9 +1,10 @@
 import {Player} from '../../players/Players'
-import {List, Map} from 'immutable'
+import {List, Map, Set} from 'immutable'
 import {HexCoord} from './HexCoord'
 import {Board} from './Board'
 import {Spot, Terrain} from './Spot'
 import * as assert from 'assert';
+import {connected} from './HexGraph';
 
 export interface Arranger {
     arrange(board: Board): Map<HexCoord, Spot>
@@ -55,28 +56,43 @@ export class CornersPlayerArranger implements Arranger {
     }
 }
 
-export class MountainArranger implements Arranger {
+// replace empty terrain randomly and without blocking
+export class TerrainArranger implements Arranger {
     constructor(
-        readonly mountainFraction: number,
+        // what fraction of empty terrain should be replaced?
+        readonly fractionOfEmpty: number,
+        readonly terrain: Terrain = Terrain.Mountain
     ) {
-        assert(mountainFraction <= 1 && mountainFraction >= 0)
+        assert(fractionOfEmpty <= 1 && fractionOfEmpty >= 0)
     }
 
-    arrange(board: Board): Map<HexCoord, Spot> {
-        let emptyHexes: List<HexCoord> = List(board.constraints.all().filter(
+    arrange(board: Board, avoidBlocking: boolean = true): Map<HexCoord, Spot> {
+        // spots we might replace with terrain
+        let candidates: List<HexCoord> = List(board.constraints.all().filter(
             (hex: HexCoord) => board.isEmpty(hex)
         ))
-        const beforeEmpty = emptyHexes.size
-        const numMountains = Math.floor(this.mountainFraction * beforeEmpty)
+        // remaining empty spots
+        let remainingEmpties: Set<HexCoord> = Set(candidates)
+
+        const beforeEmpty = candidates.size
+        const numReplacements = Math.floor(this.fractionOfEmpty * beforeEmpty)
+
         const resultTemp: Map<HexCoord, Spot> = Map()
+        // noinspection PointlessBooleanExpressionJS
         return resultTemp.withMutations(result => {
-            while (result.size < numMountains) {
-                const r = Math.floor(Math.random() * emptyHexes.size)
-                const hex = emptyHexes.get(r)
-                result.set(hex, board.getSpot(hex).setTerrain(Terrain.Mountain))
-                emptyHexes = emptyHexes.delete(r)
+            while (result.size < numReplacements) {
+                const r = Math.floor(Math.random() * candidates.size)
+                // pick a random empty to replace with a mountain
+                const hex = candidates.get(r)
+                // would it bisect the remaining empty spots?
+                const remainingWithoutThisOne = remainingEmpties.remove(hex)
+                if (!avoidBlocking || connected(remainingWithoutThisOne)) {
+                    result.set(hex, board.getSpot(hex).setTerrain(this.terrain))
+                    candidates = candidates.delete(r)
+                    remainingEmpties = remainingWithoutThisOne
+                }
             }
-            assert(emptyHexes.size === beforeEmpty - numMountains)
+            assert(candidates.size === beforeEmpty - numReplacements)
         })
     }
 }

@@ -8,7 +8,7 @@ import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from '../board/model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {List} from 'immutable'
-import {MountainArranger, RandomPlayerArranger} from '../board/model/Arranger'
+import {TerrainArranger, RandomPlayerArranger} from '../board/model/Arranger'
 import {StupidRobot} from '../players/StupidRobot'
 import * as assert from 'assert';
 import {isNumber} from 'util';
@@ -68,7 +68,7 @@ const openLocalGameReducer =
         players,
         [
             new RandomPlayerArranger(),
-            new MountainArranger(mountainFrequency),
+            new TerrainArranger(mountainFrequency),
         ],
     )
     // assign stupid AI to all non-humans

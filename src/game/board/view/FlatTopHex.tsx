@@ -37,9 +37,11 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
     // const logIt = (desc: string) => console.log(
     //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
     // )
+    // tslint:disable-next-line
     const logIt = (desc: string) => {}
     return (
         <g
+            className={`${props.owner} spot${props.selected ? ' active' : ''}`}
             onMouseDown={(e) => {
                 logIt(`onMouseDown ${e}`)
                 if (props.onSelect) {
@@ -66,8 +68,7 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             onTouchMove={(e) => {logIt(`onTouchMove ${e.nativeEvent.type}`)}}
             onTouchCancel={(e) => {logIt(`onTouchCancel ${e.nativeEvent.type}`)}}
             onDragOver={(e) => {logIt(`onDragOver ${e.nativeEvent.type}`)}}
-            // onMouseDownCapture={(e) => {logIt(`onMouseDownCapture ${e.nativeEvent.type}`)}}
-            className={`${props.owner} spot${props.selected ? ' active' : ''}`}
+            onMouseDownCapture={(e) => {logIt(`onMouseDownCapture ${e.nativeEvent.type}`)}}
         >
             <polygon
                 points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
