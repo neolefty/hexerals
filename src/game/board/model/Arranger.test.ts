@@ -1,7 +1,7 @@
 import {Set} from 'immutable'
 
 import {HexCoord} from './HexCoord'
-import {Terrain} from './Spot'
+import {Terrain} from './Tile'
 import {Board} from './Board'
 import {pickNPlayers} from '../../players/Players';
 import {connected} from './HexGraph';
@@ -16,7 +16,7 @@ it ('does not bisect the map with mountains', () => {
             new RandomPlayerArranger(),
             new TerrainArranger(0.5),
         ])
-        expect(connected(tenByTen.filterSpots(spot => spot.canBeOccupied())))
+        expect(connected(tenByTen.filterTiles(tile => tile.canBeOccupied())))
     }
 })
 
@@ -27,7 +27,7 @@ it('places mountains randomly', () => {
     for (let i = 0; i < 2; ++i)
         setOfSame = setOfSame.add(Set(Board.constructSquare(
             5, pickNPlayers(4), [new CornersPlayerArranger()]
-        ).filterSpots(spot => !spot.isBlank())))
+        ).filterTiles(tile => !tile.isBlank())))
     expect(setOfSame.size).toEqual(1)
 
     // test that random placement is different every time (for a large enough board)
@@ -44,8 +44,8 @@ it('places mountains randomly', () => {
                     new RandomPlayerArranger(),
                     new TerrainArranger(mtnFraction),
                 ]
-            ).filterSpots(
-                spot => spot.terrain === Terrain.Mountain
+            ).filterTiles(
+                tile => tile.terrain === Terrain.Mountain
             )
         )
     // available spaces is total spaces minus one (a capital) for each player
@@ -74,8 +74,8 @@ it('does not get trapped or bisect', () => {
             ],
             messages
         )
-        expect(connected(board.filterSpots(
-            spot => spot.canBeOccupied()
+        expect(connected(board.filterTiles(
+            tile => tile.canBeOccupied()
         ))).toBeTruthy()
         // should get messages about map being too small
         expect(messages.length).toBeGreaterThan(0)
@@ -100,7 +100,7 @@ it('bisection can be allowed', () => {
             ],
             messages,
         )
-        if (!connected(board.filterSpots(spot => spot.canBeOccupied())))
+        if (!connected(board.filterTiles(tile => tile.canBeOccupied())))
             ++bisections
     }
     // console.log(`${bisections} bisections`)

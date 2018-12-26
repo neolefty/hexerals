@@ -1,5 +1,5 @@
 import {DriftColor} from '../../../color/DriftColor';
-import {Terrain} from '../model/Spot';
+import {Terrain} from '../model/Tile';
 import * as React from 'react';
 
 const WALL_W = 13 // half the width of the house body

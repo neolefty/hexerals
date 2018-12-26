@@ -5,7 +5,7 @@ import {HexMove, PlayerMove} from '../board/model/Move';
 import {BoardState} from '../board/model/BoardState';
 import {Player} from './Players';
 import {HexCoord} from '../board/model/HexCoord';
-import {Spot} from '../board/model/Spot';
+import {Tile} from '../board/model/Tile';
 import {Board} from '../board/model/Board';
 import * as assert from 'assert';
 
@@ -31,15 +31,15 @@ export class StupidRobot implements Robot {
                 bs.board,
                 player,
                 (orig: HexCoord, dests: List<HexCoord>) => {
-                    const origSpot = bs.board.getSpot(orig)
+                    const origTile = bs.board.getTile(orig)
                     // I think this is a shortcut to giving each move a fair weight
                     const takeIt: boolean =
-                        (Math.random() * (totalPop + origSpot.pop)) > totalPop
+                        (Math.random() * (totalPop + origTile.pop)) > totalPop
                     if (takeIt) {
                         const dest = dests.get(Math.floor(Math.random() * dests.size))
                         chosenMove = new HexMove(orig, dest.minus(orig))
                     }
-                    totalPop += origSpot.pop
+                    totalPop += origTile.pop
                 }
             )
             if (chosenMove !== NONE_MOVE) {
@@ -72,8 +72,8 @@ const forEachSetOfStarts = (
     player: Player,
     sideEffect: (orig: HexCoord, dests: List<HexCoord>) => void
 ): void => {
-    board.explicitSpots.forEach((spot: Spot, orig: HexCoord) => {
-        if (spot.owner === player && spot.pop > 1) {
+    board.explicitTiles.forEach((tile: Tile, orig: HexCoord) => {
+        if (tile.owner === player && tile.pop > 1) {
             const dests = orig.getNeighbors().filter((dest: HexCoord) =>
                 board.canBeOccupied(dest)
             ) as List<HexCoord>

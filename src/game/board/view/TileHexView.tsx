@@ -1,30 +1,32 @@
 import * as React from 'react';
-import {Spot} from '../model/Spot';
+import {Tile} from '../model/Tile';
 import {FlatTopHex} from './FlatTopHex';
 import {HexCoord} from '../model/HexCoord';
 import {DriftColor} from '../../../color/DriftColor';
 
-interface SpottedHexProps {
-    spot: Spot
+interface TileHexViewProps {
+    tile: Tile
     hex: HexCoord
     viewBoxHeight: number
     selected: boolean
+    color: DriftColor
+    text?: string
+    textColor?: DriftColor
+
     onSelect?: () => void
     onDragInto?: () => void
-    color: DriftColor
-    render?: (centerX: number, centerY: number) => JSX.Element | undefined
 }
 
 export const centerX = (cartX: number): number => 45 * cartX + 30
 export const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
-export const SpottedHex = (props: SpottedHexProps) => {
+export const TileHexView = (props: TileHexViewProps) => {
     const x: number = centerX(props.hex.cartX)
     const y: number = centerY(props.viewBoxHeight, props.hex.cartY)
     return (
         <FlatTopHex
             hex={props.hex}
-            owner={props.spot.owner}
-            terrain={props.spot.terrain}
+            owner={props.tile.owner}
+            terrain={props.tile.terrain}
             color={props.color}
             selected={props.selected}
             centerX={x}
@@ -32,15 +34,20 @@ export const SpottedHex = (props: SpottedHexProps) => {
             hexRadius={30}
             onSelect={props.onSelect}
             onDragInto={props.onDragInto}
-        >
-            {props.render && props.render(x, y)}
+        >{
+            props.text ? (
+                <text
+                    x={0}
+                    y={0.35 * 26}
+                    fontFamily="Sans-Serif"
+                    fontSize={27}
+                    textAnchor="middle"
+                    fill={(props.textColor || props.color.contrast()).toHexString()}
+                >
+                    {props.text}
+                </text>
+            ) : undefined
+        }
         </FlatTopHex>
     )
 }
-
-interface LocatedComponentProps {
-    centerX: number
-    centerY: number
-}
-
-export class LocatedComponent extends React.Component<LocatedComponentProps> {}

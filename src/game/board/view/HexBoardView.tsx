@@ -26,12 +26,12 @@ export class HexBoardView extends BoardViewBase {
 
     filterNobody(hex: HexCoord): boolean {
         return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getSpot(hex).owner === Player.Nobody
+            && this.props.boardState.board.getTile(hex).owner === Player.Nobody
     }
 
     filterPlayers(hex: HexCoord): boolean {
         return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getSpot(hex).owner !== Player.Nobody
+            && this.props.boardState.board.getTile(hex).owner !== Player.Nobody
     }
 
     filterCursor(hex: HexCoord): boolean {

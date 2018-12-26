@@ -92,8 +92,8 @@ const queueMovesReducer = (
             .playerIsQueuedTo(move.player, move.source)
         const options = result.board.validationOptions(newMessages)
         options.ignoreSmallPop = true
-        if (queuedTo) // if the player hopes to have already taken that spot, let them try
-            options.ignoreSpotOwner = true
+        if (queuedTo) // if the player hopes to have already taken that hex, let them try
+            options.ignoreTileOwner = true
         const valid = result.board.validate(move, options)
         const updatedMessages = newMessages.length > 0
             ? result.messages.push(...newMessages)

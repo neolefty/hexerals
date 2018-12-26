@@ -2,14 +2,14 @@ import {Map} from 'immutable'
 
 import {HexCoord} from './HexCoord'
 import {Board} from './Board'
-import {Spot} from './Spot'
+import {Tile} from './Tile'
 import {StatusMessage} from '../../../common/StatusMessage';
 
 export class Arranger {
     arrange(
         board: Board,
         status: StatusMessage[] | undefined = undefined,
-    ): Map<HexCoord, Spot> {
+    ): Map<HexCoord, Tile> {
         throw new Error('not implemented')
     }
 }

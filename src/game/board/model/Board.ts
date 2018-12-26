@@ -6,7 +6,7 @@ import {PlayerMove} from './Move'
 import {Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {Arranger} from './Arranger'
-import {Spot} from './Spot'
+import {Tile} from './Tile'
 import {HexCoord} from './HexCoord'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
@@ -34,7 +34,7 @@ export class BoardRules {
     ) {}
 }
 
-export type SpotFilter = (spot: Spot) => boolean
+export type TileFilter = (tile: Tile) => boolean
 
 export class Board {
     static readonly DEFAULT_ARRANGERS: Arranger[] = [new RandomPlayerArranger()]
@@ -42,13 +42,13 @@ export class Board {
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
-        // there may be blank spots not listed here -- see allSpots
-        explicitSpots: Map<HexCoord, Spot> = Map(),
+        // there may be blank tiles not listed here -- see allTiles
+        explicitTiles: Map<HexCoord, Tile> = Map(),
     ) {
         return new Board(
             new BoardRules(constraints),
             players,
-            explicitSpots,
+            explicitTiles,
         )
     }
 
@@ -70,7 +70,7 @@ export class Board {
         const constraints = new RectangularConstraints(w, h)
         let result = Board.construct(constraints, players)
         arrangers.forEach(arranger =>
-            result = result.overlaySpots(
+            result = result.overlayTiles(
                 arranger.arrange(result, messages)
             )
         )
@@ -81,8 +81,8 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // empty spots are implied — see this.allHexes
-        readonly explicitSpots: Map<HexCoord, Spot>,
+        // empty tiles are implied — see this.allHexes
+        readonly explicitTiles: Map<HexCoord, Tile>,
     ) {}
 
     get moveValidator(): MoveValidator { return this.rules.validator }
@@ -93,45 +93,45 @@ export class Board {
     inBounds = (coord: HexCoord) => this.constraints.inBounds(coord)
 
     canBeOccupied = (coord: HexCoord) =>
-        this.inBounds(coord) && this.getSpot(coord).canBeOccupied()
+        this.inBounds(coord) && this.getTile(coord).canBeOccupied()
 
-    // All of this board's possible spots. Note that this.explicitSpots omits some blanks.
+    // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
     get allHexes(): Set<HexCoord> {
         return this.constraints.all()
     }
 
     // noinspection PointlessBooleanExpressionJS
-    filterSpots = (filter: SpotFilter): Set<HexCoord> =>
+    filterTiles = (filter: TileFilter): Set<HexCoord> =>
         this.allHexes.filter(
-            hex => !!(hex && filter(this.getSpot(hex)))
+            hex => !!(hex && filter(this.getTile(hex)))
         ) as Set<HexCoord>
 
-    getSpot(coord: HexCoord): Spot {
+    getTile(coord: HexCoord): Tile {
         assert(this.inBounds(coord))
-        return this.explicitSpots.get(coord, Spot.BLANK)
+        return this.explicitTiles.get(coord, Tile.BLANK)
     }
 
-    getCartSpot(cx: number, cy: number): Spot {
+    getCartTile(cx: number, cy: number): Tile {
         assert((cx + cy) % 2 === 0)
-        return this.getSpot(HexCoord.getCart(cx, cy))
+        return this.getTile(HexCoord.getCart(cx, cy))
     }
 
     applyMove(move: PlayerMove): BoardAndMessages {
         return this.applyMoves(List([move]))
     }
 
-    setSpots(spots: Map<HexCoord, Spot>): Board {
-        return (this.explicitSpots.equals(spots))
+    setTiles(tiles: Map<HexCoord, Tile>): Board {
+        return (this.explicitTiles.equals(tiles))
             ? this
-            : new Board(this.rules, this.players, spots)
+            : new Board(this.rules, this.players, tiles)
     }
 
-    overlaySpots(overlay: Map<HexCoord, Spot>): Board {
-        return this.setSpots(
-            this.explicitSpots.withMutations(
-                (mSpots: Map<HexCoord, Spot>) => {
-                    overlay.forEach((value: Spot, key: HexCoord) => {
-                        mSpots.set(key, value)
+    overlayTiles(overlay: Map<HexCoord, Tile>): Board {
+        return this.setTiles(
+            this.explicitTiles.withMutations(
+                (mTiles: Map<HexCoord, Tile>) => {
+                    overlay.forEach((value: Tile, key: HexCoord) => {
+                        mTiles.set(key, value)
                     })
                 })
         )
@@ -140,10 +140,10 @@ export class Board {
     // Do some moves.
     // Illegal moves are skipped -- for example if a player no longer controls a hex.
     applyMoves(moves: List<PlayerMove>): BoardAndMessages {
-        const options = new MoveValidatorOptions(this.explicitSpots, [])
+        const options = new MoveValidatorOptions(this.explicitTiles, [])
         this.moveValidator.applyMoves(moves, options)
         return new BoardAndMessages(
-            this.setSpots(options.spots),
+            this.setTiles(options.tiles),
             List(options.status || []),
         )
     }
@@ -163,15 +163,15 @@ export class Board {
     validationOptions(
         messages: StatusMessage[] | undefined = undefined
     ): MoveValidatorOptions {
-        return new MoveValidatorOptions(this.explicitSpots, messages)
+        return new MoveValidatorOptions(this.explicitTiles, messages)
     }
 
     toString(): string {
         let result = `Constraints: ${this.constraints.toString()}\n`
             + `Edges: ${ this.edges.toString()}\n`
-            + `Spots: (`
-        this.explicitSpots.map((spot, coord) =>
-            result += spot.pop ? `${coord} — ${spot} ` : ''
+            + `Tiles: (`
+        this.explicitTiles.map((tile, coord) =>
+            result += tile.pop ? `${coord} — ${tile} ` : ''
         )
         result += ')'
         return result

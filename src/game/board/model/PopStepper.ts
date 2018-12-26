@@ -1,5 +1,5 @@
 import {Board} from './Board';
-import {Terrain} from './Spot';
+import {Terrain} from './Tile';
 
 const COUNTRYSIDE_TURNS = 50
 const CITY_TURNS = 2
@@ -11,22 +11,22 @@ export class PopStepper {
     ) {}
 
     step(orig: Board, turn: number): Board {
-        let result = orig.explicitSpots
+        let result = orig.explicitTiles
         // TODO consider using a single loop
         if (turn % this.cityTurns === 0)
             result = result.withMutations(mut =>
-                result.forEach((spot, hex) => {
-                    if (spot.terrain === Terrain.City && spot.isOwned)
-                        mut.set(hex, spot.incrementPop())
+                result.forEach((tile, hex) => {
+                    if (tile.terrain === Terrain.City && tile.isOwned)
+                        mut.set(hex, tile.incrementPop())
                 })
             )
         if (turn % this.countrysideTurns === 0)
             result = result.withMutations(mut =>
-                result.forEach((spot, hex) => {
-                    if (spot.terrain === Terrain.Empty && spot.isOwned)
-                        mut.set(hex, spot.incrementPop())
+                result.forEach((tile, hex) => {
+                    if (tile.terrain === Terrain.Empty && tile.isOwned)
+                        mut.set(hex, tile.incrementPop())
                 })
             )
-        return orig.setSpots(result)
+        return orig.setTiles(result)
     }
 }

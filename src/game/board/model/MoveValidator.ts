@@ -1,30 +1,30 @@
 import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {Spot} from './Spot';
+import {Tile} from './Tile';
 import {List, Map} from 'immutable';
 import {HexCoord} from './HexCoord';
 import {PlayerMove} from './Move';
 import {BoardConstraints} from './Constraints';
 
 export class MoveValidatorOptions {
-    // the spots under consideration, which start out as the current board's spots
+    // the tiles under consideration, which start out as the current board's tiles
     // but may get speculatively reassigned in internal scratch values during validation
-    spots: Map<HexCoord, Spot>
+    tiles: Map<HexCoord, Tile>
 
     // If true, don't invalidate just because there isn't enough population
-    // in the spot *now* to move -- there may be enough in the future.
+    // on the tile *now* to move -- there may be enough in the future.
     ignoreSmallPop: boolean = false
 
     // If true, don't invalidate because the current owner doesn't match the
     // player planning the move -- ownership may change before this move happens.
-    ignoreSpotOwner: boolean = false
+    ignoreTileOwner: boolean = false
 
     constructor(
-        spots: Map<HexCoord, Spot>,
+        tiles: Map<HexCoord, Tile>,
         // status messages to add to
         readonly status: StatusMessage[] | undefined = undefined,
     ) {
-        this.spots = spots
+        this.tiles = tiles
     }
 }
 
@@ -57,7 +57,7 @@ export class MoveValidator {
         }
 
         // can be occupied
-        const dest = options.spots.get(move.dest)
+        const dest = options.tiles.get(move.dest)
         if (dest && !dest.canBeOccupied()) {
             if (options.status)
                 options.status.push(
@@ -82,8 +82,8 @@ export class MoveValidator {
         }
 
         // owner === player making the move
-        const origin = options.spots.get(move.source, Spot.BLANK)
-        if (!options.ignoreSpotOwner && origin.owner !== move.player) {
+        const origin = options.tiles.get(move.source, Tile.BLANK)
+        if (!options.ignoreTileOwner && origin.owner !== move.player) {
             if (options && options.status)
                 options.status.push(new StatusMessage(
                     'wrong player', // TODO use constant
@@ -109,23 +109,23 @@ export class MoveValidator {
     }
 
     // Do some moves.
-    // Mutates options.messages and options.spots.
+    // Mutates options.messages and options.tiles.
     // Invalid moves are skipped.
     applyMoves(moves: List<PlayerMove>, options: MoveValidatorOptions) {
         moves.forEach((move: PlayerMove) => {
             const valid = this.validate(move, options)
             if (valid) {
-                const origin = options.spots.get(move.source)
+                const origin = options.tiles.get(move.source)
                 assert(origin)
-                const newSourceSpot = origin.setPop(1)
+                const newSourceTile = origin.setPop(1)
                 // TODO support moving only part of a stack (half etc)
-                const oldDestSpot = options.spots.get(move.dest, Spot.BLANK)
-                const march = new Spot(origin.owner, origin.pop - 1)
-                const newDestSpot = oldDestSpot.settle(march)
-                options.spots = options.spots.withMutations(
-                    (m: Map<HexCoord, Spot>) => {
-                        m.set(move.source, newSourceSpot)
-                        m.set(move.dest, newDestSpot)
+                const oldDestTile = options.tiles.get(move.dest, Tile.BLANK)
+                const march = new Tile(origin.owner, origin.pop - 1)
+                const newDestTile = oldDestTile.settle(march)
+                options.tiles = options.tiles.withMutations(
+                    (m: Map<HexCoord, Tile>) => {
+                        m.set(move.source, newSourceTile)
+                        m.set(move.dest, newDestTile)
                     })
             }
         })

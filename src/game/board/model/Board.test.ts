@@ -6,7 +6,7 @@ import {pickNPlayers, Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {CornersPlayerArranger} from './PlayerArranger'
-import {Spot, Terrain} from './Spot'
+import {Tile, Terrain} from './Tile'
 import {HexCoord} from './HexCoord'
 
 // noinspection JSUnusedGlobalSymbols
@@ -17,13 +17,13 @@ export function printBoard(board: Board) {
         board.edges.xRange().forEach((x: number) => {
             let c = ' '
             if ((x + y) % 2 === 0 && board.inBounds(HexCoord.getCart(x, y))) {
-                const spot = board.getCartSpot(x, y)
-                if (spot.owner === Player.Two)
-                    c = spot.pop === 0 ? 'o' : (spot.pop === 1 ? 'p' : 'P')
-                else if (spot.owner === Player.One)
-                    c = spot.pop === 0 ? '=' : (spot.pop === 1 ? 'c' : 'C')
+                const tile = board.getCartTile(x, y)
+                if (tile.owner === Player.Two)
+                    c = tile.pop === 0 ? 'o' : (tile.pop === 1 ? 'p' : 'P')
+                else if (tile.owner === Player.One)
+                    c = tile.pop === 0 ? '=' : (tile.pop === 1 ? 'c' : 'C')
                 else
-                    c = (spot.terrain == Terrain.Mountain) ? 'M' : '-'
+                    c = (tile.terrain == Terrain.Mountain) ? 'M' : '-'
             }
             line += c
         })
@@ -40,20 +40,20 @@ it('converts between hex and cartesian coords', () => {
     // h x w, but every other row (that is, h/2 rows) is short by 1
     expect(tenByFive.constraints.all().size == w * h - Math.trunc(h/2))
 
-    const metaCartSpot = (cx: number, cy: number) => (
-        () => tenByFive.getCartSpot(cx, cy)
+    const metaCartTile = (cx: number, cy: number) => (
+        () => tenByFive.getCartTile(cx, cy)
     )
 
-    expect(metaCartSpot(6, 3)).toThrow()  // assert sum is even
-    expect(metaCartSpot(-1, -1)).toThrow()  // out of bounds
-    expect(metaCartSpot(w, h)).toThrow()  // out of bounds
-    expect(metaCartSpot(w, 0)).toThrow()  // out of bounds
-    expect(metaCartSpot(0, h)).toThrow()  // out of bounds
+    expect(metaCartTile(6, 3)).toThrow()  // assert sum is even
+    expect(metaCartTile(-1, -1)).toThrow()  // out of bounds
+    expect(metaCartTile(w, h)).toThrow()  // out of bounds
+    expect(metaCartTile(w, 0)).toThrow()  // out of bounds
+    expect(metaCartTile(0, h)).toThrow()  // out of bounds
 
     const midHex = HexCoord.getCart(6, 2)
     expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
     // expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
-    expect(tenByFive.getCartSpot(6, 2) === Spot.BLANK).toBeTruthy()
+    expect(tenByFive.getCartTile(6, 2) === Tile.BLANK).toBeTruthy()
 })
 
 it('overlays', () => {
@@ -62,18 +62,18 @@ it('overlays', () => {
         pickNPlayers(4),
         [new CornersPlayerArranger(10)],
     )
-    expect(five.getSpot(HexCoord.ORIGIN))
-        .toEqual(new Spot(Player.Zero, 10, Terrain.City))
-    expect(five.getSpot(HexCoord.RIGHT_UP) === Spot.BLANK).toBeTruthy()
-    const emptyFive = new Spot(Player.Nobody, 5, Terrain.Empty)
-    const cityThree = new Spot(Player.One, 3, Terrain.City)
-    const overlayTemp: Map<HexCoord, Spot> = Map()
+    expect(five.getTile(HexCoord.ORIGIN))
+        .toEqual(new Tile(Player.Zero, 10, Terrain.City))
+    expect(five.getTile(HexCoord.RIGHT_UP) === Tile.BLANK).toBeTruthy()
+    const emptyFive = new Tile(Player.Nobody, 5, Terrain.Empty)
+    const cityThree = new Tile(Player.One, 3, Terrain.City)
+    const overlayTemp: Map<HexCoord, Tile> = Map()
     const overlay = overlayTemp
         .set(HexCoord.ORIGIN, emptyFive)
         .set(HexCoord.RIGHT_UP, cityThree)
-    const after = five.overlaySpots(overlay)
-    expect(after.getSpot(HexCoord.ORIGIN) === emptyFive).toBeTruthy()
-    expect(after.getSpot(HexCoord.RIGHT_UP) === cityThree).toBeTruthy()
+    const after = five.overlayTiles(overlay)
+    expect(after.getTile(HexCoord.ORIGIN) === emptyFive).toBeTruthy()
+    expect(after.getTile(HexCoord.RIGHT_UP) === cityThree).toBeTruthy()
 })
 
 it('navigates around a board', () => {
@@ -180,34 +180,34 @@ it('steps population', () => {
     const ur = threeByFour.edges.upperRight
     const urd = ur.getDown()
     const urd2 = urd.getDown()
-    expect(threeByFour.getSpot(ur).terrain).toBe(Terrain.City)
-    expect(threeByFour.getSpot(ur).pop).toBe(20)
-    expect(threeByFour.getSpot(ur).isOwned).toBeTruthy()
-    expect(threeByFour.getSpot(urd).isOwned).toBeFalsy()
+    expect(threeByFour.getTile(ur).terrain).toBe(Terrain.City)
+    expect(threeByFour.getTile(ur).pop).toBe(20)
+    expect(threeByFour.getTile(ur).isOwned).toBeTruthy()
+    expect(threeByFour.getTile(urd).isOwned).toBeFalsy()
 
     // make a move
     const moved = threeByFour.applyMove(
         PlayerMove.construct(Player.One, ur, HexCoord.DOWN)
     ).board
-    expect(moved.getSpot(ur).pop).toBe(1)
-    expect(moved.getSpot(urd).pop).toBe(19)
-    expect(moved.getSpot(urd2).pop).toBe(0)
+    expect(moved.getTile(ur).pop).toBe(1)
+    expect(moved.getTile(urd).pop).toBe(19)
+    expect(moved.getTile(urd2).pop).toBe(0)
 
     // after turn 1, no changes in population
     const one = moved.stepPop(1)
-    expect(one.getSpot(ur).pop).toBe(1)
-    expect(one.getSpot(urd).pop).toBe(19)
-    expect(one.getSpot(urd2).pop).toBe(0)
+    expect(one.getTile(ur).pop).toBe(1)
+    expect(one.getTile(urd).pop).toBe(19)
+    expect(one.getTile(urd2).pop).toBe(0)
 
     // after turn 2, city grows
     const two = one.stepPop(2)
-    expect(two.getSpot(ur).pop).toBe(2)
-    expect(two.getSpot(urd).pop).toBe(19)
-    expect(two.getSpot(urd2).pop).toBe(0)
+    expect(two.getTile(ur).pop).toBe(2)
+    expect(two.getTile(urd).pop).toBe(19)
+    expect(two.getTile(urd2).pop).toBe(0)
 
     // after turn 50, both city and countryside grow
     const fifty = two.stepPop(50)
-    expect(fifty.getSpot(ur).pop).toBe(3)
-    expect(fifty.getSpot(urd).pop).toBe(20)
-    expect(fifty.getSpot(urd2).pop).toBe(0)
+    expect(fifty.getTile(ur).pop).toBe(3)
+    expect(fifty.getTile(urd).pop).toBe(20)
+    expect(fifty.getTile(urd2).pop).toBe(0)
 })

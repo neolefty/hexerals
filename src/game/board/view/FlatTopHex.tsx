@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Player} from '../../players/Players'
 import {DriftColor} from '../../../color/DriftColor'
-import {Terrain} from '../model/Spot'
+import {Terrain} from '../model/Tile'
 import {TerrainView} from './TerrainView'
 import {HexCoord} from '../model/HexCoord'
 
@@ -41,7 +41,8 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
     const logIt = (desc: string) => {}
     return (
         <g
-            className={`${props.owner} spot${props.selected ? ' active' : ''}`}
+            transform={`translate(${props.centerX} ${props.centerY})`}
+            className={`${props.owner} tile${props.selected ? ' active' : ''}`}
             onMouseDown={(e) => {
                 logIt(`onMouseDown ${e}`)
                 if (props.onSelect) {
@@ -71,7 +72,7 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             onMouseDownCapture={(e) => {logIt(`onMouseDownCapture ${e.nativeEvent.type}`)}}
         >
             <polygon
-                points={hexPoints(props.centerX, props.centerY, props.hexRadius)}
+                points={hexPoints(0, 0, props.hexRadius)}
                 style={
                     props.color && {
                         fill: props.color.toHexString()
@@ -80,17 +81,15 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             />
             {
                 props.terrain !== Terrain.Empty ? (
-                        <TerrainView
-                            centerX={props.centerX}
-                            centerY={props.centerY}
-                            hexRadius={props.hexRadius}
-                            terrain={props.terrain}
-                            color={props.color}
-                        />
-                    )
-                    : undefined
+                    <TerrainView
+                        centerX={0}
+                        centerY={0}
+                        hexRadius={props.hexRadius}
+                        terrain={props.terrain}
+                        color={props.color}
+                    />
+                ) : undefined
             }
-
             {props.children && <g>{props.children}</g>}
         </g>
     )

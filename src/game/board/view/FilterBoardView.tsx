@@ -3,7 +3,7 @@ import * as React from 'react';
 import {DriftColor} from '../../../color/DriftColor';
 import {HexCoord} from '../model/HexCoord';
 import {BoardViewProps} from './BoardViewBase';
-import {SpottedHex} from './SpottedHex';
+import {TileHexView} from './TileHexView';
 import {PlayerMove} from '../model/Move';
 import {List} from 'immutable';
 import {Player} from '../../players/Players';
@@ -44,34 +44,21 @@ export class FilterBoardView extends React.Component<FilterBoardViewProps> {
                 boardState.board.constraints.all().filter(
                     this.props.filter
                 ).map(hex => {
-                    const spot = boardState.board.getSpot(hex)
+                    const tile = boardState.board.getTile(hex)
                     const maybeColor: DriftColor | undefined
-                        = this.props.colors && this.props.colors.get(spot.owner)
+                        = this.props.colors && this.props.colors.get(tile.owner)
                     const color: DriftColor = maybeColor || DriftColor.BLACK
                     return (
-                        <SpottedHex
+                        <TileHexView
                             key={hex.id}
-                            spot={spot}
+                            text={tile.pop === 0 ? undefined : `${tile.pop}`}
+                            tile={tile}
                             color={color}
                             hex={hex}
                             selected={hex === boardState.cursor}
                             viewBoxHeight={h}
                             onSelect={() => this.props.onPlaceCursor(hex)}
                             onDragInto={this.makeOnDrag(hex)}
-                            render={(spot.pop === 0)
-                                ? undefined
-                                : (centerX: number, centerY: number) => (
-                                    <text
-                                        x={centerX}
-                                        y={centerY + 0.35 * 26}
-                                        fontFamily="Sans-Serif"
-                                        fontSize={27}
-                                        textAnchor="middle"
-                                        fill={color.contrast().toHexString()}
-                                    >
-                                        {spot.pop}
-                                    </text>)
-                            }
                         />
                     )
                 })

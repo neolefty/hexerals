@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Dimension from '../../../common/Dimension';
-import {SpottedHex} from './SpottedHex';
-import {Spot, Terrain} from '../model/Spot';
+import {TileHexView} from './TileHexView';
+import {Tile, Terrain} from '../model/Tile';
 import {HexCoord} from '../model/HexCoord';
 import {DriftColor} from '../../../color/DriftColor';
 import {Map} from 'immutable';
@@ -15,26 +15,26 @@ export interface HelpOptions {
 const h = 6 * 26
 const w = 3 * 45 + 15
 
-interface SpotAndText {
-    spot: Spot
+interface TileAndText {
+    tile: Tile
     text: string
     color: DriftColor
 }
 
-const st = (spot: Spot, text: string, color: DriftColor = DriftColor.GREY_20) =>
-    ({ spot: spot, text: text, color: color })
+const st = (tile: Tile, text: string, color: DriftColor = DriftColor.GREY_20) =>
+    ({ tile: tile, text: text, color: color })
 
-const dirs = Map<HexCoord, SpotAndText>([
+const dirs = Map<HexCoord, TileAndText>([
     [
         HexCoord.ORIGIN,
-        st(new Spot(Player.Nobody, 0, Terrain.City), '', DriftColor.GREY_20),
+        st(new Tile(Player.Nobody, 0, Terrain.City), '', DriftColor.GREY_20),
     ],
-    [HexCoord.UP, st(Spot.BLANK, 'w')],
-    [HexCoord.DOWN, st(Spot.BLANK, 's')],
-    [HexCoord.LEFT_UP, st(Spot.BLANK, 'q')],
-    [HexCoord.LEFT_DOWN, st(Spot.BLANK, 'a')],
-    [HexCoord.RIGHT_UP, st(Spot.BLANK, 'e')],
-    [HexCoord.RIGHT_DOWN, st(Spot.BLANK, 'd')],
+    [HexCoord.UP, st(Tile.BLANK, 'w')],
+    [HexCoord.DOWN, st(Tile.BLANK, 's')],
+    [HexCoord.LEFT_UP, st(Tile.BLANK, 'q')],
+    [HexCoord.LEFT_DOWN, st(Tile.BLANK, 'a')],
+    [HexCoord.RIGHT_UP, st(Tile.BLANK, 'e')],
+    [HexCoord.RIGHT_DOWN, st(Tile.BLANK, 'd')],
 ])
 
 export const Help = (props: HelpOptions) => {
@@ -54,25 +54,15 @@ export const Help = (props: HelpOptions) => {
             >
                 {
                     dirs.keySeq().map((hex: HexCoord) => (
-                        <SpottedHex
+                        <TileHexView
                             key={hex.id}
-                            spot={dirs.get(hex).spot}
+                            tile={dirs.get(hex).tile}
                             hex={hex}
                             selected={false}
                             viewBoxHeight={h}
-                            // color={DriftColor.GREY_40}
                             color={dirs.get(hex).color}
-                            render={(x, y) => (
-                                <text
-                                    x={x}
-                                    y={y + 0.35 * 26}
-                                    fontSize={27}
-                                    textAnchor="middle"
-                                    fill="#fff"
-                                >
-                                    {dirs.get(hex).text}
-                                </text>
-                            )}
+                            text={dirs.get(hex).text}
+                            textColor={DriftColor.WHITE}
                         />
                     ))}
             </svg>

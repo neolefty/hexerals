@@ -11,7 +11,7 @@ import {Board} from '../model/Board';
 import {pickNPlayers, Player} from '../../players/Players';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
 import {HexCoord} from '../model/HexCoord';
-import {Spot} from '../model/Spot';
+import {Tile} from '../model/Tile';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MovementQueue} from '../model/MovementQueue';
 import {PlayerMove} from '../model/Move';
@@ -35,16 +35,16 @@ export class BoardReducerTester {
         )))
     }
 
-    getRawSpot = (coord: HexCoord): Spot | undefined => this.spots.get(coord)
-    getSpot = (coord: HexCoord): Spot => this.board.getSpot(coord)
+    getRawTile = (coord: HexCoord): Tile | undefined => this.tiles.get(coord)
+    getTile = (coord: HexCoord): Tile => this.board.getTile(coord)
 
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
-    get spots(): Map<HexCoord, Spot> { return this.board.explicitSpots }
+    get tiles(): Map<HexCoord, Tile> { return this.board.explicitTiles }
     get cursor(): HexCoord { return this.state.cursor }
     get messages(): List<StatusMessage> { return this.state.messages }
-    get cursorRawSpot(): Spot | undefined { return this.getRawSpot(this.cursor) }
-    get cursorSpot(): Spot { return this.getSpot(this.cursor) }
+    get cursorRawTile(): Tile | undefined { return this.getRawTile(this.cursor) }
+    get cursorTile(): Tile { return this.getTile(this.cursor) }
     get moves(): MovementQueue { return this.state.moves }
 
     get ll() { return this.state.board.edges.lowerLeft }

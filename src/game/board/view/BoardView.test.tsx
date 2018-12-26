@@ -12,19 +12,19 @@ import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
-import {Spot, Terrain} from '../model/Spot';
+import {Tile, Terrain} from '../model/Tile';
 import {PlayerMove} from '../model/Move';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
 import {BoardReducerTester} from './BoardReducerTester';
 
-it('renders a spot', () => {
+it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})
     const board = Board.constructSquare(
         3, pickNPlayers(2), [new CornersPlayerArranger(5)]
     )
     const view = enzyme.render(
-        <OldGridSpotView
-            spot={board.getSpot(HexCoord.ORIGIN)}
+        <OldGridTileView
+            tile={board.getTile(HexCoord.ORIGIN)}
             key={0}
             selected={false}
             coord={HexCoord.ORIGIN}
@@ -58,12 +58,12 @@ it('renders a board with no selection', () => {
         />
     )
     expect(view.children().length).toEqual(n)  // n rows
-    const spots = view.find('.spot')
-    expect(spots.length).toEqual(8)
-    expect(spots.first().text()).toEqual('0')
-    expect(spots.first().next().next().text()).toEqual('3')
-    expect(spots.text()).toEqual(('003'+'00'+'300'))
-    expect(spots[2].attribs['title'].substr(0, String(Player.One).length))
+    const tiles = view.find('.tile')
+    expect(tiles.length).toEqual(8)
+    expect(tiles.first().text()).toEqual('0')
+    expect(tiles.first().next().next().text()).toEqual('3')
+    expect(tiles.text()).toEqual(('003'+'00'+'300'))
+    expect(tiles[2].attribs['title'].substr(0, String(Player.One).length))
         .toEqual(String(Player.One))
     // none are selected
     expect(view.find('.active').length).toEqual(0)
@@ -98,29 +98,29 @@ it('renders a board with a selection', () => {
     expect(active[0]).toEqual(view.children()[2])
 })
 
-it('clicks a spot to select it', () => {
+it('clicks a tile to select it', () => {
     const board = Board.constructSquare(
         3, pickNPlayers(2), [new CornersPlayerArranger(6)])
     const coord = board.constraints.extreme(c => - c.cartX - c.cartY)
-    const spot = board.getSpot(coord)
+    const tile = board.getTile(coord)
     const state = {
         selected: false,
     }
 
-    const spotWrap = shallow(<OldGridSpotView
-        spot={spot}
+    const tileWrap = shallow(<OldGridTileView
+        tile={tile}
         coord={coord}
         selected={state.selected}
         onSelect={() => state.selected = true}
     />)
 
-    expect(spotWrap.hasClass('active')).toBeFalsy()
-    spotWrap.simulate('click')
+    expect(tileWrap.hasClass('active')).toBeFalsy()
+    tileWrap.simulate('click')
     expect(state.selected).toBeTruthy()
 
     // have to recreate since rendering above uses static reference to props.selected
     expect(shallow(
-        <OldGridSpotView spot={spot} selected={true} coord={coord}/>
+        <OldGridTileView tile={tile} selected={true} coord={coord}/>
     ).hasClass('active')).toBeTruthy()
 })
 
@@ -164,11 +164,11 @@ it('ensures things are not mutable', () => {
 
 it('creates game via react-redux', () => {
     const brt = new BoardReducerTester()
-    expect(brt.board.explicitSpots.size).toEqual(2)
+    expect(brt.board.explicitTiles.size).toEqual(2)
     expect(brt.messages.size).toEqual(0)
     const lowLeft = HexCoord.ORIGIN
-    expect(brt.getSpot(lowLeft)).toEqual(
-        new Spot(Player.Zero, BoardReducerTester.INITIAL_POP, Terrain.City)
+    expect(brt.getTile(lowLeft)).toEqual(
+        new Tile(Player.Zero, BoardReducerTester.INITIAL_POP, Terrain.City)
     )
 })
 
@@ -195,7 +195,7 @@ it('queues multiple moves at once', () => {
 it('blocks illegal moves', () => {
     const brt = new BoardReducerTester()
     expect(brt.cursor === HexCoord.NONE).toBeTruthy()
-    expect(brt.cursorRawSpot).toBeUndefined()
+    expect(brt.cursorRawTile).toBeUndefined()
 
     // try to move when there's no cursor -- should have no effect
     const boardBefore = brt.board
@@ -228,7 +228,7 @@ it('blocks illegal moves', () => {
 //     st.placeCursor(ul)
 //     st.queueMoveDown()
 //     expect(st.cursor === ul.getDown()).toBeTruthy()
-//     expect(st.cursorRawSpot).toBeUndefined()
+//     expect(st.cursorRawTile).toBeUndefined()
 // })
 
 it('cancels moves', () => {
@@ -298,7 +298,7 @@ it('makes real moves', () => {
     const boardBefore = brt.board
     brt.placeCursor(brt.ur)
     expect(brt.cursor === brt.ur).toBeTruthy()
-    expect(brt.getRawSpot(brt.ur.getDown())).toBeUndefined()
+    expect(brt.getRawTile(brt.ur.getDown())).toBeUndefined()
 
     brt.queueMoveDown()
     expect(brt.moves.size).toBe(0) // no current player yet
@@ -331,8 +331,8 @@ it('makes real moves', () => {
     // console.log(`-- moved --\n${boardStateToString(brt.state)}`)
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
     expect(brt.cursor === brt.ur.getDown()).toBeTruthy()
-    expect(brt.cursorRawSpot).toEqual(
-        new Spot(Player.One, BoardReducerTester.INITIAL_POP - 1)
+    expect(brt.cursorRawTile).toEqual(
+        new Tile(Player.One, BoardReducerTester.INITIAL_POP - 1)
     )
 
     // can't move more than 1 space at a time (can't jump)
@@ -352,7 +352,7 @@ it('makes real moves', () => {
     const down3 = brt.ur.getDown().plus(down2)
     expect(brt.cursor === down3).toBeTruthy()
 
-    // TODO queue from queued-to spot
+    // TODO queue from queued-to tile
 
     // make a second move down
     brt.placeCursor(brt.ur.getDown())
@@ -370,23 +370,23 @@ it('makes real moves', () => {
     expect(brt.moves.size).toBe(2)
 
     const downFromUR = (n: number) =>
-        brt.getSpot(brt.ur.plus(HexCoord.DOWN.times(n)))
-    const human1 = new Spot(Player.One, 1)
+        brt.getTile(brt.ur.plus(HexCoord.DOWN.times(n)))
+    const human1 = new Tile(Player.One, 1)
     expect(downFromUR(0)).toEqual(human1.setTerrain(Terrain.City))
     expect(downFromUR(1)).toEqual(human1)
     expect(downFromUR(2)).toEqual(
-        new Spot(Player.One, BoardReducerTester.INITIAL_POP-2)
+        new Tile(Player.One, BoardReducerTester.INITIAL_POP-2)
     )
-    expect(downFromUR(3)).toEqual(new Spot(Player.Nobody, 0))
-    expect(downFromUR(3) === Spot.BLANK).toBeTruthy()
+    expect(downFromUR(3)).toEqual(new Tile(Player.Nobody, 0))
+    expect(downFromUR(3) === Tile.BLANK).toBeTruthy()
 
     // moving contents 1 has no effect
     brt.placeCursor(brt.ur.getDown())
-    expect(brt.cursorSpot.owner === Player.One).toBeTruthy()
+    expect(brt.cursorTile.owner === Player.One).toBeTruthy()
     const before2 = brt.board
     brt.queueMoveDown(false)
     brt.doMoves()
-    expect(brt.getSpot(brt.ur.getDown()).pop).toEqual(1)
+    expect(brt.getTile(brt.ur.getDown()).pop).toEqual(1)
     // move had no effect, so board not updated
     expect(brt.board === before2).toBeTruthy()
 
@@ -394,25 +394,25 @@ it('makes real moves', () => {
     // TODO test that multiple players' queued moves all work simultaneously
 })
 
-interface OldGridSpotProps {
-    spot: Spot
+interface OldGridTileProps {
+    tile: Tile
     selected: boolean
     coord: HexCoord
 
     onSelect?: () => void
 }
 
-const oldGridSpotStyle = (props: OldGridSpotProps) =>
-(props.selected ? 'active ' : '') + 'spot ' + props.spot.owner
+const oldGridTileStyle = (props: OldGridTileProps) =>
+(props.selected ? 'active ' : '') + 'tile ' + props.tile.owner
 
-export const OldGridSpotView = (props: OldGridSpotProps) => (
+export const OldGridTileView = (props: OldGridTileProps) => (
     <span
-        className={oldGridSpotStyle(props)}
-        title={props.spot.owner + ' - ' + props.coord.toString(true)}
+        className={oldGridTileStyle(props)}
+        title={props.tile.owner + ' - ' + props.coord.toString(true)}
         // onClick={props.onSelect}
         onClick={(/*e*/) => props.onSelect && props.onSelect()}
     >
-        {props.spot.pop}
+        {props.tile.pop}
     </span>
 )
 
@@ -437,8 +437,8 @@ export class OldGridView extends BoardViewBase {
                                     (coord: HexCoord) => bs.board.inBounds(coord)
                                 ).map(
                                     (coord: HexCoord) => (
-                                        <OldGridSpotView
-                                            spot={bs.board.getSpot(coord)}
+                                        <OldGridTileView
+                                            tile={bs.board.getTile(coord)}
                                             key={coord.id}
                                             selected={coord === bs.cursor}
                                             onSelect={() => this.props.onPlaceCursor(coord)}

@@ -1,7 +1,4 @@
-svg.board {
-}
-
-g.spot {
+g.tile {
     cursor: default;
 
     polygon {
@@ -14,12 +11,13 @@ g.spot {
         polygon {
             stroke: #a22;
             stroke-width: 0.5%;
+            //stroke-width: 5%;
+            //transform: scale(0.5);
         }
     }
 }
 
 g.Nobody polygon {}
-
 
 /* TODO would be nice for active to take precedence over hover or something */
 g.active {

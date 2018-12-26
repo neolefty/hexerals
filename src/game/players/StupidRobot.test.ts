@@ -8,8 +8,8 @@ it('makes moves', () => {
     brt.setRobot(Player.Zero, stupid)
     brt.setRobot(Player.One, stupid)
     const countNonEmptyHexes = () =>
-        brt.board.filterSpots(spot => spot.pop > 0).size
-    // two spots should have non-zero population
+        brt.board.filterTiles(tile => tile.pop > 0).size
+    // two tiles should have non-zero population
     expect(countNonEmptyHexes()).toEqual(2)
     brt.queueRobots()
     brt.doMoves()

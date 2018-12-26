@@ -6,7 +6,7 @@ import {DriftColor} from '../../../color/DriftColor';
 import {Player} from '../../players/Players';
 import {viewBoxHeight} from './FilterBoardView';
 import {HexMove} from '../model/Move';
-import {centerX, centerY} from './SpottedHex';
+import {centerX, centerY} from './TileHexView';
 
 interface MoveQueueViewProps {
     moves: MovementQueue
