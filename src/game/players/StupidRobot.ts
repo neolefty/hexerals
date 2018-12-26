@@ -7,6 +7,7 @@ import {Player} from './Players';
 import {HexCoord} from '../board/model/HexCoord';
 import {Spot} from '../board/model/Spot';
 import {Board} from '../board/model/Board';
+import * as assert from 'assert';
 
 // improvements
 // * parameterize intelligence -- a vector of booleans or numbers that can be randomly modified
@@ -26,11 +27,14 @@ export class StupidRobot implements Robot {
         if (!curMoves || curMoves.size === 0) {
             let totalPop = 0
             let chosenMove: HexMove = NONE_MOVE
-            forEachSetOfStarts(bs.board, player,
+            forEachSetOfStarts(
+                bs.board,
+                player,
                 (orig: HexCoord, dests: List<HexCoord>) => {
                     const origSpot = bs.board.getSpot(orig)
                     // I think this is a shortcut to giving each move a fair weight
-                    const takeIt: boolean = (Math.random() * (totalPop + origSpot.pop)) > totalPop
+                    const takeIt: boolean =
+                        (Math.random() * (totalPop + origSpot.pop)) > totalPop
                     if (takeIt) {
                         const dest = dests.get(Math.floor(Math.random() * dests.size))
                         chosenMove = new HexMove(orig, dest.minus(orig))
@@ -48,6 +52,14 @@ export class StupidRobot implements Robot {
                     pos = dest
                     dest = dest.plus(delta)
                 } while (bs.board.canBeOccupied(dest))
+                // randomly shorten the move queue, biased towards longer
+                if (result.size > 1) {
+                    const movesToDrop = Math.floor(
+                        Math.random() * Math.random() * result.size
+                    )
+                    result = result.slice(0, result.size - movesToDrop) as List<HexMove>
+                    assert(result.size >= 1)
+                }
                 return { makeMoves: result }
             }
         }
