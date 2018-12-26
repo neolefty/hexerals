@@ -24,7 +24,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         tickMillis: 500,
         boardWidth: 11,
         boardHeight: 7,
-        mountainPercent: 10,
+        mountainPercent: 30,
     },
     localGame: undefined,
 }
