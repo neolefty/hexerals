@@ -40,6 +40,8 @@ g.Nobody polygon {}
 //}
 
 g.spot:hover polygon {
+    //fill: #fff;
+    //fill-opacity: 100%;
     stroke: #a22;
     stroke-width: 0.5%;
 }

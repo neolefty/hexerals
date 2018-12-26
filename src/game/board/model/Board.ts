@@ -90,9 +90,10 @@ export class Board {
     get edges(): RectEdges { return this.rules.edges }
     get popStepper(): PopStepper { return this.rules.stepper }
 
-    inBounds(coord: HexCoord) {
-        return this.constraints.inBounds(coord)
-    }
+    inBounds = (coord: HexCoord) => this.constraints.inBounds(coord)
+
+    canBeOccupied = (coord: HexCoord) =>
+        this.inBounds(coord) && this.getSpot(coord).canBeOccupied()
 
     // All of this board's possible spots. Note that this.explicitSpots omits some blanks.
     get allHexes(): Set<HexCoord> {
@@ -174,9 +175,5 @@ export class Board {
         )
         result += ')'
         return result
-    }
-
-    isBlank(hex: HexCoord) {
-        return !this.explicitSpots.has(hex) || this.getSpot(hex).isBlank()
     }
 }

@@ -8,9 +8,6 @@ import {HexCoord} from './HexCoord';
 import {connected} from './HexGraph';
 import {Arranger} from './Arranger';
 
-export const nonMountain: SpotFilter = (spot) =>
-    spot.terrain !== Terrain.Mountain
-
 // replace empty terrain randomly and without blocking
 export class TerrainArranger extends Arranger {
     constructor(
@@ -21,7 +18,7 @@ export class TerrainArranger extends Arranger {
         // is it okay to bisect the map using this terrain?
         readonly allowBisection: boolean = false,
         // what spots should be considered when avoiding bisection?
-        readonly bisectionFilter: SpotFilter = nonMountain,
+        readonly bisectionFilter: SpotFilter = spot => spot.canBeOccupied(),
     ) {
         super()
         assert(fractionOfEmpty <= 1 && fractionOfEmpty >= 0)

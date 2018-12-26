@@ -5,7 +5,7 @@ import {HexMove, PlayerMove} from '../board/model/Move';
 import {BoardState} from '../board/model/BoardState';
 import {Player} from './Players';
 import {HexCoord} from '../board/model/HexCoord';
-import {Spot, Terrain} from '../board/model/Spot';
+import {Spot} from '../board/model/Spot';
 import {Board} from '../board/model/Board';
 
 // improvements
@@ -25,23 +25,29 @@ export class StupidRobot implements Robot {
         // only queue moves if we don't already have any queued
         if (!curMoves || curMoves.size === 0) {
             let totalPop = 0
-            let curMove: HexMove = NONE_MOVE
-            forEachLegalMove(bs.board, player, (orig: HexCoord, dest: HexCoord) => {
-                const origSpot = bs.board.getSpot(orig)
-                // I think this is a shortcut to giving each move a fair weight
-                const takeIt: boolean = (Math.random() * (totalPop + origSpot.pop)) > totalPop
-                if (takeIt)
-                    curMove = new HexMove(orig, dest.minus(orig))
-                totalPop += origSpot.pop
-            })
-            if (curMove !== NONE_MOVE) {
+            let chosenMove: HexMove = NONE_MOVE
+            forEachSetOfStarts(bs.board, player,
+                (orig: HexCoord, dests: List<HexCoord>) => {
+                    const origSpot = bs.board.getSpot(orig)
+                    // I think this is a shortcut to giving each move a fair weight
+                    const takeIt: boolean = (Math.random() * (totalPop + origSpot.pop)) > totalPop
+                    if (takeIt) {
+                        const dest = dests.get(Math.floor(Math.random() * dests.size))
+                        chosenMove = new HexMove(orig, dest.minus(orig))
+                    }
+                    totalPop += origSpot.pop
+                }
+            )
+            if (chosenMove !== NONE_MOVE) {
+                const delta = chosenMove.delta
                 let result: List<HexMove> = List()
-                let pos: HexCoord = curMove.source
-                const delta = curMove.delta
+                let pos: HexCoord = chosenMove.source
+                let dest = chosenMove.dest
                 do {
                     result = result.push(new HexMove(pos, delta))
-                    pos = pos.plus(delta)
-                } while (bs.board.inBounds(pos))
+                    pos = dest
+                    dest = dest.plus(delta)
+                } while (bs.board.canBeOccupied(dest))
                 return { makeMoves: result }
             }
         }
@@ -49,17 +55,18 @@ export class StupidRobot implements Robot {
     }
 }
 
-const forEachLegalMove = (
+const forEachSetOfStarts = (
     board: Board,
     player: Player,
-    sideEffect: (orig: HexCoord, dest: HexCoord) => void
+    sideEffect: (orig: HexCoord, dests: List<HexCoord>) => void
 ): void => {
     board.explicitSpots.forEach((spot: Spot, orig: HexCoord) => {
         if (spot.owner === player && spot.pop > 1) {
-            orig.getNeighbors().forEach((dest: HexCoord) => {
-                if (board.inBounds(dest) && board.getSpot(dest).terrain !== Terrain.Mountain)
-                    sideEffect(orig, dest)
-            })
+            const dests = orig.getNeighbors().filter((dest: HexCoord) =>
+                board.canBeOccupied(dest)
+            ) as List<HexCoord>
+            if (dests.size > 0)
+                sideEffect(orig, dests)
         }
     })
 }

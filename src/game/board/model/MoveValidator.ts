@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {Spot, Terrain} from './Spot';
+import {Spot} from './Spot';
 import {List, Map} from 'immutable';
 import {HexCoord} from './HexCoord';
 import {PlayerMove} from './Move';
@@ -18,9 +18,6 @@ export class MoveValidatorOptions {
     // If true, don't invalidate because the current owner doesn't match the
     // player planning the move -- ownership may change before this move happens.
     ignoreSpotOwner: boolean = false
-
-    // If true, allow moving into a mountain since it might be a city due to fog of war.
-    ignoreMountains: boolean = false
 
     constructor(
         spots: Map<HexCoord, Spot>,
@@ -59,19 +56,17 @@ export class MoveValidator {
             return false
         }
 
-        // not a mountain
-        if (!options.ignoreMountains) {
-            const dest = options.spots.get(move.dest)
-            if (dest && dest.terrain === Terrain.Mountain) {
-                if (options.status)
-                    options.status.push(
-                        new StatusMessage(
-                            'mountain',
-                            `destination ${move.dest} is a mountain`,
-                            `${move}`,
-                        ))
-                return false
-            }
+        // can be occupied
+        const dest = options.spots.get(move.dest)
+        if (dest && !dest.canBeOccupied()) {
+            if (options.status)
+                options.status.push(
+                    new StatusMessage(
+                        'blocked',
+                        `destination ${move.dest} is a ${dest.terrain}`,
+                        `${move}`,
+                    ))
+            return false
         }
 
         // move distance == 1

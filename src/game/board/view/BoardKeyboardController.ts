@@ -4,7 +4,6 @@ import * as React from 'react';
 import {HexCoord} from '../model/HexCoord';
 import {PlayerMove} from '../model/Move';
 import {BoardViewBase} from './BoardViewBase';
-import {Terrain} from '../model/Spot';
 
 const KEY_CONTROLS: Map<string, HexCoord> = Map({
     'ArrowLeft': HexCoord.LEFT_DOWN,
@@ -36,10 +35,7 @@ export class BoardKeyboardController {
                 // TODO don't move into known mountains but move right through unknown ones
                 // TODO differentiate between known & unknown mountains — add question mark to unknown, like generals does
                 const newCursor = bs.cursor.plus(delta)
-                if (
-                    bs.board.inBounds(newCursor)
-                    && bs.board.getSpot(newCursor).terrain !== Terrain.Mountain
-                )
+                if (bs.board.canBeOccupied(newCursor))
                     this.view.props.onPlaceCursor(newCursor)
                 e.preventDefault()
                 return

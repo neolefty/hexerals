@@ -16,7 +16,7 @@ it ('does not bisect the map with mountains', () => {
             new RandomPlayerArranger(),
             new TerrainArranger(0.5),
         ])
-        expect(connected(tenByTen.filterSpots(spot => spot.terrain !== Terrain.Mountain)))
+        expect(connected(tenByTen.filterSpots(spot => spot.canBeOccupied())))
     }
 })
 
@@ -74,10 +74,9 @@ it('does not get trapped or bisect', () => {
             ],
             messages
         )
-        const nonMountains: Set<HexCoord> = board.filterSpots(
-            spot => spot.terrain !== Terrain.Mountain
-        )
-        expect(connected(nonMountains)).toBeTruthy()
+        expect(connected(board.filterSpots(
+            spot => spot.canBeOccupied()
+        ))).toBeTruthy()
         // should get messages about map being too small
         expect(messages.length).toBeGreaterThan(0)
         expect(messages.filter(
@@ -101,10 +100,7 @@ it('bisection can be allowed', () => {
             ],
             messages,
         )
-        const nonMountains: Set<HexCoord> = board.filterSpots(
-            spot => spot.terrain !== Terrain.Mountain
-        )
-        if (!connected(nonMountains))
+        if (!connected(board.filterSpots(spot => spot.canBeOccupied())))
             ++bisections
     }
     // console.log(`${bisections} bisections`)
