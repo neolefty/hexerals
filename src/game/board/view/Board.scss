@@ -1,8 +1,4 @@
-/* SVG Styles */
 svg.board {
-    //position: fixed;
-    //left: 0;
-    //top: 0;
 }
 
 g.spot {
@@ -13,48 +9,30 @@ g.spot {
         stroke: #777;
         stroke-width: 0.2%;
     }
+
+    &:hover {
+        polygon {
+            stroke: #a22;
+            stroke-width: 0.5%;
+        }
+    }
 }
 
 g.Nobody polygon {}
 
-//$playerColors: (
-//    Zero: #adf,
-//    One: #6b6,
-//    Two: #fff,
-//    Three: #e8f,
-//    Four: #fc8,
-//);
-/* Could be cool to have a reverse one, #533 & #faa */
-
-//@each $name, $bg in $playerColors {
-//    g.#{$name} {
-//        polygon {
-//            //fill: #{$bg};
-//            //stroke: darken($bg, 40%);
-//            stroke: #555;
-//        }
-//        //text {
-//        //    fill: darken($bg, 60%);
-//        //}
-//    }
-//}
-
-g.spot:hover polygon {
-    //fill: #fff;
-    //fill-opacity: 100%;
-    stroke: #a22;
-    stroke-width: 0.5%;
-}
 
 /* TODO would be nice for active to take precedence over hover or something */
-g.active polygon {
+g.active {
     // TODO check for a way to draw line on inside instead of half-in-half-out
     // TODO instead expand coords to allow inner and outer?
-    stroke: #a22;
-    stroke-width: 0.35%;
+    polygon {
+        stroke: #a22;
+        stroke-width: 0.35%;
+    }
+
+    text {
+        fill: #a22;
+        font-weight: bold;
+    }
 }
 
-g.active text {
-    fill: #a22;
-    font-weight: bold;
-}
