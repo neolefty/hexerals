@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import Dimension from '../../common/Dimension'
+import CartPair from '../../common/CartPair'
 import './LocalGameOptions.css'
 
 export interface LocalGameOptions {
@@ -13,7 +13,7 @@ export interface LocalGameOptions {
 
 export interface LocalGameOptionsViewProps {
     localOptions: LocalGameOptions
-    displaySize: Dimension
+    displaySize: CartPair
 
     changeLocalOption: (name: string, n: number) => void
     newGame: () => void
@@ -27,8 +27,8 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
         <div
             className="LocalGameOptionsView"
             style={{
-                width: props.displaySize.w,
-                height: props.displaySize.h,
+                width: props.displaySize.x,
+                height: props.displaySize.y,
             }}
         >
             <NumberInput

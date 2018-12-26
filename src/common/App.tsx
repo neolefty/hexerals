@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 
 import './App.css'
-import Dimension from '../common/Dimension'
+import CartPair from './CartPair'
 import {ColorsContainer, ColorsState} from '../color/ColorsContainer'
 import {CycleState} from '../game/cycle/CycleState'
 import {CycleContainer} from '../game/cycle/CycleContainer'
@@ -23,7 +23,7 @@ export interface AppState {
 
     // displaySize is only needed here so that setState in updateDimensions()
     // will trigger rendering of children
-    displaySize: Dimension
+    displaySize: CartPair
 }
 
 export interface AppProps {
@@ -33,7 +33,7 @@ class App extends React.Component<AppProps, AppState> {
     private dimensionListener = this.updateDimensions.bind(this)
 
     updateDimensions() {
-        const dim = new Dimension(
+        const dim = new CartPair(
             Math.max(window.innerWidth, MIN_WIDTH),
             Math.max(window.innerHeight - 25, MIN_HEIGHT)
         )
@@ -53,7 +53,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     render() {
-        const displaySize = this.getDisplaySize().plus(0, -30)
+        const displaySize = this.getDisplaySize().plusXY(0, -30)
         return (
             <div className="App">
                 <Tabs>
@@ -79,7 +79,7 @@ class App extends React.Component<AppProps, AppState> {
     private getDisplaySize() {
         return (this.state && this.state.displaySize)
             ? this.state.displaySize
-            : new Dimension(MIN_WIDTH, MIN_HEIGHT)
+            : new CartPair(MIN_WIDTH, MIN_HEIGHT)
     }
 }
 

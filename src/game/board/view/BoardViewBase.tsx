@@ -1,5 +1,5 @@
 import {BoardState} from '../model/BoardState';
-import Dimension from '../../../common/Dimension';
+import CartPair from '../../../common/CartPair';
 import {List, Map} from 'immutable';
 import {Player} from '../../players/Players';
 import {DriftColor} from '../../../color/DriftColor';
@@ -17,7 +17,7 @@ export interface BoardViewActions {
 
 export interface BoardViewProps extends BoardViewActions {
     boardState: BoardState
-    displaySize: Dimension
+    displaySize: CartPair
     colors?: Map<Player, DriftColor>
 }
 

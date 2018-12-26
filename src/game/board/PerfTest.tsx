@@ -15,7 +15,7 @@ export function PerfReducer(
     state: PerfState = INITIAL_PERF_STATE, action: PerfAction
 ): PerfState {
     // if (isQueuePerfTest(action)) {
-    //     console.log(`Queue perf test ${action.wh}`)
+    //     console.log(`Queue perf test ${action.xy}`)
     // }
     if (isRunPerfTest(action))
         return { ...state, history: state.history.push(runPerfTest(action.wh)) }
@@ -44,7 +44,7 @@ interface QueuePerfTest extends GenericAction { type: QUEUE_PERF_TEST; wh: Wh }
 type PerfAction = RunPerfTest | ChangeWh | QueuePerfTest
 
 function changeWhAction(wh: Wh): ChangeWh { return {type: CHANGE_WH, wh: wh} }
-// function queuePerfTestAction(wh: Wh): QueuePerfTest { return {type: QUEUE_PERF_TEST, wh: wh} }
+// function queuePerfTestAction(xy: Wh): QueuePerfTest { return {type: QUEUE_PERF_TEST, xy: xy} }
 function runPerfTestAction(wh: Wh): RunPerfTest { return {type: RUN_PERF_TEST, wh: wh} }
 
 const mapStateToPerfProps = (state: PerfState) => ({

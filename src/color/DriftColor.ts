@@ -1,7 +1,5 @@
 import {CieColor} from './CieColor'
 
-const TEXTURE_VALUE_DIFF = 20
-
 export class DriftColor {
     // allowed limits on lightness & saturation when drifting (hsluv)
     static readonly MIN_BRIGHT = 30
@@ -106,30 +104,29 @@ export class DriftColor {
     get lightness() { return this.cie.hsl[2] }
 
     // tslint:disable-next-line:member-ordering
-    private _texture: DriftColor | undefined = undefined
-    // A color with same hue & sat, but slightly darker or brighter for texture
-    texture(): DriftColor {
-        if (!this._texture) {
+    private textureCache: Map<number, DriftColor> = new Map()
+
+    // A color with same hue & sat, but slightly lighter or darker, for texture
+    texture(diff: number = 20): DriftColor {
+        if (!this.textureCache.has(diff)) {
             // lightness 0-25 -- return brighter (too dark to get darker)
             //   - 25-50 -- darker
             //   - 50-75 -- brighter
             //   - 75-100 -- darker (too bright to get brighter)
             const darker: boolean = (
-                this.lightness > TEXTURE_VALUE_DIFF - 5
+                this.lightness > diff - 5
                 && this.lightness < DriftColor.MID_LIGHT
-            ) || this.lightness > (95 - TEXTURE_VALUE_DIFF)
-            this._texture = new DriftColor(
+            ) || this.lightness > (95 - diff)
+            this.textureCache.set(diff, new DriftColor(
                 new CieColor([
                     this.cie.hsl[0],
                     this.cie.hsl[1],
-                    darker
-                        ? this.cie.hsl[2] - TEXTURE_VALUE_DIFF
-                        : this.cie.hsl[2] + TEXTURE_VALUE_DIFF,
+                    darker ? this.cie.hsl[2] - diff : this.cie.hsl[2] + diff,
                 ]),
-                this.key * (1 + TEXTURE_VALUE_DIFF / 100)
-            )
+                this.key * (1 + diff / 100)
+            ))
         }
-        return this._texture
+        return this.textureCache.get(diff) as DriftColor
     }
 
     toHexString(): string { return this.cie.toHexString() }

@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
-import Dimension from "./Dimension";
+import CartPair from "./CartPair";
 import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from '../game/cycle/CycleReducer';
 import {CycleState} from '../game/cycle/CycleState';
 import {CycleContainer} from '../game/cycle/CycleContainer';
@@ -15,7 +15,7 @@ it('renders without crashing', () => {
     ReactDOM.render(
         <Provider store={store}>
             <CycleContainer
-                displaySize={new Dimension(100, 100)}
+                displaySize={new CartPair(100, 100)}
             />
         </Provider>,
         div);
@@ -26,7 +26,7 @@ it('renders without crashing', () => {
     ReactDOM.render(
         <Provider store={store}>
             <CycleContainer
-                displaySize={new Dimension(100, 100)}
+                displaySize={new CartPair(100, 100)}
             />
         </Provider>,
         div);

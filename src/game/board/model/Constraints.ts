@@ -131,9 +131,9 @@ export abstract class BoardConstraints {
 }
 
 // Defines a board of hexes with an overall rectangular shape.
-// If width and height are w and h, then -- assuming both are odd -- the corners are:
-// (0,0,0)      (w-1, -(w-1)/2, -(w-1)/2)
-// (0, -(h-1), h-1) (w-1, -(w-1)/2 -(h-1), -(w-1)/2 +(h-1))
+// If width and height are x and h, then -- assuming both are odd -- the corners are:
+// (0,0,0)      (x-1, -(x-1)/2, -(x-1)/2)
+// (0, -(h-1), h-1) (x-1, -(x-1)/2 -(h-1), -(x-1)/2 +(h-1))
 //
 // General formula: (cx, (cy - cx) / 2, - (cy + cx) / 2)
 export class RectangularConstraints extends BoardConstraints {

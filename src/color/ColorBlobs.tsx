@@ -3,7 +3,7 @@ import {Component} from 'react';
 import {Map} from 'immutable';
 import {ColorPodge} from './ColorPodge';
 import {DriftColor} from './DriftColor';
-import Dimension from '../common/Dimension';
+import CartPair from '../common/CartPair';
 
 const SPACE_FILL = 0.65;
 const MIN_STEP_MILLIS = 16; // no faster than 60 fps
@@ -14,7 +14,7 @@ const COLOR_NEIGHBORHOOD = 20; // multiple of radius
 
 export interface ColorBlobsProps {
     colors: ColorPodge;
-    displaySize: Dimension;
+    displaySize: CartPair;
     onRemoveColor: (x: number) => void;
 }
 

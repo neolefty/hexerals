@@ -7,7 +7,7 @@ import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
 } from '../board/model/BoardReducer'
 import {AppState} from '../../common/App'
-import Dimension from '../../common/Dimension'
+import CartPair from '../../common/CartPair'
 import {BoardState} from '../board/model/BoardState'
 import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'
@@ -16,7 +16,7 @@ import {PlayerMove} from '../board/model/Move'
 import {TickerBoardView} from '../board/view/TickerBoardView';
 
 export interface LocalGameProps {
-    displaySize: Dimension
+    displaySize: CartPair
     onEndGame: () => void
 }
 

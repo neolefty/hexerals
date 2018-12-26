@@ -49,8 +49,8 @@ export class HexBoardView extends BoardViewBase {
 
     render(): React.ReactNode {
         // calculate board size
-        const innerW = this.props.displaySize.w - 2 * OUTER_BOARD_MARGIN
-        const innerH = this.props.displaySize.h - 2 * OUTER_BOARD_MARGIN
+        const innerW = this.props.displaySize.x - 2 * OUTER_BOARD_MARGIN
+        const innerH = this.props.displaySize.y - 2 * OUTER_BOARD_MARGIN
         const coordsWidth = this.props.boardState.board.edges.width
         const coordsHeight = this.props.boardState.board.edges.height
 

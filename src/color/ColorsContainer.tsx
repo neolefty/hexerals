@@ -1,6 +1,6 @@
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
-import Dimension from '../common/Dimension'
+import CartPair from '../common/CartPair'
 import {ColorPodge} from './ColorPodge'
 import {AppState, GenericAction} from '../common/App'
 import {List} from 'immutable'
@@ -23,7 +23,7 @@ export interface ColorsActions {
 }
 
 export interface ColorsProps {
-    displaySize: Dimension
+    displaySize: CartPair
     tick: number
 }
 

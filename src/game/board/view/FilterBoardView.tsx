@@ -47,7 +47,7 @@ export class FilterBoardView extends React.Component<FilterBoardViewProps> {
                     const tile = boardState.board.getTile(hex)
                     const maybeColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
-                    const color: DriftColor = maybeColor || DriftColor.BLACK
+                    const color: DriftColor = maybeColor || DriftColor.GREY_10
                     return (
                         <TileHexView
                             key={hex.id}

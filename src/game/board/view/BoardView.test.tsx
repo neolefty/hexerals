@@ -7,7 +7,7 @@ import {shallow} from 'enzyme'
 import {queueMovesAction,} from '../model/BoardReducer'
 import {Board} from '../model/Board'
 import {HexCoord} from '../model/HexCoord'
-import Dimension from "../../../common/Dimension"
+import CartPair from "../../../common/CartPair"
 import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
@@ -50,7 +50,7 @@ it('renders a board with no selection', () => {
     const view = enzyme.render(
         <OldGridView
             boardState={boardState}
-            displaySize={new Dimension(1000, 1000)}
+            displaySize={new CartPair(1000, 1000)}
             onPlaceCursor={() => {}}
             onQueueMoves={() => {}}
             onCancelMoves={() => {}}
@@ -86,7 +86,7 @@ it('renders a board with a selection', () => {
     const view = enzyme.render(
         <OldGridView
             boardState={bs}
-            displaySize={new Dimension(1000, 1000)}
+            displaySize={new CartPair(1000, 1000)}
             onPlaceCursor={() => {}}
             onQueueMoves={() => {}}
             onCancelMoves={() => {}}

@@ -82,8 +82,6 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             {
                 props.terrain !== Terrain.Empty ? (
                     <TerrainView
-                        centerX={0}
-                        centerY={0}
                         hexRadius={props.hexRadius}
                         terrain={props.terrain}
                         color={props.color}

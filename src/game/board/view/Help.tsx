@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Dimension from '../../../common/Dimension';
+import CartPair from '../../../common/CartPair';
 import {TileHexView} from './TileHexView';
 import {Tile, Terrain} from '../model/Tile';
 import {HexCoord} from '../model/HexCoord';
@@ -9,7 +9,7 @@ import {Player} from '../../players/Players';
 import './Help.css'
 
 export interface HelpOptions {
-    displaySize: Dimension;
+    displaySize: CartPair;
 }
 
 const h = 6 * 26
@@ -38,13 +38,13 @@ const dirs = Map<HexCoord, TileAndText>([
 ])
 
 export const Help = (props: HelpOptions) => {
-    const d = Math.min(props.displaySize.w - 50, props.displaySize.h - 120)
+    const d = Math.min(props.displaySize.x - 50, props.displaySize.y - 120)
     return (
         <div
             className="Help"
             style={{
-                width: props.displaySize.w,
-                height: props.displaySize.h,
+                width: props.displaySize.x,
+                height: props.displaySize.y,
             }}
         >
             <svg

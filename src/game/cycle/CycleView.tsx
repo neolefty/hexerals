@@ -1,4 +1,4 @@
-import Dimension from '../../common/Dimension'
+import CartPair from '../../common/CartPair'
 import {LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from './CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
@@ -6,7 +6,7 @@ import * as React from 'react'
 import {CycleState} from './CycleState'
 
 export interface CycleViewProps extends CycleState {
-    displaySize: Dimension
+    displaySize: CartPair
 
     onOpenLocalGame: () => void
     onCloseGame: () => void

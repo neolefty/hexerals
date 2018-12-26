@@ -1,7 +1,7 @@
 import {Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import {CycleView} from './CycleView';
-import Dimension from '../../common/Dimension';
+import CartPair from '../../common/CartPair';
 import {
     changeLocalOptionAction, closeGameAction, openLocalGameAction,
 } from './CycleReducer';
@@ -9,7 +9,7 @@ import {AppState} from '../../common/App';
 import {CycleState} from './CycleState';
 
 export interface CycleContainerProps {
-    displaySize: Dimension;
+    displaySize: CartPair;
 }
 
 const mapStateToCycleViewProps =

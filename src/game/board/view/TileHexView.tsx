@@ -3,6 +3,7 @@ import {Tile} from '../model/Tile';
 import {FlatTopHex} from './FlatTopHex';
 import {HexCoord} from '../model/HexCoord';
 import {DriftColor} from '../../../color/DriftColor';
+import {HEX_COLUMN, HEX_HALF_HEIGHT, HEX_RADIUS} from './HexContants';
 
 interface TileHexViewProps {
     tile: Tile
@@ -17,8 +18,10 @@ interface TileHexViewProps {
     onDragInto?: () => void
 }
 
-export const centerX = (cartX: number): number => 45 * cartX + 30
-export const centerY = (height: number, cartY: number): number => height - (cartY + 1) * 26
+export const centerX = (cartX: number): number =>
+    HEX_COLUMN * cartX + HEX_RADIUS
+export const centerY = (height: number, cartY: number): number =>
+    height - (cartY + 1) * HEX_HALF_HEIGHT
 export const TileHexView = (props: TileHexViewProps) => {
     const x: number = centerX(props.hex.cartX)
     const y: number = centerY(props.viewBoxHeight, props.hex.cartY)
@@ -31,16 +34,16 @@ export const TileHexView = (props: TileHexViewProps) => {
             selected={props.selected}
             centerX={x}
             centerY={y}
-            hexRadius={30}
+            hexRadius={HEX_RADIUS}
             onSelect={props.onSelect}
             onDragInto={props.onDragInto}
         >{
             props.text ? (
                 <text
                     x={0}
-                    y={0.35 * 26}
+                    y={0.35 * HEX_HALF_HEIGHT}
                     fontFamily="Sans-Serif"
-                    fontSize={27}
+                    fontSize={HEX_HALF_HEIGHT}
                     textAnchor="middle"
                     fill={(props.textColor || props.color.contrast()).toHexString()}
                 >
