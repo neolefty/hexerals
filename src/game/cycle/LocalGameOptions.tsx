@@ -1,4 +1,5 @@
 import * as React from 'react'
+
 import Dimension from '../../common/Dimension'
 import './LocalGameOptions.css'
 
@@ -37,6 +38,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 min={1}
                 max={12}
                 onChange={optionChanger('numPlayers')}
+                onEnter={props.newGame}
             />
             <NumberInput
                 label="Width"
@@ -45,6 +47,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 min={1}
                 max={23}
                 onChange={optionChanger('boardWidth')}
+                onEnter={props.newGame}
             />
             <NumberInput
                 label="Height"
@@ -53,6 +56,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 min={2}
                 max={15}
                 onChange={optionChanger('boardHeight')}
+                onEnter={props.newGame}
             />
             <NumberInput
                 label="Tick"
@@ -61,6 +65,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 min={1}
                 max={9999}
                 onChange={optionChanger('tickMillis')}
+                onEnter={props.newGame}
             />
             <NumberInput
                 label="Mountains"
@@ -69,6 +74,7 @@ export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
                 min={0}
                 max={50}
                 onChange={optionChanger('mountainPercent')}
+                onEnter={props.newGame}
             />
             <button
                 onClick={props.newGame}
@@ -83,10 +89,12 @@ interface IntInputProps {
     label: string
     title: string
     value: number
-    onChange: (x: number) => void
     min: number
     max: number
     step?: number
+
+    onChange: (x: number) => void
+    onEnter?: () => void
 }
 
 const minMax = (x: number, min: number, max: number) =>
@@ -104,6 +112,12 @@ const NumberInput = (props: IntInputProps) => (
             max={props.max}
             step={props.step || 1}
             value={props.value}
+            onKeyPress={(e) => {
+                if (props.onEnter && e.key === 'Enter') {
+                    e.preventDefault()
+                    props.onEnter()
+                }
+            }}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const str = e.currentTarget.value
                 const step = props.step || 1

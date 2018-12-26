@@ -11,7 +11,7 @@ export class PopStepper {
     ) {}
 
     step(orig: Board, turn: number): Board {
-        let result = orig.spots
+        let result = orig.explicitSpots
         // TODO consider using a single loop
         if (turn % this.cityTurns === 0)
             result = result.withMutations(mut =>

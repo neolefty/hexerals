@@ -1,4 +1,7 @@
-// the meta-game
+import {List} from 'immutable'
+import * as assert from 'assert';
+import {isNumber} from 'util';
+
 import {CycleMode} from './CycleState'
 import {Board} from '../board/model/Board'
 import {GenericAction} from '../../common/App'
@@ -7,11 +10,12 @@ import {GameAction, BoardReducer} from '../board/model/BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from '../board/model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
-import {List} from 'immutable'
-import {TerrainArranger, RandomPlayerArranger} from '../board/model/Arranger'
+import {RandomPlayerArranger} from '../board/model/PlayerArranger'
 import {StupidRobot} from '../players/StupidRobot'
-import * as assert from 'assert';
-import {isNumber} from 'util';
+import {StatusMessage} from '../../common/StatusMessage';
+import {TerrainArranger} from '../board/model/TerrainArranger';
+
+// the meta-game
 
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
@@ -28,6 +32,13 @@ export const INITIAL_CYCLE_STATE: CycleState = {
 export type CycleAction = GameAction
     | OpenLocalGame | CloseGame
     | ChangeLocalOption
+
+// TODO write CycleReducerTester like BoardReducerTester
+// it('messages show up in game state', () => {
+//     const crt: CycleReducerTester = new CycleReducerTester(1,1)
+//     expect(crt.messages.size).toBe(1)
+//     expect(crt.messages.get(0).tag === MAP_TOO_SMALL)
+// })
 
 export const CycleReducer =
     (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
@@ -62,6 +73,7 @@ const openLocalGameReducer =
 {
     const players = pickNPlayers(state.localOptions.numPlayers)
     const mountainFrequency = state.localOptions.mountainPercent / 100
+    const messages: StatusMessage[] = []
     const newBoard = Board.constructRectangular(
         state.localOptions.boardWidth,
         state.localOptions.boardHeight,
@@ -70,6 +82,7 @@ const openLocalGameReducer =
             new RandomPlayerArranger(),
             new TerrainArranger(mountainFrequency),
         ],
+        messages,
     )
     // assign stupid AI to all non-humans
     let pm: PlayerManager = PlayerManager.construct(players)
@@ -87,7 +100,7 @@ const openLocalGameReducer =
             players: pm,
             cursor: HexCoord.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,
-            messages: List(),
+            messages: List(messages),
             curPlayer: Player.Zero,
         },
     }

@@ -1,6 +1,7 @@
-import {CornersPlayerArranger} from '../board/model/Arranger';
-import {HexCoord} from '../board/model/HexCoord';
 import {List} from 'immutable';
+
+import {CornersPlayerArranger} from '../board/model/PlayerArranger';
+import {HexCoord} from '../board/model/HexCoord';
 import {Board} from '../board/model/Board';
 import {pickNPlayers} from '../players/Players';
 import {BoardConstraints} from '../board/model/Constraints';

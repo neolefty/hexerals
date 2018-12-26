@@ -1,15 +1,17 @@
 import * as assert from 'assert'
-import {List, Map} from 'immutable'
+import {List, Map, Set} from 'immutable'
+
 import {RectEdges} from './Constraints'
 import {PlayerMove} from './Move'
 import {Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {Arranger, RandomPlayerArranger} from './Arranger'
+import {Arranger} from './Arranger'
 import {Spot} from './Spot'
 import {HexCoord} from './HexCoord'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
 import {PopStepper} from './PopStepper';
+import {RandomPlayerArranger} from './PlayerArranger';
 
 export class BoardAndMessages {
     constructor(
@@ -32,18 +34,21 @@ export class BoardRules {
     ) {}
 }
 
+export type SpotFilter = (spot: Spot) => boolean
+
 export class Board {
     static readonly DEFAULT_ARRANGERS: Arranger[] = [new RandomPlayerArranger()]
 
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
-        spots: Map<HexCoord, Spot> = Map(),
+        // there may be blank spots not listed here -- see allSpots
+        explicitSpots: Map<HexCoord, Spot> = Map(),
     ) {
         return new Board(
             new BoardRules(constraints),
             players,
-            spots,
+            explicitSpots,
         )
     }
 
@@ -60,11 +65,14 @@ export class Board {
         h: number,
         players: List<Player>,
         arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
+        messages: StatusMessage[] | undefined = undefined,
     ): Board {
         const constraints = new RectangularConstraints(w, h)
         let result = Board.construct(constraints, players)
         arrangers.forEach(arranger =>
-            result = result.overlaySpots(arranger.arrange(result))
+            result = result.overlaySpots(
+                arranger.arrange(result, messages)
+            )
         )
         return result
     }
@@ -73,8 +81,8 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // non-blank spots on the map
-        readonly spots: Map<HexCoord, Spot>,
+        // empty spots are implied — see this.allHexes
+        readonly explicitSpots: Map<HexCoord, Spot>,
     ) {}
 
     get moveValidator(): MoveValidator { return this.rules.validator }
@@ -86,9 +94,20 @@ export class Board {
         return this.constraints.inBounds(coord)
     }
 
+    // All of this board's possible spots. Note that this.explicitSpots omits some blanks.
+    get allHexes(): Set<HexCoord> {
+        return this.constraints.all()
+    }
+
+    // noinspection PointlessBooleanExpressionJS
+    filterSpots = (filter: SpotFilter): Set<HexCoord> =>
+        this.allHexes.filter(
+            hex => !!(hex && filter(this.getSpot(hex)))
+        ) as Set<HexCoord>
+
     getSpot(coord: HexCoord): Spot {
         assert(this.inBounds(coord))
-        return this.spots.get(coord, Spot.BLANK)
+        return this.explicitSpots.get(coord, Spot.BLANK)
     }
 
     getCartSpot(cx: number, cy: number): Spot {
@@ -101,14 +120,14 @@ export class Board {
     }
 
     setSpots(spots: Map<HexCoord, Spot>): Board {
-        return (this.spots === spots)
+        return (this.explicitSpots.equals(spots))
             ? this
             : new Board(this.rules, this.players, spots)
     }
 
     overlaySpots(overlay: Map<HexCoord, Spot>): Board {
         return this.setSpots(
-            this.spots.withMutations(
+            this.explicitSpots.withMutations(
                 (mSpots: Map<HexCoord, Spot>) => {
                     overlay.forEach((value: Spot, key: HexCoord) => {
                         mSpots.set(key, value)
@@ -120,7 +139,7 @@ export class Board {
     // Do some moves.
     // Illegal moves are skipped -- for example if a player no longer controls a hex.
     applyMoves(moves: List<PlayerMove>): BoardAndMessages {
-        const options = new MoveValidatorOptions(this.spots, [])
+        const options = new MoveValidatorOptions(this.explicitSpots, [])
         this.moveValidator.applyMoves(moves, options)
         return new BoardAndMessages(
             this.setSpots(options.spots),
@@ -143,21 +162,21 @@ export class Board {
     validationOptions(
         messages: StatusMessage[] | undefined = undefined
     ): MoveValidatorOptions {
-        return new MoveValidatorOptions(this.spots, messages)
+        return new MoveValidatorOptions(this.explicitSpots, messages)
     }
 
     toString(): string {
         let result = `Constraints: ${this.constraints.toString()}\n`
             + `Edges: ${ this.edges.toString()}\n`
             + `Spots: (`
-        this.spots.map((spot, coord) =>
-            result += spot.pop ? `${coord} -- ${spot} ` : ''
+        this.explicitSpots.map((spot, coord) =>
+            result += spot.pop ? `${coord} — ${spot} ` : ''
         )
         result += ')'
         return result
     }
 
-    isEmpty(hex: HexCoord) {
-        return !this.spots.has(hex) || this.getSpot(hex).isBlank()
+    isBlank(hex: HexCoord) {
+        return !this.explicitSpots.has(hex) || this.getSpot(hex).isBlank()
     }
 }

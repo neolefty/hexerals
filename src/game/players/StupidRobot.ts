@@ -1,5 +1,6 @@
-import {GameDecision, Robot} from './Robot';
 import {List} from 'immutable';
+
+import {GameDecision, Robot} from './Robot';
 import {HexMove, PlayerMove} from '../board/model/Move';
 import {BoardState} from '../board/model/BoardState';
 import {Player} from './Players';
@@ -24,7 +25,6 @@ export class StupidRobot implements Robot {
         // only queue moves if we don't already have any queued
         if (!curMoves || curMoves.size === 0) {
             let totalPop = 0
-            // ran into a TS bug with "let curMove: HexCoord | undefined"
             let curMove: HexMove = NONE_MOVE
             forEachLegalMove(bs.board, player, (orig: HexCoord, dest: HexCoord) => {
                 const origSpot = bs.board.getSpot(orig)
@@ -54,7 +54,7 @@ const forEachLegalMove = (
     player: Player,
     sideEffect: (orig: HexCoord, dest: HexCoord) => void
 ): void => {
-    board.spots.forEach((spot: Spot, orig: HexCoord) => {
+    board.explicitSpots.forEach((spot: Spot, orig: HexCoord) => {
         if (spot.owner === player && spot.pop > 1) {
             orig.getNeighbors().forEach((dest: HexCoord) => {
                 if (board.inBounds(dest) && board.getSpot(dest).terrain !== Terrain.Mountain)

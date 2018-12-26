@@ -5,7 +5,7 @@ import {Board} from './Board'
 import {pickNPlayers, Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
-import {CornersPlayerArranger} from './Arranger'
+import {CornersPlayerArranger} from './PlayerArranger'
 import {Spot, Terrain} from './Spot'
 import {HexCoord} from './HexCoord'
 
