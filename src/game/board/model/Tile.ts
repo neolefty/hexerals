@@ -3,8 +3,10 @@ import {Player} from '../../players/Players'
 export enum Terrain {
     Empty = 'Empty',  // Normal. Plains?
     City = 'City',
+    Capital = 'Capital',
     Mountain = 'Mountain',
-    // Swamp = 'Swamp',
+    MaybeMountain = 'MaybeMountain',
+    Swamp = 'Swamp',
 }
 
 export const canBeOccupied = (terrain: Terrain): boolean =>
@@ -13,8 +15,10 @@ export const canBeOccupied = (terrain: Terrain): boolean =>
 // contents of a space on the board
 export class Tile {
     static readonly BLANK: Tile = new Tile(Player.Nobody, 0, Terrain.Empty)
-    // static readonly NONEXISTENT: Tile = new Tile(
-    //     Player.Nobody, 0, Terrain.Nonexistent)
+    static readonly SWAMP = new Tile(Player.Nobody, 0, Terrain.Swamp)
+    static readonly MAYBE_MOUNTAIN = new Tile(
+        Player.Nobody, 0, Terrain.MaybeMountain
+    )
 
     constructor(
         readonly owner: Player,
@@ -27,6 +31,26 @@ export class Tile {
         return this.owner === Player.Nobody
             && this.pop === 0
             && this.terrain === Terrain.Empty
+    }
+
+    fromADistance(): Tile | undefined {
+        switch (this.terrain) {
+
+            case Terrain.Mountain:
+            case Terrain.MaybeMountain:
+            case Terrain.City:
+                return Tile.MAYBE_MOUNTAIN
+
+            case Terrain.Capital:
+            case Terrain.Empty:
+                return undefined
+
+            case Terrain.Swamp:
+                return Tile.SWAMP
+
+            default:
+                throw Error(this.terrain)
+        }
     }
 
     // member functions instead of function properties to avoid messing up ==

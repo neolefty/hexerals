@@ -25,6 +25,15 @@ export class MovementQueue {
             )
     }
 
+    public onlyForPlayer(player: Player): MovementQueue {
+        let newQueues = Map<Player, List<PlayerMove>>()
+        return new MovementQueue(
+            this.playerQueues.has(player)
+                ? newQueues.set(player, this.playerQueues.get(player))
+                : newQueues
+        )
+    }
+
     public get size(): number {
         return this.playerQueues.reduce(
             (n: number, q: List<PlayerMove>): number => n + q.size,

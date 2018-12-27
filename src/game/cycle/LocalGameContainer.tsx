@@ -14,10 +14,12 @@ import {ColorPodge} from '../../color/ColorPodge'
 import {Player, PLAYERS} from '../players/Players'
 import {PlayerMove} from '../board/model/Move'
 import {TickerBoardView} from '../board/view/TickerBoardView';
+import {LocalGameOptions} from './LocalGameOptions';
 
 export interface LocalGameProps {
     displaySize: CartPair
     onEndGame: () => void
+    localOptions: LocalGameOptions
 }
 
 // TODO stop updating if colors stabilize

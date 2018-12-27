@@ -42,7 +42,7 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
     return (
         <g
             transform={`translate(${props.centerX} ${props.centerY})`}
-            className={`${props.owner} tile${props.selected ? ' active' : ''}`}
+            className={`FlatTopHex ${props.owner} tile${props.selected ? ' active' : ''}`}
             onMouseDown={(e) => {
                 logIt(`onMouseDown ${e}`)
                 if (props.onSelect) {

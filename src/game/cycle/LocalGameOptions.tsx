@@ -11,7 +11,9 @@ export interface LocalGameOptions {
     boardWidth: number
     boardHeight: number
     mountainPercent: number
-    showAdvanced: number
+
+    fog: number  // boolean
+    showAdvanced: number  // boolean
 }
 
 export interface LGOProps {
@@ -25,20 +27,52 @@ export interface LGOProps {
 export class LocalGameOptionsView
     extends React.Component<LGOProps>
 {
-    isAdvancedVisible = (): boolean => this.props.localOptions.showAdvanced > 0
+    private isOption = (optionName: string): boolean =>
+        this.props.localOptions[optionName] > 0
+    private toggleOption = (optionName: string) =>
+        this.props.changeLocalOption(optionName, this.isOption(optionName) ? 0 : 1)
 
-    toggleAdvanced = () => {
-        this.props.changeLocalOption('showAdvanced', this.isAdvancedVisible() ? 0 : 1)
-    }
+    isShowAdvanced = () => this.isOption('showAdvanced')
+    toggleAdvanced = () => this.toggleOption('showAdvanced')
 
     render(): React.ReactNode {
         const optionChanger = (name: string) =>
             (n: number) => this.props.changeLocalOption(name, n)
+        const optionToggler = (optionName: string) =>
+            () => this.toggleOption(optionName)
+
+        const numberInput = (
+            label: string, option: string, min: number, max: number, title: string,
+            advanced: boolean = false,
+        ) => (
+            <NumberInput
+                label={label}
+                value={this.props.localOptions[option]}
+                title={title}
+                min={min}
+                max={max}
+                onChange={optionChanger(option)}
+                onEnter={this.props.newGame}
+                blockTabbing={advanced ? !this.isShowAdvanced() : false}
+            />
+        )
+
+        const checkInput = (
+            label: string, option: string, title: string, advanced: boolean = false
+        ) => (
+            <CheckInput
+                label={label}
+                value={this.isOption(option)}
+                title={title}
+                onChange={optionToggler(option)}
+                onEnter={this.props.newGame}
+            />
+        )
 
         return (
             <div
                 className={`LocalGameOptionsView Column ${
-                    this.isAdvancedVisible() ? 'ShowAdvanced' : 'HideAdvanced'
+                    this.isShowAdvanced() ? 'ShowAdvanced' : 'HideAdvanced'
                 }`}
                 style={{
                     width: this.props.displaySize.x,
@@ -47,66 +81,34 @@ export class LocalGameOptionsView
             >
                 <div className="Row">
                     <div className="Basic Column">
-                        <NumberInput
-                            label="Players"
-                            value={this.props.localOptions.numPlayers}
-                            title="How many players?\nOne will be you, and the others very stupid AIs."
-                            min={1}
-                            max={12}
-                            onChange={optionChanger('numPlayers')}
-                            onEnter={this.props.newGame}
-                        />
-                        <NumberInput
-                            label="Width"
-                            title="How many tiles wide?"
-                            value={this.props.localOptions.boardWidth}
-                            min={1}
-                            max={23}
-                            onChange={optionChanger('boardWidth')}
-                            onEnter={this.props.newGame}
-                        />
-                        <NumberInput
-                            label="Height"
-                            title="How many tiles tall?"
-                            value={this.props.localOptions.boardHeight}
-                            min={2}
-                            max={15}
-                            onChange={optionChanger('boardHeight')}
-                            onEnter={this.props.newGame}
-                        />
+                        {numberInput(
+                            'Players', 'numPlayers', 1, 12, 'How many players?\n'
+                            + 'One will be you, and the others very stupid AIs.'
+                        )}
+                        {numberInput('Width', 'boardWidth', 1, 23, 'How many tiles wide?')}
+                        {numberInput('Height', 'boardHeight', 2, 15, 'How many tiles tall?')}
                     </div>
                     <div className="Advanced Column">
-                        <NumberInput
-                            label="Mountains"
-                            title="Percent of the map covered by mountains"
-                            value={this.props.localOptions.mountainPercent}
-                            min={0}
-                            max={50}
-                            onChange={optionChanger('mountainPercent')}
-                            onEnter={this.props.newGame}
-                            blockTabbing={!this.isAdvancedVisible()}
-                        />
-                        <NumberInput
-                            label="Tick"
-                            title="Milliseconds between turns"
-                            value={this.props.localOptions.tickMillis}
-                            min={1}
-                            max={9999}
-                            onChange={optionChanger('tickMillis')}
-                            onEnter={this.props.newGame}
-                            blockTabbing={!this.isAdvancedVisible()}
-                        />
+                        {numberInput(
+                            'Mountains', 'mountainPercent', 0, 50,
+                            'Percent of the map covered by mountains', true
+                        )}
+                        {numberInput(
+                            'Tick', 'tickMillis', 1, 9999,
+                            'Milliseconds between turns', true
+                        )}
+                        {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', true)}
                     </div>
                     <div>
                         <button
                             onClick={this.toggleAdvanced}
                             title={
-                                this.isAdvancedVisible()
+                                this.isShowAdvanced()
                                     ? 'Hide advanced options'
                                     : 'Show advanced options'
                             }
                         >
-                            {this.isAdvancedVisible() ? '<<<' : '>>>'}
+                            {this.isShowAdvanced() ? '<<<' : '>>>'}
                         </button>
                     </div>
                 </div>
@@ -130,11 +132,18 @@ interface IntInputProps {
     blockTabbing?: boolean
 
     onChange: (x: number) => void
-    onEnter?: () => void
+    onEnter: () => void
 }
 
 const minMax = (x: number, min: number, max: number) =>
     Math.max(min, Math.min(max, x))
+
+const onEnterKey = (effect: () => void) => (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+        e.preventDefault()
+        effect()
+    }
+}
 
 const NumberInput = (props: IntInputProps) => (
     <label
@@ -149,14 +158,7 @@ const NumberInput = (props: IntInputProps) => (
             step={props.step || 1}
             value={props.value}
             tabIndex={props.blockTabbing ? -1 : undefined}
-            onKeyPress={
-                (e: React.KeyboardEvent) => {
-                    if (props.onEnter && e.key === 'Enter') {
-                        e.preventDefault()
-                        props.onEnter()
-                    }
-                }
-            }
+            onKeyPress={onEnterKey(props.onEnter)}
             onChange={
                 (e: React.ChangeEvent<HTMLInputElement>) => {
                     const str = e.currentTarget.value
@@ -172,6 +174,32 @@ const NumberInput = (props: IntInputProps) => (
                     }
                 }
             }
+        />
+    </label>
+)
+
+interface CheckInputProps {
+    label: string
+    title: string
+    value: boolean
+    blockTabbing?: boolean
+
+    onChange: () => void
+    onEnter: () => void
+}
+
+const CheckInput = (props: CheckInputProps) => (
+    <label
+        className="CheckInput"
+        title={props.title}
+    >
+        {props.label}
+        <input
+            type="checkbox"
+            checked={props.value}
+            tabIndex={props.blockTabbing ? -1 : undefined}
+            onChange={props.onChange}
+            onKeyPress={onEnterKey(props.onEnter)}
         />
     </label>
 )

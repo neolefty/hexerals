@@ -6,6 +6,15 @@
   }
 }
 
+.CheckInput {
+  margin: 0.3em;
+  white-space: nowrap;
+  input {
+    transform: scale(2) translate(0,-2px);
+    margin-left: 0.7em;
+  }
+}
+
 .Column {
   display: flex;
   flex-direction: column;

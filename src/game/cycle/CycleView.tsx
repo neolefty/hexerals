@@ -21,6 +21,7 @@ export const CycleView = (props: CycleViewProps) => {
                     <LocalGameContainer
                         displaySize={props.displaySize}
                         onEndGame={props.onCloseGame}
+                        localOptions={props.localOptions}
                     />
                 )
             else

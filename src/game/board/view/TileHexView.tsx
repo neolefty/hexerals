@@ -40,7 +40,7 @@ export const TileHexView = (props: TileHexViewProps) => {
         >{
             props.text ? (
                 <text
-                    x={0}
+                    // TODO move this into a style sheet
                     y={0.35 * HEX_HALF_HEIGHT}
                     fontFamily="Sans-Serif"
                     fontSize={HEX_HALF_HEIGHT}

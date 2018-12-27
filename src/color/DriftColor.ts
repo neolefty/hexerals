@@ -16,6 +16,7 @@ export class DriftColor {
     static readonly GREY_10: DriftColor = new DriftColor(CieColor.GREY_10);
     static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
     static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
+    static readonly GREY_60: DriftColor = new DriftColor(CieColor.GREY_60);
     static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
 
     static clamp_bright(b: number): number {
