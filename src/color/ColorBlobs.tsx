@@ -70,11 +70,17 @@ export class Coord {
     }
 }
 
+const minMax = (lo: number, hi: number, x: number) =>
+    Math.min(hi, Math.max(lo, x))
+
 export const ColorBlob = (props: ColorBlobProps) => {
     const delta = props.acceleration.times(-1100)
         .plus(props.position.times(props.radius * -0.2))
     const pos1 = props.position.plus(delta)
     const pos2 = props.position.plus(delta.times(1.5))
+    const speed = props.velocity.mag()
+    const contrast1 = minMax(5, 25, Math.floor(speed * 20000))
+    const contrast2 = minMax(10, 50, Math.floor(speed * 40000))
     return (
         <g>
             <circle
@@ -88,14 +94,14 @@ export const ColorBlob = (props: ColorBlobProps) => {
                 r={props.radius * 0.7}
                 cx={pos1.x}
                 cy={pos1.y}
-                style={{fill: props.color.texture(10).toHexString()}}
+                style={{fill: props.color.texture(contrast1).toHexString()}}
                 onClick={() => props.onRemove()}
             />
             <circle
                 r={props.radius * 0.5}
                 cx={pos2.x}
                 cy={pos2.y}
-                style={{fill: props.color.texture(20).toHexString()}}
+                style={{fill: props.color.texture(contrast2).toHexString()}}
                 onClick={() => props.onRemove()}
             />
         </g>
