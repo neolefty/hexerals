@@ -37,10 +37,10 @@ export const TerrainView = (props: TerrainViewProps): JSX.Element => {
                 {result}
                 // TODO move this into a style sheet, same as TileHexView
                 <text
-                    y={0.35 * HEX_HALF_HEIGHT}
-                    fontSize={HEX_HALF_HEIGHT}
+                    y={0.5 * HEX_HALF_HEIGHT}
+                    fontSize={1.5 * HEX_HALF_HEIGHT}
                     textAnchor="middle"
-                    fill={props.color.texture(25).toHexString()}
+                    fill={props.color.texture(20).toHexString()}
                 >
                     ?
                 </text>
