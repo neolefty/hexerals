@@ -25,6 +25,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         boardWidth: 11,
         boardHeight: 7,
         mountainPercent: 30,
+        showAdvanced: 0, // non-zero is true
     },
     localGame: undefined,
 }

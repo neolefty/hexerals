@@ -6,11 +6,21 @@
   }
 }
 
-.LocalGameOptionsView {
+.Column {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.LocalGameOptionsView {
   font-size: 140%;
   //border: 1px solid #ccc;
 
@@ -23,5 +33,24 @@
     margin: 0.3em;
     font-size: 110%;
     padding: 0.3em 0.5em;
+  }
+
+  .Advanced {
+    transition: all 400ms;
+
+    .IntInput {
+      white-space: nowrap;
+    }
+  }
+
+  &.ShowAdvanced .Advanced {
+    width: 8em;  // because auto doesn't animate
+    opacity: 100%;
+  }
+
+  &.HideAdvanced .Advanced {
+    transform: scaleX(0);
+    opacity: 0;
+    width: 0;
   }
 }

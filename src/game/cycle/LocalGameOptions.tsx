@@ -4,14 +4,17 @@ import CartPair from '../../common/CartPair'
 import './LocalGameOptions.css'
 
 export interface LocalGameOptions {
+    // All numbers because our reducer assumes it.
+    // If we need a non-number, the reducer should be easy to modify.
     numPlayers: number
     tickMillis: number
     boardWidth: number
     boardHeight: number
     mountainPercent: number
+    showAdvanced: number
 }
 
-export interface LocalGameOptionsViewProps {
+export interface LGOProps {
     localOptions: LocalGameOptions
     displaySize: CartPair
 
@@ -19,70 +22,95 @@ export interface LocalGameOptionsViewProps {
     newGame: () => void
 }
 
-export const LocalGameOptionsView = (props: LocalGameOptionsViewProps) => {
-    const optionChanger = (name: string) =>
-        (n: number) => props.changeLocalOption(name, n)
+export class LocalGameOptionsView
+    extends React.Component<LGOProps>
+{
+    isAdvancedVisible = (): boolean => this.props.localOptions.showAdvanced > 0
 
-    return (
-        <div
-            className="LocalGameOptionsView"
-            style={{
-                width: props.displaySize.x,
-                height: props.displaySize.y,
-            }}
-        >
-            <NumberInput
-                label="Players"
-                value={props.localOptions.numPlayers}
-                title="How many players? One will be you, and the others very stupid AIs."
-                min={1}
-                max={12}
-                onChange={optionChanger('numPlayers')}
-                onEnter={props.newGame}
-            />
-            <NumberInput
-                label="Width"
-                title="How many hexes across?"
-                value={props.localOptions.boardWidth}
-                min={1}
-                max={23}
-                onChange={optionChanger('boardWidth')}
-                onEnter={props.newGame}
-            />
-            <NumberInput
-                label="Height"
-                title="How many hexes tall?"
-                value={props.localOptions.boardHeight}
-                min={2}
-                max={15}
-                onChange={optionChanger('boardHeight')}
-                onEnter={props.newGame}
-            />
-            <NumberInput
-                label="Tick"
-                title="Milliseconds between turns."
-                value={props.localOptions.tickMillis}
-                min={1}
-                max={9999}
-                onChange={optionChanger('tickMillis')}
-                onEnter={props.newGame}
-            />
-            <NumberInput
-                label="Mountains"
-                title="Percent of the map covered in mountains."
-                value={props.localOptions.mountainPercent}
-                min={0}
-                max={50}
-                onChange={optionChanger('mountainPercent')}
-                onEnter={props.newGame}
-            />
-            <button
-                onClick={props.newGame}
+    toggleAdvanced = () => {
+        this.props.changeLocalOption('showAdvanced', this.isAdvancedVisible() ? 0 : 1)
+    }
+
+    render(): React.ReactNode {
+        const optionChanger = (name: string) =>
+            (n: number) => this.props.changeLocalOption(name, n)
+
+        return (
+            <div
+                className={`LocalGameOptionsView Column ${
+                    this.isAdvancedVisible() ? 'ShowAdvanced' : 'HideAdvanced'
+                }`}
+                style={{
+                    width: this.props.displaySize.x,
+                    height: this.props.displaySize.y,
+                }}
             >
-                Start Game
-            </button>
-        </div>
-    )
+                <div className="Row">
+                    <div className="Basic Column">
+                        <NumberInput
+                            label="Players"
+                            value={this.props.localOptions.numPlayers}
+                            title="How many players? One will be you, and the others very stupid AIs."
+                            min={1}
+                            max={12}
+                            onChange={optionChanger('numPlayers')}
+                            onEnter={this.props.newGame}
+                        />
+                        <NumberInput
+                            label="Width"
+                            title="How many hexes across?"
+                            value={this.props.localOptions.boardWidth}
+                            min={1}
+                            max={23}
+                            onChange={optionChanger('boardWidth')}
+                            onEnter={this.props.newGame}
+                        />
+                        <NumberInput
+                            label="Height"
+                            title="How many hexes tall?"
+                            value={this.props.localOptions.boardHeight}
+                            min={2}
+                            max={15}
+                            onChange={optionChanger('boardHeight')}
+                            onEnter={this.props.newGame}
+                        />
+                    </div>
+                    <div className="Advanced Column">
+                        <NumberInput
+                            label="Mountains"
+                            title="Percent of the map covered in mountains."
+                            value={this.props.localOptions.mountainPercent}
+                            min={0}
+                            max={50}
+                            onChange={optionChanger('mountainPercent')}
+                            onEnter={this.props.newGame}
+                            blockTabbing={!this.isAdvancedVisible()}
+                        />
+                        <NumberInput
+                            label="Tick"
+                            title="Milliseconds between turns."
+                            value={this.props.localOptions.tickMillis}
+                            min={1}
+                            max={9999}
+                            onChange={optionChanger('tickMillis')}
+                            onEnter={this.props.newGame}
+                            blockTabbing={!this.isAdvancedVisible()}
+                        />
+                    </div>
+                    <div>
+                        <button onClick={this.toggleAdvanced}>
+                            {this.isAdvancedVisible() ? '<<<' : '>>>'}
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <button onClick={this.props.newGame}>
+                        Start Game
+                    </button>
+                </div>
+            </div>
+        )
+    }
 }
 
 interface IntInputProps {
@@ -92,6 +120,7 @@ interface IntInputProps {
     min: number
     max: number
     step?: number
+    blockTabbing?: boolean
 
     onChange: (x: number) => void
     onEnter?: () => void
@@ -112,25 +141,30 @@ const NumberInput = (props: IntInputProps) => (
             max={props.max}
             step={props.step || 1}
             value={props.value}
-            onKeyPress={(e) => {
-                if (props.onEnter && e.key === 'Enter') {
-                    e.preventDefault()
-                    props.onEnter()
+            tabIndex={props.blockTabbing ? -1 : undefined}
+            onKeyPress={
+                (e: React.KeyboardEvent) => {
+                    if (props.onEnter && e.key === 'Enter') {
+                        e.preventDefault()
+                        props.onEnter()
+                    }
                 }
-            }}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const str = e.currentTarget.value
-                const step = props.step || 1
-                if (str) {
-                    const parsed = (step === Math.floor(step))
-                        ? parseInt(str, 10)
-                        : parseFloat(str)
-                    if (!isNaN(parsed))
-                        props.onChange(
-                            minMax(parsed, props.min, props.max)
-                        )
+            }
+            onChange={
+                (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const str = e.currentTarget.value
+                    const step = props.step || 1
+                    if (str) {
+                        const parsed = (step === Math.floor(step))
+                            ? parseInt(str, 10)
+                            : parseFloat(str)
+                        if (!isNaN(parsed))
+                            props.onChange(
+                                minMax(parsed, props.min, props.max)
+                            )
+                    }
                 }
-            }}
+            }
         />
     </label>
 )
