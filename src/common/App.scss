@@ -1,14 +1,22 @@
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
 .App {
+}
+
+.App {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  align-items: center;
+
+  &-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 80px;
+  }
+
   .react-tabs {
     -webkit-tap-highlight-color: transparent;
 
