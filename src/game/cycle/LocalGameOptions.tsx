@@ -50,7 +50,7 @@ export class LocalGameOptionsView
                         <NumberInput
                             label="Players"
                             value={this.props.localOptions.numPlayers}
-                            title="How many players? One will be you, and the others very stupid AIs."
+                            title="How many players?\nOne will be you, and the others very stupid AIs."
                             min={1}
                             max={12}
                             onChange={optionChanger('numPlayers')}
@@ -58,7 +58,7 @@ export class LocalGameOptionsView
                         />
                         <NumberInput
                             label="Width"
-                            title="How many hexes across?"
+                            title="How many tiles wide?"
                             value={this.props.localOptions.boardWidth}
                             min={1}
                             max={23}
@@ -67,7 +67,7 @@ export class LocalGameOptionsView
                         />
                         <NumberInput
                             label="Height"
-                            title="How many hexes tall?"
+                            title="How many tiles tall?"
                             value={this.props.localOptions.boardHeight}
                             min={2}
                             max={15}
@@ -78,7 +78,7 @@ export class LocalGameOptionsView
                     <div className="Advanced Column">
                         <NumberInput
                             label="Mountains"
-                            title="Percent of the map covered in mountains."
+                            title="Percent of the map covered by mountains"
                             value={this.props.localOptions.mountainPercent}
                             min={0}
                             max={50}
@@ -88,7 +88,7 @@ export class LocalGameOptionsView
                         />
                         <NumberInput
                             label="Tick"
-                            title="Milliseconds between turns."
+                            title="Milliseconds between turns"
                             value={this.props.localOptions.tickMillis}
                             min={1}
                             max={9999}
@@ -98,7 +98,14 @@ export class LocalGameOptionsView
                         />
                     </div>
                     <div>
-                        <button onClick={this.toggleAdvanced}>
+                        <button
+                            onClick={this.toggleAdvanced}
+                            title={
+                                this.isAdvancedVisible()
+                                    ? 'Hide advanced options'
+                                    : 'Show advanced options'
+                            }
+                        >
                             {this.isAdvancedVisible() ? '<<<' : '>>>'}
                         </button>
                     </div>
