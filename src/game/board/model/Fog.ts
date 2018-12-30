@@ -41,7 +41,7 @@ export class PlayerFog {
         }
         ownedHexes.forEach(hex => {
             copyIt(hex)
-            hex.getNeighbors().forEach(neighbor => copyIt(neighbor))
+            hex.neighbors.forEach(neighbor => copyIt(neighbor))
         })
 
         // cities and mountains in the distance look the same

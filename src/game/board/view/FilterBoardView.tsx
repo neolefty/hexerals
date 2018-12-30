@@ -23,7 +23,7 @@ export class FilterBoardView extends React.PureComponent<FilterBoardViewProps> {
     makeOnDrag = (hex: Hex) => () => {
         const cursor: Hex | undefined = this.props.boardState.cursor
         const player: Player | undefined = this.props.boardState.curPlayer
-        if (cursor && player && hex.getNeighbors().contains(cursor)) {
+        if (cursor && player && hex.neighbors.contains(cursor)) {
             this.props.onQueueMoves(List([
                 PlayerMove.construct(
                     player,

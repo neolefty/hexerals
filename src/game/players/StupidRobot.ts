@@ -74,7 +74,7 @@ const forEachSetOfStarts = (
 ): void => {
     board.explicitTiles.forEach((tile: Tile, orig: Hex) => {
         if (tile.owner === player && tile.pop > 1) {
-            const dests = orig.getNeighbors().filter((dest: Hex) =>
+            const dests = orig.neighbors.filter((dest: Hex) =>
                 board.canBeOccupied(dest)
             ) as List<Hex>
             if (dests.size > 0)

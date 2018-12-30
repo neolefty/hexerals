@@ -31,7 +31,7 @@ export const floodShortestPath = (
             const curCost: HexNum = scratch.get(hex) // the cost to get here
             // to get to a neighbor, go here first; the trip will cost you to here + 1
             const nextCost = {h: hex, n: curCost.n + 1}
-            hex.getNeighbors().forEach(neighbor => {
+            hex.neighbors.forEach(neighbor => {
                 if (hexes.has(neighbor) && !curRing.has(neighbor) && !prevRing.has(neighbor)) {
                     nextRing.add(neighbor)
                     const neighborCost = scratch.get(neighbor)

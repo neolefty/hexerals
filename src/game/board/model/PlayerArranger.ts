@@ -93,7 +93,7 @@ export class SpreadPlayersArranger extends Arranger {
         let lastNDeltas: List<number> = List<number>(Array(this.settleRounds).fill(Infinity))
         let nRounds = 0
         let curStarts = randomStarts
-        console.log(`Start — ${ hexesToString(List(List(curStarts.keys()).sort()))}`)
+        // console.log(`Start — ${ hexesToString(List(List(curStarts.keys()).sort()))}`)
 
         const distancesToOthers = (a: Hex, player: Player): List<number> => {
             const result: number[] = []
@@ -114,7 +114,7 @@ export class SpreadPlayersArranger extends Arranger {
             curStarts.forEach((tile, hex) => {
                 // console.log(`     * ${tile.owner} at ${hex.toCartString()}`)
                 let [ nextHex, minDist ] = [ hex, distancesToOthers(hex, tile.owner).min() ]
-                hex.getNeighbors().forEach(neighbor => {
+                hex.neighbors.forEach(neighbor => {
                     if (!curStarts.has(neighbor) && emptyHexes.has(neighbor)) {
                         const neighborDs = distancesToOthers(neighbor, tile.owner)
                         if (neighborDs.min() > minDist) {
@@ -132,8 +132,8 @@ export class SpreadPlayersArranger extends Arranger {
                 .insert(0, maxOfMins - minOfMins)
             ++nRounds
             curStarts = nextStarts
-            console.log(` - Round ${nRounds} — (${minOfMins} to ${maxOfMins}) ${
-                hexesToString(List(List(curStarts.keys()).sort()))}`)
+            // console.log(` - Round ${nRounds} — (${minOfMins} to ${maxOfMins}) ${
+            //     hexesToString(List(List(curStarts.keys()).sort()))}`)
         }
         return curStarts
     }

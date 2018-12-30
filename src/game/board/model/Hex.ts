@@ -89,7 +89,7 @@ export class Hex {
         return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z));
     }
 
-    getNeighbors(): List<Hex> {
+    get neighbors(): List<Hex> {
         if (this.neighborsCache === undefined) {
             this.neighborsCache = List<Hex>(
                 Hex.DIRECTIONS.map(c => this.plus(c))

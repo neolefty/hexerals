@@ -28,3 +28,7 @@ it ('finds a simple shortest path', () => {
     simpleShortest(lr, ul)
     simpleShortest(lr, ur)
 })
+
+it ('finds a slightly more complex shortest path', () => {
+    
+})

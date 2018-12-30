@@ -52,7 +52,7 @@ export const flood = (
 const _flood = (hex: Hex, result: FloodResult[]) => {
     // console.log(`  ... ${hex.toCartString()} | ${result[0].toString()}`)
     result[0] = result[0].transfer(hex)
-    hex.getNeighbors().forEach(neighbor => {
+    hex.neighbors.forEach(neighbor => {
         if (
             result[0].remaining.has(neighbor) // relevant ...
             && !result[0].flooded.has(neighbor) // ... and not captured yet

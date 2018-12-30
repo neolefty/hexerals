@@ -7,8 +7,8 @@ const randomWalk = (n: number, start: Hex): Set<Hex> => {
     let here: Hex = start
     while (result.size < n) {
         result = result.add(here)
-        here = here.getNeighbors().get(
-            Math.floor(Math.random() * here.getNeighbors().size)
+        here = here.neighbors.get(
+            Math.floor(Math.random() * here.neighbors.size)
         )
     }
     return result

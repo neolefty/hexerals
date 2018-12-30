@@ -117,7 +117,7 @@ export abstract class BoardConstraints {
             floodEdge = Set<Hex>().asMutable()
             oldEdge.forEach(x => {
                 result.add(x)
-                x.getNeighbors().map(neighbor => {
+                x.neighbors.map(neighbor => {
                     // discard any that are out of bounds or already included
                     // conversely: keep those that are in bounds and novel
                     if (this.inBounds(neighbor) && !result.contains(neighbor))
