@@ -1,15 +1,13 @@
 import * as React from 'react'
 
-import {Player} from '../model/players/Players'
 import {DriftColor} from '../../../color/DriftColor'
-import {Terrain} from '../model/Tile'
+import {Terrain, Tile} from '../model/Tile'
 import {TerrainView} from './TerrainView'
 import {Hex} from '../model/Hex'
 
 export interface FlatTopHexProps {
     hex?: Hex
-    owner: Player
-    terrain: Terrain
+    tile: Tile
     color: DriftColor
     selected: boolean
     centerX: number
@@ -34,42 +32,42 @@ const hexPoints = (x: number, y: number, hexRadius: number) => {
 
 // a hexagon centered at (x, y)
 export const FlatTopHex = (props: FlatTopHexProps) => {
-    // const logIt = (desc: string) => console.log(
+    // const logEvent = (desc: string) => console.log(
     //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
     // )
     // tslint:disable-next-line
-    const logIt = (desc: string) => {}
+    const logEvent = (desc: string) => {}
     return (
         <g
             transform={`translate(${props.centerX} ${props.centerY})`}
-            className={`FlatTopHex ${props.owner} tile${props.selected ? ' active' : ''}`}
+            className={`FlatTopHex ${props.tile.owner} tile${props.selected ? ' active' : ''}`}
             onMouseDown={(e) => {
-                logIt(`onMouseDown ${e}`)
+                logEvent(`onMouseDown ${e}`)
                 if (props.onSelect) {
                     e.preventDefault()
                     props.onSelect()
                 }
             }}
             onTouchStart={(e) => { // not standard — Chrome only
-                logIt(`onTouchStart ${e.nativeEvent.type}`)
+                logEvent(`onTouchStart ${e.nativeEvent.type}`)
                 if (props.onSelect) {
                     e.preventDefault()
                     props.onSelect()
                 }
             }}
             onMouseEnter={(e) => {
-                logIt(`onMouseEnter ${e.nativeEvent.type} ${e.buttons}`)
+                logEvent(`onMouseEnter ${e.nativeEvent.type} ${e.buttons}`)
                 if (props.onDragInto && e.buttons === 1) { // TODO look up canonical value
                     props.onDragInto()
                     e.preventDefault()
                 }
             }}
 
-            onDragEnter={(e) => {logIt(`onDragEnter ${e.nativeEvent.type}`)}}
-            onTouchMove={(e) => {logIt(`onTouchMove ${e.nativeEvent.type}`)}}
-            onTouchCancel={(e) => {logIt(`onTouchCancel ${e.nativeEvent.type}`)}}
-            onDragOver={(e) => {logIt(`onDragOver ${e.nativeEvent.type}`)}}
-            onMouseDownCapture={(e) => {logIt(`onMouseDownCapture ${e.nativeEvent.type}`)}}
+            onDragEnter={(e) => {logEvent(`onDragEnter ${e.nativeEvent.type}`)}}
+            onTouchMove={(e) => {logEvent(`onTouchMove ${e.nativeEvent.type}`)}}
+            onTouchCancel={(e) => {logEvent(`onTouchCancel ${e.nativeEvent.type}`)}}
+            onDragOver={(e) => {logEvent(`onDragOver ${e.nativeEvent.type}`)}}
+            onMouseDownCapture={(e) => {logEvent(`onMouseDownCapture ${e.nativeEvent.type}`)}}
         >
             <polygon
                 points={hexPoints(0, 0, props.hexRadius)}
@@ -80,10 +78,10 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
                 }
             />
             {
-                props.terrain !== Terrain.Empty ? (
+                props.tile.terrain !== Terrain.Empty ? (
                     <TerrainView
                         hexRadius={props.hexRadius}
-                        terrain={props.terrain}
+                        tile={props.tile}
                         color={props.color}
                     />
                 ) : undefined

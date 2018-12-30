@@ -53,7 +53,7 @@ it('converts between hex and cartesian coords', () => {
     const midHex = Hex.getCart(6, 2)
     expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
     // expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
-    expect(tenByFive.getCartTile(6, 2) === Tile.BLANK).toBeTruthy()
+    expect(tenByFive.getCartTile(6, 2) === Tile.MAYBE_EMPTY).toBeTruthy()
 })
 
 it('overlays', () => {
@@ -64,7 +64,7 @@ it('overlays', () => {
     )
     expect(five.getTile(Hex.ORIGIN))
         .toEqual(new Tile(Player.Zero, 10, Terrain.City))
-    expect(five.getTile(Hex.RIGHT_UP) === Tile.BLANK).toBeTruthy()
+    expect(five.getTile(Hex.RIGHT_UP) === Tile.MAYBE_EMPTY).toBeTruthy()
     const emptyFive = new Tile(Player.Nobody, 5, Terrain.Empty)
     const cityThree = new Tile(Player.One, 3, Terrain.City)
     const overlayTemp: Map<Hex, Tile> = Map()

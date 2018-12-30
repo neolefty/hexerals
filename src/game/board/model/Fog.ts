@@ -1,4 +1,4 @@
-import {Map} from 'immutable';
+import {Map, Set} from 'immutable';
 
 import {Player} from './players/Players';
 import {BoardState} from './BoardState';
@@ -9,6 +9,8 @@ import {Tile} from './Tile';
 export class PlayerFog {
     private prevGlobal?: BoardState
     private prevFog?: BoardState
+    // doesn't include empty terrain
+    private seenBefore = Set<Hex>().asMutable()
 
     constructor(readonly player: Player) {}
 
@@ -34,25 +36,29 @@ export class PlayerFog {
     private fogBoard(board: Board) {
         // copy visible tiles — owned by or neighboring player's tiles
         const ownedHexes = board.filterTiles(tile => tile.owner === this.player)
-        const mSpots = Map<Hex, Tile>().asMutable()
-        const copyIt = (hex: Hex) => {
-            if (!mSpots.has(hex) && board.explicitTiles.has(hex))
-                mSpots.set(hex, board.explicitTiles.get(hex))
+        this.seenBefore = this.seenBefore.union(ownedHexes).asMutable()
+        const fogTiles = Map<Hex, Tile>().asMutable()
+        const canSee = (hex: Hex) => {
+            if (!fogTiles.has(hex)) {
+                fogTiles.set(hex, board.explicitTiles.get(hex, Tile.EMPTY))
+                this.seenBefore.add(hex)
+            }
         }
         ownedHexes.forEach(hex => {
-            copyIt(hex)
-            hex.neighbors.forEach(neighbor => copyIt(neighbor))
+            canSee(hex)
+            hex.neighbors.forEach(neighbor => canSee(neighbor))
         })
 
         // cities and mountains in the distance look the same
         board.explicitTiles.forEach((tile, hex) => {
-            if (!mSpots.has(hex)) {
-                const fromADistance = tile.fromADistance()
+            if (!fogTiles.has(hex)) {
+                const fromADistance = tile.fromADistance(
+                    this.seenBefore.has(hex))
                 if (fromADistance)
-                    mSpots.set(hex, fromADistance)
+                    fogTiles.set(hex, fromADistance)
             }
         })
 
-        return board.setTiles(mSpots.asImmutable())
+        return board.setTiles(fogTiles.asImmutable())
     }
 }

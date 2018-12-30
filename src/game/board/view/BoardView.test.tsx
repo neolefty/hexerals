@@ -377,8 +377,8 @@ it('makes real moves', () => {
     expect(downFromUR(2)).toEqual(
         new Tile(Player.One, BoardReducerTester.INITIAL_POP-2)
     )
-    expect(downFromUR(3)).toEqual(new Tile(Player.Nobody, 0))
-    expect(downFromUR(3) === Tile.BLANK).toBeTruthy()
+    expect(downFromUR(3)).toEqual(new Tile(Player.Nobody, 0, Terrain.Empty, false))
+    expect(downFromUR(3) === Tile.MAYBE_EMPTY).toBeTruthy()
 
     // moving contents 1 has no effect
     brt.placeCursor(brt.ur.getDown())

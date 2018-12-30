@@ -1,9 +1,11 @@
 import {HEX_HALF_HEIGHT, HEX_LL_XY, HEX_LR_XY, HEX_RIGHT_XY, HEX_UL_XY, HEX_UR_XY} from './HexContants';
-import {Terrain} from '../model/Tile';
+import {Terrain, Tile} from '../model/Tile';
 import {Map} from 'immutable';
 
 // how much contrast to give for each line in a terrain's set of polygons
 type Shader = (index: number) => number
+
+const UNKNOWN_SHADER = (index: number) => (index % 2 + 2) * 4 // faded
 
 const terrainPolygons = Map<Terrain, string[]>().asMutable()
 const terrainShaders = Map<Terrain, Shader>().asMutable()
@@ -25,8 +27,8 @@ terrainPolygons.set(Terrain.City, [
     `${-WALL_W * .4},${y + WALL_H} ${-WALL_W * .4},${y - WALL_H * .6}`
     + ` ${WALL_W * .4},${y - WALL_H * .6} ${WALL_W * .4},${y + WALL_H}`,
 ])
-const cityShader = (index: number) => (index % 2 + 2) * 7
-terrainShaders.set(Terrain.City, cityShader)
+const CITY_SHADER = (index: number) => (index % 2 + 2) * 7
+terrainShaders.set(Terrain.City, CITY_SHADER)
 
 const mtnLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))
 const mtnRight = HEX_LR_XY.plus(HEX_UR_XY.scale(0.7))
@@ -41,13 +43,10 @@ terrainShaders.set(
     Terrain.Mountain, (index: number) => (index % 2 + 2) * 10
 )
 
-terrainPolygons.set(Terrain.MaybeMountain, terrainPolygons.get(Terrain.Mountain))
-terrainShaders.set(  // faded
-    Terrain.MaybeMountain, (index: number) => (index % 2 + 2) * 4
-)
+export const getTerrainPolygons = (tile: Tile): string[] | undefined =>
+    terrainPolygons.get(tile.terrain)
 
-export const getTerrainPolygons = (terrain: Terrain): string[] | undefined =>
-    terrainPolygons.get(terrain, undefined)
-
-export const getTerrainShader = (terrain: Terrain): Shader =>
-    terrainShaders.get(terrain, cityShader)
+export const getTerrainShader = (tile: Tile) =>
+    tile.known
+        ? terrainShaders.get(tile.terrain, CITY_SHADER)
+        : UNKNOWN_SHADER

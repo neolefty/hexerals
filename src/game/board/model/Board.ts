@@ -118,7 +118,7 @@ export class Board {
 
     getTile(coord: Hex): Tile {
         assert(this.inBounds(coord))
-        return this.explicitTiles.get(coord, Tile.BLANK)
+        return this.explicitTiles.get(coord, Tile.MAYBE_EMPTY)
     }
 
     getCartTile(cx: number, cy: number): Tile {

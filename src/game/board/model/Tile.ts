@@ -5,7 +5,6 @@ export enum Terrain {
     City = 'City',
     Capital = 'Capital',
     Mountain = 'Mountain',
-    MaybeMountain = 'MaybeMountain',
     Swamp = 'Swamp',
 }
 
@@ -14,41 +13,46 @@ export const canBeOccupied = (terrain: Terrain): boolean =>
 
 // contents of a space on the board
 export class Tile {
-    static readonly BLANK: Tile = new Tile(Player.Nobody, 0, Terrain.Empty)
-    static readonly SWAMP = new Tile(Player.Nobody, 0, Terrain.Swamp)
-    static readonly MOUNTAIN = new Tile(Player.Nobody, 0, Terrain.Mountain)
+    static readonly EMPTY: Tile = new Tile(
+        Player.Nobody, 0, Terrain.Empty)
+    static readonly MOUNTAIN = new Tile(
+        Player.Nobody, 0, Terrain.Mountain)
+
+    static readonly MAYBE_EMPTY = new Tile(
+        Player.Nobody, 0, Terrain.Empty, false)
+    static readonly MAYBE_CITY = new Tile(
+        Player.Nobody, 0, Terrain.City, false)
     static readonly MAYBE_MOUNTAIN = new Tile(
-        Player.Nobody, 0, Terrain.MaybeMountain
-    )
+        Player.Nobody, 0, Terrain.Mountain, false)
+    static readonly MAYBE_SWAMP = new Tile(
+        Player.Nobody, 0, Terrain.Swamp, false)
 
     constructor(
         readonly owner: Player,
-        readonly pop: number,
-        readonly terrain: Terrain = Terrain.Empty
+        readonly pop: number = 0,
+        readonly terrain: Terrain = Terrain.Empty,
+        readonly known: boolean = true,
     ) {}
 
-    // TODO check whether (this == BLANK) will work instead
+    // TODO check whether (this == EMPTY) will work instead
     isBlank() {
         return this.owner === Player.Nobody
             && this.pop === 0
             && this.terrain === Terrain.Empty
     }
 
-    fromADistance(): Tile | undefined {
+    fromADistance(seenBefore: boolean): Tile | undefined {
         switch (this.terrain) {
-
-            case Terrain.Mountain:
-            case Terrain.MaybeMountain:
-            case Terrain.City:
-                return Tile.MAYBE_MOUNTAIN
-
-            case Terrain.Capital:
             case Terrain.Empty:
                 return undefined
-
+            case Terrain.Mountain:
+                return Tile.MAYBE_MOUNTAIN
+            case Terrain.City:
+                return seenBefore ? Tile.MAYBE_CITY : Tile.MAYBE_MOUNTAIN
+            case Terrain.Capital:
+                return seenBefore ? Tile.MAYBE_CITY : undefined
             case Terrain.Swamp:
-                return Tile.SWAMP
-
+                return Tile.MAYBE_SWAMP
             default:
                 throw Error(this.terrain)
         }

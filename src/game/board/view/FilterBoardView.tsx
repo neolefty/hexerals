@@ -83,13 +83,17 @@ export class FilterBoardView extends React.PureComponent<FilterBoardViewProps> {
                     this.props.filter
                 ).map(hex => {
                     const tile = boardState.board.getTile(hex)
-                    const maybeColor: DriftColor | undefined
+                    const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
-                    const color: DriftColor = maybeColor || DriftColor.GREY_40
+                    const color: DriftColor = ownerColor
+                        || (tile.known && tile.canBeOccupied() ? DriftColor.GREY_60 : DriftColor.GREY_40)
+                    const text = !tile.known && !tile.isBlank() ? '?' : tile.pop !== 0 ? `${tile.pop}` : undefined
+                    const textColor = !tile.known ? color.texture(20) : undefined
                     return (
                         <TileHexView
                             key={hex.id}
-                            text={tile.pop === 0 ? undefined : `${tile.pop}`}
+                            text={text}
+                            textColor={textColor}
                             tile={tile}
                             color={color}
                             hex={hex}

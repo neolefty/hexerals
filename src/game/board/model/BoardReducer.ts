@@ -93,6 +93,9 @@ const queueMovesReducer = (
         const options = result.board.validationOptions(newMessages)
         // newMessages.forEach(m => console.log(m.toString()))
         options.ignoreSmallPop = true
+        // Allow queueing into mountains so we don't circumvent fog — UI prevents
+        // known mountains, and also moves are re-validated when executed.
+        options.ignoreOccupiability = true
         if (queuedTo) // if the player hopes to have already taken that hex, let them try
             options.ignoreTileOwner = true
         const valid = result.board.validate(move, options)

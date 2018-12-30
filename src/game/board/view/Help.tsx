@@ -29,12 +29,12 @@ const dirs = Map<Hex, TileAndText>([
         Hex.ORIGIN,
         st(new Tile(Player.Nobody, 0, Terrain.City), '', DriftColor.GREY_20),
     ],
-    [Hex.UP, st(Tile.BLANK, 'w')],
-    [Hex.DOWN, st(Tile.BLANK, 's')],
-    [Hex.LEFT_UP, st(Tile.BLANK, 'q')],
-    [Hex.LEFT_DOWN, st(Tile.BLANK, 'a')],
-    [Hex.RIGHT_UP, st(Tile.BLANK, 'e')],
-    [Hex.RIGHT_DOWN, st(Tile.BLANK, 'd')],
+    [Hex.UP, st(Tile.EMPTY, 'w')],
+    [Hex.DOWN, st(Tile.EMPTY, 's')],
+    [Hex.LEFT_UP, st(Tile.EMPTY, 'q')],
+    [Hex.LEFT_DOWN, st(Tile.EMPTY, 'a')],
+    [Hex.RIGHT_UP, st(Tile.EMPTY, 'e')],
+    [Hex.RIGHT_DOWN, st(Tile.EMPTY, 'd')],
 ])
 
 export const Help = (props: HelpOptions) => {

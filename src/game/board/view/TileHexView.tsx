@@ -28,8 +28,7 @@ export const TileHexView = (props: TileHexViewProps) => {
     return (
         <FlatTopHex
             hex={props.hex}
-            owner={props.tile.owner}
-            terrain={props.tile.terrain}
+            tile={props.tile}
             color={props.color}
             selected={props.selected}
             centerX={x}
@@ -41,9 +40,9 @@ export const TileHexView = (props: TileHexViewProps) => {
             props.text ? (
                 <text
                     // TODO move this into a style sheet
-                    y={0.35 * HEX_HALF_HEIGHT}
+                    y={props.tile.known ? 0.35 * HEX_HALF_HEIGHT : 0.5 * HEX_HALF_HEIGHT}
                     fontFamily="Sans-Serif"
-                    fontSize={HEX_HALF_HEIGHT}
+                    fontSize={HEX_HALF_HEIGHT * (props.tile.known ? 1 : 1.5)}
                     textAnchor="middle"
                     fill={(props.textColor || props.color.contrast()).toHexString()}
                 >

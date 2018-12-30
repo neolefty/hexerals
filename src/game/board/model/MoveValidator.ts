@@ -19,6 +19,9 @@ export class MoveValidatorOptions {
     // player planning the move -- ownership may change before this move happens.
     ignoreTileOwner: boolean = false
 
+    // If true, don't invalidate because of mountains etc.
+    ignoreOccupiability: boolean = false
+
     constructor(
         tiles: Map<Hex, Tile>,
         // status messages to add to
@@ -57,16 +60,18 @@ export class MoveValidator {
         }
 
         // can be occupied
-        const dest = options.tiles.get(move.dest)
-        if (dest && !dest.canBeOccupied()) {
-            if (options.status)
-                options.status.push(
-                    new StatusMessage(
-                        'blocked',
-                        `destination ${move.dest} is a ${dest.terrain}`,
-                        `${move}`,
-                    ))
-            return false
+        if (!options.ignoreOccupiability) {
+            const dest = options.tiles.get(move.dest)
+            if (dest && !dest.canBeOccupied()) {
+                if (options.status)
+                    options.status.push(
+                        new StatusMessage(
+                            'blocked',
+                            `destination ${move.dest} is a ${dest.terrain}`,
+                            `${move}`,
+                        ))
+                return false
+            }
         }
 
         // move distance == 1
@@ -82,7 +87,7 @@ export class MoveValidator {
         }
 
         // owner === player making the move
-        const origin = options.tiles.get(move.source, Tile.BLANK)
+        const origin = options.tiles.get(move.source, Tile.EMPTY)
         if (!options.ignoreTileOwner && origin.owner !== move.player) {
             if (options && options.status)
                 options.status.push(new StatusMessage(
@@ -119,7 +124,7 @@ export class MoveValidator {
                 assert(origin)
                 const newSourceTile = origin.setPop(1)
                 // TODO support moving only part of a stack (half etc)
-                const oldDestTile = options.tiles.get(move.dest, Tile.BLANK)
+                const oldDestTile = options.tiles.get(move.dest, Tile.EMPTY)
                 const march = new Tile(origin.owner, origin.pop - 1)
                 const newDestTile = oldDestTile.settle(march)
                 options.tiles = options.tiles.withMutations(
