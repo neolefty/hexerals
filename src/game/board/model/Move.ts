@@ -18,15 +18,22 @@ export class HexMove {
 }
 
 export class PlayerMove {
-    static construct(player: Player, source: Hex, delta: Hex): PlayerMove {
-        return new PlayerMove(player, new HexMove(source, delta))
-    }
+    static constructDelta = (player: Player, source: Hex, delta: Hex) =>
+        new PlayerMove(player, new HexMove(source, delta))
 
-    constructor(
+    static constructDest = (player: Player, source: Hex, dest: Hex) =>
+        new PlayerMove(
+            player,
+            new HexMove(source, dest.minus(source))
+        )
+
+    static construct = (player: Player, move: HexMove): PlayerMove =>
+        new PlayerMove(player, move)
+
+    private constructor(
         readonly player: Player,
         readonly  move: HexMove,
-    ) {
-    }
+    ) {}
 
     get source(): Hex {
         return this.move.source

@@ -91,6 +91,7 @@ const queueMovesReducer = (
         const queuedTo = result.moves
             .playerIsQueuedTo(move.player, move.source)
         const options = result.board.validationOptions(newMessages)
+        // newMessages.forEach(m => console.log(m.toString()))
         options.ignoreSmallPop = true
         if (queuedTo) // if the player hopes to have already taken that hex, let them try
             options.ignoreTileOwner = true
@@ -266,8 +267,8 @@ const robotsDecideReducer = (state: BoardState): BoardState => {
             result = queueMovesReducer(
                 result,
                 queueMovesAction(
-                    List(decision.makeMoves.map((hex: HexMove) =>
-                        PlayerMove.construct(player, hex.source, hex.delta)
+                    List(decision.makeMoves.map((move: HexMove) =>
+                        PlayerMove.construct(player, move)
                     ))
                 )
             )

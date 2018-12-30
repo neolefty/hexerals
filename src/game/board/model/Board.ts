@@ -81,7 +81,7 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // empty tiles are implied — see this.allHexes
+        // empty tiles are implied — see this.hexesAll
         readonly explicitTiles: Map<Hex, Tile>,
     ) {}
 
@@ -96,13 +96,23 @@ export class Board {
         this.inBounds(coord) && this.getTile(coord).canBeOccupied()
 
     // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
-    get allHexes(): Set<Hex> {
+    get hexesAll(): Set<Hex> {
         return this.constraints.all()
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _occupiableCache: Set<Hex> | undefined = undefined
+    get hexesOccupiable(): Set<Hex> {
+        if (!this._occupiableCache)
+            this._occupiableCache = this.filterTiles(
+                tile => tile.canBeOccupied()
+            )
+        return this._occupiableCache
     }
 
     // noinspection PointlessBooleanExpressionJS
     filterTiles = (filter: TileFilter): Set<Hex> =>
-        this.allHexes.filter(
+        this.hexesAll.filter(
             hex => !!(hex && filter(this.getTile(hex)))
         ) as Set<Hex>
 

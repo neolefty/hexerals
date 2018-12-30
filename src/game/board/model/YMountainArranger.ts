@@ -31,17 +31,17 @@ export class YMountainArranger extends Arranger {
 
     findCenter(board: Board): Hex {
         let [ sumX, sumY, sumZ ] = [ 0, 0, 0 ]
-        board.allHexes.forEach(hex => {
+        board.hexesAll.forEach(hex => {
             sumX += hex.x
             sumY += hex.y
             sumZ += hex.z
         })
-        const n = board.allHexes.size
+        const n = board.hexesAll.size
         const [ avgX, avgY, avgZ ] = [ sumX / n, sumY / n, sumZ / n ]
         const distanceFromAvg = (hex: Hex) =>
             Math.abs(hex.x - avgX) + Math.abs(hex.y - avgY) + Math.abs(hex.z - avgZ)
-        let closestHex = board.allHexes.first()
-        board.allHexes.forEach(hex => {
+        let closestHex = board.hexesAll.first()
+        board.hexesAll.forEach(hex => {
             if (distanceFromAvg(hex) < distanceFromAvg(closestHex))
                 closestHex = hex
         })

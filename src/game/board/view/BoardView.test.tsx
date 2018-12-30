@@ -175,12 +175,12 @@ it('creates game via react-redux', () => {
 it('queues multiple moves at once', () => {
     const brt = new BoardReducerTester()
     const moves: List<PlayerMove> = List([
-        PlayerMove.construct(Player.Zero, brt.ll, Hex.UP),
-        PlayerMove.construct(Player.One, brt.ur, Hex.DOWN),
-        PlayerMove.construct(Player.Zero, brt.ll.plus(Hex.UP), Hex.UP),
-        PlayerMove.construct(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
-        PlayerMove.construct(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
-        PlayerMove.construct(Player.Zero, brt.ll, Hex.UP),
+        PlayerMove.constructDelta(Player.Zero, brt.ll, Hex.UP),
+        PlayerMove.constructDelta(Player.One, brt.ur, Hex.DOWN),
+        PlayerMove.constructDelta(Player.Zero, brt.ll.plus(Hex.UP), Hex.UP),
+        PlayerMove.constructDelta(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
+        PlayerMove.constructDelta(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
+        PlayerMove.constructDelta(Player.Zero, brt.ll, Hex.UP),
     ])
     // console.log('Moves:')
     // moves.forEach((move, idx) => console.log(`${idx}: ${move.toString()}`))

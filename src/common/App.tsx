@@ -74,7 +74,7 @@ class App extends React.Component<AppProps, AppState> {
                         <Help displaySize={displaySize}/>
                     </TabPanel>
                     <TabPanel>
-                        <Benchmark/>
+                        <Benchmark displaySize={displaySize}/>
                     </TabPanel>
                 </Tabs>
             </div>

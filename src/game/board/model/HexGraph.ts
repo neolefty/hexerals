@@ -1,12 +1,6 @@
-import {Hex} from './Hex';
+import {Hex, hexesToString} from './Hex';
 import {List, Set} from 'immutable';
 import * as assert from 'assert';
-
-export const hexesToString = (s: List<Hex>) => {
-    let result = `${s.size} —`
-    s.forEach(hex => result += ` ${hex.toCartString()}`)
-    return result
-}
 
 export const connected = (hexes: Set<Hex>): boolean =>
     hexes.size <= 1 || flood(hexes.first(), hexes).remaining.size === 0
@@ -49,6 +43,7 @@ export const flood = (
     // console.log(` — ${result[0].toString()}`)
     return result[0]
 }
+
 const _flood = (hex: Hex, result: FloodResult[]) => {
     // console.log(`  ... ${hex.toCartString()} | ${result[0].toString()}`)
     result[0] = result[0].transfer(hex)

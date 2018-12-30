@@ -37,7 +37,7 @@ export class RandomPlayerArranger extends Arranger {
                     status.push(new StatusMessage(
                         MAP_TOO_SMALL,
                         `Could not place player ${player}`,
-                        `map size ${board.allHexes.size} / players ${
+                        `map size ${board.hexesAll.size} / players ${
                             board.players.size
                             }`,
                     ))

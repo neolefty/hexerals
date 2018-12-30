@@ -23,6 +23,7 @@ const BOARD_HEIGHT = 13
 const PLAYERS = pickNPlayers(NUM_PLAYERS)
 
 interface BenchmarkProps {
+    displaySize: CartPair
 }
 
 interface BenchmarkState {
@@ -43,7 +44,7 @@ const createColors = () => {
     let result = new ColorPodge()
     while (result.driftColors.size < NUM_PLAYERS)
         result = result.addRandomColor()
-    const dispersions = [16, 11, 8, 5, 3, 2, 1, 1, 1]
+    const dispersions = [16, 13, 10, 7, 5, 5, 3, 3, 2, 1, 1]
     dispersions.forEach(x => result = result.disperse(x))
     return playerColors(result)
 }
@@ -113,21 +114,24 @@ export class Benchmark extends React.Component<BenchmarkProps, BenchmarkState> {
     }
 
     render(): React.ReactNode {
-        if (this.state && this.state.curGame) {
-            return (
-                <div className="Benchmark">
-                    <HexBoardView
-                        {...staticBoardViewProps}
-                        boardState={this.state.curGame}
-                    />
-                </div>
-            )
-        }
-        else return (
-            <div className="Benchmark">
-                <button onClick={this.startGame}>
-                    Run
-                </button>
+        return (
+            <div
+                className="Row"
+                style={{height: this.props.displaySize.y}}
+            >{
+                this.state && this.state.curGame
+                    ? (
+                        <HexBoardView
+                            {...staticBoardViewProps}
+                            boardState={this.state.curGame}
+                        />
+                    )
+                    : (
+                        <button onClick={this.startGame}>
+                            Run
+                        </button>
+                    )
+            }
             </div>
         )
     }

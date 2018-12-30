@@ -116,17 +116,17 @@ it('validates moves', () => {
     const messages: StatusMessage[] = []
     const options = threeByFour.validationOptions(messages)
 
-    expect(threeByFour.validate(PlayerMove.construct(
+    expect(threeByFour.validate(PlayerMove.constructDelta(
         Player.Zero, threeByFour.edges.lowerLeft, Hex.UP
     ))).toBeTruthy()
     expect(threeByFour.edges.lowerLeft).toEqual(Hex.ORIGIN)
-    expect(threeByFour.validate(PlayerMove.construct(
+    expect(threeByFour.validate(PlayerMove.constructDelta(
         Player.One, threeByFour.edges.upperRight, Hex.DOWN
     ))).toBeTruthy()
 
     // would go off the board
     expect(threeByFour.validate(
-        PlayerMove.construct(Player.One, threeByFour.edges.upperRight, Hex.UP),
+        PlayerMove.constructDelta(Player.One, threeByFour.edges.upperRight, Hex.UP),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
@@ -134,7 +134,7 @@ it('validates moves', () => {
 
     // would start off the board
     expect(threeByFour.validate(
-        PlayerMove.construct(Player.Zero, Hex.DOWN, Hex.UP),
+        PlayerMove.constructDelta(Player.Zero, Hex.DOWN, Hex.UP),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
@@ -142,7 +142,7 @@ it('validates moves', () => {
 
     // too far
     const rightUp2 = Hex.RIGHT_UP.plus(Hex.RIGHT_UP)
-    expect(threeByFour.validate(PlayerMove.construct(
+    expect(threeByFour.validate(PlayerMove.constructDelta(
         Player.Zero, Hex.ORIGIN, rightUp2),
         options,
     )).toBeFalsy()
@@ -150,24 +150,24 @@ it('validates moves', () => {
     expect(messages[messages.length-1].msg.includes('2')).toBeTruthy()
 
     // wrong owner
-    const oneOriginUp = PlayerMove.construct(
+    const oneOriginUp = PlayerMove.constructDelta(
         Player.One, Hex.ORIGIN, Hex.UP)
     expect(threeByFour.validate(oneOriginUp, options)).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('wrong player')
     expect(threeByFour.validate(oneOriginUp)).toBeFalsy()
 
     // pop of only 1
-    const moved = threeByFour.applyMove(PlayerMove.construct(
+    const moved = threeByFour.applyMove(PlayerMove.constructDelta(
         Player.Zero, Hex.ORIGIN, Hex.UP
     )).board
     const movedOptions = moved.validationOptions(messages)
     expect(moved.validate(
-        PlayerMove.construct(Player.Zero, Hex.ORIGIN, Hex.UP),
+        PlayerMove.constructDelta(Player.Zero, Hex.ORIGIN, Hex.UP),
         movedOptions,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('insufficient population')
     movedOptions.ignoreSmallPop = true
-    expect(moved.validate(PlayerMove.construct(
+    expect(moved.validate(PlayerMove.constructDelta(
         Player.Zero, Hex.ORIGIN, Hex.UP
     ), movedOptions)).toBeTruthy()
 })
@@ -187,7 +187,7 @@ it('steps population', () => {
 
     // make a move
     const moved = threeByFour.applyMove(
-        PlayerMove.construct(Player.One, ur, Hex.DOWN)
+        PlayerMove.constructDelta(Player.One, ur, Hex.DOWN)
     ).board
     expect(moved.getTile(ur).pop).toBe(1)
     expect(moved.getTile(urd).pop).toBe(19)

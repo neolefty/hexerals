@@ -55,7 +55,7 @@ export class BoardReducerTester {
     queueMove = (player: Player, delta: Hex, alsoCursor = true) => {
         this.store.dispatch(
             queueMovesAction(
-                List([PlayerMove.construct(player, this.cursor, delta)])
+                List([PlayerMove.constructDelta(player, this.cursor, delta)])
             )
         )
         if (alsoCursor)

@@ -14,11 +14,11 @@ it ('finds a simple shortest path', () => {
     expect(ul.minus(ll).maxAbs()).toBe(9)
     expect(lr.minus(ll).maxAbs()).toBe(9)
     expect(lr.minus(ul).maxAbs()).toBe(13)
-    const cache = new CacheDistance(ten.allHexes)
+    const cache = new CacheDistance(ten.hexesAll)
 
     const simpleShortest = (a: Hex, b: Hex) => {
         // console.log(`path from ${a.toString()} to ${b.toString()} — manhattan ${a.minus(b).maxAbs()}`)
-        const path = floodShortestPath(ten.allHexes, a, b)
+        const path = floodShortestPath(ten.hexesAll, a, b)
         // console.log(`  --> ${hexesToString(path)}`)
         const manhattan = b.minus(a).maxAbs() + 1
         expect(path.size).toBe(manhattan)
@@ -47,5 +47,5 @@ it ('finds a slightly more complex shortest path', () => {
     const [ ll, ur ] = [ ten.edges.lowerLeft, ten.edges.upperRight ]
     const hexes = ten.filterTiles(tile => tile.terrain === Terrain.Empty)
     expect(floodShortestPath(hexes, ll, ur).size).toBe(30)
-    expect(floodShortestPath(ten.allHexes, ll, ur).size).toBe(14)
+    expect(floodShortestPath(ten.hexesAll, ll, ur).size).toBe(14)
 })

@@ -181,3 +181,11 @@ export class Hex {
         this.z = -x - y;
     }
 }
+
+export const hexesToString = (s: List<Hex> | undefined) => {
+    if (!s)
+        return 'undefined'
+    let result = `${s.size} —`
+    s.forEach(hex => result += ` ${hex.toCartString()}`)
+    return result
+}
