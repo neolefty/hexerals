@@ -1,4 +1,4 @@
-import {List, Map} from 'immutable';
+import {List} from 'immutable';
 
 import {Board} from './Board';
 import {CacheDistance, floodShortestPath} from './ShortestPath';
