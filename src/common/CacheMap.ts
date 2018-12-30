@@ -1,5 +1,6 @@
 import {OrderedMap} from 'immutable';
 
+// first-in first-out cache
 export class CacheMap<K, V> {
     private cache = OrderedMap<K, V>()
 

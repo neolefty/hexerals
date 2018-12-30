@@ -1,4 +1,4 @@
-import {BoardReducerTester} from '../board/view/BoardReducerTester';
+import {BoardReducerTester} from '../../view/BoardReducerTester';
 import {Player} from './Players';
 import {StupidRobot} from './StupidRobot';
 

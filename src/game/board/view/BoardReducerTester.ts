@@ -8,14 +8,14 @@ import {
     queueMovesAction, robotsDecideAction, setCurPlayerAction, setRobotAction,
 } from '../model/BoardReducer';
 import {Board} from '../model/Board';
-import {pickNPlayers, Player} from '../../players/Players';
+import {pickNPlayers, Player} from '../model/players/Players';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
 import {Hex} from '../model/Hex';
 import {Tile} from '../model/Tile';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MovementQueue} from '../model/MovementQueue';
 import {PlayerMove} from '../model/Move';
-import {Robot} from '../../players/Robot';
+import {Robot} from '../model/players/Robot';
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50

@@ -1,12 +1,12 @@
 import {List} from 'immutable';
 
 import {GameDecision, Robot} from './Robot';
-import {HexMove, PlayerMove} from '../board/model/Move';
-import {BoardState} from '../board/model/BoardState';
+import {HexMove, PlayerMove} from '../Move';
+import {BoardState} from '../BoardState';
 import {Player} from './Players';
-import {Hex} from '../board/model/Hex';
-import {Tile} from '../board/model/Tile';
-import {Board} from '../board/model/Board';
+import {Hex} from '../Hex';
+import {Tile} from '../Tile';
+import {Board} from '../Board';
 import * as assert from 'assert';
 
 // improvements

@@ -4,7 +4,7 @@ import {Map} from 'immutable'
 import './Board.css'
 import {Hex} from '../model/Hex'
 import {DriftColor} from '../../../color/DriftColor'
-import {Player} from '../../players/Players'
+import {Player} from '../model/players/Players'
 import {FilterBoardView} from './FilterBoardView';
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';

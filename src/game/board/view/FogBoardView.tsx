@@ -3,7 +3,7 @@ import * as React from 'react'
 import {BoardViewProps} from './BoardViewBase'
 import {PlayerFog} from '../model/Fog';
 import {Map} from 'immutable';
-import {Player} from '../../players/Players';
+import {Player} from '../model/players/Players';
 import {HexBoardView} from './HexBoardView';
 
 interface FogBoardProps extends BoardViewProps {}

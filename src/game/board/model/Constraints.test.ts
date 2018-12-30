@@ -1,10 +1,10 @@
 import {List} from 'immutable';
 
-import {CornersPlayerArranger} from '../board/model/PlayerArranger';
-import {Hex} from '../board/model/Hex';
-import {Board} from '../board/model/Board';
-import {pickNPlayers} from '../players/Players';
-import {BoardConstraints} from '../board/model/Constraints';
+import {CornersPlayerArranger} from './PlayerArranger';
+import {Hex} from './Hex';
+import {Board} from './Board';
+import {pickNPlayers} from './players/Players';
+import {BoardConstraints} from './Constraints';
 
 it('checks rectangular board geometry', () => {
     const arr = [new CornersPlayerArranger()]

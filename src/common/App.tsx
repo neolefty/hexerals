@@ -4,8 +4,8 @@ import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 import './App.css'
 import CartPair from './CartPair'
 import {ColorsContainer, ColorsState} from '../color/ColorsContainer'
-import {CycleState} from '../game/cycle/CycleState'
-import {CycleContainer} from '../game/cycle/CycleContainer'
+import {CycleState} from '../game/board/model/CycleState'
+import {CycleContainer} from '../game/board/model/CycleContainer'
 import {Help} from '../game/board/view/Help';
 import {Benchmark} from '../game/board/view/Benchmark';
 

@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import {Map} from 'immutable'
 
 import {Board} from './Board'
-import {pickNPlayers, Player} from '../../players/Players'
+import {pickNPlayers, Player} from './players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {CornersPlayerArranger} from './PlayerArranger'

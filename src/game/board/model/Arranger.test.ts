@@ -3,7 +3,7 @@ import {Set} from 'immutable'
 import {Hex} from './Hex'
 import {Terrain} from './Tile'
 import {Board} from './Board'
-import {pickNPlayers} from '../../players/Players';
+import {pickNPlayers} from './players/Players';
 import {connected} from './HexGraph';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MAP_TOO_SMALL} from './Arranger'

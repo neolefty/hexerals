@@ -5,15 +5,15 @@ import {BoardState} from '../model/BoardState'
 import {HexBoardView} from './HexBoardView'
 import {ColorPodge} from '../../../color/ColorPodge'
 import CartPair from '../../../common/CartPair'
-import {playerColors} from '../../cycle/LocalGameContainer'
+import {playerColors} from './LocalGameContainer'
 import './Benchmark.css'
 import {Board} from '../model/Board'
-import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
+import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {Hex} from '../model/Hex'
 import {MovementQueue} from '../model/MovementQueue'
 import {BoardViewProps} from './BoardViewBase'
-import {StupidRobot} from '../../players/StupidRobot'
+import {StupidRobot} from '../model/players/StupidRobot'
 import {SpreadPlayersArranger} from '../model/PlayerArranger';
 import {YMountainArranger} from '../model/YMountainArranger';
 

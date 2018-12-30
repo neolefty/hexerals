@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {Player} from '../../players/Players'
+import {Player} from '../model/players/Players'
 import {DriftColor} from '../../../color/DriftColor'
 import {Terrain} from '../model/Tile'
 import {TerrainView} from './TerrainView'

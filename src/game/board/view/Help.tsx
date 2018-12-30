@@ -5,7 +5,7 @@ import {Tile, Terrain} from '../model/Tile';
 import {Hex} from '../model/Hex';
 import {DriftColor} from '../../../color/DriftColor';
 import {Map} from 'immutable';
-import {Player} from '../../players/Players';
+import {Player} from '../model/players/Players';
 import './Help.css'
 
 export interface HelpOptions {

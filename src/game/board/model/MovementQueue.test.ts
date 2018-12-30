@@ -1,5 +1,5 @@
 import {MovementQueue, QueueAndMoves} from './MovementQueue';
-import {Player} from '../../players/Players';
+import {Player} from './players/Players';
 import {Hex} from './Hex';
 import {PlayerMove} from './Move';
 

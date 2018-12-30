@@ -2,20 +2,20 @@ import {List, Map} from 'immutable'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {Hex} from '../board/model/Hex'
+import {Hex} from '../model/Hex'
 import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
-} from '../board/model/BoardReducer'
-import {AppState} from '../../common/App'
-import CartPair from '../../common/CartPair'
-import {BoardState} from '../board/model/BoardState'
-import {DriftColor} from '../../color/DriftColor'
-import {ColorPodge} from '../../color/ColorPodge'
-import {Player, PLAYERS} from '../players/Players'
-import {PlayerMove} from '../board/model/Move'
-import {TickerBoardView} from '../board/view/TickerBoardView';
+} from '../model/BoardReducer'
+import {AppState} from '../../../common/App'
+import CartPair from '../../../common/CartPair'
+import {BoardState} from '../model/BoardState'
+import {DriftColor} from '../../../color/DriftColor'
+import {ColorPodge} from '../../../color/ColorPodge'
+import {Player, PLAYERS} from '../model/players/Players'
+import {PlayerMove} from '../model/Move'
+import {TickerBoardView} from './TickerBoardView';
 import {LocalGameOptions} from './LocalGameOptions';
-import {CacheMap} from '../../common/CacheMap';
+import {CacheMap} from '../../../common/CacheMap';
 
 export interface LocalGameProps {
     displaySize: CartPair

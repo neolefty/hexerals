@@ -6,7 +6,7 @@ import {BoardViewProps} from './BoardViewBase';
 import {TileHexView} from './TileHexView';
 import {PlayerMove} from '../model/Move';
 import {List} from 'immutable';
-import {Player} from '../../players/Players';
+import {Player} from '../model/players/Players';
 
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 

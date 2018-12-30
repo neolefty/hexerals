@@ -1,7 +1,7 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable'
 import {Hex} from './Hex'
-import {Player} from '../../players/Players'
+import {Player} from './players/Players'
 import {PlayerMove} from './Move';
 
 export class MovementQueue {

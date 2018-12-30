@@ -1,5 +1,5 @@
 import {Hex} from './Hex';
-import {Player} from '../../players/Players';
+import {Player} from './players/Players';
 
 export class HexMove {
     constructor(

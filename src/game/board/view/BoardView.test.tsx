@@ -10,7 +10,7 @@ import {Hex} from '../model/Hex'
 import CartPair from "../../../common/CartPair"
 import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
-import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
+import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
 import {Tile, Terrain} from '../model/Tile';
 import {PlayerMove} from '../model/Move';

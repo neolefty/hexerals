@@ -1,11 +1,11 @@
 import {Dispatch} from 'redux';
 import {connect} from 'react-redux';
-import {CycleView} from './CycleView';
-import CartPair from '../../common/CartPair';
+import {CycleView} from '../view/CycleView';
+import CartPair from '../../../common/CartPair';
 import {
     changeLocalOptionAction, closeGameAction, openLocalGameAction,
 } from './CycleReducer';
-import {AppState} from '../../common/App';
+import {AppState} from '../../../common/App';
 import {CycleState} from './CycleState';
 
 export interface CycleContainerProps {

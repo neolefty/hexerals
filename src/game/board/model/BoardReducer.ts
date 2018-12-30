@@ -7,8 +7,8 @@ import {BoardState} from './BoardState'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
 import {GenericAction} from '../../../common/App'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {pickNPlayers, Player, PlayerManager} from '../../players/Players'
-import {GameDecision, Robot} from '../../players/Robot';
+import {pickNPlayers, Player, PlayerManager} from './players/Players'
+import {GameDecision, Robot} from './players/Robot';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions

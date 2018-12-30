@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import CartPair from '../../common/CartPair'
+import CartPair from '../../../common/CartPair'
 import './LocalGameOptions.css'
 
 export interface LocalGameOptions {

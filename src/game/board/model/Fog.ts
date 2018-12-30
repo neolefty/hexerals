@@ -1,6 +1,6 @@
 import {Map} from 'immutable';
 
-import {Player} from '../../players/Players';
+import {Player} from './players/Players';
 import {BoardState} from './BoardState';
 import {Hex} from './Hex';
 import {Board} from './Board';

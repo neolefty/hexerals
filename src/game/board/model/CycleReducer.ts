@@ -3,17 +3,17 @@ import * as assert from 'assert';
 import {isNumber} from 'util';
 
 import {CycleMode} from './CycleState'
-import {Board} from '../board/model/Board'
-import {GenericAction} from '../../common/App'
-import {Hex} from '../board/model/Hex'
-import {GameAction, BoardReducer} from '../board/model/BoardReducer'
+import {Board} from './Board'
+import {GenericAction} from '../../../common/App'
+import {Hex} from './Hex'
+import {GameAction, BoardReducer} from './BoardReducer'
 import {CycleState} from './CycleState'
-import {EMPTY_MOVEMENT_QUEUE} from '../board/model/MovementQueue'
-import {pickNPlayers, Player, PlayerManager} from '../players/Players'
-import {SpreadPlayersArranger} from '../board/model/PlayerArranger'
-import {StupidRobot} from '../players/StupidRobot'
-import {StatusMessage} from '../../common/StatusMessage';
-import {RandomTerrainArranger} from '../board/model/RandomTerrainArranger';
+import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
+import {pickNPlayers, Player, PlayerManager} from './players/Players'
+import {SpreadPlayersArranger} from './PlayerArranger'
+import {StupidRobot} from './players/StupidRobot'
+import {StatusMessage} from '../../../common/StatusMessage';
+import {RandomTerrainArranger} from './RandomTerrainArranger';
 
 // the meta-game
 

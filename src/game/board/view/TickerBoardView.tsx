@@ -2,7 +2,7 @@ import * as React from 'react'
 import {HexBoardView} from './HexBoardView'
 import {Ticker} from '../../../common/Ticker'
 import {BoardViewProps} from './BoardViewBase';
-import {LocalGameOptions} from '../../cycle/LocalGameOptions';
+import {LocalGameOptions} from './LocalGameOptions';
 import {FogBoardView} from './FogBoardView';
 
 export interface TickerBoardViewProps extends BoardViewProps {

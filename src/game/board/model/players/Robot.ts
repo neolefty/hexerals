@@ -1,6 +1,6 @@
-import {BoardState} from '../board/model/BoardState';
+import {BoardState} from '../BoardState';
 import {List} from 'immutable';
-import {HexMove, PlayerMove} from '../board/model/Move';
+import {HexMove, PlayerMove} from '../Move';
 import {Player} from './Players';
 
 export interface GameDecision {

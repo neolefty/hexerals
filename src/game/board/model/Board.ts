@@ -3,7 +3,7 @@ import {List, Map, Set} from 'immutable'
 
 import {RectEdges} from './Constraints'
 import {PlayerMove} from './Move'
-import {Player} from '../../players/Players'
+import {Player} from './players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {Arranger} from './Arranger'
 import {Tile} from './Tile'

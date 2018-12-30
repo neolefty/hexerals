@@ -3,7 +3,7 @@ import {List, Map} from 'immutable';
 
 import {MovementQueue} from '../model/MovementQueue';
 import {DriftColor} from '../../../color/DriftColor';
-import {Player} from '../../players/Players';
+import {Player} from '../model/players/Players';
 import {viewBoxHeight} from './FilterBoardView';
 import {HexMove} from '../model/Move';
 import {centerX, centerY} from './TileHexView';

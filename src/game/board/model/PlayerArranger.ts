@@ -6,7 +6,7 @@ import {Hex} from './Hex';
 import {Tile, Terrain} from './Tile';
 import {Arranger, MAP_TOO_SMALL} from './Arranger';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {Player} from '../../players/Players';
+import {Player} from './players/Players';
 import {CacheDistance} from './ShortestPath';
 
 // arranges players on a board

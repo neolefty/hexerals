@@ -1,9 +1,9 @@
-import CartPair from '../../common/CartPair'
+import CartPair from '../../../common/CartPair'
 import {LocalGameOptionsView} from './LocalGameOptions'
-import {CycleMode} from './CycleState'
+import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
-import {CycleState} from './CycleState'
+import {CycleState} from '../model/CycleState'
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
