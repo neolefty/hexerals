@@ -6,7 +6,7 @@ import {shallow} from 'enzyme'
 
 import {queueMovesAction,} from '../model/BoardReducer'
 import {Board} from '../model/Board'
-import {HexCoord} from '../model/HexCoord'
+import {Hex} from '../model/Hex'
 import CartPair from "../../../common/CartPair"
 import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
@@ -24,10 +24,10 @@ it('renders a tile', () => {
     )
     const view = enzyme.render(
         <OldGridTileView
-            tile={board.getTile(HexCoord.ORIGIN)}
+            tile={board.getTile(Hex.ORIGIN)}
             key={0}
             selected={false}
-            coord={HexCoord.ORIGIN}
+            coord={Hex.ORIGIN}
         />
     )
     expect(view.text()).toEqual('5')
@@ -41,7 +41,7 @@ it('renders a board with no selection', () => {
     const boardState: BoardState = {
         board: board,
         turn: 0,
-        cursor: HexCoord.NONE,
+        cursor: Hex.NONE,
         moves: EMPTY_MOVEMENT_QUEUE,
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
@@ -166,7 +166,7 @@ it('creates game via react-redux', () => {
     const brt = new BoardReducerTester()
     expect(brt.board.explicitTiles.size).toEqual(2)
     expect(brt.messages.size).toEqual(0)
-    const lowLeft = HexCoord.ORIGIN
+    const lowLeft = Hex.ORIGIN
     expect(brt.getTile(lowLeft)).toEqual(
         new Tile(Player.Zero, BoardReducerTester.INITIAL_POP, Terrain.City)
     )
@@ -175,12 +175,12 @@ it('creates game via react-redux', () => {
 it('queues multiple moves at once', () => {
     const brt = new BoardReducerTester()
     const moves: List<PlayerMove> = List([
-        PlayerMove.construct(Player.Zero, brt.ll, HexCoord.UP),
-        PlayerMove.construct(Player.One, brt.ur, HexCoord.DOWN),
-        PlayerMove.construct(Player.Zero, brt.ll.plus(HexCoord.UP), HexCoord.UP),
-        PlayerMove.construct(Player.One, brt.lr, HexCoord.RIGHT_UP), // invalid
-        PlayerMove.construct(Player.One, brt.lr, HexCoord.RIGHT_UP), // invalid
-        PlayerMove.construct(Player.Zero, brt.ll, HexCoord.UP),
+        PlayerMove.construct(Player.Zero, brt.ll, Hex.UP),
+        PlayerMove.construct(Player.One, brt.ur, Hex.DOWN),
+        PlayerMove.construct(Player.Zero, brt.ll.plus(Hex.UP), Hex.UP),
+        PlayerMove.construct(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
+        PlayerMove.construct(Player.One, brt.lr, Hex.RIGHT_UP), // invalid
+        PlayerMove.construct(Player.Zero, brt.ll, Hex.UP),
     ])
     // console.log('Moves:')
     // moves.forEach((move, idx) => console.log(`${idx}: ${move.toString()}`))
@@ -194,22 +194,22 @@ it('queues multiple moves at once', () => {
 
 it('blocks illegal moves', () => {
     const brt = new BoardReducerTester()
-    expect(brt.cursor === HexCoord.NONE).toBeTruthy()
+    expect(brt.cursor === Hex.NONE).toBeTruthy()
     expect(brt.cursorRawTile).toBeUndefined()
 
     // try to move when there's no cursor -- should have no effect
     const boardBefore = brt.board
     expect(brt.moves.size).toEqual(0)
     brt.queueMoveDown(false)
-    expect(brt.cursor === HexCoord.NONE).toBeTruthy()
+    expect(brt.cursor === Hex.NONE).toBeTruthy()
     expect(brt.moves.size).toEqual(0)
 
     // trying to move the cursor relative to a nonexistent cursor should have no effect
     brt.queueMoveDown(true)
-    expect(brt.cursor === HexCoord.NONE).toBeTruthy()
+    expect(brt.cursor === Hex.NONE).toBeTruthy()
     expect(boardBefore === brt.board).toBeTruthy()  // no moves executed
     brt.doMoves() // still no legit moves requested, so no effective moves
-    expect(brt.cursor === HexCoord.NONE).toBeTruthy()
+    expect(brt.cursor === Hex.NONE).toBeTruthy()
     expect(brt.moves.size).toEqual(0)
 
     // through all this, the board should be unchanged
@@ -218,8 +218,8 @@ it('blocks illegal moves', () => {
     expect(boardBefore === brt.board).toBeTruthy()  // no effect on board
 
     // place cursor outside bounds -- no effect
-    brt.placeCursor(HexCoord.LEFT_UP)
-    expect(brt.cursor === HexCoord.NONE).toBeTruthy()
+    brt.placeCursor(Hex.LEFT_UP)
+    expect(brt.cursor === Hex.NONE).toBeTruthy()
 })
 
 // it('moves the cursor', () => {
@@ -245,19 +245,19 @@ it('cancels moves', () => {
     brt.queueMoveUp()
     brt.queueMoveUp()
     expect(brt.moves.size).toBe(4)
-    const up2 = brt.ll.plus(HexCoord.UP).plus(HexCoord.UP)
+    const up2 = brt.ll.plus(Hex.UP).plus(Hex.UP)
     expect(brt.cursor === up2).toBeTruthy()
 
     // cancel a move and expect the cursor to retreat
     brt.cancelMoves()
     expect(brt.moves.playerHasMove(Player.Zero)).toBeTruthy()
-    expect(brt.cursor === brt.ll.plus(HexCoord.UP)).toBeTruthy()
+    expect(brt.cursor === brt.ll.plus(Hex.UP)).toBeTruthy()
     expect(brt.moves.size).toBe(3)
 
     // now cancel one of the other player's moves -- away from the cursor
     brt.cancelMoves(Player.One)
     expect(brt.moves.playerQueues.get(Player.One).size).toBe(1)
-    expect(brt.cursor === brt.ll.plus(HexCoord.UP)).toBeTruthy()
+    expect(brt.cursor === brt.ll.plus(Hex.UP)).toBeTruthy()
     expect(brt.moves.size).toBe(2)
 
     // cancel the current player's remaining move
@@ -304,25 +304,25 @@ it('makes real moves', () => {
     expect(brt.moves.size).toBe(0) // no current player yet
     brt.setCurPlayer(Player.One) // cursor is on One's starting point, UR corner
     brt.queueMoveDown()
-    expect(brt.cursor === brt.ur.plus(HexCoord.DOWN)).toBeTruthy()
+    expect(brt.cursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
     expect(brt.moves.size).toBe(1)
 
     // interlude: queue and cancel a move UP
-    brt.queueMove(Player.One, HexCoord.UP)
+    brt.queueMove(Player.One, Hex.UP)
     expect(brt.moves.size).toBe(2)
     expect(brt.cursor === brt.ur).toBeTruthy()
     brt.cancelMoves(Player.One)
     expect(brt.moves.size).toBe(1)
     // cancel moved the cursor back intelligently
-    expect(brt.cursor === brt.ur.plus(HexCoord.DOWN)).toBeTruthy()
+    expect(brt.cursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
 
     // also check that cancelling doesn't move the cursor back stupidly
-    brt.queueMove(Player.One, HexCoord.UP)
+    brt.queueMove(Player.One, Hex.UP)
     brt.placeCursor(brt.ul)
     brt.cancelMoves(Player.One)
     expect(brt.moves.size).toBe(1)
     expect(brt.cursor === brt.ul).toBeTruthy()
-    brt.placeCursor(brt.ur.plus(HexCoord.DOWN)) // back where we should be
+    brt.placeCursor(brt.ur.plus(Hex.DOWN)) // back where we should be
 
     expect(boardBefore === brt.board).toBeTruthy() // only queued -- no board updates yet
     // console.log(`-- queued --\n${boardStateToString(brt.state)}`)
@@ -336,7 +336,7 @@ it('makes real moves', () => {
     )
 
     // can't move more than 1 space at a time (can't jump)
-    const down2 = HexCoord.DOWN.getDown()
+    const down2 = Hex.DOWN.getDown()
     const dest2 = brt.cursor.plus(down2)
     // even though the destination is in bounds
     expect((brt.board.inBounds(dest2)))
@@ -363,14 +363,14 @@ it('makes real moves', () => {
     // queue two moves down-left
     brt.placeCursor(brt.ur)
     // console.log(brt.messages)
-    brt.queueMove(Player.One, HexCoord.LEFT_DOWN)
+    brt.queueMove(Player.One, Hex.LEFT_DOWN)
     // console.log(brt.messages)
-    brt.queueMove(Player.One, HexCoord.LEFT_DOWN)
+    brt.queueMove(Player.One, Hex.LEFT_DOWN)
     // console.log(brt.messages)
     expect(brt.moves.size).toBe(2)
 
     const downFromUR = (n: number) =>
-        brt.getTile(brt.ur.plus(HexCoord.DOWN.times(n)))
+        brt.getTile(brt.ur.plus(Hex.DOWN.times(n)))
     const human1 = new Tile(Player.One, 1)
     expect(downFromUR(0)).toEqual(human1.setTerrain(Terrain.City))
     expect(downFromUR(1)).toEqual(human1)
@@ -397,7 +397,7 @@ it('makes real moves', () => {
 interface OldGridTileProps {
     tile: Tile
     selected: boolean
-    coord: HexCoord
+    coord: Hex
 
     onSelect?: () => void
 }
@@ -432,11 +432,11 @@ export class OldGridView extends BoardViewBase {
                                 bs.board.edges.xRange().filter( // remove nonexistent
                                     (cx: number) => (cx + cy) % 2 === 0
                                 ).map( // turn cartesian into hex
-                                    (cx: number) => HexCoord.getCart(cx, cy)
+                                    (cx: number) => Hex.getCart(cx, cy)
                                 ).filter( // only in-bounds
-                                    (coord: HexCoord) => bs.board.inBounds(coord)
+                                    (coord: Hex) => bs.board.inBounds(coord)
                                 ).map(
-                                    (coord: HexCoord) => (
+                                    (coord: Hex) => (
                                         <OldGridTileView
                                             tile={bs.board.getTile(coord)}
                                             key={coord.id}

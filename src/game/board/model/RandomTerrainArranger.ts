@@ -4,12 +4,12 @@ import {List, Map, Set} from 'immutable';
 import {Tile, Terrain} from './Tile';
 import {Board, TileFilter} from './Board';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {connected} from './HexGraph';
 import {Arranger} from './Arranger';
 
 // replace empty terrain randomly and without blocking
-export class TerrainArranger extends Arranger {
+export class RandomTerrainArranger extends Arranger {
     constructor(
         // what fraction of empty terrain should be replaced?
         readonly fractionOfEmpty: number,
@@ -27,12 +27,12 @@ export class TerrainArranger extends Arranger {
     arrange(
         board: Board,
         status: StatusMessage[] | undefined = undefined,
-    ): Map<HexCoord, Tile> {
+    ): Map<Hex, Tile> {
         // remaining tiles we don't want to bisect -- may contain some that
         // are not candidates for replacement because it would bisect the map
-        let notToBisect: Set<HexCoord> = board.filterTiles(this.bisectionFilter)
+        let notToBisect: Set<Hex> = board.filterTiles(this.bisectionFilter)
         // tiles we might replace with terrain
-        let remainingCandidates: List<HexCoord> = List(board.filterTiles(
+        let remainingCandidates: List<Hex> = List(board.filterTiles(
             tile => tile.isBlank()
         ))
         let ranOutOfSpace = false
@@ -41,7 +41,7 @@ export class TerrainArranger extends Arranger {
         const beforeEmpty = remainingCandidates.size
         const numReplacements = Math.floor(this.fractionOfEmpty * beforeEmpty)
 
-        return Map<HexCoord, Tile>().withMutations(result => {
+        return Map<Hex, Tile>().withMutations(result => {
             while (result.size < numReplacements) {
                 const r = Math.floor(Math.random() * remainingCandidates.size)
                 // pick a random empty to replace with a mountain

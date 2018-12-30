@@ -2,7 +2,7 @@ import {List, Map} from 'immutable'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {HexCoord} from '../board/model/HexCoord'
+import {Hex} from '../board/model/Hex'
 import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
 } from '../board/model/BoardReducer'
@@ -15,6 +15,7 @@ import {Player, PLAYERS} from '../players/Players'
 import {PlayerMove} from '../board/model/Move'
 import {TickerBoardView} from '../board/view/TickerBoardView';
 import {LocalGameOptions} from './LocalGameOptions';
+import {CacheMap} from '../../common/CacheMap';
 
 export interface LocalGameProps {
     displaySize: CartPair
@@ -23,9 +24,8 @@ export interface LocalGameProps {
 }
 
 // TODO stop updating if colors stabilize
-const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
-    const im: Map<Player, DriftColor> = Map()
-    const result = im.asMutable()
+export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
+    const result = Map<Player, DriftColor>().asMutable()
     // console.log(`podge = ${colors} -- ${colors.driftColors}`)
     colors.driftColors.forEach(
         (value: DriftColor, key: number) => {
@@ -36,12 +36,35 @@ const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
     return result.asImmutable()
 }
 
+// is 5 enough?
+const playerColorsCache = new CacheMap<ColorPodge, Map<Player, DriftColor>>(5)
+
+export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
+    if (!playerColorsCache.has(colors))
+        playerColorsCache.set(colors, playerColors(colors))
+    return playerColorsCache.get(colors) as Map<Player, DriftColor>
+}
+
+// export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
+//     // use cache to avoid mutating if colors stabilize
+//     if (!playerColorsCache.has(colors)) {
+//         const result = Map<Player, DriftColor>().asMutable()
+//         colors.driftColors.forEach(
+//             (value: DriftColor, key: number) =>
+//                 result.set(PLAYERS.get(key), value)
+//         )
+//         playerColorsCache.set(colors, result.asImmutable())
+//     }
+//     return playerColorsCache.get(colors) as Map<Player, DriftColor>
+// }
+
 const mapStateToTickerBoardViewProps = (
     state: AppState, ownProps: LocalGameProps
 ) => ({
     boardState: state.cycle.localGame as BoardState, // assert it's not undefined
     displaySize: ownProps.displaySize,
-    colors: playerColors(state.colors.colors),
+    // colors: playerColors(state.colors.colors),
+    colors: cachedPlayerColors(state.colors.colors),
     tickMillis: state.cycle.localOptions.tickMillis,
     onEndGame: ownProps.onEndGame,
 })
@@ -53,7 +76,7 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
     onCancelMoves: (player: Player, count: number) => dispatch(
         cancelMovesAction(player, count)
     ),
-    onPlaceCursor: (position: HexCoord) => dispatch(
+    onPlaceCursor: (position: Hex) => dispatch(
         placeCursorAction(position)
     ),
     onStep: () => {

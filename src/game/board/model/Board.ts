@@ -7,7 +7,7 @@ import {Player} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {Arranger} from './Arranger'
 import {Tile} from './Tile'
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
 import {PopStepper} from './PopStepper';
@@ -43,7 +43,7 @@ export class Board {
         constraints: BoardConstraints,
         players: List<Player>,
         // there may be blank tiles not listed here -- see allTiles
-        explicitTiles: Map<HexCoord, Tile> = Map(),
+        explicitTiles: Map<Hex, Tile> = Map(),
     ) {
         return new Board(
             new BoardRules(constraints),
@@ -82,7 +82,7 @@ export class Board {
         readonly rules: BoardRules,
         readonly players: List<Player>,
         // empty tiles are implied — see this.allHexes
-        readonly explicitTiles: Map<HexCoord, Tile>,
+        readonly explicitTiles: Map<Hex, Tile>,
     ) {}
 
     get moveValidator(): MoveValidator { return this.rules.validator }
@@ -90,47 +90,47 @@ export class Board {
     get edges(): RectEdges { return this.rules.edges }
     get popStepper(): PopStepper { return this.rules.stepper }
 
-    inBounds = (coord: HexCoord) => this.constraints.inBounds(coord)
+    inBounds = (coord: Hex) => this.constraints.inBounds(coord)
 
-    canBeOccupied = (coord: HexCoord) =>
+    canBeOccupied = (coord: Hex) =>
         this.inBounds(coord) && this.getTile(coord).canBeOccupied()
 
     // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
-    get allHexes(): Set<HexCoord> {
+    get allHexes(): Set<Hex> {
         return this.constraints.all()
     }
 
     // noinspection PointlessBooleanExpressionJS
-    filterTiles = (filter: TileFilter): Set<HexCoord> =>
+    filterTiles = (filter: TileFilter): Set<Hex> =>
         this.allHexes.filter(
             hex => !!(hex && filter(this.getTile(hex)))
-        ) as Set<HexCoord>
+        ) as Set<Hex>
 
-    getTile(coord: HexCoord): Tile {
+    getTile(coord: Hex): Tile {
         assert(this.inBounds(coord))
         return this.explicitTiles.get(coord, Tile.BLANK)
     }
 
     getCartTile(cx: number, cy: number): Tile {
         assert((cx + cy) % 2 === 0)
-        return this.getTile(HexCoord.getCart(cx, cy))
+        return this.getTile(Hex.getCart(cx, cy))
     }
 
     applyMove(move: PlayerMove): BoardAndMessages {
         return this.applyMoves(List([move]))
     }
 
-    setTiles(tiles: Map<HexCoord, Tile>): Board {
+    setTiles(tiles: Map<Hex, Tile>): Board {
         return (this.explicitTiles.equals(tiles))
             ? this
             : new Board(this.rules, this.players, tiles)
     }
 
-    overlayTiles(overlay: Map<HexCoord, Tile>): Board {
+    overlayTiles(overlay: Map<Hex, Tile>): Board {
         return this.setTiles(
             this.explicitTiles.withMutations(
-                (mTiles: Map<HexCoord, Tile>) => {
-                    overlay.forEach((value: Tile, key: HexCoord) => {
+                (mTiles: Map<Hex, Tile>) => {
+                    overlay.forEach((value: Tile, key: Hex) => {
                         mTiles.set(key, value)
                     })
                 })

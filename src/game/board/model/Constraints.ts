@@ -1,4 +1,4 @@
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {Range, Seq, Set} from 'immutable'
 import * as assert from 'assert'
 
@@ -12,10 +12,10 @@ export class RectEdges {
     readonly width: number
     readonly height: number
 
-    readonly lowerLeft: HexCoord // (0, 0)
-    readonly lowerRight: HexCoord // (2(w-1), 0)
-    readonly upperLeft: HexCoord // (0, h-1)
-    readonly upperRight: HexCoord // (2(w-1), h-1)
+    readonly lowerLeft: Hex // (0, 0)
+    readonly lowerRight: Hex // (2(w-1), 0)
+    readonly upperLeft: Hex // (0, h-1)
+    readonly upperRight: Hex // (2(w-1), h-1)
 
     constructor(constraints: BoardConstraints) {
         this.left = constraints.extreme(h => h.cartX).cartX // min x
@@ -55,7 +55,7 @@ export class RectEdges {
 
 // The shape of a board -- what hexes are in and not in the board?
 export abstract class BoardConstraints {
-    private allCache?: Set<HexCoord>
+    private allCache?: Set<Hex>
     // what's a good place to start if we want to enumerate this board's coordinates?
 
     // static readonly LTE = (x: number, y: number) => (x <= y)
@@ -66,44 +66,44 @@ export abstract class BoardConstraints {
     // Override to have a constraints class start somewhere else.
     // Needs to be inBounds().
     // noinspection JSMethodCanBeStatic
-    start(): HexCoord {
-        return HexCoord.ORIGIN
+    start(): Hex {
+        return Hex.ORIGIN
     }
 
     toString = (): string => 'BoardConstraints'
 
     // is coord within the constrained area?
-    abstract inBounds(coord: HexCoord): boolean
+    abstract inBounds(coord: Hex): boolean
 
     /**
      * Find coord at extreme value by default, finds the smallest, by
      * using BoardConstraints.LT. To find the largest instead, use
      * BoardConstraints.GT, or negate the sort value, or something.
      *
-     * @param {(x: HexCoord) => number} f indexing function
+     * @param {(x: Hex) => number} f indexing function
      * @param {(x: number, y: number) => boolean} compare ordering function
-     * @returns {HexCoord} that wins in comparison to all the others
+     * @returns {Hex} that wins in comparison to all the others
      */
     extreme(
-        f: (x: HexCoord) => number,
+        f: (x: Hex) => number,
         compare: (x: number, y: number) => boolean = BoardConstraints.LT
-    ): HexCoord {
-        return this.all().reduce((champ: HexCoord, contender: HexCoord) =>
+    ): Hex {
+        return this.all().reduce((champ: Hex, contender: Hex) =>
             compare(f(contender), f(champ)) ? contender : champ
         )
     }
 
-    all(): Set<HexCoord> {
+    all(): Set<Hex> {
         if (this.allCache === undefined)
             this.allCache = this.buildAll()
         return this.allCache
     }
 
     // Compile the set of all hexes that are in bounds and connected to this.start().
-    private buildAll(): Set<HexCoord> {
-        const result = Set<HexCoord>().asMutable()
+    private buildAll(): Set<Hex> {
+        const result = Set<Hex>().asMutable()
 
-        let floodEdge = Set<HexCoord>().asMutable()
+        let floodEdge = Set<Hex>().asMutable()
         assert(this.inBounds(this.start()))
         floodEdge.add(this.start())
 
@@ -114,7 +114,7 @@ export abstract class BoardConstraints {
             // freeze the old edge
             const oldEdge = floodEdge.asImmutable()
             // start building a new edge
-            floodEdge = Set<HexCoord>().asMutable()
+            floodEdge = Set<Hex>().asMutable()
             oldEdge.forEach(x => {
                 result.add(x)
                 x.getNeighbors().map(neighbor => {
@@ -141,7 +141,7 @@ export class RectangularConstraints extends BoardConstraints {
         super()
     }
 
-    inBounds(coord: HexCoord): boolean {
+    inBounds(coord: Hex): boolean {
         const x = coord.cartX
         const y = coord.cartY
         return (

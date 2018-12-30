@@ -24,9 +24,7 @@ export interface LGOProps {
     newGame: () => void
 }
 
-export class LocalGameOptionsView
-    extends React.Component<LGOProps>
-{
+export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
     private isOption = (optionName: string): boolean =>
         this.props.localOptions[optionName] > 0
     private toggleOption = (optionName: string) =>
@@ -159,6 +157,7 @@ const NumberInput = (props: IntInputProps) => (
             value={props.value}
             tabIndex={props.blockTabbing ? -1 : undefined}
             onKeyPress={onEnterKey(props.onEnter)}
+            style={{width: `${props.max.toString().length * 0.65 + 1.3}em`}}
             onChange={
                 (e: React.ChangeEvent<HTMLInputElement>) => {
                     const str = e.currentTarget.value

@@ -1,10 +1,10 @@
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {Set} from 'immutable';
 import {connected, connectedSets, flood} from './HexGraph';
 
-const randomWalk = (n: number, start: HexCoord): Set<HexCoord> => {
-    let result = Set<HexCoord>()
-    let here: HexCoord = start
+const randomWalk = (n: number, start: Hex): Set<Hex> => {
+    let result = Set<Hex>()
+    let here: Hex = start
     while (result.size < n) {
         result = result.add(here)
         here = here.getNeighbors().get(
@@ -16,8 +16,8 @@ const randomWalk = (n: number, start: HexCoord): Set<HexCoord> => {
 
 it ('floods', () => {
     const n = 3
-    const o = HexCoord.ORIGIN
-    const far = HexCoord.getCart(n * 4, 0)
+    const o = Hex.ORIGIN
+    const far = Hex.getCart(n * 4, 0)
     const byO = randomWalk(n, o)
     const byFar = randomWalk(n, far)
     const both = byO.union(byFar)
@@ -34,9 +34,9 @@ it ('floods', () => {
 
 it ('finds disconnected sets', () => {
     const n = 3
-    const o = HexCoord.ORIGIN
-    const far = HexCoord.getCart(n * 4, 0)
-    const beyond = HexCoord.getCart(n * 8, 0)
+    const o = Hex.ORIGIN
+    const far = Hex.getCart(n * 4, 0)
+    const beyond = Hex.getCart(n * 8, 0)
     const byO = randomWalk(n, o)
     const byFar = randomWalk(n, far)
     const byBeyond = randomWalk(n, beyond)

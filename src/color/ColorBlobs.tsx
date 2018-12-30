@@ -1,5 +1,4 @@
 import * as React from 'react'
-import {Component} from 'react'
 import {Map} from 'immutable'
 import {ColorPodge} from './ColorPodge'
 import {DriftColor} from './DriftColor'
@@ -108,7 +107,7 @@ export const ColorBlob = (props: ColorBlobProps) => {
     )
 }
 
-export class ColorBlobs extends Component<ColorBlobsProps> {
+export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
     private positions: Map<number, Coord> = Map()
     private velocities: Map<number, Coord> = Map()
     private accelerations: Map<number, Coord> = Map()

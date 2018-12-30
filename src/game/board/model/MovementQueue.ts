@@ -1,6 +1,6 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable'
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {Player} from '../../players/Players'
 import {PlayerMove} from './Move';
 
@@ -79,7 +79,7 @@ export class MovementQueue {
             return undefined
     }
 
-    playerIsQueuedTo(player: Player, hex: HexCoord): boolean {
+    playerIsQueuedTo(player: Player, hex: Hex): boolean {
         const moves: List<PlayerMove> | undefined = this.playerQueues.get(player)
         return !!(moves && moves.find(
             (move: PlayerMove) => move.dest === hex)

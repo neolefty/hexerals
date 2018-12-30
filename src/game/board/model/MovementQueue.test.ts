@@ -1,6 +1,6 @@
 import {MovementQueue, QueueAndMoves} from './MovementQueue';
 import {Player} from '../../players/Players';
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {PlayerMove} from './Move';
 
 it('checks sanity', () => {
@@ -8,22 +8,22 @@ it('checks sanity', () => {
     expect(q0.popEach(() => true)).toBeUndefined();
     expect(q0.size).toBe(0);
     const q1 = q0.addMove(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.DOWN));
+        Player.Zero, Hex.ORIGIN, Hex.DOWN));
     expect(q1.size).toBe(1);
     expect(q0.size).toBe(0);
     const q2 = q1.addMove(PlayerMove.construct(
-        Player.Zero, HexCoord.DOWN, HexCoord.DOWN));
+        Player.Zero, Hex.DOWN, Hex.DOWN));
     expect(q2.size).toBe(2);
     const q3 = q2.addMove(PlayerMove.construct(
-        Player.One, HexCoord.ORIGIN, HexCoord.UP));
+        Player.One, Hex.ORIGIN, Hex.UP));
     expect(q3.size).toBe(3);
 
     expect(q3.playerIsQueuedTo(
-        Player.Zero, HexCoord.DOWN.plus(HexCoord.DOWN))).toBeTruthy();
-    expect(q3.playerIsQueuedTo(Player.Zero, HexCoord.LEFT_UP)).toBeFalsy();
+        Player.Zero, Hex.DOWN.plus(Hex.DOWN))).toBeTruthy();
+    expect(q3.playerIsQueuedTo(Player.Zero, Hex.LEFT_UP)).toBeFalsy();
     const q4 = q3.addMove(PlayerMove.construct(
-        Player.Zero, HexCoord.UP, HexCoord.LEFT_DOWN));
-    expect(q4.playerIsQueuedTo(Player.Zero, HexCoord.LEFT_UP)).toBeTruthy();
+        Player.Zero, Hex.UP, Hex.LEFT_DOWN));
+    expect(q4.playerIsQueuedTo(Player.Zero, Hex.LEFT_UP)).toBeTruthy();
 });
 
 it('pops', () => {
@@ -31,23 +31,23 @@ it('pops', () => {
     expect(new MovementQueue().popEach(() => true)).toBeUndefined();
 
     const p0_originDown = PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.DOWN);
+        Player.Zero, Hex.ORIGIN, Hex.DOWN);
     const p1_originDown = PlayerMove.construct(
-        Player.One, HexCoord.ORIGIN, HexCoord.DOWN);
+        Player.One, Hex.ORIGIN, Hex.DOWN);
 
     const q = new MovementQueue()
 
         .addMove(p0_originDown)
-        .addMove(PlayerMove.construct(Player.Zero, HexCoord.DOWN, HexCoord.DOWN))
-        .addMove(PlayerMove.construct(Player.Zero, HexCoord.ORIGIN, HexCoord.UP))
+        .addMove(PlayerMove.construct(Player.Zero, Hex.DOWN, Hex.DOWN))
+        .addMove(PlayerMove.construct(Player.Zero, Hex.ORIGIN, Hex.UP))
 
-        .addMove(PlayerMove.construct(Player.One, HexCoord.DOWN, HexCoord.LEFT_UP))
+        .addMove(PlayerMove.construct(Player.One, Hex.DOWN, Hex.LEFT_UP))
         .addMove(p1_originDown)
-        .addMove(PlayerMove.construct(Player.One, HexCoord.DOWN, HexCoord.DOWN));
+        .addMove(PlayerMove.construct(Player.One, Hex.DOWN, Hex.DOWN));
 
     expect(q.size).toBe(6);
     const qm: QueueAndMoves | undefined = q.popEach(
-        (move: PlayerMove) => (move.delta === HexCoord.DOWN)
+        (move: PlayerMove) => (move.delta === Hex.DOWN)
     );
     expect(qm).not.toBeUndefined();
     if (qm) { // satisfy compiler

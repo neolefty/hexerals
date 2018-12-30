@@ -1,17 +1,17 @@
 import {RectangularConstraints} from './Constraints'
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 
 it('checks hex neighbors', () => {
-    expect(HexCoord.ORIGIN.getRightDown() === HexCoord.RIGHT_DOWN).toBeTruthy()
-    expect(HexCoord.ORIGIN.getUp() === HexCoord.UP).toBeTruthy()
+    expect(Hex.ORIGIN.getRightDown() === Hex.RIGHT_DOWN).toBeTruthy()
+    expect(Hex.ORIGIN.getUp() === Hex.UP).toBeTruthy()
 
-    function checkHexNeighbors(c: HexCoord) {
-        expect(c.getRightUp() === c.plus(HexCoord.RIGHT_UP)).toBeTruthy()
-        expect(c.getRightDown() === c.plus(HexCoord.RIGHT_DOWN)).toBeTruthy()
-        expect(c.getDown() === c.plus(HexCoord.DOWN)).toBeTruthy()
-        expect(c.getLeftDown() === c.plus(HexCoord.LEFT_DOWN)).toBeTruthy()
-        expect(c.getLeftUp() === c.plus(HexCoord.LEFT_UP)).toBeTruthy()
-        expect(c.getUp() === c.plus(HexCoord.UP)).toBeTruthy()
+    function checkHexNeighbors(c: Hex) {
+        expect(c.getRightUp() === c.plus(Hex.RIGHT_UP)).toBeTruthy()
+        expect(c.getRightDown() === c.plus(Hex.RIGHT_DOWN)).toBeTruthy()
+        expect(c.getDown() === c.plus(Hex.DOWN)).toBeTruthy()
+        expect(c.getLeftDown() === c.plus(Hex.LEFT_DOWN)).toBeTruthy()
+        expect(c.getLeftUp() === c.plus(Hex.LEFT_UP)).toBeTruthy()
+        expect(c.getUp() === c.plus(Hex.UP)).toBeTruthy()
 
         expect(c.getRightDown().getUp().getLeftDown() === c).toBeTruthy() // triangle
         expect(c.getLeftUp().getDown().getRightUp() === c).toBeTruthy() // triangle
@@ -25,16 +25,16 @@ it('checks hex neighbors', () => {
         expect(c.getLeftUp().cartY).toBe(c.cartY + 1)
     }
 
-    checkHexNeighbors(HexCoord.ORIGIN)
-    checkHexNeighbors(HexCoord.ORIGIN.getDown())
-    checkHexNeighbors(HexCoord.ORIGIN.getRightUp())
+    checkHexNeighbors(Hex.ORIGIN)
+    checkHexNeighbors(Hex.ORIGIN.getDown())
+    checkHexNeighbors(Hex.ORIGIN.getRightUp())
     // true, but is this what we want?
-    expect(HexCoord.NONE.getRightUp() === HexCoord.NONE).toBeTruthy()
+    expect(Hex.NONE.getRightUp() === Hex.NONE).toBeTruthy()
 
     function r() { return Math.floor(Math.random() * 20) } // 0 - 19
     for (let i = 0; i < 20; ++i) {
         const x = r(), y = r()
-        checkHexNeighbors(HexCoord.get(x, y, - x - y))
+        checkHexNeighbors(Hex.get(x, y, - x - y))
     }
 })
 
@@ -62,20 +62,20 @@ it('checks various sizes of board constraints', () => {
 })
 
 it('checks trigonometry', () => {
-    // HexCoord.DIRECTIONS.forEach((hex) =>
+    // Hex.DIRECTIONS.forEach((hex) =>
     //     console.log(`${hex.toString(true, true)}`)
     // )
 
-    expect(HexCoord.UP.cartYExact).toBeCloseTo(1)
-    expect(HexCoord.UP.cartXExact).toBeCloseTo(0)
+    expect(Hex.UP.cartYExact).toBeCloseTo(1)
+    expect(Hex.UP.cartXExact).toBeCloseTo(0)
     // 30 degrees
-    expect(HexCoord.RIGHT_UP.cartYExact).toBeCloseTo(0.5)
-    expect(HexCoord.RIGHT_UP.cartXExact).toBeCloseTo(Math.cos(Math.PI / 6))
+    expect(Hex.RIGHT_UP.cartYExact).toBeCloseTo(0.5)
+    expect(Hex.RIGHT_UP.cartXExact).toBeCloseTo(Math.cos(Math.PI / 6))
 
-    expect(HexCoord.RIGHT_UP.degrees).toBeCloseTo(30)
-    expect(HexCoord.UP.degrees).toBeCloseTo(90)
-    expect(HexCoord.LEFT_UP.degrees).toBeCloseTo(150)
-    expect(HexCoord.LEFT_DOWN.degrees).toBeCloseTo(210)
-    expect(HexCoord.DOWN.degrees).toBeCloseTo(270)
-    expect(HexCoord.RIGHT_DOWN.degrees).toBeCloseTo(330)
+    expect(Hex.RIGHT_UP.degrees).toBeCloseTo(30)
+    expect(Hex.UP.degrees).toBeCloseTo(90)
+    expect(Hex.LEFT_UP.degrees).toBeCloseTo(150)
+    expect(Hex.LEFT_DOWN.degrees).toBeCloseTo(210)
+    expect(Hex.DOWN.degrees).toBeCloseTo(270)
+    expect(Hex.RIGHT_DOWN.degrees).toBeCloseTo(330)
 })

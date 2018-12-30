@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 
 import {CornersPlayerArranger} from '../board/model/PlayerArranger';
-import {HexCoord} from '../board/model/HexCoord';
+import {Hex} from '../board/model/Hex';
 import {Board} from '../board/model/Board';
 import {pickNPlayers} from '../players/Players';
 import {BoardConstraints} from '../board/model/Constraints';
@@ -24,7 +24,7 @@ it('checks rectangular board geometry', () => {
     expect(nineByTwalf.constraints.extreme(
         // cartY is first digit, cartX is second digit
         x => x.cartX + 10 * x.cartY, BoardConstraints.GT
-    ) === HexCoord.getCart(7, 3)).toBeTruthy() // bottom right
+    ) === Hex.getCart(7, 3)).toBeTruthy() // bottom right
 
     expect(nineByTwalf.edges.width).toEqual(9)
     expect(nineByTwalf.edges.height).toEqual(4)
@@ -35,15 +35,15 @@ it('checks rectangular board geometry', () => {
         .toEqual(List<number>([0, 1, 2, 3]))
 
     // for some reason, these both cause a stack overflow:
-    // expect(upperLeft === HexCoord.ORIGIN).toBeTruthy()
-    // expect(upperLeft).toEqual(HexCoord.ORIGIN)
-    expect(nineByTwalf.edges.upperLeft === HexCoord.ORIGIN).toBeFalsy()
-    expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
-    expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
-    expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
-    expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
-    // expect(nineByTwalf.edges.upperLeft === HexCoord.getCart(1, 3)).toBeTruthy()
-    // expect(nineByTwalf.edges.upperRight === HexCoord.getCart(7, 3)).toBeTruthy()
-    // expect(nineByTwalf.edges.lowerRight === HexCoord.getCart(8, 0)).toBeTruthy()
-    // expect(nineByTwalf.edges.lowerLeft === HexCoord.ORIGIN).toBeTruthy()
+    // expect(upperLeft === Hex.ORIGIN).toBeTruthy()
+    // expect(upperLeft).toEqual(Hex.ORIGIN)
+    expect(nineByTwalf.edges.upperLeft === Hex.ORIGIN).toBeFalsy()
+    expect(nineByTwalf.edges.upperLeft === Hex.getCart(1, 3)).toBeTruthy()
+    expect(nineByTwalf.edges.upperRight === Hex.getCart(7, 3)).toBeTruthy()
+    expect(nineByTwalf.edges.lowerRight === Hex.getCart(8, 0)).toBeTruthy()
+    expect(nineByTwalf.edges.lowerLeft === Hex.ORIGIN).toBeTruthy()
+    // expect(nineByTwalf.edges.upperLeft === Hex.getCart(1, 3)).toBeTruthy()
+    // expect(nineByTwalf.edges.upperRight === Hex.getCart(7, 3)).toBeTruthy()
+    // expect(nineByTwalf.edges.lowerRight === Hex.getCart(8, 0)).toBeTruthy()
+    // expect(nineByTwalf.edges.lowerLeft === Hex.ORIGIN).toBeTruthy()
 })

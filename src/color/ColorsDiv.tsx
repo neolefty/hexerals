@@ -8,7 +8,7 @@ export const ColorsDiv = (props: ColorWheelProps) => {
     const rod = Math.min(props.displaySize.x * 0.5, props.displaySize.y)
     const square = new CartPair(rod, rod);
     return (
-        <div>
+        <div style={{textAlign: 'center'}}>
             <Ticker
                 tickMillis={props.tick}
                 tick={props.onDiverge}
@@ -22,7 +22,7 @@ export const ColorsDiv = (props: ColorWheelProps) => {
                     colors={props.colors}
                     onRemoveColor={props.onRemoveColor}
                 />
-            </Ticker>«
+            </Ticker>
         </div>
     )
 }

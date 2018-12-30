@@ -2,7 +2,7 @@ import {Map} from 'immutable';
 
 import {Player} from '../../players/Players';
 import {BoardState} from './BoardState';
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {Board} from './Board';
 import {Tile} from './Tile';
 
@@ -34,8 +34,8 @@ export class PlayerFog {
     private fogBoard(board: Board) {
         // copy visible tiles — owned by or neighboring player's tiles
         const ownedHexes = board.filterTiles(tile => tile.owner === this.player)
-        const mSpots = Map<HexCoord, Tile>().asMutable()
-        const copyIt = (hex: HexCoord) => {
+        const mSpots = Map<Hex, Tile>().asMutable()
+        const copyIt = (hex: Hex) => {
             if (!mSpots.has(hex) && board.explicitTiles.has(hex))
                 mSpots.set(hex, board.explicitTiles.get(hex))
         }

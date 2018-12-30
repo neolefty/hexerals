@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {Component} from 'react';
 
 // as long as this is present, it will tick
 export interface TickerProps {
@@ -8,7 +7,7 @@ export interface TickerProps {
     children?: JSX.Element | JSX.Element[];
 }
 
-export class Ticker extends Component<TickerProps> {
+export class Ticker extends React.PureComponent<TickerProps> {
     private timer?: NodeJS.Timer;
 
     componentWillMount(): void {

@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {DriftColor} from '../../../color/DriftColor';
-import {HexCoord} from '../model/HexCoord';
+import {Hex} from '../model/Hex';
 import {BoardViewProps} from './BoardViewBase';
 import {TileHexView} from './TileHexView';
 import {PlayerMove} from '../model/Move';
@@ -11,17 +11,17 @@ import {Player} from '../../players/Players';
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
 interface FilterBoardViewProps extends BoardViewProps {
-    filter: (hex: HexCoord) => boolean
+    filter: (hex: Hex) => boolean
 }
 
-export class FilterBoardView extends React.Component<FilterBoardViewProps> {
+export class FilterBoardView extends React.PureComponent<FilterBoardViewProps> {
     constructor(props: FilterBoardViewProps) {
         super(props)
         this.makeOnDrag = this.makeOnDrag.bind(this)
     }
 
-    makeOnDrag = (hex: HexCoord) => () => {
-        const cursor: HexCoord | undefined = this.props.boardState.cursor
+    makeOnDrag = (hex: Hex) => () => {
+        const cursor: Hex | undefined = this.props.boardState.cursor
         const player: Player | undefined = this.props.boardState.curPlayer
         if (cursor && player && hex.getNeighbors().contains(cursor)) {
             this.props.onQueueMoves(List([

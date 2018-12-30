@@ -10,7 +10,7 @@ import {
 import {Board} from '../model/Board';
 import {pickNPlayers, Player} from '../../players/Players';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
-import {HexCoord} from '../model/HexCoord';
+import {Hex} from '../model/Hex';
 import {Tile} from '../model/Tile';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MovementQueue} from '../model/MovementQueue';
@@ -35,13 +35,13 @@ export class BoardReducerTester {
         )))
     }
 
-    getRawTile = (coord: HexCoord): Tile | undefined => this.tiles.get(coord)
-    getTile = (coord: HexCoord): Tile => this.board.getTile(coord)
+    getRawTile = (coord: Hex): Tile | undefined => this.tiles.get(coord)
+    getTile = (coord: Hex): Tile => this.board.getTile(coord)
 
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
-    get tiles(): Map<HexCoord, Tile> { return this.board.explicitTiles }
-    get cursor(): HexCoord { return this.state.cursor }
+    get tiles(): Map<Hex, Tile> { return this.board.explicitTiles }
+    get cursor(): Hex { return this.state.cursor }
     get messages(): List<StatusMessage> { return this.state.messages }
     get cursorRawTile(): Tile | undefined { return this.getRawTile(this.cursor) }
     get cursorTile(): Tile { return this.getTile(this.cursor) }
@@ -52,7 +52,7 @@ export class BoardReducerTester {
     get ur() { return this.state.board.edges.upperRight }
     get lr() { return this.state.board.edges.lowerRight }
 
-    queueMove = (player: Player, delta: HexCoord, alsoCursor = true) => {
+    queueMove = (player: Player, delta: Hex, alsoCursor = true) => {
         this.store.dispatch(
             queueMovesAction(
                 List([PlayerMove.construct(player, this.cursor, delta)])
@@ -64,15 +64,15 @@ export class BoardReducerTester {
 
     queueMoveDown = (alsoCursor = true) => {
         if (this.state.curPlayer)
-            this.queueMove(this.state.curPlayer, HexCoord.DOWN, alsoCursor)
+            this.queueMove(this.state.curPlayer, Hex.DOWN, alsoCursor)
     }
 
     queueMoveUp = (alsoCursor = true) => {
         if (this.state.curPlayer)
-            this.queueMove(this.state.curPlayer, HexCoord.UP, alsoCursor)
+            this.queueMove(this.state.curPlayer, Hex.UP, alsoCursor)
     }
 
-    placeCursor = (coord: HexCoord) => this.store.dispatch(placeCursorAction(coord))
+    placeCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
     doMoves = () => this.store.dispatch(doMovesAction())
     queueRobots = () => this.store.dispatch(robotsDecideAction())
     setCurPlayer = (player: Player) => this.store.dispatch(setCurPlayerAction(player))

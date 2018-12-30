@@ -4,10 +4,10 @@ import {Player} from '../../players/Players'
 import {DriftColor} from '../../../color/DriftColor'
 import {Terrain} from '../model/Tile'
 import {TerrainView} from './TerrainView'
-import {HexCoord} from '../model/HexCoord'
+import {Hex} from '../model/Hex'
 
 export interface FlatTopHexProps {
-    hex?: HexCoord
+    hex?: Hex
     owner: Player
     terrain: Terrain
     color: DriftColor

@@ -2,7 +2,7 @@ import * as React from 'react';
 import CartPair from '../../../common/CartPair';
 import {TileHexView} from './TileHexView';
 import {Tile, Terrain} from '../model/Tile';
-import {HexCoord} from '../model/HexCoord';
+import {Hex} from '../model/Hex';
 import {DriftColor} from '../../../color/DriftColor';
 import {Map} from 'immutable';
 import {Player} from '../../players/Players';
@@ -24,17 +24,17 @@ interface TileAndText {
 const st = (tile: Tile, text: string, color: DriftColor = DriftColor.GREY_20) =>
     ({ tile: tile, text: text, color: color })
 
-const dirs = Map<HexCoord, TileAndText>([
+const dirs = Map<Hex, TileAndText>([
     [
-        HexCoord.ORIGIN,
+        Hex.ORIGIN,
         st(new Tile(Player.Nobody, 0, Terrain.City), '', DriftColor.GREY_20),
     ],
-    [HexCoord.UP, st(Tile.BLANK, 'w')],
-    [HexCoord.DOWN, st(Tile.BLANK, 's')],
-    [HexCoord.LEFT_UP, st(Tile.BLANK, 'q')],
-    [HexCoord.LEFT_DOWN, st(Tile.BLANK, 'a')],
-    [HexCoord.RIGHT_UP, st(Tile.BLANK, 'e')],
-    [HexCoord.RIGHT_DOWN, st(Tile.BLANK, 'd')],
+    [Hex.UP, st(Tile.BLANK, 'w')],
+    [Hex.DOWN, st(Tile.BLANK, 's')],
+    [Hex.LEFT_UP, st(Tile.BLANK, 'q')],
+    [Hex.LEFT_DOWN, st(Tile.BLANK, 'a')],
+    [Hex.RIGHT_UP, st(Tile.BLANK, 'e')],
+    [Hex.RIGHT_DOWN, st(Tile.BLANK, 'd')],
 ])
 
 export const Help = (props: HelpOptions) => {
@@ -53,7 +53,7 @@ export const Help = (props: HelpOptions) => {
                 viewBox={[-46, 51, w + 2, h + 2].join(',')}
             >
                 {
-                    dirs.keySeq().map((hex: HexCoord) => (
+                    dirs.keySeq().map((hex: Hex) => (
                         <TileHexView
                             key={hex.id}
                             tile={dirs.get(hex).tile}

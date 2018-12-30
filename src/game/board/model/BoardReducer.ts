@@ -1,6 +1,6 @@
 import {List} from 'immutable'
 
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {HexMove, PlayerMove} from './Move';
 import {Board} from './Board'
 import {BoardState} from './BoardState'
@@ -24,7 +24,7 @@ const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
     board: Board.constructSquare(2, INITIAL_PLAYERS),
     turn: 0,
-    cursor: HexCoord.NONE,
+    cursor: Hex.NONE,
     players: PlayerManager.construct(INITIAL_PLAYERS),
     curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
@@ -67,7 +67,7 @@ export const newGameAction = (board: Board): NewGame =>
     ({ type: NEW_GAME, board: board })
 const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
     ...state,
-    cursor: HexCoord.NONE,
+    cursor: Hex.NONE,
     board: action.board,
 })
 
@@ -199,11 +199,11 @@ const PLACE_CURSOR = 'PLACE_CURSOR'
 type PLACE_CURSOR = typeof PLACE_CURSOR
 interface PlaceCursor extends GenericAction {
     type: PLACE_CURSOR
-    position: HexCoord
+    position: Hex
 }
 const isPlaceCursor = (action: GameAction): action is PlaceCursor =>
     action.type === PLACE_CURSOR
-export const placeCursorAction = (position: HexCoord): PlaceCursor =>
+export const placeCursorAction = (position: Hex): PlaceCursor =>
     ({ type: PLACE_CURSOR, position: position })
 const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState =>
     (action.position === state.cursor || !state.board.inBounds(action.position))

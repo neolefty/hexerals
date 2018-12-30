@@ -7,7 +7,7 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {CornersPlayerArranger} from './PlayerArranger'
 import {Tile, Terrain} from './Tile'
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -16,7 +16,7 @@ export function printBoard(board: Board) {
         let line = ''
         board.edges.xRange().forEach((x: number) => {
             let c = ' '
-            if ((x + y) % 2 === 0 && board.inBounds(HexCoord.getCart(x, y))) {
+            if ((x + y) % 2 === 0 && board.inBounds(Hex.getCart(x, y))) {
                 const tile = board.getCartTile(x, y)
                 if (tile.owner === Player.Two)
                     c = tile.pop === 0 ? 'o' : (tile.pop === 1 ? 'p' : 'P')
@@ -50,9 +50,9 @@ it('converts between hex and cartesian coords', () => {
     expect(metaCartTile(w, 0)).toThrow()  // out of bounds
     expect(metaCartTile(0, h)).toThrow()  // out of bounds
 
-    const midHex = HexCoord.getCart(6, 2)
-    expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
-    // expect(midHex === HexCoord.get(6, -2, -4)).toBeTruthy()
+    const midHex = Hex.getCart(6, 2)
+    expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
+    // expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
     expect(tenByFive.getCartTile(6, 2) === Tile.BLANK).toBeTruthy()
 })
 
@@ -62,30 +62,30 @@ it('overlays', () => {
         pickNPlayers(4),
         [new CornersPlayerArranger(10)],
     )
-    expect(five.getTile(HexCoord.ORIGIN))
+    expect(five.getTile(Hex.ORIGIN))
         .toEqual(new Tile(Player.Zero, 10, Terrain.City))
-    expect(five.getTile(HexCoord.RIGHT_UP) === Tile.BLANK).toBeTruthy()
+    expect(five.getTile(Hex.RIGHT_UP) === Tile.BLANK).toBeTruthy()
     const emptyFive = new Tile(Player.Nobody, 5, Terrain.Empty)
     const cityThree = new Tile(Player.One, 3, Terrain.City)
-    const overlayTemp: Map<HexCoord, Tile> = Map()
+    const overlayTemp: Map<Hex, Tile> = Map()
     const overlay = overlayTemp
-        .set(HexCoord.ORIGIN, emptyFive)
-        .set(HexCoord.RIGHT_UP, cityThree)
+        .set(Hex.ORIGIN, emptyFive)
+        .set(Hex.RIGHT_UP, cityThree)
     const after = five.overlayTiles(overlay)
-    expect(after.getTile(HexCoord.ORIGIN) === emptyFive).toBeTruthy()
-    expect(after.getTile(HexCoord.RIGHT_UP) === cityThree).toBeTruthy()
+    expect(after.getTile(Hex.ORIGIN) === emptyFive).toBeTruthy()
+    expect(after.getTile(Hex.RIGHT_UP) === cityThree).toBeTruthy()
 })
 
 it('navigates around a board', () => {
     const elevenByFalf = Board.constructRectangular(
         11, 5.5, pickNPlayers(2), [new CornersPlayerArranger(20)])
-    expect(elevenByFalf.inBounds(HexCoord.ORIGIN)).toBeTruthy()
-    expect(elevenByFalf.constraints.all().contains(HexCoord.ORIGIN)).toBeTruthy()
-    expect(elevenByFalf.inBounds(HexCoord.NONE)).toBeFalsy()
-    expect(elevenByFalf.constraints.all().contains(HexCoord.NONE)).toBeFalsy()
+    expect(elevenByFalf.inBounds(Hex.ORIGIN)).toBeTruthy()
+    expect(elevenByFalf.constraints.all().contains(Hex.ORIGIN)).toBeTruthy()
+    expect(elevenByFalf.inBounds(Hex.NONE)).toBeFalsy()
+    expect(elevenByFalf.constraints.all().contains(Hex.NONE)).toBeFalsy()
 
     // staggered walk from origin to the right edge
-    let c = HexCoord.ORIGIN
+    let c = Hex.ORIGIN
     while (elevenByFalf.inBounds(c.getRightUp().getRightDown())) {
         c = c.getRightUp().getRightDown()
         expect(elevenByFalf.constraints.all().contains(c))
@@ -97,16 +97,16 @@ it('navigates around a board', () => {
     expect(c.x).toBe(10)
 
     expect(
-        HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
-     === HexCoord.getCart(1, 3)).toBeTruthy()
+        Hex.ORIGIN.plus(Hex.RIGHT_UP).plus(Hex.UP)
+     === Hex.getCart(1, 3)).toBeTruthy()
     // This causes a stack overflow in V8, where === does not. Why?
     // See jest source code -- packages/expect/matchers.js and
     // possibly packages/jest-matcher-utils/src. Could stringification be
-    // the culprit, maybe with HexCoord.neighborsCache? Is there a way to hide that?
+    // the culprit, maybe with Hex.neighborsCache? Is there a way to hide that?
     // Or is it something else (probably)?
     // expect(
-    //     HexCoord.ORIGIN.plus(HexCoord.RIGHT_UP).plus(HexCoord.UP)
-    //     === HexCoord.getCart(1, 5)
+    //     Hex.ORIGIN.plus(Hex.RIGHT_UP).plus(Hex.UP)
+    //     === Hex.getCart(1, 5)
     // ).toBeTruthy()
 })
 
@@ -117,16 +117,16 @@ it('validates moves', () => {
     const options = threeByFour.validationOptions(messages)
 
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.Zero, threeByFour.edges.lowerLeft, HexCoord.UP
+        Player.Zero, threeByFour.edges.lowerLeft, Hex.UP
     ))).toBeTruthy()
-    expect(threeByFour.edges.lowerLeft).toEqual(HexCoord.ORIGIN)
+    expect(threeByFour.edges.lowerLeft).toEqual(Hex.ORIGIN)
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.One, threeByFour.edges.upperRight, HexCoord.DOWN
+        Player.One, threeByFour.edges.upperRight, Hex.DOWN
     ))).toBeTruthy()
 
     // would go off the board
     expect(threeByFour.validate(
-        PlayerMove.construct(Player.One, threeByFour.edges.upperRight, HexCoord.UP),
+        PlayerMove.construct(Player.One, threeByFour.edges.upperRight, Hex.UP),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
@@ -134,16 +134,16 @@ it('validates moves', () => {
 
     // would start off the board
     expect(threeByFour.validate(
-        PlayerMove.construct(Player.Zero, HexCoord.DOWN, HexCoord.UP),
+        PlayerMove.construct(Player.Zero, Hex.DOWN, Hex.UP),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
     expect(messages[messages.length-1].msg.startsWith('start')).toBeTruthy()
 
     // too far
-    const rightUp2 = HexCoord.RIGHT_UP.plus(HexCoord.RIGHT_UP)
+    const rightUp2 = Hex.RIGHT_UP.plus(Hex.RIGHT_UP)
     expect(threeByFour.validate(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, rightUp2),
+        Player.Zero, Hex.ORIGIN, rightUp2),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('illegal move')
@@ -151,24 +151,24 @@ it('validates moves', () => {
 
     // wrong owner
     const oneOriginUp = PlayerMove.construct(
-        Player.One, HexCoord.ORIGIN, HexCoord.UP)
+        Player.One, Hex.ORIGIN, Hex.UP)
     expect(threeByFour.validate(oneOriginUp, options)).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('wrong player')
     expect(threeByFour.validate(oneOriginUp)).toBeFalsy()
 
     // pop of only 1
     const moved = threeByFour.applyMove(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.UP
+        Player.Zero, Hex.ORIGIN, Hex.UP
     )).board
     const movedOptions = moved.validationOptions(messages)
     expect(moved.validate(
-        PlayerMove.construct(Player.Zero, HexCoord.ORIGIN, HexCoord.UP),
+        PlayerMove.construct(Player.Zero, Hex.ORIGIN, Hex.UP),
         movedOptions,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('insufficient population')
     movedOptions.ignoreSmallPop = true
     expect(moved.validate(PlayerMove.construct(
-        Player.Zero, HexCoord.ORIGIN, HexCoord.UP
+        Player.Zero, Hex.ORIGIN, Hex.UP
     ), movedOptions)).toBeTruthy()
 })
 
@@ -187,7 +187,7 @@ it('steps population', () => {
 
     // make a move
     const moved = threeByFour.applyMove(
-        PlayerMove.construct(Player.One, ur, HexCoord.DOWN)
+        PlayerMove.construct(Player.One, ur, Hex.DOWN)
     ).board
     expect(moved.getTile(ur).pop).toBe(1)
     expect(moved.getTile(urd).pop).toBe(19)

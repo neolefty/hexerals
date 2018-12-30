@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {Tile} from '../model/Tile';
 import {FlatTopHex} from './FlatTopHex';
-import {HexCoord} from '../model/HexCoord';
+import {Hex} from '../model/Hex';
 import {DriftColor} from '../../../color/DriftColor';
 import {HEX_COLUMN, HEX_HALF_HEIGHT, HEX_RADIUS} from './HexContants';
 
 interface TileHexViewProps {
     tile: Tile
-    hex: HexCoord
+    hex: Hex
     viewBoxHeight: number
     selected: boolean
     color: DriftColor

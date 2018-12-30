@@ -1,20 +1,20 @@
 import {Set} from 'immutable'
 
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {Terrain} from './Tile'
 import {Board} from './Board'
 import {pickNPlayers} from '../../players/Players';
 import {connected} from './HexGraph';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MAP_TOO_SMALL} from './Arranger'
-import {TerrainArranger} from './TerrainArranger';
+import {RandomTerrainArranger} from './RandomTerrainArranger';
 import {CornersPlayerArranger, RandomPlayerArranger} from './PlayerArranger';
 
 it ('does not bisect the map with mountains', () => {
     for (let i = 0; i < 10; ++i) {
         const tenByTen = Board.constructSquare(10, pickNPlayers(12), [
             new RandomPlayerArranger(),
-            new TerrainArranger(0.5),
+            new RandomTerrainArranger(0.5),
         ])
         expect(connected(tenByTen.filterTiles(tile => tile.canBeOccupied())))
     }
@@ -22,7 +22,7 @@ it ('does not bisect the map with mountains', () => {
 
 it('places mountains randomly', () => {
     // test that sets of the same HexCoords are the same
-    let setOfSame: Set<Set<HexCoord>> = Set()
+    let setOfSame: Set<Set<Hex>> = Set()
     // no randomness in this one, so should be the same set of HexCoords every time
     for (let i = 0; i < 2; ++i)
         setOfSame = setOfSame.add(Set(Board.constructSquare(
@@ -32,7 +32,7 @@ it('places mountains randomly', () => {
 
     // test that random placement is different every time (for a large enough board)
     const nTrials = 5
-    let setOfMountainSets: Set<Set<HexCoord>> = Set()
+    let setOfMountainSets: Set<Set<Hex>> = Set()
     // Expect each arrangement of mountains to be different
     const numPlayers = 10
     const mtnFraction = 0.5
@@ -42,7 +42,7 @@ it('places mountains randomly', () => {
             Board.constructSquare(
                 10, pickNPlayers(numPlayers), [
                     new RandomPlayerArranger(),
-                    new TerrainArranger(mtnFraction),
+                    new RandomTerrainArranger(mtnFraction),
                 ]
             ).filterTiles(
                 tile => tile.terrain === Terrain.Mountain
@@ -70,7 +70,7 @@ it('does not get trapped or bisect', () => {
         const board = Board.constructRectangular(
             1, 20, pickNPlayers(12), [
                 new RandomPlayerArranger(1),
-                new TerrainArranger(1, Terrain.Mountain),
+                new RandomTerrainArranger(1, Terrain.Mountain),
             ],
             messages
         )
@@ -94,7 +94,7 @@ it('bisection can be allowed', () => {
         const board = Board.constructRectangular(
             4, 12, pickNPlayers(12), [
                 new RandomPlayerArranger(1),
-                new TerrainArranger(
+                new RandomTerrainArranger(
                     .9, Terrain.Mountain, true
                 ),
             ],

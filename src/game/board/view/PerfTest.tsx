@@ -3,8 +3,8 @@ import * as React from 'react'
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {GenericAction} from '../../common/App'
-import { RectangularConstraints } from './model/Constraints'
+import {GenericAction} from '../../../common/App'
+import { RectangularConstraints } from '../model/Constraints'
 
 export interface PerfState {
     history: List<PerfRecord>

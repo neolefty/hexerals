@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Map} from 'immutable'
 
 import './Board.css'
-import {HexCoord} from '../model/HexCoord'
+import {Hex} from '../model/Hex'
 import {DriftColor} from '../../../color/DriftColor'
 import {Player} from '../../players/Players'
 import {FilterBoardView} from './FilterBoardView';
@@ -24,17 +24,17 @@ export class HexBoardView extends BoardViewBase {
         this.filterCursor = this.filterCursor.bind(this)
     }
 
-    filterNobody(hex: HexCoord): boolean {
+    filterNobody(hex: Hex): boolean {
         return this.props.boardState.cursor !== hex
             && this.props.boardState.board.getTile(hex).owner === Player.Nobody
     }
 
-    filterPlayers(hex: HexCoord): boolean {
+    filterPlayers(hex: Hex): boolean {
         return this.props.boardState.cursor !== hex
             && this.props.boardState.board.getTile(hex).owner !== Player.Nobody
     }
 
-    filterCursor(hex: HexCoord): boolean {
+    filterCursor(hex: Hex): boolean {
         return this.props.boardState.cursor === hex
     }
 

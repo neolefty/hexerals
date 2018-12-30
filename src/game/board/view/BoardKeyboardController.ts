@@ -1,23 +1,23 @@
 import {List, Map} from 'immutable';
 import * as React from 'react';
 
-import {HexCoord} from '../model/HexCoord';
+import {Hex} from '../model/Hex';
 import {PlayerMove} from '../model/Move';
 import {BoardViewBase} from './BoardViewBase';
 
-const KEY_CONTROLS: Map<string, HexCoord> = Map({
-    'ArrowLeft': HexCoord.LEFT_DOWN,
-    'Home': HexCoord.LEFT_UP,
-    'ArrowRight': HexCoord.RIGHT_DOWN,
-    'PageUp': HexCoord.RIGHT_UP,
-    'ArrowUp': HexCoord.UP,
-    'ArrowDown': HexCoord.DOWN,
-    'q': HexCoord.LEFT_UP,
-    'a': HexCoord.LEFT_DOWN,
-    'w': HexCoord.UP,
-    's': HexCoord.DOWN,
-    'e': HexCoord.RIGHT_UP,
-    'd': HexCoord.RIGHT_DOWN,
+const KEY_CONTROLS: Map<string, Hex> = Map({
+    'ArrowLeft': Hex.LEFT_DOWN,
+    'Home': Hex.LEFT_UP,
+    'ArrowRight': Hex.RIGHT_DOWN,
+    'PageUp': Hex.RIGHT_UP,
+    'ArrowUp': Hex.UP,
+    'ArrowDown': Hex.DOWN,
+    'q': Hex.LEFT_UP,
+    'a': Hex.LEFT_DOWN,
+    'w': Hex.UP,
+    's': Hex.DOWN,
+    'e': Hex.RIGHT_UP,
+    'd': Hex.RIGHT_DOWN,
 })
 
 export class BoardKeyboardController {
@@ -27,9 +27,9 @@ export class BoardKeyboardController {
 
     onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
         const bs = this.view.props.boardState
-        if (bs.cursor !== HexCoord.NONE && bs.curPlayer) {
-            const delta = KEY_CONTROLS.get(e.key, HexCoord.NONE)
-            if (delta !== HexCoord.NONE) {
+        if (bs.cursor !== Hex.NONE && bs.curPlayer) {
+            const delta = KEY_CONTROLS.get(e.key, Hex.NONE)
+            if (delta !== Hex.NONE) {
                 const move = PlayerMove.construct(bs.curPlayer, bs.cursor, delta)
                 this.view.props.onQueueMoves(List([move]))
                 // TODO don't move into known mountains but move right through unknown ones

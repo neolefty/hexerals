@@ -3,12 +3,11 @@ import * as React from 'react';
 // import hsluv from 'hsluv';
 import './ColorWheel.css';
 import {ColorsActions, ColorsProps, ColorsState} from './ColorsContainer';
-import {Component} from 'react';
 
 export interface ColorWheelProps extends ColorsState, ColorsActions, ColorsProps {
 }
 
-export class ColorWheel extends Component<ColorWheelProps> {
+export class ColorWheel extends React.PureComponent<ColorWheelProps> {
     render(): React.ReactNode {
         const onlyOne = this.props.colors.driftColors.size === 1;
         return (

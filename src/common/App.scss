@@ -16,6 +16,7 @@
 
   .react-tabs {
     -webkit-tap-highlight-color: transparent;
+    width: 100%;
 
     &__tab-list {
       border-bottom: 1px solid #aaa;
@@ -69,6 +70,7 @@
 
     &__tab-panel--selected {
       display: block;
+      width: 100%;
     }
   }
 }

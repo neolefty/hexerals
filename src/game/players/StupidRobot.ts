@@ -4,7 +4,7 @@ import {GameDecision, Robot} from './Robot';
 import {HexMove, PlayerMove} from '../board/model/Move';
 import {BoardState} from '../board/model/BoardState';
 import {Player} from './Players';
-import {HexCoord} from '../board/model/HexCoord';
+import {Hex} from '../board/model/Hex';
 import {Tile} from '../board/model/Tile';
 import {Board} from '../board/model/Board';
 import * as assert from 'assert';
@@ -17,7 +17,7 @@ import * as assert from 'assert';
 // * bias towards initial capture
 // * test that smarter always wins
 
-const NONE_MOVE = new HexMove(HexCoord.NONE, HexCoord.NONE)
+const NONE_MOVE = new HexMove(Hex.NONE, Hex.NONE)
 
 export class StupidRobot implements Robot {
     decide(
@@ -30,7 +30,7 @@ export class StupidRobot implements Robot {
             forEachSetOfStarts(
                 bs.board,
                 player,
-                (orig: HexCoord, dests: List<HexCoord>) => {
+                (orig: Hex, dests: List<Hex>) => {
                     const origTile = bs.board.getTile(orig)
                     // I think this is a shortcut to giving each move a fair weight
                     const takeIt: boolean =
@@ -45,7 +45,7 @@ export class StupidRobot implements Robot {
             if (chosenMove !== NONE_MOVE) {
                 const delta = chosenMove.delta
                 let result: List<HexMove> = List()
-                let pos: HexCoord = chosenMove.source
+                let pos: Hex = chosenMove.source
                 let dest = chosenMove.dest
                 do {
                     result = result.push(new HexMove(pos, delta))
@@ -70,13 +70,13 @@ export class StupidRobot implements Robot {
 const forEachSetOfStarts = (
     board: Board,
     player: Player,
-    sideEffect: (orig: HexCoord, dests: List<HexCoord>) => void
+    sideEffect: (orig: Hex, dests: List<Hex>) => void
 ): void => {
-    board.explicitTiles.forEach((tile: Tile, orig: HexCoord) => {
+    board.explicitTiles.forEach((tile: Tile, orig: Hex) => {
         if (tile.owner === player && tile.pop > 1) {
-            const dests = orig.getNeighbors().filter((dest: HexCoord) =>
+            const dests = orig.getNeighbors().filter((dest: Hex) =>
                 board.canBeOccupied(dest)
-            ) as List<HexCoord>
+            ) as List<Hex>
             if (dests.size > 0)
                 sideEffect(orig, dests)
         }

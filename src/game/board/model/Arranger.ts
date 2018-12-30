@@ -1,15 +1,16 @@
 import {Map} from 'immutable'
 
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {Board} from './Board'
 import {Tile} from './Tile'
 import {StatusMessage} from '../../../common/StatusMessage';
 
 export class Arranger {
+    // return a set of tiles to overlay on board — blank tiles will be ignored
     arrange(
         board: Board,
         status: StatusMessage[] | undefined = undefined,
-    ): Map<HexCoord, Tile> {
+    ): Map<Hex, Tile> {
         throw new Error('not implemented')
     }
 }

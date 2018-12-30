@@ -1,5 +1,5 @@
 import {Board} from './Board'
-import {HexCoord} from './HexCoord'
+import {Hex} from './Hex'
 import {MovementQueue} from './MovementQueue'
 import {Player, PlayerManager} from '../../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
@@ -8,7 +8,7 @@ import {List} from 'immutable'
 export interface BoardState {
     board: Board
     turn: number
-    cursor: HexCoord
+    cursor: Hex
     moves: MovementQueue
     players: PlayerManager
     curPlayer: Player | undefined

@@ -2,14 +2,14 @@ import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Tile} from './Tile';
 import {List, Map} from 'immutable';
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {PlayerMove} from './Move';
 import {BoardConstraints} from './Constraints';
 
 export class MoveValidatorOptions {
     // the tiles under consideration, which start out as the current board's tiles
     // but may get speculatively reassigned in internal scratch values during validation
-    tiles: Map<HexCoord, Tile>
+    tiles: Map<Hex, Tile>
 
     // If true, don't invalidate just because there isn't enough population
     // on the tile *now* to move -- there may be enough in the future.
@@ -20,7 +20,7 @@ export class MoveValidatorOptions {
     ignoreTileOwner: boolean = false
 
     constructor(
-        tiles: Map<HexCoord, Tile>,
+        tiles: Map<Hex, Tile>,
         // status messages to add to
         readonly status: StatusMessage[] | undefined = undefined,
     ) {
@@ -123,7 +123,7 @@ export class MoveValidator {
                 const march = new Tile(origin.owner, origin.pop - 1)
                 const newDestTile = oldDestTile.settle(march)
                 options.tiles = options.tiles.withMutations(
-                    (m: Map<HexCoord, Tile>) => {
+                    (m: Map<Hex, Tile>) => {
                         m.set(move.source, newSourceTile)
                         m.set(move.dest, newDestTile)
                     })

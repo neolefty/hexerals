@@ -12,7 +12,7 @@ interface FogBoardState {
     fogsCache: Map<Player, PlayerFog>  // mutable
 }
 
-export class FogBoardView extends React.Component<FogBoardProps, FogBoardState> {
+export class FogBoardView extends React.PureComponent<FogBoardProps, FogBoardState> {
     componentWillMount(): void {
         this.setState({
             fogsCache: Map<Player, PlayerFog>().asMutable()

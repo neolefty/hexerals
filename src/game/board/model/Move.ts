@@ -1,14 +1,14 @@
-import {HexCoord} from './HexCoord';
+import {Hex} from './Hex';
 import {Player} from '../../players/Players';
 
 export class HexMove {
     constructor(
-        readonly source: HexCoord,
-        readonly delta: HexCoord,
+        readonly source: Hex,
+        readonly delta: Hex,
     ) {
     }
 
-    get dest(): HexCoord {
+    get dest(): Hex {
         return this.source.plus(this.delta)
     }
 
@@ -18,7 +18,7 @@ export class HexMove {
 }
 
 export class PlayerMove {
-    static construct(player: Player, source: HexCoord, delta: HexCoord): PlayerMove {
+    static construct(player: Player, source: Hex, delta: Hex): PlayerMove {
         return new PlayerMove(player, new HexMove(source, delta))
     }
 
@@ -28,15 +28,15 @@ export class PlayerMove {
     ) {
     }
 
-    get source(): HexCoord {
+    get source(): Hex {
         return this.move.source
     }
 
-    get delta(): HexCoord {
+    get delta(): Hex {
         return this.move.delta
     }
 
-    get dest(): HexCoord {
+    get dest(): Hex {
         return this.move.dest
     }
 

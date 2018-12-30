@@ -5,15 +5,15 @@ import {isNumber} from 'util';
 import {CycleMode} from './CycleState'
 import {Board} from '../board/model/Board'
 import {GenericAction} from '../../common/App'
-import {HexCoord} from '../board/model/HexCoord'
+import {Hex} from '../board/model/Hex'
 import {GameAction, BoardReducer} from '../board/model/BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from '../board/model/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
-import {RandomPlayerArranger} from '../board/model/PlayerArranger'
+import {SpreadPlayersArranger} from '../board/model/PlayerArranger'
 import {StupidRobot} from '../players/StupidRobot'
 import {StatusMessage} from '../../common/StatusMessage';
-import {TerrainArranger} from '../board/model/TerrainArranger';
+import {RandomTerrainArranger} from '../board/model/RandomTerrainArranger';
 
 // the meta-game
 
@@ -81,8 +81,8 @@ const openLocalGameReducer =
         state.localOptions.boardHeight,
         players,
         [
-            new RandomPlayerArranger(),
-            new TerrainArranger(mountainFrequency),
+            new SpreadPlayersArranger(),
+            new RandomTerrainArranger(mountainFrequency),
         ],
         messages,
     )
@@ -100,7 +100,7 @@ const openLocalGameReducer =
             board: newBoard,
             turn: 0,
             players: pm,
-            cursor: HexCoord.NONE,
+            cursor: Hex.NONE,
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(messages),
             curPlayer: Player.Zero,

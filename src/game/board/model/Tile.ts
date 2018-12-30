@@ -16,6 +16,7 @@ export const canBeOccupied = (terrain: Terrain): boolean =>
 export class Tile {
     static readonly BLANK: Tile = new Tile(Player.Nobody, 0, Terrain.Empty)
     static readonly SWAMP = new Tile(Player.Nobody, 0, Terrain.Swamp)
+    static readonly MOUNTAIN = new Tile(Player.Nobody, 0, Terrain.Mountain)
     static readonly MAYBE_MOUNTAIN = new Tile(
         Player.Nobody, 0, Terrain.MaybeMountain
     )
