@@ -169,9 +169,9 @@ export class Board {
     toString(): string {
         let result = `Constraints: ${this.constraints.toString()}\n`
             + `Edges: ${ this.edges.toString()}\n`
-            + `Tiles: (`
-        this.explicitTiles.map((tile, coord) =>
-            result += tile.pop ? `${coord} — ${tile} ` : ''
+            + `Non-blank tiles: (`
+        this.explicitTiles.forEach((tile, coord) =>
+            result += tile.isBlank() ? '' : `${coord} — ${tile} `
         )
         result += ')'
         return result

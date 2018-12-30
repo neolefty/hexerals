@@ -50,16 +50,9 @@ export const floodShortestPath = (
     }
     let result = List<Hex>([dest])
     // walk backwards from destination
-    while (result.get(0) !== origin) {
-        // const prevStep = result.get(0)
-        // const prevCost = scratch.get(prevStep)
-        // const toGetThere = prevCost.h
-        // console.log(` ... from ${prevCost.h.toString()} to ${prevStep.toString()}`)
-        // result = result.insert(0, toGetThere)
-        // result = result.splice(0, 0, toGetThere)
-
+    while (result.get(0) !== origin)
         result = result.insert(0, scratch.get(result.get(0)).h)
-    }
+
     return result
 }
 
