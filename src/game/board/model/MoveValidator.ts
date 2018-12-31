@@ -5,6 +5,7 @@ import {List, Map} from 'immutable';
 import {Hex} from './Hex';
 import {PlayerMove} from './Move';
 import {BoardConstraints} from './Constraints';
+import {Terrain} from './Terrain';
 
 export class MoveValidatorOptions {
     // the tiles under consideration, which start out as the current board's tiles
@@ -127,6 +128,19 @@ export class MoveValidator {
                 const oldDestTile = options.tiles.get(move.dest, Tile.EMPTY)
                 const march = new Tile(origin.owner, origin.pop - 1)
                 const newDestTile = oldDestTile.settle(march)
+                // was it a capital capture?
+                if (newDestTile.owner !== oldDestTile.owner && oldDestTile.terrain === Terrain.Capital)
+                    // noinspection PointlessBooleanExpressionJS
+                    options.tiles = options.tiles.withMutations(m =>
+                        options.tiles.filter(tile =>
+                            !!(tile && tile.owner === oldDestTile.owner)
+                        ).forEach((tile, hex) =>
+                            // give territory to attacker, with half pop (rounded up)
+                            m.set(hex, tile.setOwner(move.player)
+                                .setPop(Math.ceil(tile.pop * 0.5)))
+                        )
+                    )
+                // do the move
                 options.tiles = options.tiles.withMutations(
                     (m: Map<Hex, Tile>) => {
                         m.set(move.source, newSourceTile)

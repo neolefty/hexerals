@@ -1,12 +1,13 @@
 import * as React from 'react';
 import CartPair from '../../../common/CartPair';
 import {TileHexView} from './TileHexView';
-import {Tile, Terrain} from '../model/Tile';
+import {Tile} from '../model/Tile';
 import {Hex} from '../model/Hex';
 import {DriftColor} from '../../../color/DriftColor';
 import {Map} from 'immutable';
 import {Player} from '../model/players/Players';
 import './Help.css'
+import {Terrain} from '../model/Terrain';
 
 export interface HelpOptions {
     displaySize: CartPair;

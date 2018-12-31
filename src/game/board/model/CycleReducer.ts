@@ -14,6 +14,7 @@ import {SpreadPlayersArranger} from './PlayerArranger'
 import {StupidRobot} from './players/StupidRobot'
 import {StatusMessage} from '../../../common/StatusMessage';
 import {RandomTerrainArranger} from './RandomTerrainArranger';
+import {Terrain} from './Terrain';
 
 // the meta-game
 
@@ -25,8 +26,10 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         boardWidth: 11,
         boardHeight: 7,
         mountainPercent: 30,
+        // booleans — non-zero is true
         fog: 1,
-        showAdvanced: 0, // non-zero is true
+        capitals: 1,
+        showAdvanced: 0,
     },
     localGame: undefined,
 }
@@ -81,7 +84,9 @@ const openLocalGameReducer =
         state.localOptions.boardHeight,
         players,
         [
-            new SpreadPlayersArranger(),
+            new SpreadPlayersArranger(
+                state.localOptions.capitals === 0 ? Terrain.City : Terrain.Capital
+            ),
             new RandomTerrainArranger(mountainFrequency),
         ],
         messages,

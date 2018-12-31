@@ -1,12 +1,13 @@
 import * as assert from 'assert';
 import {List, Map, Set} from 'immutable';
 
-import {Tile, Terrain} from './Tile';
+import {Tile} from './Tile';
 import {Board, TileFilter} from './Board';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Hex} from './Hex';
 import {connected} from './HexGraph';
 import {Arranger} from './Arranger';
+import {Terrain} from './Terrain';
 
 // replace empty terrain randomly and without blocking
 export class RandomTerrainArranger extends Arranger {

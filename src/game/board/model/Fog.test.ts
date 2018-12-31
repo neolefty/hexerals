@@ -2,7 +2,8 @@ import {BoardReducerTester} from '../view/BoardReducerTester';
 import {PlayerFog} from './Fog';
 import {Player} from './players/Players';
 import {Hex} from './Hex';
-import {Terrain, Tile} from './Tile';
+import {Tile} from './Tile';
+import {Terrain} from './Terrain';
 
 it('fogs the board for a player', () => {
     const brt = new BoardReducerTester(5, 5)

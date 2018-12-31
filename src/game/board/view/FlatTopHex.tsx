@@ -1,9 +1,10 @@
 import * as React from 'react'
 
 import {DriftColor} from '../../../color/DriftColor'
-import {Terrain, Tile} from '../model/Tile'
+import {Tile} from '../model/Tile'
 import {TerrainView} from './TerrainView'
 import {Hex} from '../model/Hex'
+import {Terrain} from '../model/Terrain';
 
 export interface FlatTopHexProps {
     hex?: Hex

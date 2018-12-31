@@ -1,15 +1,5 @@
 import {Player} from './players/Players'
-
-export enum Terrain {
-    Empty = 'Empty',  // Normal. Plains?
-    City = 'City',
-    Capital = 'Capital',
-    Mountain = 'Mountain',
-    Swamp = 'Swamp',
-}
-
-export const canBeOccupied = (terrain: Terrain): boolean =>
-    terrain !== Terrain.Mountain
+import {canBeOccupied, Terrain} from './Terrain';
 
 // contents of a space on the board
 export class Tile {
@@ -75,11 +65,13 @@ export class Tile {
         else if (this.pop >= that.pop)
             return this.setPop(this.pop - that.pop)
         else
-            return this.setPop(that.pop - this.pop).setOwner(that.owner)
+            return this.setPop(that.pop - this.pop)
+                .setOwner(that.owner)
+                .setTerrain(this.terrain === Terrain.Capital ? Terrain.City : this.terrain)
     }
 
     toString(): string {
-        return (this.terrain === Terrain.Empty ? '' : `Terrain: ${ this.terrain }, `)
-            + `Owner: ${ this.owner }, Pop: ${ this.pop }`
+        return `${this.owner}'s ${this.terrain}${
+            this.pop === 0 ? '' : ` pop ${this.pop}`}`
     }
 }

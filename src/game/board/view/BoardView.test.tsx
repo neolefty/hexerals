@@ -12,10 +12,11 @@ import {BoardViewBase} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
-import {Tile, Terrain} from '../model/Tile';
+import {Tile} from '../model/Tile';
 import {PlayerMove} from '../model/Move';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
 import {BoardReducerTester} from './BoardReducerTester';
+import {Terrain} from '../model/Terrain';
 
 it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})

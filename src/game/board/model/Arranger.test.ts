@@ -1,7 +1,7 @@
 import {Set} from 'immutable'
 
 import {Hex} from './Hex'
-import {Terrain} from './Tile'
+import {Terrain} from './Terrain'
 import {Board} from './Board'
 import {pickNPlayers} from './players/Players';
 import {connected} from './HexGraph';

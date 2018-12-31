@@ -1,13 +1,14 @@
 import * as assert from 'assert'
-import {Map} from 'immutable'
+import {List, Map} from 'immutable'
 
 import {Board} from './Board'
 import {pickNPlayers, Player} from './players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {PlayerMove} from './Move'
 import {CornersPlayerArranger} from './PlayerArranger'
-import {Tile, Terrain} from './Tile'
+import {Tile} from './Tile'
 import {Hex} from './Hex'
+import {Terrain} from './Terrain';
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -210,4 +211,30 @@ it('steps population', () => {
     expect(fifty.getTile(ur).pop).toBe(3)
     expect(fifty.getTile(urd).pop).toBe(20)
     expect(fifty.getTile(urd2).pop).toBe(0)
+})
+
+it('captures capitals', () => {
+    const start = Board.constructRectangular(
+        3, 2, pickNPlayers(2),
+        [new CornersPlayerArranger(20, Terrain.Capital)],
+    )
+    expect(start.getTile(Hex.ORIGIN).terrain).toBe(Terrain.Capital)
+    // move player one to lower right corner
+    const moved = start.applyMoves(List([
+        PlayerMove.constructDelta(
+            Player.One, start.edges.upperRight, Hex.LEFT_DOWN),
+        PlayerMove.constructDelta(
+            Player.One, Hex.RIGHT_UP, Hex.RIGHT_DOWN),
+    ])).board
+    expect(moved.getCartTile(2, 0).pop).toBe(18)
+    const captured = moved.applyMoves(List([
+        PlayerMove.constructDelta(
+            Player.Zero, Hex.ORIGIN, Hex.RIGHT_UP),
+        PlayerMove.constructDelta(
+            Player.Zero, Hex.RIGHT_UP, Hex.RIGHT_UP),
+    ])).board
+    expect(captured.getCartTile(2, 2)).toEqual(
+        new Tile(Player.Zero, 16, Terrain.City))
+    expect(captured.getCartTile(2, 0)).toEqual(
+        new Tile(Player.Zero, 9))
 })

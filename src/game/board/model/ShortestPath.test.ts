@@ -3,7 +3,8 @@ import {List} from 'immutable';
 import {Board} from './Board';
 import {CacheDistance, floodShortestPath} from './ShortestPath';
 import {Hex} from './Hex';
-import {Terrain, Tile} from './Tile';
+import {Tile} from './Tile';
+import {Terrain} from './Terrain';
 
 it ('finds a simple shortest path', () => {
     const ten = Board.constructSquare(10, List())

@@ -3,15 +3,19 @@ import {List, Map} from 'immutable';
 
 import {Board} from './Board';
 import {Hex} from './Hex';
-import {Tile, Terrain} from './Tile';
+import {Tile} from './Tile';
 import {Arranger, MAP_TOO_SMALL} from './Arranger';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Player} from './players/Players';
 import {CacheDistance} from './ShortestPath';
+import {Terrain} from './Terrain';
 
 // arranges players on a board
 export class RandomPlayerArranger extends Arranger {
-    constructor(readonly startingPop: number = 0) {
+    constructor(
+        readonly startingPop: number = 0,
+        readonly startingTerrain: Terrain = Terrain.City,
+    ) {
         super()
     }
 
@@ -29,7 +33,7 @@ export class RandomPlayerArranger extends Arranger {
                 starts = starts.set(hex, new Tile(
                     player,
                     this.startingPop,
-                    Terrain.City,
+                    this.startingTerrain,
                 ))
             }
             else {
@@ -49,7 +53,10 @@ export class RandomPlayerArranger extends Arranger {
 
 // place up to 4 players in lower left, upper right, upper left, and lower right
 export class CornersPlayerArranger extends Arranger {
-    constructor(readonly startingPop: number = 0) { super() }
+    constructor(
+        readonly startingPop: number = 0,
+        readonly terrain: Terrain = Terrain.City,
+    ) { super() }
 
     public arrange(board: Board): Map<Hex, Tile> {
         assert(board.players.size <= 4)
@@ -63,7 +70,7 @@ export class CornersPlayerArranger extends Arranger {
         board.players.forEach((player, i) =>
             starts = starts.set(
                 corners[i](board),
-                new Tile(player, this.startingPop, Terrain.City),
+                new Tile(player, this.startingPop, this.terrain),
             )
         )
         return starts
@@ -76,6 +83,7 @@ export class CornersPlayerArranger extends Arranger {
 // Maybe better to minimize difference in total distance to neighbors?
 export class SpreadPlayersArranger extends Arranger {
     constructor(
+        readonly startingTerrain: Terrain = Terrain.Capital,
         readonly startingPop: number = 0,
         readonly settleRounds: number = 4,  // how many rounds to require to settle before returning
         readonly settleDelta: number = 6, // maximum change during settling
@@ -84,8 +92,9 @@ export class SpreadPlayersArranger extends Arranger {
     ) { super() }
 
     arrange(board: Board, status: StatusMessage[] | undefined = undefined): Map<Hex, Tile> {
-        const randomStarts: Map<Hex, Tile> = new RandomPlayerArranger(this.startingPop)
-            .arrange(board, status)
+        const randomStarts: Map<Hex, Tile> = new RandomPlayerArranger(
+            this.startingPop, this.startingTerrain,
+        ).arrange(board, status)
         const emptyHexes = board.filterTiles(tile => tile.terrain === Terrain.Empty)
         const distances = new CacheDistance(emptyHexes)
         // the last N rounds' delta between closest & farthest pairs

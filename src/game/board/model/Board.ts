@@ -176,14 +176,17 @@ export class Board {
         return new MoveValidatorOptions(this.explicitTiles, messages)
     }
 
-    toString(): string {
-        let result = `Constraints: ${this.constraints.toString()}\n`
-            + `Edges: ${ this.edges.toString()}\n`
-            + `Non-blank tiles: (`
-        this.explicitTiles.forEach((tile, coord) =>
-            result += tile.isBlank() ? '' : `${coord} — ${tile} `
+    toString(onlyTiles: boolean = false): string {
+        let result = ''
+        if (!onlyTiles)
+            result += `Constraints: ${this.constraints.toString()}\n`
+                + `Edges: ${ this.edges.toString()}\n`
+                + `Non-blank tiles: (\n`
+        this.explicitTiles.forEach((tile, hex) =>
+            result += `   ${hex.toCartString()} — ${tile}\n`
         )
-        result += ')'
+        if (!onlyTiles)
+            result += ')'
         return result
     }
 }

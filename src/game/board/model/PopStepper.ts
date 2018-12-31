@@ -1,5 +1,5 @@
 import {Board} from './Board';
-import {Terrain} from './Tile';
+import {Terrain} from './Terrain';
 
 const COUNTRYSIDE_TURNS = 50
 const CITY_TURNS = 2
@@ -16,7 +16,10 @@ export class PopStepper {
         if (turn % this.cityTurns === 0)
             result = result.withMutations(mut =>
                 result.forEach((tile, hex) => {
-                    if (tile.terrain === Terrain.City && tile.isOwned)
+                    if (
+                        (tile.terrain === Terrain.City || tile.terrain === Terrain.Capital)
+                        && tile.isOwned
+                    )
                         mut.set(hex, tile.incrementPop())
                 })
             )
