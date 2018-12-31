@@ -17,8 +17,8 @@ export interface BoardState {
 
 export const boardStateToString = (s: BoardState): string =>
     ''
-    + `cursor: ${s.cursor}\n`
-    + `players: ${s.players}\n`
+    + (s.cursor === Hex.NONE ? '' : `cursor: ${s.cursor}\n`)
+    + `players: ${s.players.toString()}\n`
     + `current: ${s.curPlayer}\n`
     + `board: ${s.board.toString()}\n`
     + `moves: ${s.moves}\n`

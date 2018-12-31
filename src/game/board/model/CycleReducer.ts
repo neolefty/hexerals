@@ -11,7 +11,7 @@ import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
 import {SpreadPlayersArranger} from './PlayerArranger'
-import {StupidRobot} from './players/StupidRobot'
+import {BasicRobot} from './players/BasicRobot'
 import {StatusMessage} from '../../../common/StatusMessage';
 import {RandomTerrainArranger} from './RandomTerrainArranger';
 import {Terrain} from './Terrain';
@@ -21,11 +21,12 @@ import {Terrain} from './Terrain';
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
-        numPlayers: 6,
-        tickMillis: 500,
+        numRobots: 5,
         boardWidth: 17,
         boardHeight: 9,
+        difficulty: 0,
         mountainPercent: 30,
+        tickMillis: 500,
         // booleans — non-zero is true
         fog: 1,
         capitals: 1,
@@ -76,7 +77,7 @@ export const openLocalGameAction = (): OpenLocalGame =>
 const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
-    const players = pickNPlayers(state.localOptions.numPlayers)
+    const players = pickNPlayers(state.localOptions.numRobots + 1)
     const mountainFrequency = state.localOptions.mountainPercent / 100
     const messages: StatusMessage[] = []
     const newBoard = Board.constructRectangular(
@@ -93,10 +94,12 @@ const openLocalGameReducer =
     )
     // assign stupid AI to all non-humans
     let pm: PlayerManager = PlayerManager.construct(players)
-    const stupid = new StupidRobot()
     players.forEach((player: Player) => {
         if (player !== Player.Zero) // human
-            pm = pm.setRobot(player, stupid)
+            pm = pm.setRobot(
+                player,
+                BasicRobot.byIntelligence(state.localOptions.difficulty)
+            )
     })
     return {
         ...state,

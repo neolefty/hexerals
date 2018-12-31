@@ -5,7 +5,8 @@ import {BoardState, boardStateToString} from '../model/BoardState';
 import {
     BoardReducer,
     cancelMovesAction, doMovesAction, newGameAction, placeCursorAction,
-    queueMovesAction, robotsDecideAction, setCurPlayerAction, setRobotAction,
+    queueMovesAction, robotsDecideAction, setCurPlayerAction,
+    setRobotAction, stepPopAction,
 } from '../model/BoardReducer';
 import {Board} from '../model/Board';
 import {pickNPlayers, Player} from '../model/players/Players';
@@ -16,6 +17,7 @@ import {StatusMessage} from '../../../common/StatusMessage';
 import {MovementQueue} from '../model/MovementQueue';
 import {PlayerMove} from '../model/Move';
 import {Robot} from '../model/players/Robot';
+import {Arranger} from '../model/Arranger';
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
@@ -26,13 +28,14 @@ export class BoardReducerTester {
     constructor(
         width = BoardReducerTester.INITIAL_WIDTH,
         height = BoardReducerTester.INITIAL_HEIGHT,
+        arrangers: Arranger[] = [
+            new CornersPlayerArranger(BoardReducerTester.INITIAL_POP)
+        ],
+        players: List<Player> = pickNPlayers(2),
     ) {
         this.store = createStore<BoardState>(BoardReducer)
         this.store.dispatch(newGameAction(Board.constructRectangular(
-            width, height,
-            pickNPlayers(2),
-            [new CornersPlayerArranger(BoardReducerTester.INITIAL_POP)],
-        )))
+            width, height, players, arrangers)))
     }
 
     getRawTile = (coord: Hex): Tile | undefined => this.tiles.get(coord)
@@ -74,6 +77,7 @@ export class BoardReducerTester {
 
     placeCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
     doMoves = () => this.store.dispatch(doMovesAction())
+    stepPop = () => this.store.dispatch(stepPopAction())
     queueRobots = () => this.store.dispatch(robotsDecideAction())
     setCurPlayer = (player: Player) => this.store.dispatch(setCurPlayerAction(player))
 
@@ -90,6 +94,30 @@ export class BoardReducerTester {
 
     setRobot = (player: Player, robot: Robot) =>
         this.store.dispatch(setRobotAction(player, robot))
+
+    popTotal = (player: Player) => {
+        let result = 0
+        this.board.forOccupiableTiles((hex, tile) =>
+            result += tile.owner === player ? tile.pop : 0
+        )
+        return result
+    }
+
+    get isGameOver(): boolean {
+        // are all explicit occupiable tiles owned by the same player?
+        const contender = this.board.explicitTiles.first().owner
+        try {
+            this.board.explicitTiles.forEach(tile => {
+                if (tile && tile.canBeOccupied() && tile.owner !== contender)
+                    throw 'different'
+            })
+            return true
+        }
+        catch(e) {
+            if (e === 'different') return false
+            else throw e
+        }
+    }
 
     toString = () => boardStateToString(this.state)
 }

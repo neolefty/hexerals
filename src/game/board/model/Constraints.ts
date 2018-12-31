@@ -73,7 +73,7 @@ export abstract class BoardConstraints {
     toString = (): string => 'BoardConstraints'
 
     // is coord within the constrained area?
-    abstract inBounds(coord: Hex): boolean
+    abstract inBounds(hex: Hex): boolean
 
     /**
      * Find coord at extreme value by default, finds the smallest, by

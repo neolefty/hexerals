@@ -66,11 +66,11 @@ it('checks trigonometry', () => {
     //     console.log(`${hex.toString(true, true)}`)
     // )
 
-    expect(Hex.UP.cartYExact).toBeCloseTo(1)
-    expect(Hex.UP.cartXExact).toBeCloseTo(0)
+    expect(Hex.UP.cartYGeo).toBeCloseTo(1)
+    expect(Hex.UP.cartXGeo).toBeCloseTo(0)
     // 30 degrees
-    expect(Hex.RIGHT_UP.cartYExact).toBeCloseTo(0.5)
-    expect(Hex.RIGHT_UP.cartXExact).toBeCloseTo(Math.cos(Math.PI / 6))
+    expect(Hex.RIGHT_UP.cartYGeo).toBeCloseTo(0.5)
+    expect(Hex.RIGHT_UP.cartXGeo).toBeCloseTo(Math.cos(Math.PI / 6))
 
     expect(Hex.RIGHT_UP.degrees).toBeCloseTo(30)
     expect(Hex.UP.degrees).toBeCloseTo(90)

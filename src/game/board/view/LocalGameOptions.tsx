@@ -7,11 +7,12 @@ import {CheckInput, NumberInput} from '../../../common/Inputs';
 export interface LocalGameOptions {
     // All numbers because our reducer assumes it.
     // If we need a non-number, the reducer should be easy to modify.
-    numPlayers: number
+    numRobots: number
     tickMillis: number
     boardWidth: number
     boardHeight: number
     mountainPercent: number
+    difficulty: number
 
     // booleans
     fog: number
@@ -67,6 +68,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 title={title}
                 onChange={optionToggler(option)}
                 onEnter={this.props.newGame}
+                blockTabbing={advanced ? !this.isShowAdvanced() : false}
             />
         )
 
@@ -83,8 +85,10 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 <div className="Row">
                     <div className="Basic Column">
                         {numberInput(
-                            'Players', 'numPlayers', 1, 12, 'How many players?\n'
-                            + 'One will be you, and the others very stupid AIs.'
+                            'Robots', 'numRobots', 0, 11, 'How many AI opponents?'
+                        )}
+                        {numberInput(
+                            'Difficulty', 'difficulty', 0, 3, 'How smart should those robots be?'
                         )}
                         {numberInput('Width', 'boardWidth', 1, 29, 'How many tiles wide?')}
                         {numberInput('Height', 'boardHeight', 2, 15, 'How many tiles tall?')}

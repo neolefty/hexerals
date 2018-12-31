@@ -18,7 +18,7 @@ const WALL_W = HEX_HALF_HEIGHT / 2  // half the width of the house body
 const WALL_H = WALL_W * 9 / 13  // half the height of the house body
 const ROOF_W = WALL_H  // eaves
 const ROOF_H = WALL_W * 15 / 13  // attic
-const Y_OFFSET = WALL_H / 2  // shift
+const Y_OFFSET = WALL_H * 0.6  // shift down
 const y = Y_OFFSET
 // const houseLL = new CartPair(-WALL_W, y + WALL_H)
 // const houseLR = new CartPair(WALL_W, y + WALL_H)
@@ -55,9 +55,9 @@ terrainShaders.set(
 
 { // castle
     const [ w, h, doorW, doorH ] = [ 9, 16, 2.5, 11 ]
-    const [ crenH, flagH ] = [ 5, 11 ]
+    const [ crenH, flagH ] = [ 5, 13 ]
     const [ flagW, flagM ] = [ flagH * 0.7, flagH * 0.3 ]
-    const dy = 3 // shift down
+    const dy = 4 // shift down
 
     const ur = new CartPair(w, -h + dy)
     const lr = new CartPair(w, h + dy)

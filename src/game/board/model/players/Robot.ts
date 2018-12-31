@@ -15,3 +15,10 @@ export interface Robot {
         curMoves?: List<PlayerMove>,
     ): GameDecision | undefined
 }
+
+export const gameDecisionToString = (gd: GameDecision): string =>
+    `${
+        gd.makeMoves ? `moves: ${gd.makeMoves.toString()}` : ''
+    } ${
+        gd.cancelMoves ? `cancel: ${gd.cancelMoves}` : ''
+    }`

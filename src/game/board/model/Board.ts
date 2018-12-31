@@ -35,6 +35,7 @@ export class BoardRules {
 }
 
 export type TileFilter = (tile: Tile) => boolean
+export type TileSideEffect = (hex: Hex, tile: Tile) => void
 
 export class Board {
     static readonly DEFAULT_ARRANGERS: Arranger[] = [new RandomPlayerArranger()]
@@ -90,7 +91,8 @@ export class Board {
     get edges(): RectEdges { return this.rules.edges }
     get popStepper(): PopStepper { return this.rules.stepper }
 
-    inBounds = (coord: Hex) => this.constraints.inBounds(coord)
+    inBounds = (hex: Hex | undefined) =>
+        !!(hex && this.constraints.inBounds(hex))
 
     canBeOccupied = (coord: Hex) =>
         this.inBounds(coord) && this.getTile(coord).canBeOccupied()
@@ -115,6 +117,19 @@ export class Board {
         this.hexesAll.filter(
             hex => !!(hex && filter(this.getTile(hex)))
         ) as Set<Hex>
+
+    forNeighborsInBounds(hex: Hex, sideEffect: TileSideEffect) {
+        hex.neighbors.filter(
+            neighbor => this.inBounds(neighbor)
+        ).forEach(
+            inBounds => sideEffect(inBounds, this.getTile(inBounds))
+        )}
+
+    forOccupiableTiles(sideEffect: TileSideEffect) {
+        this.hexesOccupiable.forEach(hex => {
+            sideEffect(hex, this.getTile(hex))
+        })
+    }
 
     getTile(coord: Hex): Tile {
         assert(this.inBounds(coord))

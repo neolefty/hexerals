@@ -10,9 +10,8 @@ it('fogs the board for a player', () => {
     const fog = new PlayerFog(Player.Zero)
     const fogged = fog.fog(brt.state).board
     expect(fogged.getTile(Hex.ORIGIN).known).toBeTruthy()
-    Hex.ORIGIN.neighbors.filter(hex =>
-        brt.board.inBounds(hex)).forEach(hex =>
-            expect(fogged.getTile(hex).known).toBeTruthy())
+    fogged.forNeighborsInBounds(Hex.ORIGIN, (hex, tile) =>
+        expect(tile.known).toBeTruthy())
     const upUpUp = Hex.ORIGIN.plus(Hex.UP.times(2))
     expect(fogged.getTile(upUpUp).known).toBeFalsy()
     // where Player.One starts — fogged city

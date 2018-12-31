@@ -138,10 +138,10 @@ export class Hex {
     // tslint:disable-next-line:member-ordering
     static readonly COS_30 = Math.cos(Math.PI / 6)
     // the actual y coordinate, corrected for hexagon heights
-    get cartYExact(): number {
+    get cartYGeo(): number {
         return this.cartY * 0.5
     }
-    get cartXExact(): number {
+    get cartXGeo(): number {
         return this.cartX * Hex.COS_30
     }
 
@@ -153,24 +153,30 @@ export class Hex {
     get degrees(): number {
         if (this._degrees < 360)
             this._degrees =
-                (Math.atan2(this.cartYExact, this.cartXExact) * 180 / Math.PI + 360) % 360
+                (Math.atan2(this.cartYGeo, this.cartXGeo) * 180 / Math.PI + 360) % 360
         return this._degrees
     }
 
-    toString(includeCart: boolean = true, includeExact: boolean = false): string {
-        return `[${ this.x },${ this.y },${ this.z }]${
-            includeCart ? ' ' + this.toCartString() : ''
+    toString(includeCart: boolean = true, includeHex: boolean = false, includeGeo: boolean = false): string {
+        return `${
+            includeHex ? this.toHexString() + ' ' : ''
         }${
-            includeExact ? ' ' + this.toExactString() : ''
+            includeCart ? this.toCartString() : ''
+        }${
+            includeGeo ? ' ' + this.toGeoString() : ''
         }`;
+    }
+
+    toHexString() {
+        return `[${ this.x },${ this.y },${ this.z }]`
     }
 
     toCartString() {
         return `(${this.cartX},${this.cartY})`;
     }
 
-    toExactString() {
-        return `(${this.cartXExact},${this.cartYExact})`;
+    toGeoString() {
+        return `(${this.cartXGeo},${this.cartYGeo})`;
     }
 
     // Private constructor: access instances through get() or getCart().

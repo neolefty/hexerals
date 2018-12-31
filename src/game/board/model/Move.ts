@@ -50,4 +50,10 @@ export class PlayerMove {
     public toString(): string {
         return `${this.player} ${this.move}`
     }
+
+    equals(that: PlayerMove) {
+        return this.player === that.player
+            && this.source === that.source
+            && this.delta === that.delta
+    }
 }

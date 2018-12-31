@@ -1,5 +1,5 @@
 import {Player} from './players/Players'
-import {canBeOccupied, Terrain} from './Terrain';
+import {canBeOccupied, growsFast, Terrain} from './Terrain';
 
 // contents of a space on the board
 export class Tile {
@@ -48,8 +48,11 @@ export class Tile {
         }
     }
 
-    // member functions instead of function properties to avoid messing up ==
+    // member functions instead of function properties to avoid messing up .equals
+    // not a mountain
     canBeOccupied(): boolean { return canBeOccupied(this.terrain) }
+    // city or capital
+    growsFast(): boolean {return growsFast(this.terrain) }
     setPop(pop: number): Tile { return new Tile(this.owner, pop, this.terrain) }
     incrementPop(): Tile { return this.setPop(this.pop + 1) }
     setOwner(owner: Player): Tile { return new Tile(owner, this.pop, this.terrain) }
