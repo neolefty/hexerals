@@ -38,37 +38,46 @@ const dirs = Map<Hex, TileAndText>([
 ])
 
 export const Help = (props: HelpOptions) => {
-    const d = Math.min(props.displaySize.x - 50, props.displaySize.y - 120)
+    const size = Math.min(props.displaySize.x - 50, props.displaySize.y - 160)
     return (
         <div
-            className="Help"
+            className="Help Row"
             style={{
                 width: props.displaySize.x,
                 height: props.displaySize.y,
             }}
         >
-            <svg
-                width={d}
-                height={d * (h / w)}
-                viewBox={[-46, 51, w + 2, h + 2].join(',')}
-            >
-                {
-                    dirs.keySeq().map((hex: Hex) => (
-                        <TileHexView
-                            key={hex.id}
-                            tile={dirs.get(hex).tile}
-                            hex={hex}
-                            selected={false}
-                            viewBoxHeight={h}
-                            color={dirs.get(hex).color}
-                            text={dirs.get(hex).text}
-                            textColor={DriftColor.WHITE}
-                        />
-                    ))}
-            </svg>
-            <p>z — cancel 1 move</p>
-            <p>x — cancel all moves</p>
-            <p>esc — end game</p>
+            <div className="Column">
+                <p><strong>click and drag to move, or:</strong></p>
+                <p><hr/></p>
+                <p>movement keys ⟶</p>{/* ➡ ⇨ */}
+                <p>end game — esc</p>
+                <p>cancel 1 move — z</p>
+                <p>cancel all moves — x</p>
+                <p><hr/></p>
+                <p>phone & tablet support<br/>coming <em>soon</em></p>
+            </div>
+            <div className="Column">
+                <svg
+                    width={size}
+                    height={size * (h / w)}
+                    viewBox={[-46, 51, w + 2, h + 2].join(',')}
+                >
+                    {
+                        dirs.keySeq().map((hex: Hex) => (
+                            <TileHexView
+                                key={hex.id}
+                                tile={dirs.get(hex).tile}
+                                hex={hex}
+                                selected={false}
+                                viewBoxHeight={h}
+                                color={dirs.get(hex).color}
+                                text={dirs.get(hex).text}
+                                textColor={DriftColor.WHITE}
+                            />
+                        ))}
+                </svg>
+            </div>
         </div>
     )
 }

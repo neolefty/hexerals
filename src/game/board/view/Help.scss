@@ -1,10 +1,12 @@
 .Help {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   p {
+    width: 100%;
     font-size: 140%;
-    margin: 0.5em 0 0 0;
+    margin: 0.2em 3em 0.2em 0;
+    text-align: right;
+    strong {
+      font-size:150%;
+      //text-decoration: underline;
+    }
   }
 }
