@@ -1,15 +1,15 @@
-import * as React from 'react';
+import * as React from 'react'
 
-// import hsluv from 'hsluv';
-import './ColorWheel.css';
-import {ColorsActions, ColorsProps, ColorsState} from './ColorsContainer';
+// import hsluv from 'hsluv'
+import './ColorWheel.css'
+import {ColorsActions, ColorsProps, ColorsState} from './ColorsReducer'
 
 export interface ColorWheelProps extends ColorsState, ColorsActions, ColorsProps {
 }
 
 export class ColorWheel extends React.PureComponent<ColorWheelProps> {
     render(): React.ReactNode {
-        const onlyOne = this.props.colors.driftColors.size === 1;
+        const onlyOne = this.props.colors.driftColors.size === 1
         return (
             <svg
                 width={this.props.displaySize.min}
@@ -21,15 +21,15 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                         const wedgeStyle = {
                             // stroke: driftColor.toHex(),
                             fill: driftColor.toHexString(),
-                        };
-                        const r1 = 2.5; // inner radius fraction (2 = half, 3 = third)
-                        const r2 = 0.5; // outer radius fraction
-                        const rText = 2.3; // text radius fraction
-                        const delta = Math.PI * 2 / this.props.colors.driftColors.size;
-                        const a = delta * i, b = delta * (i + 1), m = (a + b) / 2;
+                        }
+                        const r1 = 2.5 // inner radius fraction (2 = half, 3 = third)
+                        const r2 = 0.5 // outer radius fraction
+                        const rText = 2.3 // text radius fraction
+                        const delta = Math.PI * 2 / this.props.colors.driftColors.size
+                        const a = delta * i, b = delta * (i + 1), m = (a + b) / 2
                         const cosA = Math.cos(a), cosB = Math.cos(b),
                             sinA = Math.sin(a), sinB = Math.sin(b),
-                            cosM = Math.cos(m), sinM = Math.sin(m);
+                            cosM = Math.cos(m), sinM = Math.sin(m)
                         const points = onlyOne
                             ? `1,1 -1,1 -1,-1 1,-1` // fill square if only one color
                             : `${cosA / r2},${sinA / r2}` // otherwise wedges
@@ -37,12 +37,12 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                             + ` ${cosB / r2},${sinB / r2}`
                             + ` ${cosB / r1},${sinB / r1}`
                             + ` ${cosM / r1},${sinM / r1}`
-                            + ` ${cosA / r1},${sinA / r1}`;
-                        const textX = cosM / rText;
-                        const textY = sinM / rText;
+                            + ` ${cosA / r1},${sinA / r1}`
+                        const textX = cosM / rText
+                        const textY = sinM / rText
                         const textStyle = {
                             fill: driftColor.contrast().toHexString(),
-                        };
+                        }
                         return (
                             <g
                                 className="colorWedge"
@@ -65,7 +65,7 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                                     {driftColor.cie.toLchString()}
                                 </text>
                             </g>
-                        );
+                        )
                     })
                 }
                 <g className="addColor">
@@ -90,6 +90,6 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                     </text>
                 </g>
             </svg>
-        );
+        )
     }
 }

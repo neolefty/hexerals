@@ -5,7 +5,7 @@ import {combineReducers, createStore} from 'redux';
 import App, {AppState} from './common/App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
-import {ColorsReducer} from './color/ColorsContainer';
+import {ColorsReducer} from './color/ColorsReducer';
 import {CycleReducer} from './game/board/model/CycleReducer';
 
 /* eslint-disable no-underscore-dangle */

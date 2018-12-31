@@ -9,12 +9,26 @@ export class ColorPodge {
         [-1, 0, 0], [0, -3, 0], [0, 0, -1], [1, 0, 0], [0, 3, 0], [0, 0, 1],
     ];
 
+    // The poor programmer's version, but still
+    static readonly ANNEAL = [16, 13, 10, 7, 5, 5, 3, 3, 2, 1, 1]
+
     static MAX_DISPERSION_HISTORY = 320;
     static SETTLED_THRESHOLD = 150;
 
+    static construct = (numColors: number, anneal: boolean = true) => {
+        let result = new ColorPodge()
+        while (result.driftColors.size < numColors)
+            result = result.addRandomColor()
+        if (anneal)
+            ColorPodge.ANNEAL.forEach(
+                x => result = result.disperse(x)
+            )
+        return result
+    }
+
     constructor(
         readonly driftColors: List<DriftColor> = List(),
-        readonly neverSettle: boolean = false,
+        readonly neverSettle: boolean = true,
         // if these aren't set, tracking settling is reset
         readonly settled: boolean = false,  // has dispersion settled down?
         // history of the last few closestTwo score

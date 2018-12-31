@@ -86,7 +86,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                             'Players', 'numPlayers', 1, 12, 'How many players?\n'
                             + 'One will be you, and the others very stupid AIs.'
                         )}
-                        {numberInput('Width', 'boardWidth', 1, 23, 'How many tiles wide?')}
+                        {numberInput('Width', 'boardWidth', 1, 29, 'How many tiles wide?')}
                         {numberInput('Height', 'boardHeight', 2, 15, 'How many tiles tall?')}
                     </div>
                     <div className="Advanced Column">

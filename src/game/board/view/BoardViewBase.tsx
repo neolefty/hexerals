@@ -13,6 +13,7 @@ export interface BoardViewActions {
     onCancelMoves: (player: Player, count: number) => void
     onPlaceCursor: (position: Hex) => void
     onEndGame: () => void
+    onResetColors: (n: number) => void
 }
 
 export interface BoardViewProps extends BoardViewActions {
@@ -29,3 +30,13 @@ export class BoardViewBase extends React.PureComponent<BoardViewProps> {
         this.keyboardController = new BoardKeyboardController(this)
     }
 }
+
+export const BOARD_STUBS = ({
+    /* tslint:disable */
+    onPlaceCursor: () => {},
+    onQueueMoves: () => {},
+    onCancelMoves: () => {},
+    onEndGame: () => {},
+    onResetColors: () => {},
+    /* tslint:enable */
+})

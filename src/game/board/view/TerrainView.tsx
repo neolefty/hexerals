@@ -22,7 +22,7 @@ export const TerrainView = (props: TerrainViewProps): JSX.Element => {
                         key={index}
                         style={{
                             stroke: 'none',
-                            fill: props.color.texture(shader(index)).toHexString(),
+                            fill: shader(index, props.color).toHexString(),
                         }}
                     />
                 ))

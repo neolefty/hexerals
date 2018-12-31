@@ -23,8 +23,8 @@ export const INITIAL_CYCLE_STATE: CycleState = {
     localOptions: {
         numPlayers: 6,
         tickMillis: 500,
-        boardWidth: 11,
-        boardHeight: 7,
+        boardWidth: 17,
+        boardHeight: 9,
         mountainPercent: 30,
         // booleans — non-zero is true
         fog: 1,

@@ -12,7 +12,7 @@ import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {Hex} from '../model/Hex'
 import {MovementQueue} from '../model/MovementQueue'
-import {BoardViewProps} from './BoardViewBase'
+import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import {StupidRobot} from '../model/players/StupidRobot'
 import {SpreadPlayersArranger} from '../model/PlayerArranger';
 import {YMountainArranger} from '../model/YMountainArranger';
@@ -38,15 +38,6 @@ class BenchmarkRun {
         readonly endTime: number,
         readonly boardState: BoardState,
     ) {}
-}
-
-const createColors = () => {
-    let result = new ColorPodge()
-    while (result.driftColors.size < NUM_PLAYERS)
-        result = result.addRandomColor()
-    const dispersions = [16, 13, 10, 7, 5, 5, 3, 3, 2, 1, 1]
-    dispersions.forEach(x => result = result.disperse(x))
-    return playerColors(result)
 }
 
 const assignRobots = (): PlayerManager => {
@@ -76,18 +67,13 @@ const newBoardState = (
 
 // the parts of BoardViewProps that don't change — everything except boardState: BoardState
 const staticBoardViewProps: BoardViewProps = {
+    ...BOARD_STUBS,
+
     // static parts that don't change
     displaySize: new CartPair(1000, 700),
-    colors: createColors(),
+    colors: playerColors(ColorPodge.construct(NUM_PLAYERS)),
 
-    /* tslint:disable */
-    onEndGame: () => {},
-    onCancelMoves: () => {},
-    onQueueMoves: () => {},
-    onPlaceCursor: () => {},
-    /* tslint:enable */
-
-    // replace this with an actual boardState
+    // this gets replaced Run is clicked
     boardState: newBoardState(1, 1)
 }
 

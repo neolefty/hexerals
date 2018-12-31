@@ -22,6 +22,11 @@ export class HexBoardView extends BoardViewBase {
         this.filterNobody = this.filterNobody.bind(this)
         this.filterPlayers = this.filterPlayers.bind(this)
         this.filterCursor = this.filterCursor.bind(this)
+        if (
+            !this.props.colors
+            || this.props.colors.size !== this.props.boardState.players.size
+        )
+            this.props.onResetColors(this.props.boardState.players.size)
     }
 
     filterNobody(hex: Hex): boolean {

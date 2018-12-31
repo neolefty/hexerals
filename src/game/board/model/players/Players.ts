@@ -40,6 +40,10 @@ export class PlayerManager {
         readonly playerRobots: Map<Player, Robot>,
     ) {}
 
+    get size() {
+        return this.playerIndexes.size
+    }
+
     setRobot(player: Player, robot: Robot | undefined): PlayerManager {
         return robot
             ? new PlayerManager(

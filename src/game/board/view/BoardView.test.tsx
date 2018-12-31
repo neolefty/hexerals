@@ -8,7 +8,7 @@ import {queueMovesAction,} from '../model/BoardReducer'
 import {Board} from '../model/Board'
 import {Hex} from '../model/Hex'
 import CartPair from "../../../common/CartPair"
-import {BoardViewBase} from "./BoardViewBase"
+import {BoardViewBase, BOARD_STUBS} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
@@ -49,13 +49,9 @@ it('renders a board with no selection', () => {
         messages: List(),
     }
     const view = enzyme.render(
-        <OldGridView
+        <OldGridView {...BOARD_STUBS}
             boardState={boardState}
             displaySize={new CartPair(1000, 1000)}
-            onPlaceCursor={() => {}}
-            onQueueMoves={() => {}}
-            onCancelMoves={() => {}}
-            onEndGame={() => {}}
         />
     )
     expect(view.children().length).toEqual(n)  // n rows
@@ -85,13 +81,9 @@ it('renders a board with a selection', () => {
         messages: List(),
     }
     const view = enzyme.render(
-        <OldGridView
+        <OldGridView  {...BOARD_STUBS}
             boardState={bs}
             displaySize={new CartPair(1000, 1000)}
-            onPlaceCursor={() => {}}
-            onQueueMoves={() => {}}
-            onCancelMoves={() => {}}
-            onEndGame={() => {}}
         />
     )
     const active = view.find('.active')

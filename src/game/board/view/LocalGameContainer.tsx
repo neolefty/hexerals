@@ -16,6 +16,7 @@ import {PlayerMove} from '../model/Move'
 import {TickerBoardView} from './TickerBoardView';
 import {LocalGameOptions} from './LocalGameOptions';
 import {CacheMap} from '../../../common/CacheMap';
+import {setColorsAction} from '../../../color/ColorsReducer';
 
 export interface LocalGameProps {
     displaySize: CartPair
@@ -23,13 +24,10 @@ export interface LocalGameProps {
     localOptions: LocalGameOptions
 }
 
-// TODO stop updating if colors stabilize
 export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
     const result = Map<Player, DriftColor>().asMutable()
-    // console.log(`podge = ${colors} -- ${colors.driftColors}`)
     colors.driftColors.forEach(
         (value: DriftColor, key: number) => {
-            // console.log(`   - ${key} -- ${PLAYERS.get(key)} -- ${value.cie}`)
             result.set(PLAYERS.get(key), value)
         }
     )
@@ -44,19 +42,6 @@ export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> 
         playerColorsCache.set(colors, playerColors(colors))
     return playerColorsCache.get(colors) as Map<Player, DriftColor>
 }
-
-// export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
-//     // use cache to avoid mutating if colors stabilize
-//     if (!playerColorsCache.has(colors)) {
-//         const result = Map<Player, DriftColor>().asMutable()
-//         colors.driftColors.forEach(
-//             (value: DriftColor, key: number) =>
-//                 result.set(PLAYERS.get(key), value)
-//         )
-//         playerColorsCache.set(colors, result.asImmutable())
-//     }
-//     return playerColorsCache.get(colors) as Map<Player, DriftColor>
-// }
 
 const mapStateToTickerBoardViewProps = (
     state: AppState, ownProps: LocalGameProps
@@ -83,7 +68,10 @@ const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
         dispatch(robotsDecideAction())
         dispatch(doMovesAction())
         dispatch(stepPopAction())
-    }
+    },
+    onResetColors: (n: number) => {
+        dispatch(setColorsAction(ColorPodge.construct(n)))
+    },
 })
 
 export const LocalGameContainer = connect(

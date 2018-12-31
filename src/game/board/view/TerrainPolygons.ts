@@ -3,11 +3,13 @@ import {Tile} from '../model/Tile';
 import {Map} from 'immutable';
 import CartPair from '../../../common/CartPair';
 import {Terrain} from '../model/Terrain';
+import {DriftColor} from '../../../color/DriftColor';
 
 // how much contrast to give for each line in a terrain's set of polygons
-type Shader = (index: number) => number
+type Shader = (lineIndex: number, color: DriftColor) => DriftColor
 
-const UNKNOWN_SHADER = (index: number) => (index % 2 + 2) * 4 // faded
+const UNKNOWN_SHADER: Shader = (index, color) =>
+    color.texture((index % 2 + 2) * 4) // faded
 
 const terrainPolygons = Map<Terrain, string[]>().asMutable()
 const terrainShaders = Map<Terrain, Shader>().asMutable()
@@ -31,7 +33,8 @@ terrainPolygons.set(Terrain.City, [
     `${-WALL_W * .4},${y + WALL_H} ${-WALL_W * .4},${y - WALL_H * .6}`
     + ` ${WALL_W * .4},${y - WALL_H * .6} ${WALL_W * .4},${y + WALL_H}`,
 ])
-const CITY_SHADER = (index: number) => (index % 2 + 2) * 7
+const CITY_SHADER: Shader = (index, color) =>
+    color.texture((index % 2 + 2) * 7)
 terrainShaders.set(Terrain.City, CITY_SHADER)
 
 // mtnLeft and mtnRight are points along the left and right lower segments
@@ -46,14 +49,15 @@ terrainPolygons.set(Terrain.Mountain, [
     `${mtnMidBottom} ${HEX_LR_XY} ${mtnRight} 8,-13 3,-15`,
 ])
 terrainShaders.set(
-    Terrain.Mountain, (index: number) => (index % 2 + 2) * 10
+    Terrain.Mountain, (index, color) =>
+        color.texture((index % 2 + 2) * 10)
 )
 
 { // castle
     const [ w, h, doorW, doorH ] = [ 9, 16, 2.5, 11 ]
     const [ crenH, flagH ] = [ 5, 11 ]
     const [ flagW, flagM ] = [ flagH * 0.7, flagH * 0.3 ]
-    const dy = 5 // shift down
+    const dy = 3 // shift down
 
     const ur = new CartPair(w, -h + dy)
     const lr = new CartPair(w, h + dy)
@@ -87,6 +91,11 @@ terrainShaders.set(
             + ` ${ul.plus(crenR4).plus(crenD)} ${ul.plus(crenR4)}`,
         `${doorUL} ${doorLL} ${doorLR} ${doorUR}`,
     ])
+    terrainShaders.set(Terrain.Capital, (index, color) =>
+        (index === 0)
+            ? color.contrast()
+            : CITY_SHADER(index, color)
+    )
 }
 
 export const getTerrainPolygons = (tile: Tile): string[] | undefined =>
