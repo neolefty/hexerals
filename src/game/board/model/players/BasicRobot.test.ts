@@ -117,7 +117,7 @@ it('control — IQ 0 vs self', () => {
     const robot = BasicRobot.byIntelligence(0)
     const control = countAWins(robot, robot)
     console.log(`Dumb vs dumb: ${control}/${robotTrials}`)
-    expect(control).toBeGreaterThanOrEqual(robotTrials * 0.4)
+    expect(control).toBeGreaterThanOrEqual(robotTrials * 0.35)
 })
 
 it('IQ 1 not lose too much', () => {
