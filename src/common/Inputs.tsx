@@ -11,6 +11,8 @@ export interface NumberInputProps {
 
     onChange: (x: number) => void
     onEnter: () => void
+
+    children?: JSX.Element | JSX.Element[];
 }
 
 const minMax = (x: number, min: number, max: number) =>
@@ -26,6 +28,7 @@ export const NumberInput = (props: NumberInputProps) => (
         className="IntInput"
         title={props.title}
     >
+        {props.children}
         {props.label}
         <input
             type="number"

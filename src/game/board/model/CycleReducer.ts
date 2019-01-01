@@ -27,6 +27,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         difficulty: 0,
         mountainPercent: 30,
         tickMillis: 500,
+        startingPop: 0,
         // booleans — non-zero is true
         fog: 1,
         capitals: 1,
@@ -86,7 +87,7 @@ const openLocalGameReducer =
         players,
         [
             new SpreadPlayersArranger(
-                state.localOptions.capitals === 0 ? Terrain.City : Terrain.Capital
+                state.localOptions.capitals === 0 ? Terrain.City : Terrain.Capital, state.localOptions.startingPop,
             ),
             new RandomTerrainArranger(mountainFrequency),
         ],

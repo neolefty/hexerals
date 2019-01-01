@@ -66,7 +66,9 @@ export class BasicRobotSettings {
 
 export class BasicRobot implements Robot {
     static byIntelligence(intelligence: number): BasicRobot {
-        return new BasicRobot(BasicRobotSettings.byIntelligence(intelligence))
+        const result = new BasicRobot(BasicRobotSettings.byIntelligence(intelligence))
+        console.log(result.toString())
+        return result
     }
 
     static byArray(booleans: boolean[]) {
@@ -91,10 +93,10 @@ export class BasicRobot implements Robot {
             const nextMove = curMoves.get(0) as PlayerMove
             const source = bs.board.getTile(nextMove.source)
             const dest = bs.board.getTile(nextMove.dest)
-
             let cancel = false
+
             // avoid losing battles?
-            if (this.settings.wasteNot && !canCapture(source, dest))
+            if (this.settings.wasteNot && !canMoveInto(source, dest))
                 cancel = true
 
             if (this.settings.stopByCities) {
@@ -192,7 +194,7 @@ export class BasicRobot implements Robot {
                         if (!board.canBeOccupied(dest)) return false
                         if (this.settings.wasteNot) { // don't queue a move you'll regret
                             const destTile = board.getTile(dest)
-                            if (destTile.owner !== player && !canCapture(sourceTile, destTile))
+                            if (!canMoveInto(sourceTile, destTile))
                                 return false
                         }
                         return true;
@@ -205,7 +207,7 @@ export class BasicRobot implements Robot {
     }
 }
 
-const canCapture = (sourceTile?: Tile, destTile?: Tile): boolean =>
-    !!(sourceTile && destTile)
-    && destTile.owner !== sourceTile.owner
-    && destTile.pop < sourceTile.pop - 1
+// can capture or merge
+const canMoveInto = (sourceTile: Tile, destTile: Tile): boolean =>
+    destTile.owner === sourceTile.owner
+    || sourceTile.pop + 2 >= destTile.pop

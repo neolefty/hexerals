@@ -16,27 +16,47 @@
 }
 
 .LocalGameOptionsView {
+  .IntInput, .CheckInput {
+    white-space: nowrap;
+  }
+  
+  div {
+    text-align: center;
+  }
+
   input {
     font-size: 100%;
     text-align: right;
   }
 
-  .Advanced {
+  .Level1, .Level2 {
     transition: all 400ms;
+  }
 
-    .IntInput {
-      white-space: nowrap;
+  &.Show0 {
+    .Level1, .Level2 {
+      transform: scaleX(0);
+      opacity: 0;
+      width: 0;
     }
   }
 
-  &.ShowAdvanced .Advanced {
-    width: 8em;  // because auto doesn't animate
-    opacity: 100%;
+  &.Show1 {
+    .Level1 {
+      width: 8.5em;  // because auto doesn't animate
+      opacity: 1;
+    }
+    .Level2 {
+      transform: scaleX(0);
+      opacity: 0;
+      width: 0;
+    }
   }
 
-  &.HideAdvanced .Advanced {
-    transform: scaleX(0);
-    opacity: 0;
-    width: 0;
+  &.Show2 {
+    .Level1, .Level2 {
+      width: 8.5em;  // because auto doesn't animate
+      opacity: 1;
+    }
   }
 }

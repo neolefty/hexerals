@@ -53,7 +53,7 @@ it('captures nearby', () => {
     }
 })
 
-it ('wastes not', () => {
+it('wastes not', () => {
     for (let i = 0; i < 20; ++i) {
         const brt = new BoardReducerTester(3, 2)
         brt.setRobot(Player.Zero, makeIqOne(1))
@@ -65,6 +65,10 @@ it ('wastes not', () => {
         // Zero never attacked One because it would lose
         expect(brt.getTile(brt.ur).pop === 20)
     }
+})
+
+it('stops by cities', () => {
+    throw 'nyi'
 })
 
 // TODO specific tests for stops partway & stops by cities

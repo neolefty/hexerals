@@ -14,6 +14,7 @@ export interface LocalGameOptions {
     boardHeight: number
     mountainPercent: number
     difficulty: number
+    startingPop: number
 
     // booleans
     fog: number
@@ -35,8 +36,13 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
     private toggleOption = (optionName: string) =>
         this.props.changeLocalOption(optionName, this.isOption(optionName) ? 0 : 1)
 
-    isShowAdvanced = () => this.isOption('showAdvanced')
-    toggleAdvanced = () => this.toggleOption('showAdvanced')
+    isShowAdvanced = (level: number) =>
+        this.props.localOptions.showAdvanced >= level
+    toggleAdvanced = () =>
+        this.props.changeLocalOption(
+            'showAdvanced',
+            (this.props.localOptions.showAdvanced + 1) % 3 // 0, 1, 2
+        )
 
     render(): React.ReactNode {
         const optionChanger = (name: string) =>
@@ -46,7 +52,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
 
         const numberInput = (
             label: string, option: string, min: number, max: number, title: string,
-            advanced: boolean = false,
+            advanced: number = 0, children?: JSX.Element | JSX.Element[],
         ) => (
             <NumberInput
                 label={label}
@@ -56,12 +62,13 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 max={max}
                 onChange={optionChanger(option)}
                 onEnter={this.props.newGame}
-                blockTabbing={advanced ? !this.isShowAdvanced() : false}
+                blockTabbing={this.isShowAdvanced(advanced)}
+                children={children}
             />
         )
 
         const checkInput = (
-            label: string, option: string, title: string, advanced: boolean = false
+            label: string, option: string, title: string, advanced: number = 0
         ) => (
             <CheckInput
                 label={label}
@@ -69,14 +76,14 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 title={title}
                 onChange={optionToggler(option)}
                 onEnter={this.props.newGame}
-                blockTabbing={advanced ? !this.isShowAdvanced() : false}
+                blockTabbing={this.isShowAdvanced(advanced)}
             />
         )
 
         return (
             <div
-                className={`LocalGameOptionsView Column ${
-                    this.isShowAdvanced() ? 'ShowAdvanced' : 'HideAdvanced'
+                className={`LocalGameOptionsView Column Show${
+                    this.props.localOptions.showAdvanced
                 }`}
                 style={{
                     width: this.props.displaySize.x,
@@ -84,38 +91,33 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 }}
             >
                 <div className="Row">
-                    <div className="Basic Column">
-                        {numberInput(
-                            'Robots', 'numRobots', 0, 11, 'How many AI opponents?'
-                        )}
-                        {numberInput(
-                            'Difficulty', 'difficulty', 0, BasicRobotSettings.MAX_INTELLIGENCE, 'How smart should those robots be?'
-                        )}
+                    <div className="Level0 Column">
+                        {numberInput('Robots', 'numRobots', 0, 11, 'How many AI opponents?')}
+                        {numberInput('Difficulty', 'difficulty', 0, BasicRobotSettings.MAX_INTELLIGENCE, 'How smart should those robots be?')}
                         {numberInput('Width', 'boardWidth', 1, 29, 'How many tiles wide?')}
                         {numberInput('Height', 'boardHeight', 2, 15, 'How many tiles tall?')}
                     </div>
-                    <div className="Advanced Column">
-                        {numberInput(
-                            'Mountains', 'mountainPercent', 0, 50,
-                            'Percent of the map covered by mountains', true
-                        )}
-                        {numberInput(
-                            'Tick', 'tickMillis', 1, 9999,
-                            'Milliseconds between turns', true
-                        )}
-                        {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', true)}
-                        {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', true)}
+                    <div className="Level1 Column">
+                        {numberInput('Mountains', 'mountainPercent', 0, 50, 'Percent of the map covered by mountains', 1)}
+                        {numberInput('Tick', 'tickMillis', 1, 9999, 'Milliseconds between turns', 1)}
+                        {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
+                        {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
+                    </div>
+                    <div className="Level2 Column">
+                        {numberInput('', 'startingPop', 0, 1000000, 'Population of your initial tile.', 2, (
+                            <div><span>Starting</span><br/><span>Population</span></div>
+                        ))}
                     </div>
                     <div>
                         <button
                             onClick={this.toggleAdvanced}
-                            title={
-                                this.isShowAdvanced()
-                                    ? 'Hide advanced options'
-                                    : 'Show advanced options'
-                            }
+                            title={[
+                                'Show advanced options',
+                                'Show more advanced options',
+                                'Hide advanced options',
+                            ][this.props.localOptions.showAdvanced]}
                         >
-                            {this.isShowAdvanced() ? '<<<' : '>>>'}
+                            {['>>>', '>>>', '<<<'][this.props.localOptions.showAdvanced]}
                         </button>
                     </div>
                 </div>
