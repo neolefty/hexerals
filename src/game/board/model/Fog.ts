@@ -12,7 +12,10 @@ export class PlayerFog {
     // doesn't include empty terrain
     private seenBefore = Set<Hex>().asMutable()
 
-    constructor(readonly player: Player) {}
+    constructor(
+        readonly player: Player,
+        readonly showAllIfLose: boolean,
+    ) {}
 
     fog(global: BoardState): BoardState {
         if (this.prevFog && global === this.prevGlobal)
@@ -34,8 +37,12 @@ export class PlayerFog {
     }
 
     private fogBoard(board: Board) {
-        // copy visible explicitTiles — owned by or neighboring player's explicitTiles
+        // copy visible tiles — owned by or neighboring player's tiles
         const ownedHexes = board.filterTiles(tile => tile.owner === this.player)
+        const lost = ownedHexes.size === 0
+        if (lost && this.showAllIfLose)
+            return board
+
         this.seenBefore = this.seenBefore.union(ownedHexes).asMutable()
         const fogTiles = Map<Hex, Tile>().asMutable()
         const canSee = (hex: Hex) => {

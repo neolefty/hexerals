@@ -23,7 +23,10 @@ export class FogBoardView extends React.PureComponent<FogBoardProps, FogBoardSta
         // with Nobody, whole map will be fogged
         const curPlayer: Player = this.props.boardState.curPlayer || Player.Nobody
         if (!this.state.fogsCache.has(curPlayer))
-            this.state.fogsCache.set(curPlayer, new PlayerFog(curPlayer))
+            this.state.fogsCache.set(
+                curPlayer,
+                new PlayerFog(curPlayer, true)
+            )
         return this.state.fogsCache.get(curPlayer) as PlayerFog
     }
 

@@ -7,7 +7,7 @@ import {Terrain} from './Terrain';
 
 it('fogs the board for a player', () => {
     const brt = new BoardReducerTester(5, 5)
-    const fog = new PlayerFog(Player.Zero)
+    const fog = new PlayerFog(Player.Zero, true)
     const fogged = fog.fog(brt.state).board
     expect(fogged.getTile(Hex.ORIGIN).known).toBeTruthy()
     Hex.ORIGIN.neighbors.forEach(hex => {
