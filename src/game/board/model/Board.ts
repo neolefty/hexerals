@@ -43,7 +43,7 @@ export class Board {
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
-        // there may be blank tiles not listed here -- see allTiles
+        // there may be blank explicitTiles not listed here -- see allTiles
         explicitTiles: Map<Hex, Tile> = Map(),
     ) {
         return new Board(
@@ -82,7 +82,7 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // empty tiles are implied — see this.hexesAll
+        // empty explicitTiles are implied — see this.hexesAll
         readonly explicitTiles: Map<Hex, Tile>,
     ) {}
 
@@ -97,7 +97,7 @@ export class Board {
     canBeOccupied = (coord: Hex) =>
         this.inBounds(coord) && this.getTile(coord).canBeOccupied()
 
-    // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
+    // All of this board's possible explicitTiles. Note that this.explicitTiles omits some blanks.
     get hexesAll(): Set<Hex> {
         return this.constraints.all()
     }
@@ -118,11 +118,11 @@ export class Board {
             hex => !!(hex && filter(this.getTile(hex)))
         ) as Set<Hex>
 
-    forNeighborsInBounds(hex: Hex, sideEffect: TileSideEffect) {
+    forNeighborsOccupiable(hex: Hex, sideEffect: TileSideEffect) {
         hex.neighbors.filter(
-            neighbor => this.inBounds(neighbor)
+            neighbor => this.hexesOccupiable.has(neighbor)
         ).forEach(
-            inBounds => sideEffect(inBounds, this.getTile(inBounds))
+            occ => sideEffect(occ, this.getTile(occ))
         )}
 
     forOccupiableTiles(sideEffect: TileSideEffect) {

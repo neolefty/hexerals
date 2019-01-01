@@ -34,7 +34,7 @@ export class PlayerFog {
     }
 
     private fogBoard(board: Board) {
-        // copy visible tiles — owned by or neighboring player's tiles
+        // copy visible explicitTiles — owned by or neighboring player's explicitTiles
         const ownedHexes = board.filterTiles(tile => tile.owner === this.player)
         this.seenBefore = this.seenBefore.union(ownedHexes).asMutable()
         const fogTiles = Map<Hex, Tile>().asMutable()

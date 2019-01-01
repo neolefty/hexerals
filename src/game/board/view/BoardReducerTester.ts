@@ -38,12 +38,12 @@ export class BoardReducerTester {
             width, height, players, arrangers)))
     }
 
-    getRawTile = (coord: Hex): Tile | undefined => this.tiles.get(coord)
+    getRawTile = (coord: Hex): Tile | undefined => this.explicitTiles.get(coord)
     getTile = (coord: Hex): Tile => this.board.getTile(coord)
 
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
-    get tiles(): Map<Hex, Tile> { return this.board.explicitTiles }
+    get explicitTiles(): Map<Hex, Tile> { return this.board.explicitTiles }
     get cursor(): Hex { return this.state.cursor }
     get messages(): List<StatusMessage> { return this.state.messages }
     get cursorRawTile(): Tile | undefined { return this.getRawTile(this.cursor) }
@@ -104,7 +104,7 @@ export class BoardReducerTester {
     }
 
     get isGameOver(): boolean {
-        // are all explicit occupiable tiles owned by the same player?
+        // are all explicit occupiable explicitTiles owned by the same player?
         const contender = this.board.explicitTiles.first().owner
         try {
             this.board.explicitTiles.forEach(tile => {

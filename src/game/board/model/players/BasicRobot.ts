@@ -20,7 +20,7 @@ import * as assert from 'assert';
 const NONE_MOVE = new HexMove(Hex.NONE, Hex.NONE)
 
 export class BasicRobotSettings {
-    static readonly MAX_INTELLIGENCE = 3
+    static readonly MAX_INTELLIGENCE = 4
 
     static byIntelligence(intelligence: number): BasicRobotSettings {
         assert(intelligence <= BasicRobotSettings.MAX_INTELLIGENCE)
@@ -37,22 +37,30 @@ export class BasicRobotSettings {
         readonly stopPartway: boolean = true, // doesn't always move until blocked
         readonly wasteNot: boolean = true, // avoids losing moves
         readonly captureNearby: boolean = true, // grabs cities if it can
+        readonly stopByCities: boolean = true, // stops if it's next to a city
     ) {}
 
     get intelligence() {
         return (this.stopPartway ? 1 : 0)
             + (this.wasteNot ? 1 : 0)
             + (this.captureNearby ? 1 : 0)
+            + (this.stopByCities ? 1 : 0)
+    }
+
+    get isWatchingNextMove() {
+        return this.stopByCities || this.wasteNot
     }
 
     toString(includeNegatives: boolean = true) {
         return `IQ ${this.intelligence} — ${
             this.stopPartway ? 'stops partway'
                 : includeNegatives ? 'never stops' : ''}, ${
-            this.wasteNot ? 'doesn\'t waste'
+            this.wasteNot ? 'wastes not'
                 : includeNegatives ? 'wastes' : ''}, ${
             this.captureNearby ? 'captures nearby'
-                : includeNegatives ? 'ignores nearby' : '' }`
+                : includeNegatives ? 'wastes' : ''}, ${
+            this.stopByCities ? 'stops by cities'
+                : includeNegatives ? 'passes cities' : '' }`
     }
 }
 
@@ -74,16 +82,31 @@ export class BasicRobot implements Robot {
         player: Player, bs: BoardState, curMoves?: List<PlayerMove>
     ): GameDecision | undefined {
         let result: GameDecision = {}
-        // we should queue moves if there aren't any queued currently
+
+        // queue moves? If there aren't any queued currently ...
         let shouldQueue: boolean = !curMoves || curMoves.size === 0
 
-        // avoid losing battles?
-        if (this.settings.wasteNot && curMoves && curMoves.size > 0) {
+        // cancel moves?
+        if (this.settings.isWatchingNextMove && curMoves && curMoves.size > 0) {
             const nextMove = curMoves.get(0) as PlayerMove
             const source = bs.board.getTile(nextMove.source)
             const dest = bs.board.getTile(nextMove.dest)
-            // is this a losing battle?
-            if (dest.owner !== player && dest.pop >= source.pop - 1) {
+
+            let cancel = false
+            // avoid losing battles?
+            if (this.settings.wasteNot && !canCapture(source, dest))
+                cancel = true
+
+            if (this.settings.stopByCities) {
+                bs.board.forNeighborsOccupiable(
+                    nextMove.source, (neighborHex, neighborTile) =>
+                    cancel = cancel || (
+                        neighborTile.growsFast() && neighborTile.owner !== player
+                    )
+                )
+            }
+
+            if (cancel) {
                 result.cancelMoves = curMoves.size
                 shouldQueue = true
             }
@@ -95,7 +118,7 @@ export class BasicRobot implements Robot {
                 tile => tile.owner === player
             ).forEach(myHex => {
                 const myTile = bs.board.getTile(myHex)
-                bs.board.forNeighborsInBounds(
+                bs.board.forNeighborsOccupiable(
                     myHex, (neighborHex, neighborTile) => {
                         if (
                             neighborTile.owner !== player
@@ -116,19 +139,19 @@ export class BasicRobot implements Robot {
         if (shouldQueue) {
             let totalPop = 0
             let chosenMove: HexMove = NONE_MOVE
-            forEachSetOfStarts(
+            this.forEachSetOfStarts(
                 bs.board,
                 player,
-                (orig: Hex, dests: List<Hex>) => {
-                    const origTile = bs.board.getTile(orig)
+                (source: Hex, dests: List<Hex>) => {
+                    const sourceTile = bs.board.getTile(source)
                     // I think this is a shortcut to giving each move a fair weight
                     const takeIt: boolean =
-                        (Math.random() * (totalPop + origTile.pop)) > totalPop
+                        (Math.random() * (totalPop + sourceTile.pop)) > totalPop
                     if (takeIt) {
                         const dest = dests.get(Math.floor(Math.random() * dests.size))
-                        chosenMove = new HexMove(orig, dest.minus(orig))
+                        chosenMove = new HexMove(source, dest.minus(source))
                     }
-                    totalPop += origTile.pop
+                    totalPop += sourceTile.pop
                 }
             )
             if (chosenMove !== NONE_MOVE) {
@@ -157,20 +180,32 @@ export class BasicRobot implements Robot {
     }
 
     toString() { return this.settings.toString(false) }
+
+    forEachSetOfStarts = (
+        board: Board,
+        player: Player,
+        sideEffect: (orig: Hex, dests: List<Hex>) => void
+    ): void => {
+        board.explicitTiles.forEach((sourceTile: Tile, source: Hex) => {
+            if (sourceTile.owner === player && sourceTile.pop > 1) {
+                const dests = source.neighbors.filter((dest: Hex) => {
+                        if (!board.canBeOccupied(dest)) return false
+                        if (this.settings.wasteNot) { // don't queue a move you'll regret
+                            const destTile = board.getTile(dest)
+                            if (destTile.owner !== player && !canCapture(sourceTile, destTile))
+                                return false
+                        }
+                        return true;
+                    }
+                ) as List<Hex>
+                if (dests.size > 0)
+                    sideEffect(source, dests)
+            }
+        })
+    }
 }
 
-const forEachSetOfStarts = (
-    board: Board,
-    player: Player,
-    sideEffect: (orig: Hex, dests: List<Hex>) => void
-): void => {
-    board.explicitTiles.forEach((tile: Tile, orig: Hex) => {
-        if (tile.owner === player && tile.pop > 1) {
-            const dests = orig.neighbors.filter((dest: Hex) =>
-                board.canBeOccupied(dest)
-            ) as List<Hex>
-            if (dests.size > 0)
-                sideEffect(orig, dests)
-        }
-    })
-}
+const canCapture = (sourceTile?: Tile, destTile?: Tile): boolean =>
+    !!(sourceTile && destTile)
+    && destTile.owner !== sourceTile.owner
+    && destTile.pop < sourceTile.pop - 1

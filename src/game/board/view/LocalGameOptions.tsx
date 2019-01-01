@@ -3,6 +3,7 @@ import * as React from 'react'
 import CartPair from '../../../common/CartPair'
 import './LocalGameOptions.css'
 import {CheckInput, NumberInput} from '../../../common/Inputs';
+import {BasicRobotSettings} from '../model/players/BasicRobot';
 
 export interface LocalGameOptions {
     // All numbers because our reducer assumes it.
@@ -88,7 +89,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                             'Robots', 'numRobots', 0, 11, 'How many AI opponents?'
                         )}
                         {numberInput(
-                            'Difficulty', 'difficulty', 0, 3, 'How smart should those robots be?'
+                            'Difficulty', 'difficulty', 0, BasicRobotSettings.MAX_INTELLIGENCE, 'How smart should those robots be?'
                         )}
                         {numberInput('Width', 'boardWidth', 1, 29, 'How many tiles wide?')}
                         {numberInput('Height', 'boardHeight', 2, 15, 'How many tiles tall?')}
