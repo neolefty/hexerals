@@ -16,10 +16,7 @@ export class PopStepper {
         if (turn % this.cityTurns === 0)
             result = result.withMutations(mut =>
                 result.forEach((tile, hex) => {
-                    if (
-                        (tile.terrain === Terrain.City || tile.terrain === Terrain.Capital)
-                        && tile.isOwned
-                    )
+                    if (tile.growsFast && tile.isOwned)
                         mut.set(hex, tile.incrementPop())
                 })
             )

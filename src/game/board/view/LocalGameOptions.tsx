@@ -19,7 +19,7 @@ export interface LocalGameOptions {
     // booleans
     fog: number
     capitals: number
-    showAdvanced: number  // advanced options visible?
+    levelVisible: number  // advanced options visible?
 }
 
 export interface LGOProps {
@@ -36,12 +36,12 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
     private toggleOption = (optionName: string) =>
         this.props.changeLocalOption(optionName, this.isOption(optionName) ? 0 : 1)
 
-    isShowAdvanced = (level: number) =>
-        this.props.localOptions.showAdvanced >= level
+    isLevelVisible = (level: number) =>
+        this.props.localOptions.levelVisible >= level
     toggleAdvanced = () =>
         this.props.changeLocalOption(
-            'showAdvanced',
-            (this.props.localOptions.showAdvanced + 1) % 3 // 0, 1, 2
+            'levelVisible',
+            (this.props.localOptions.levelVisible + 1) % 3 // 0, 1, 2
         )
 
     render(): React.ReactNode {
@@ -52,7 +52,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
 
         const numberInput = (
             label: string, option: string, min: number, max: number, title: string,
-            advanced: number = 0, children?: JSX.Element | JSX.Element[],
+            level: number = 0, children?: JSX.Element | JSX.Element[],
         ) => (
             <NumberInput
                 label={label}
@@ -62,7 +62,7 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 max={max}
                 onChange={optionChanger(option)}
                 onEnter={this.props.newGame}
-                blockTabbing={this.isShowAdvanced(advanced)}
+                blockTabbing={!this.isLevelVisible(level)}
                 children={children}
             />
         )
@@ -76,14 +76,14 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                 title={title}
                 onChange={optionToggler(option)}
                 onEnter={this.props.newGame}
-                blockTabbing={this.isShowAdvanced(advanced)}
+                blockTabbing={!this.isLevelVisible(advanced)}
             />
         )
 
         return (
             <div
                 className={`LocalGameOptionsView Column Show${
-                    this.props.localOptions.showAdvanced
+                    this.props.localOptions.levelVisible
                 }`}
                 style={{
                     width: this.props.displaySize.x,
@@ -115,9 +115,9 @@ export class LocalGameOptionsView extends React.PureComponent<LGOProps> {
                                 'Show advanced options',
                                 'Show more advanced options',
                                 'Hide advanced options',
-                            ][this.props.localOptions.showAdvanced]}
+                            ][this.props.localOptions.levelVisible]}
                         >
-                            {['>>>', '>>>', '<<<'][this.props.localOptions.showAdvanced]}
+                            {['>>>', '>>>', '<<<'][this.props.localOptions.levelVisible]}
                         </button>
                     </div>
                 </div>

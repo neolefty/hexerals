@@ -108,7 +108,7 @@ export class BoardReducerTester {
         const contender = this.board.explicitTiles.first().owner
         try {
             this.board.explicitTiles.forEach(tile => {
-                if (tile && tile.canBeOccupied() && tile.owner !== contender)
+                if (tile && tile.canBeOccupied && tile.owner !== contender)
                     throw 'different'
             })
             return true

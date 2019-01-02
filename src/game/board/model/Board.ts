@@ -95,7 +95,7 @@ export class Board {
         !!(hex && this.constraints.inBounds(hex))
 
     canBeOccupied = (coord: Hex) =>
-        this.inBounds(coord) && this.getTile(coord).canBeOccupied()
+        this.inBounds(coord) && this.getTile(coord).canBeOccupied
 
     // All of this board's possible explicitTiles. Note that this.explicitTiles omits some blanks.
     get hexesAll(): Set<Hex> {
@@ -107,7 +107,7 @@ export class Board {
     get hexesOccupiable(): Set<Hex> {
         if (!this._occupiableCache)
             this._occupiableCache = this.filterTiles(
-                tile => tile.canBeOccupied()
+                tile => tile.canBeOccupied
             )
         return this._occupiableCache
     }

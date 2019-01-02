@@ -19,7 +19,7 @@ export class RandomTerrainArranger extends Arranger {
         // is it okay to bisect the map using this terrain?
         readonly allowBisection: boolean = false,
         // what explicitTiles should be considered when avoiding bisection?
-        readonly bisectionFilter: TileFilter = tile => tile.canBeOccupied(),
+        readonly bisectionFilter: TileFilter = tile => tile.canBeOccupied,
     ) {
         super()
         assert(fractionOfEmpty <= 1 && fractionOfEmpty >= 0)

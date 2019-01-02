@@ -63,7 +63,7 @@ export class MoveValidator {
         // can be occupied
         if (!options.ignoreOccupiability) {
             const dest = options.tiles.get(move.dest)
-            if (dest && !dest.canBeOccupied()) {
+            if (dest && !dest.canBeOccupied) {
                 if (options.status)
                     options.status.push(
                         new StatusMessage(

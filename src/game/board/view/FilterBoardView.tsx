@@ -35,7 +35,7 @@ export class FilterBoardView extends React.PureComponent<FilterBoardViewProps> {
         const player: Player | undefined = bs.curPlayer
         if (cursor && player) {
             const dragTile = bs.board.getTile(dragHex)
-            if (dragTile.canBeOccupied()) {  // drag into mountain --> no effect
+            if (dragTile.canBeOccupied) {  // drag into mountain --> no effect
                 // path from cursor
                 let path = floodShortestPath(bs.board.hexesOccupiable, cursor, dragHex)
 
@@ -86,7 +86,7 @@ export class FilterBoardView extends React.PureComponent<FilterBoardViewProps> {
                     const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
                     const color: DriftColor = ownerColor
-                        || (tile.known && tile.canBeOccupied() ? DriftColor.GREY_60 : DriftColor.GREY_40)
+                        || (tile.known && tile.canBeOccupied ? DriftColor.GREY_60 : DriftColor.GREY_40)
                     const text = !tile.known && !tile.isBlank() ? '?' : tile.pop !== 0 ? `${tile.pop}` : undefined
                     const textColor = !tile.known ? color.texture(20) : undefined
                     return (

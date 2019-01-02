@@ -94,8 +94,28 @@ terrainShaders.set(
     terrainShaders.set(Terrain.Capital, (index, color) =>
         (index === 0)
             ? color.contrast()
-            : CITY_SHADER(index, color)
+            : CITY_SHADER(index - 1, color)
     )
+
+    // TODO make a framework for lists of pairs that can be transformed en mass — convert to String in code?
+    // captured --> without the flag, shorter ...
+    const dy2 = h * 0.125
+    const [ ul2, lr2, ll2, ur2 ] = [
+        ul.plusY(dy2), lr.plusY(-dy2), ll.plusY(-dy2), ur.plusY(dy2) ]
+    const [ dUL2, dLL2, dLR2, dUR2 ] = [
+        doorUL.plusY(-dy2), doorLL.plusY(-dy2),
+        doorLR.plusY(-dy2), doorUR.plusY(-dy2) ]
+    const crenD2 = crenD.scale(0.6)
+    terrainPolygons.set(Terrain.CapturedCapital, [
+        `${ur2} ${lr2} ${ll2} ${ul2}`
+            + ` ${ul2.plus(crenR1)} ${ul2.plus(crenR1).plus(crenD2)}`
+            + ` ${ul2.plus(crenR2).plus(crenD2)} ${ul2.plus(crenR2)}`
+            + ` ${ul2.plus(crenR3)} ${ul2.plus(crenR3).plus(crenD2)}`
+            + ` ${ul2.plus(crenR4).plus(crenD2)} ${ul2.plus(crenR4)}`,
+        `${dUL2} ${dLL2} ${dLR2} ${dUR2}`,
+    ])
+    // ... & muted
+    terrainShaders.set(Terrain.CapturedCapital, UNKNOWN_SHADER)
 }
 
 export const getTerrainPolygons = (tile: Tile): string[] | undefined =>

@@ -103,7 +103,7 @@ export class BasicRobot implements Robot {
                 bs.board.forNeighborsOccupiable(
                     nextMove.source, (neighborHex, neighborTile) =>
                     cancel = cancel || (
-                        neighborTile.growsFast() && neighborTile.owner !== player
+                        neighborTile.growsFast && neighborTile.owner !== player
                     )
                 )
             }
@@ -124,7 +124,7 @@ export class BasicRobot implements Robot {
                     myHex, (neighborHex, neighborTile) => {
                         if (
                             neighborTile.owner !== player
-                            && neighborTile.growsFast()
+                            && neighborTile.growsFast
                             && neighborTile.pop <= myTile.pop - 1
                         ) {
                             result.makeMoves = List([
