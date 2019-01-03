@@ -8,77 +8,72 @@ import {Hex} from '../Hex';
 import {Tile} from '../Tile';
 import {Board} from '../Board';
 import * as assert from 'assert';
+import {Comma} from '../../../../common/Comma';
 
 // improvements
-// * parameterize intelligence -- a vector of booleans or numbers that can be randomly modified
-// * specify robot intelligence in options
-// * don't make losing moves
-// * if you're next to a city and can take it
-// * bias towards initial capture
-// * test that smarter always wins
+// * defend capital
+// * consolidate pop
+// * move towards opponents
+// * capture opponent hexes (not just cities)
 
 const NONE_MOVE = new HexMove(Hex.NONE, Hex.NONE)
 
-export class BasicRobotSettings {
-    static readonly MAX_INTELLIGENCE = 4
+export class BasicRobot implements Robot {
+    static readonly MAX_IQ = 4
 
-    static byIntelligence(intelligence: number): BasicRobotSettings {
-        assert(intelligence <= BasicRobotSettings.MAX_INTELLIGENCE)
+    // doesn't always move all the way until blocked
+    static readonly SKILL_STOP_PARTWAY = 0
+    // avoids making losing moves
+    static readonly SKILL_WASTE_NOT = 1
+    // grabs cities if it can
+    static readonly SKILL_CAPTURE_NEARBY = 2
+    // stops if it's next to an opposing city
+    static readonly SKILL_STOP_BY_CITIES = 3
+
+    static readonly SKILL_NAMES = [
+        'stops partway', 'wastes not', 'captures nearby', 'stops by cities',
+    ]
+
+    // assign N random skills
+    static byIntelligence(intelligence: number): BasicRobot {
+        assert(intelligence <= BasicRobot.MAX_IQ)
         let settings: boolean[] = Array(
-            BasicRobotSettings.MAX_INTELLIGENCE).fill(false)
+            BasicRobot.MAX_IQ).fill(false)
         while (settings.filter(value => value).length < intelligence)
             settings[Math.floor(
-                Math.random() * this.MAX_INTELLIGENCE
+                Math.random() * this.MAX_IQ
             )] = true
-        return new BasicRobotSettings(...settings)
+        return new BasicRobot(settings)
     }
 
-    constructor(
-        readonly stopPartway: boolean = true, // doesn't always move until blocked
-        readonly wasteNot: boolean = true, // avoids losing moves
-        readonly captureNearby: boolean = true, // grabs cities if it can
-        readonly stopByCities: boolean = true, // stops if it's next to a city
-    ) {}
+    static bySkill(skill: number): BasicRobot {
+        let bools = Array(BasicRobot.MAX_IQ).fill(false)
+        bools[skill] = true
+        return new BasicRobot(bools)
+    }
+
+    constructor(readonly skills: boolean[]) {
+        assert(skills.length === BasicRobot.MAX_IQ)
+    }
+
+    get stopsPartway(): boolean {
+        return this.skills[BasicRobot.SKILL_STOP_PARTWAY] }
+    get wastesNot(): boolean {
+        return this.skills[BasicRobot.SKILL_WASTE_NOT] }
+    get capturesNearby(): boolean {
+        return this.skills[BasicRobot.SKILL_CAPTURE_NEARBY] }
+    get stopsByCities(): boolean {
+        return this.skills[BasicRobot.SKILL_STOP_BY_CITIES] }
 
     get intelligence() {
-        return (this.stopPartway ? 1 : 0)
-            + (this.wasteNot ? 1 : 0)
-            + (this.captureNearby ? 1 : 0)
-            + (this.stopByCities ? 1 : 0)
-    }
-
-    get isWatchingNextMove() {
-        return this.stopByCities || this.wasteNot
-    }
-
-    toString(includeNegatives: boolean = true) {
-        return `IQ ${this.intelligence} — ${
-            this.stopPartway ? 'stops partway'
-                : includeNegatives ? 'never stops' : ''}, ${
-            this.wasteNot ? 'wastes not'
-                : includeNegatives ? 'wastes' : ''}, ${
-            this.captureNearby ? 'captures nearby'
-                : includeNegatives ? 'wastes' : ''}, ${
-            this.stopByCities ? 'stops by cities'
-                : includeNegatives ? 'passes cities' : '' }`
-    }
-}
-
-export class BasicRobot implements Robot {
-    static byIntelligence(intelligence: number): BasicRobot {
-        const result = new BasicRobot(BasicRobotSettings.byIntelligence(intelligence))
-        console.log(result.toString())
+        let result = 0
+        this.skills.forEach(skill => result += (skill ? 1 : 0))
         return result
     }
 
-    static byArray(booleans: boolean[]) {
-        assert(booleans.length <= BasicRobotSettings.MAX_INTELLIGENCE)
-        return new BasicRobot(new BasicRobotSettings(...booleans))
+    get isWatchingNextMove() {
+        return this.stopsByCities || this.wastesNot
     }
-
-    constructor(
-        readonly settings: BasicRobotSettings
-    ) {}
 
     decide(
         player: Player, bs: BoardState, curMoves?: List<PlayerMove>
@@ -88,18 +83,22 @@ export class BasicRobot implements Robot {
         // queue moves? If there aren't any queued currently ...
         let shouldQueue: boolean = !curMoves || curMoves.size === 0
 
+        // TODO abstract these skills
+        // TODO fuzzy robot that likes or dislikes moves
+
         // cancel moves?
-        if (this.settings.isWatchingNextMove && curMoves && curMoves.size > 0) {
+        if (this.isWatchingNextMove && curMoves && curMoves.size > 0) {
             const nextMove = curMoves.get(0) as PlayerMove
             const source = bs.board.getTile(nextMove.source)
             const dest = bs.board.getTile(nextMove.dest)
             let cancel = false
 
             // avoid losing battles?
-            if (this.settings.wasteNot && !canMoveInto(source, dest))
+            if (this.wastesNot && !canMoveInto(source, dest))
                 cancel = true
 
-            if (this.settings.stopByCities) {
+            // stop if we're next to an opponent's city?
+            if (this.stopsByCities) {
                 bs.board.forNeighborsOccupiable(
                     nextMove.source, (neighborHex, neighborTile) =>
                     cancel = cancel || (
@@ -115,7 +114,7 @@ export class BasicRobot implements Robot {
         }
 
         // capture a nearby city, if we're stopped anyway
-        if (shouldQueue && this.settings.captureNearby) {
+        if (shouldQueue && this.capturesNearby) {
             bs.board.filterTiles(
                 tile => tile.owner === player
             ).forEach(myHex => {
@@ -167,7 +166,7 @@ export class BasicRobot implements Robot {
                     dest = dest.plus(delta)
                 } while (bs.board.canBeOccupied(dest))
                 // randomly shorten the move queue, biased towards longer
-                if (moves.size > 1 && this.settings.stopPartway) {
+                if (moves.size > 1 && this.stopsPartway) {
                     const movesToDrop = Math.floor(
                         Math.random() * Math.random() * moves.size
                     )
@@ -181,8 +180,6 @@ export class BasicRobot implements Robot {
         return result
     }
 
-    toString() { return this.settings.toString(false) }
-
     forEachSetOfStarts = (
         board: Board,
         player: Player,
@@ -192,7 +189,7 @@ export class BasicRobot implements Robot {
             if (sourceTile.owner === player && sourceTile.pop > 1) {
                 const dests = source.neighbors.filter((dest: Hex) => {
                         if (!board.canBeOccupied(dest)) return false
-                        if (this.settings.wasteNot) { // don't queue a move you'll regret
+                        if (this.wastesNot) { // don't queue a move you'll regret
                             const destTile = board.getTile(dest)
                             if (!canMoveInto(sourceTile, destTile))
                                 return false
@@ -204,6 +201,15 @@ export class BasicRobot implements Robot {
                     sideEffect(source, dests)
             }
         })
+    }
+
+    toString() {
+        let result = `IQ ${this.intelligence}`
+        const comma = new Comma(' — ', ', ')
+        this.skills.forEach((v, i) =>
+            result += v ? `${comma}${BasicRobot.SKILL_NAMES[i]}` : ''
+        )
+        return result
     }
 }
 

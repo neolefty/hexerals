@@ -48,6 +48,7 @@ const MoveListView = (props: MoveListViewProps) => (
                 color={props.color}
                 boardHeight={props.boardHeight}
                 move={move}
+                arrowShift={0}
             />
         )
     }
@@ -58,9 +59,16 @@ interface MoveViewProps {
     move: HexMove
     color?: DriftColor
     boardHeight: number
+    arrowShift: number
 }
 
-const MoveView = (props: MoveViewProps) => {
+const a = 12  // arrow start
+const b = 20 // arrow length
+const c = 8 // arrow width
+const d = 8 // arrow head length
+const sw = 2 // stroke width
+
+export const MoveView = (props: MoveViewProps) => {
     const x1 = centerX(props.move.source.cartX)
     // const x2 = centerX(props.move.dest.cartX)
     const h = viewBoxHeight(props.boardHeight)
@@ -68,13 +76,7 @@ const MoveView = (props: MoveViewProps) => {
     // const y2 = centerY(h, props.move.dest.cartY)
 
     const delta = props.move.dest.minus(props.move.source)
-
-    // note: hex side is
-    const a = 12  // arrow start
-    const b = 20 // arrow length
-    const c = 8 // arrow width
-    const d = 8 // arrow head length
-    const sw = 2 // stroke width
+    const a1 = props.arrowShift + a
 
     /* tslint:disable:whitespace */
     return (
@@ -91,10 +93,10 @@ const MoveView = (props: MoveViewProps) => {
                 }
             >
                 <polyline // arrow shaft
-                    points={`${x1+a},${y1} ${x1+a+b-sw},${y1}`}
+                    points={`${x1+a1},${y1} ${x1+a1+b-sw},${y1}`}
                 />
                 <polyline // arrow head
-                    points={`${x1+a+b-d},${y1-c} ${x1+a+b},${y1} ${x1+a+b-d},${y1+c}`}
+                    points={`${x1+a1+b-d},${y1-c} ${x1+a1+b},${y1} ${x1+a1+b-d},${y1+c}`}
                 />
             </g>
         </g>

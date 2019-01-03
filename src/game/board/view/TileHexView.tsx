@@ -14,6 +14,7 @@ interface TileHexViewProps {
     color: DriftColor
     text?: string
     textColor?: DriftColor
+    children?: JSX.Element | JSX.Element[]
 
     onSelect?: () => void
     onDragInto?: () => void
@@ -46,6 +47,31 @@ export const textSize = (tile: Tile, text: String): number => {
 export const TileHexView = (props: TileHexViewProps) => {
     const x: number = centerX(props.hex.cartX)
     const y: number = centerY(props.viewBoxHeight, props.hex.cartY)
+
+    let children: JSX.Element[] = []
+
+    // draw text first
+    if (props.text)
+        children.push(
+            <text
+                key="pop"
+                // TODO move this into a style sheet
+                y={textY(props.tile, props.text)}
+                fontFamily="Sans-Serif"
+                fontSize={textSize(props.tile, props.text)}
+                textAnchor="middle"
+                fill={(props.textColor || props.color.contrast()).toHexString()}
+            >
+                {props.text}
+            </text>
+        )
+
+    // and additional children next
+    if (Array.isArray(props.children))
+        children.push(...props.children)
+    else if (props.children)
+        children.push(props.children as JSX.Element)
+
     return (
         <FlatTopHex
             hex={props.hex}
@@ -54,23 +80,10 @@ export const TileHexView = (props: TileHexViewProps) => {
             selected={props.selected}
             centerX={x}
             centerY={y}
-            hexRadius={HEX_RADIUS}
             onSelect={props.onSelect}
             onDragInto={props.onDragInto}
-        >{
-            props.text ? (
-                <text
-                    // TODO move this into a style sheet
-                    y={textY(props.tile, props.text)}
-                    fontFamily="Sans-Serif"
-                    fontSize={textSize(props.tile, props.text)}
-                    textAnchor="middle"
-                    fill={(props.textColor || props.color.contrast()).toHexString()}
-                >
-                    {props.text}
-                </text>
-            ) : undefined
-        }
+        >
+            {children}
         </FlatTopHex>
     )
 }

@@ -42,7 +42,10 @@ class BenchmarkRun {
 
 const assignRobots = (): PlayerManager => {
     let players = PlayerManager.construct(PLAYERS)
-    PLAYERS.forEach(player => players = players.setRobot(player, BasicRobot.byArray([true])))
+    PLAYERS.forEach(player =>
+        players = players.setRobot(
+            player,
+            BasicRobot.bySkill(BasicRobot.SKILL_STOP_PARTWAY)))
     return players
 }
 

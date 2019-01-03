@@ -128,12 +128,12 @@ it('ensures things are not mutable', () => {
 
     const brt = new BoardReducerTester()
     brt.setCurPlayer(Player.Zero)
-    brt.placeCursor(brt.ll)
+    brt.setCursor(brt.ll)
     brt.queueMoveUp()
     brt.queueMoveUp()
     brt.queueMoveDown()
     brt.setCurPlayer(Player.One)
-    brt.placeCursor(brt.ur)
+    brt.setCursor(brt.ur)
     brt.queueMoveDown()
     brt.queueMoveDown()
     brt.queueMoveUp()
@@ -211,14 +211,14 @@ it('blocks illegal moves', () => {
     expect(boardBefore === brt.board).toBeTruthy()  // no effect on board
 
     // place cursor outside bounds -- no effect
-    brt.placeCursor(Hex.LEFT_UP)
+    brt.setCursor(Hex.LEFT_UP)
     expect(brt.cursor === Hex.NONE).toBeTruthy()
 })
 
 // it('moves the cursor', () => {
 //     const st = new storeTester()
 //     const ul = st.board.edges.upperLeft
-//     st.placeCursor(ul)
+//     st.setCursor(ul)
 //     st.queueMoveDown()
 //     expect(st.cursor === ul.getDown()).toBeTruthy()
 //     expect(st.cursorRawTile).toBeUndefined()
@@ -229,12 +229,12 @@ it('cancels moves', () => {
     const boardBefore = brt.state.board
 
     brt.setCurPlayer(Player.One)
-    brt.placeCursor(brt.ur)
+    brt.setCursor(brt.ur)
     brt.queueMoveDown()
     brt.queueMoveDown()
 
     brt.setCurPlayer(Player.Zero)
-    brt.placeCursor(brt.ll)
+    brt.setCursor(brt.ll)
     brt.queueMoveUp()
     brt.queueMoveUp()
     expect(brt.moves.size).toBe(4)
@@ -272,7 +272,7 @@ it('cancels moves', () => {
 
     // cancel multiple moves
     brt.setCurPlayer(Player.Zero)
-    brt.placeCursor(brt.board.edges.lowerLeft)
+    brt.setCursor(brt.board.edges.lowerLeft)
     for (let i: number = 0; i < 7; i++)
         brt.queueMoveUp()
     expect(brt.moves.size).toBe(7)
@@ -289,7 +289,7 @@ it('makes real moves', () => {
 
     // place cursor at upper right
     const boardBefore = brt.board
-    brt.placeCursor(brt.ur)
+    brt.setCursor(brt.ur)
     expect(brt.cursor === brt.ur).toBeTruthy()
     expect(brt.getRawTile(brt.ur.getDown())).toBeUndefined()
 
@@ -311,11 +311,11 @@ it('makes real moves', () => {
 
     // also check that cancelling doesn't move the cursor back stupidly
     brt.queueMove(Player.One, Hex.UP)
-    brt.placeCursor(brt.ul)
+    brt.setCursor(brt.ul)
     brt.cancelMoves(Player.One)
     expect(brt.moves.size).toBe(1)
     expect(brt.cursor === brt.ul).toBeTruthy()
-    brt.placeCursor(brt.ur.plus(Hex.DOWN)) // back where we should be
+    brt.setCursor(brt.ur.plus(Hex.DOWN)) // back where we should be
 
     expect(boardBefore === brt.board).toBeTruthy() // only queued -- no board updates yet
     // console.log(`-- queued --\n${boardStateToString(brt.state)}`)
@@ -348,13 +348,13 @@ it('makes real moves', () => {
     // TODO queue from queued-to tile
 
     // make a second move down
-    brt.placeCursor(brt.ur.getDown())
+    brt.setCursor(brt.ur.getDown())
     brt.queueMoveDown(false)
     brt.doMoves()
     expect(brt.cursor === brt.ur.getDown()).toBeTruthy() // didn't move cursor this time
 
     // queue two moves down-left
-    brt.placeCursor(brt.ur)
+    brt.setCursor(brt.ur)
     // console.log(brt.messages)
     brt.queueMove(Player.One, Hex.LEFT_DOWN)
     // console.log(brt.messages)
@@ -374,7 +374,7 @@ it('makes real moves', () => {
     expect(downFromUR(3) === Tile.MAYBE_EMPTY).toBeTruthy()
 
     // moving contents 1 has no effect
-    brt.placeCursor(brt.ur.getDown())
+    brt.setCursor(brt.ur.getDown())
     expect(brt.cursorTile.owner === Player.One).toBeTruthy()
     const before2 = brt.board
     brt.queueMoveDown(false)

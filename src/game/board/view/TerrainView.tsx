@@ -5,7 +5,6 @@ import {getTerrainPolygons, getTerrainShader} from './TerrainPolygons';
 import {DriftColor} from '../../../color/DriftColor';
 
 interface TerrainViewProps {
-    hexRadius: number,
     tile: Tile,
     color: DriftColor,
 }

@@ -8,8 +8,10 @@
 import CartPair from '../../../common/CartPair';
 
 export const HEX_RADIUS = 30
+export const HEX_MID = HEX_RADIUS * 0.5
 export const HEX_HALF_HEIGHT = 26
-export const HEX_COLUMN = 45
+export const HEX_ROW = HEX_HALF_HEIGHT * 2
+export const HEX_COLUMN = 3 * HEX_MID
 export const HEX_HEIGHT = HEX_HALF_HEIGHT * 2
 
 export const HEX_LEFT = -HEX_RADIUS

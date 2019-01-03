@@ -13,7 +13,6 @@ export class DriftColor {
     // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2
 
     static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
-    static readonly GREY_10: DriftColor = new DriftColor(CieColor.GREY_10);
     static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
     static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
     static readonly GREY_60: DriftColor = new DriftColor(CieColor.GREY_60);
@@ -31,10 +30,8 @@ export class DriftColor {
             new CieColor([
                 // TODO even p across CIELUV for uniform perceptual distribution
                 Math.random() * 360,
-                Math.random() * (DriftColor.MAX_SAT - DriftColor.MIN_SAT)
-                    + DriftColor.MIN_SAT,
-                Math.random() * (DriftColor.MAX_BRIGHT - DriftColor.MIN_BRIGHT)
-                    + DriftColor.MIN_BRIGHT,
+                Math.random() * (this.SPAN_SAT) + DriftColor.MIN_SAT,
+                Math.random() * (this.SPAN_BRIGHT) + DriftColor.MIN_BRIGHT,
             ]),
             Math.random()
         )

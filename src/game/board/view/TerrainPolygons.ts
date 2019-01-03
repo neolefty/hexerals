@@ -9,7 +9,7 @@ import {DriftColor} from '../../../color/DriftColor';
 type Shader = (lineIndex: number, color: DriftColor) => DriftColor
 
 const UNKNOWN_SHADER: Shader = (index, color) =>
-    color.texture((index % 2 + 2) * 4) // faded
+    color.texture((index % 2 + 2) * 6) // faded
 
 const terrainPolygons = Map<Terrain, string[]>().asMutable()
 const terrainShaders = Map<Terrain, Shader>().asMutable()
@@ -34,7 +34,7 @@ terrainPolygons.set(Terrain.City, [
     + ` ${WALL_W * .4},${y - WALL_H * .6} ${WALL_W * .4},${y + WALL_H}`,
 ])
 const CITY_SHADER: Shader = (index, color) =>
-    color.texture((index % 2 + 2) * 7)
+    color.texture((index % 2 + 2) * 9)
 terrainShaders.set(Terrain.City, CITY_SHADER)
 
 // mtnLeft and mtnRight are points along the left and right lower segments
@@ -105,7 +105,7 @@ terrainShaders.set(
     const [ dUL2, dLL2, dLR2, dUR2 ] = [
         doorUL.plusY(-dy2), doorLL.plusY(-dy2),
         doorLR.plusY(-dy2), doorUR.plusY(-dy2) ]
-    const crenD2 = crenD.scale(0.6)
+    const crenD2 = crenD.scale(0.7)
     terrainPolygons.set(Terrain.CapturedCapital, [
         `${ur2} ${lr2} ${ll2} ${ul2}`
             + ` ${ul2.plus(crenR1)} ${ul2.plus(crenR1).plus(crenD2)}`

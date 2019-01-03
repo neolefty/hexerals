@@ -7,6 +7,8 @@ export class Tile {
         Player.Nobody, 0, Terrain.Empty)
     static readonly MOUNTAIN = new Tile(
         Player.Nobody, 0, Terrain.Mountain)
+    static readonly CITY = new Tile(
+        Player.Nobody, 0, Terrain.City)
 
     static readonly MAYBE_EMPTY = new Tile(
         Player.Nobody, 0, Terrain.Empty, false)

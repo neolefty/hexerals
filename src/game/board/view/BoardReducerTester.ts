@@ -39,7 +39,9 @@ export class BoardReducerTester {
     }
 
     getRawTile = (coord: Hex): Tile | undefined => this.explicitTiles.get(coord)
-    getTile = (coord: Hex): Tile => this.board.getTile(coord)
+    getTile = (hex: Hex): Tile => this.board.getTile(hex)
+    setTile = (hex: Hex, tile: Tile) =>
+        this.state.board = this.board.setTiles(this.explicitTiles.set(hex, tile))
 
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
@@ -62,7 +64,7 @@ export class BoardReducerTester {
             )
         )
         if (alsoCursor)
-            this.placeCursor(this.cursor.plus(delta))
+            this.setCursor(this.cursor.plus(delta))
     }
 
     queueMoveDown = (alsoCursor = true) => {
@@ -75,7 +77,7 @@ export class BoardReducerTester {
             this.queueMove(this.state.curPlayer, Hex.UP, alsoCursor)
     }
 
-    placeCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
+    setCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
     doMoves = () => this.store.dispatch(doMovesAction())
     stepPop = () => this.store.dispatch(stepPopAction())
     queueRobots = () => this.store.dispatch(robotsDecideAction())

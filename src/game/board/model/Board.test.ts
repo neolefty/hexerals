@@ -234,7 +234,7 @@ it('captures capitals', () => {
             Player.Zero, Hex.RIGHT_UP, Hex.RIGHT_UP),
     ])).board
     expect(captured.getCartTile(2, 2)).toEqual(
-        new Tile(Player.Zero, 16, Terrain.City))
+        new Tile(Player.Zero, 16, Terrain.CapturedCapital))
     expect(captured.getCartTile(2, 0)).toEqual(
         new Tile(Player.Zero, 9))
 })

@@ -1,5 +1,5 @@
 import {BoardReducerTester} from '../../view/BoardReducerTester';
-import {BasicRobot, BasicRobotSettings} from './BasicRobot';
+import {BasicRobot} from './BasicRobot';
 import {Player} from './Players';
 import {List} from 'immutable';
 import {RandomTerrainArranger} from '../RandomTerrainArranger';
@@ -24,23 +24,21 @@ it('makes moves', () => {
 })
 
 it('specifies IQ', () => {
-    expect(BasicRobotSettings.byIntelligence(
-        BasicRobotSettings.MAX_INTELLIGENCE))
-        .toEqual(BasicRobotSettings.byIntelligence(
-            BasicRobotSettings.MAX_INTELLIGENCE))
+    expect(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
+        .toEqual(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
 
-    for (let i = 0; i < 20; ++i)
-        for (let iq = 0; iq <= BasicRobotSettings.MAX_INTELLIGENCE; ++iq)
-            expect(BasicRobotSettings.byIntelligence(iq).intelligence).toEqual(iq)
+    for (let i = 0; i < 10; ++i)
+        for (let iq = 0; iq <= BasicRobot.MAX_IQ; ++iq)
+            expect(BasicRobot.byIntelligence(iq).intelligence).toEqual(iq)
 })
 
 it('captures nearby', () => {
     for (let i = 0; i < 10; ++i) {
         const brt = new BoardReducerTester(3, 2)
-        brt.setRobot(Player.Zero, makeIqOne(2))
-        brt.placeCursor(brt.ur)
+        brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
+        brt.setCursor(brt.ur)
         brt.queueMove(Player.One, Hex.DOWN)
-        brt.placeCursor(brt.ll)
+        brt.setCursor(brt.ll)
         brt.queueMove(Player.Zero, Hex.RIGHT_UP)
         brt.doMoves()
         expect(brt.getTile(Hex.RIGHT_UP)).toEqual(new Tile(Player.Zero, 49))
@@ -56,7 +54,7 @@ it('captures nearby', () => {
 it('wastes not', () => {
     for (let i = 0; i < 20; ++i) {
         const brt = new BoardReducerTester(3, 2)
-        brt.setRobot(Player.Zero, makeIqOne(1))
+        brt.setRobot(Player.Zero, BasicRobot.bySkill(1))
         for (let turn = 0; turn < 20; ++turn) {
             brt.queueRobots()
             brt.doMoves()
@@ -68,17 +66,23 @@ it('wastes not', () => {
 })
 
 it('stops by cities', () => {
-    throw 'nyi'
+    const brt = new BoardReducerTester(3, 5)
+    brt.setRobot(Player.Zero, BasicRobot.bySkill(BasicRobot.SKILL_STOP_BY_CITIES))
+    brt.setTile(Hex.RIGHT_UP.plus(Hex.UP), Tile.CITY)
+    brt.setCursor(Hex.ORIGIN)
+    // straight up to the top of the board
+    brt.queueMove(Player.Zero, Hex.UP)
+    brt.queueMove(Player.Zero, Hex.UP)
+    brt.queueMove(Player.Zero, Hex.UP)
+    brt.queueMove(Player.Zero, Hex.UP)
+    brt.queueRobots() // should have no effect — robot is happy with plan
+    console.log(`---$--- ${brt.moves.playerQueues.get(Player.Zero).size}`)
+    expect(brt.moves.playerQueues.get(Player.Zero).size === 4)
+    brt.doMoves()
+    brt.queueRobots() // robot should notice city and stop
+    console.log(`---$--- ${brt.moves.playerQueues.get(Player.Zero).size}`)
+    expect(brt.moves.playerQueues.get(Player.Zero).size === 0)
 })
-
-// TODO specific tests for stops partway & stops by cities
-
-// a robot with exactly one skill
-const makeIqOne = (index: number): BasicRobot => {
-    let bools = Array(BasicRobotSettings.MAX_INTELLIGENCE).fill(false)
-    bools[index] = true
-    return BasicRobot.byArray(bools)
-}
 
 const doesABeatB = (
     first: BasicRobot, second: BasicRobot, turnLimit: number
@@ -120,24 +124,24 @@ const countAWins = (
 it('control — IQ 0 vs self', () => {
     const robot = BasicRobot.byIntelligence(0)
     const control = countAWins(robot, robot)
-    console.log(`Dumb vs dumb: ${control}/${robotTrials}`)
+    console.log(`Dumb vs dumb: ${control}/${robotTrials} = ${control/robotTrials}`)
     expect(control).toBeGreaterThanOrEqual(robotTrials * 0.35)
 })
 
 it('IQ 1 not lose too much', () => {
-    const brains = List(Array(BasicRobotSettings.MAX_INTELLIGENCE).keys())
+    const skills = List(Array(BasicRobot.MAX_IQ).keys())
 
-    brains.forEach(brainIndex => {
-        const smart = makeIqOne(brainIndex)
+    skills.forEach(brainIndex => {
+        const smart = BasicRobot.bySkill(brainIndex)
         const wins = countAWins(smart, iq0)
-        console.log(`Intelligence factor #${brainIndex}: ${wins}/${robotTrials} (${smart.toString()})`)
+        console.log(`Skill #${brainIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart.toString()})`)
         expect(wins).toBeGreaterThanOrEqual(robotTrials * 0.4)  // weak!
     })
 })
 
 it('max IQ wins a lot', () => {
-    const smart = BasicRobot.byIntelligence(3)
+    const smart = BasicRobot.byIntelligence(BasicRobot.MAX_IQ)
     const wins = countAWins(smart, iq0)
-    console.log(`Max IQ: ${wins}/${robotTrials} (${smart.toString()})`)
-    expect(wins).toBeGreaterThan(robotTrials * 0.50)
+    console.log(`Max IQ: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart.toString()})`)
+    expect(wins).toBeGreaterThanOrEqual(robotTrials * 0.60)
 })

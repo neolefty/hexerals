@@ -5,6 +5,7 @@ import {Tile} from '../model/Tile'
 import {TerrainView} from './TerrainView'
 import {Hex} from '../model/Hex'
 import {Terrain} from '../model/Terrain';
+import {HEX_HALF_HEIGHT, HEX_MID, HEX_RADIUS} from './HexContants';
 
 export interface FlatTopHexProps {
     hex?: Hex
@@ -13,23 +14,22 @@ export interface FlatTopHexProps {
     selected: boolean
     centerX: number
     centerY: number
-    hexRadius: number
     onSelect?: () => void
     onDragInto?: () => void
     children?: JSX.Element | JSX.Element[] // could use "any?" instead
 }
 
-const hexPoints = (x: number, y: number, hexRadius: number) => {
-    const hexMid = 15
-    const hexHalfHeight = 26
+const hexPoints = (x: number, y: number) => {
     return ''
-        + (x - hexRadius) + ',' + y + ' ' // left
-        + (x - hexMid) + ',' + (y - hexHalfHeight) + ' ' // up left
-        + (x + hexMid) + ',' + (y - hexHalfHeight) + ' ' // up right
-        + (x + hexRadius) + ',' + y + ' ' // right
-        + (x + hexMid) + ',' + (y + hexHalfHeight) + ' ' // down right
-        + (x - hexMid) + ',' + (y + hexHalfHeight) // down left
+        + (x - HEX_RADIUS) + ',' + y + ' ' // left
+        + (x - HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up left
+        + (x + HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up right
+        + (x + HEX_RADIUS) + ',' + y + ' ' // right
+        + (x + HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) + ' ' // down right
+        + (x - HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) // down left
 }
+
+const HEX_POINTS = hexPoints(0, 0)
 
 // a hexagon centered at (x, y)
 export const FlatTopHex = (props: FlatTopHexProps) => {
@@ -71,7 +71,7 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             onMouseDownCapture={(e) => {logEvent(`onMouseDownCapture ${e.nativeEvent.type}`)}}
         >
             <polygon
-                points={hexPoints(0, 0, props.hexRadius)}
+                points={HEX_POINTS}
                 style={
                     props.color && {
                         fill: props.color.toHexString()
@@ -81,7 +81,6 @@ export const FlatTopHex = (props: FlatTopHexProps) => {
             {
                 props.tile.terrain !== Terrain.Empty ? (
                     <TerrainView
-                        hexRadius={props.hexRadius}
                         tile={props.tile}
                         color={props.color}
                     />
