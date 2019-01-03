@@ -100,10 +100,11 @@ export class BasicRobot implements Robot {
             // stop if we're next to an opponent's city?
             if (this.stopsByCities) {
                 bs.board.forNeighborsOccupiable(
-                    nextMove.source, (neighborHex, neighborTile) =>
-                    cancel = cancel || (
-                        neighborTile.growsFast && neighborTile.owner !== player
-                    )
+                    nextMove.source, (neighborHex, neighborTile) => {
+                        cancel = cancel || (
+                            neighborTile.growsFast && neighborTile.owner !== player
+                        )
+                    }
                 )
             }
 
@@ -216,4 +217,4 @@ export class BasicRobot implements Robot {
 // can capture or merge
 const canMoveInto = (sourceTile: Tile, destTile: Tile): boolean =>
     destTile.owner === sourceTile.owner
-    || sourceTile.pop + 2 >= destTile.pop
+    || sourceTile.pop - 2 >= destTile.pop
