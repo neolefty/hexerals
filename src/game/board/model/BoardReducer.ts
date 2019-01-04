@@ -210,7 +210,11 @@ const isPlaceCursor = (action: GameAction): action is PlaceCursor =>
 export const placeCursorAction = (position: Hex): PlaceCursor =>
     ({ type: PLACE_CURSOR, position: position })
 const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState =>
-    (action.position === state.cursor || !state.board.inBounds(action.position))
+    (
+        action.position === state.cursor
+        || !state.board.canBeOccupied(action.position)
+        || !state.board.inBounds(action.position)
+    )
         ? state
         : {
             ...state,

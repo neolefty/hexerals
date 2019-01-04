@@ -36,8 +36,7 @@ export class BoardKeyboardController {
                 // TODO don't move into known mountains but move right through unknown ones
                 // TODO differentiate between known & unknown mountains — add question mark to unknown, like generals does
                 const newCursor = bs.cursor.plus(delta)
-                if (bs.board.canBeOccupied(newCursor))
-                    this.view.props.onPlaceCursor(newCursor)
+                this.view.props.onPlaceCursor(newCursor)
                 e.preventDefault()
                 return
             }

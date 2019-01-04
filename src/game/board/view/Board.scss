@@ -7,12 +7,24 @@ g.tile {
         stroke-width: 0.2%;
     }
 
+    .cursor {
+        fill: none;
+        transform: scale(0.8);
+        stroke-linejoin: miter;
+        stroke-width: 1%;
+    }
+
+    .hover {
+        visibility: hidden;
+        fill: none;
+        transform: scale(0.85);
+        stroke-linejoin: miter;
+        stroke-width: 0.6%;
+    }
+
     &:hover {
-        polygon {
-            stroke: #a22;
-            stroke-width: 0.5%;
-            //stroke-width: 5%;
-            //transform: scale(0.5);
+        .hover {
+            visibility: visible;
         }
     }
 }
@@ -21,15 +33,7 @@ g.Nobody polygon {}
 
 /* TODO would be nice for active to take precedence over hover or something */
 g.active {
-    // TODO check for a way to draw line on inside instead of half-in-half-out
-    // TODO instead expand coords to allow inner and outer?
-    polygon {
-        stroke: #a22;
-        stroke-width: 0.35%;
-    }
-
     text {
-        fill: #a22;
         font-weight: bold;
     }
 }

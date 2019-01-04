@@ -16,7 +16,7 @@ export interface FlatTopHexProps {
     centerY: number
     onSelect?: () => void
     onDragInto?: () => void
-    children?: JSX.Element | JSX.Element[] // could use "any?" instead
+    children?: JSX.Element | JSX.Element[]
 }
 
 const hexPoints = (x: number, y: number) => {
@@ -29,64 +29,99 @@ const hexPoints = (x: number, y: number) => {
         + (x - HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) // down left
 }
 
+// hex centered at (0, 0)
 const HEX_POINTS = hexPoints(0, 0)
 
 // a hexagon centered at (x, y)
-export const FlatTopHex = (props: FlatTopHexProps) => {
-    // const logEvent = (desc: string) => console.log(
-    //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
-    // )
-    // tslint:disable-next-line
-    const logEvent = (desc: string) => {}
-    return (
-        <g
-            transform={`translate(${props.centerX} ${props.centerY})`}
-            className={`FlatTopHex ${props.tile.owner} tile${props.selected ? ' active' : ''}`}
-            onMouseDown={(e) => {
-                logEvent(`onMouseDown ${e}`)
-                if (props.onSelect) {
-                    e.preventDefault()
-                    props.onSelect()
-                }
-            }}
-            onTouchStart={(e) => { // not standard — Chrome only
-                logEvent(`onTouchStart ${e.nativeEvent.type}`)
-                if (props.onSelect) {
-                    e.preventDefault()
-                    props.onSelect()
-                }
-            }}
-            onMouseEnter={(e) => {
-                logEvent(`onMouseEnter ${e.nativeEvent.type} ${e.buttons}`)
-                if (props.onDragInto && e.buttons === 1) { // TODO look up canonical value
-                    props.onDragInto()
-                    e.preventDefault()
-                }
-            }}
+export class FlatTopHex
+    extends React.PureComponent<FlatTopHexProps>
+{
+    render(): React.ReactNode {
+        // const logEvent = (desc: string) => console.log(
+        //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
+        // )
+        // tslint:disable-next-line
+        const logEvent = (desc: string) => {}
 
-            onDragEnter={(e) => {logEvent(`onDragEnter ${e.nativeEvent.type}`)}}
-            onTouchMove={(e) => {logEvent(`onTouchMove ${e.nativeEvent.type}`)}}
-            onTouchCancel={(e) => {logEvent(`onTouchCancel ${e.nativeEvent.type}`)}}
-            onDragOver={(e) => {logEvent(`onDragOver ${e.nativeEvent.type}`)}}
-            onMouseDownCapture={(e) => {logEvent(`onMouseDownCapture ${e.nativeEvent.type}`)}}
-        >
+        const children: JSX.Element[] = [(
             <polygon
                 points={HEX_POINTS}
                 style={
-                    props.color && {
-                        fill: props.color.toHexString()
+                    this.props.color && {
+                        fill: this.props.color.toHexString()
                     }
                 }
             />
-            {
-                props.tile.terrain !== Terrain.Empty ? (
-                    <TerrainView
-                        tile={props.tile}
-                        color={props.color}
-                    />
-                ) : undefined
-            }
-            {props.children && <g>{props.children}</g>}
-        </g>
-    )
+        )]
+
+        if (this.props.selected)
+            children.push(
+                <polygon
+                    className="cursor"
+                    points={HEX_POINTS}
+                    style={{
+                        stroke: this.props.color.contrast().toHexString(),
+                    }}
+                />
+            )
+
+        children.push(
+            <polygon
+                className="hover"
+                points={HEX_POINTS}
+                style={{
+                    stroke: this.props.color.contrast().toHexString(),
+                }}
+            />
+        )
+
+        if (this.props.tile.terrain !== Terrain.Empty) children.push(
+            <TerrainView
+                tile={this.props.tile}
+                color={this.props.color}
+            />
+        )
+
+        if (Array.isArray(this.props.children))
+            children.push(...this.props.children as JSX.Element[])
+        else if (this.props.children)
+            children.push(this.props.children as JSX.Element)
+
+        return (
+            <g
+                transform={`translate(${this.props.centerX} ${this.props.centerY})`}
+                className={`FlatTopHex ${this.props.tile.owner} tile${this.props.selected ? ' active' : ''}`}
+                onMouseDown={(e) => {
+                    logEvent(`onMouseDown ${e}`)
+                    if (this.props.onSelect) {
+                        e.preventDefault()
+                        this.props.onSelect()
+                    }
+                }}
+                onTouchStart={(e) => { // not standard — Chrome only?
+                    logEvent(`onTouchStart ${e.nativeEvent.type}`)
+                    if (this.props.onSelect) {
+                        e.preventDefault()
+                        this.props.onSelect()
+                    }
+                }}
+                onMouseEnter={(e) => {
+                    logEvent(`onMouseEnter ${e.nativeEvent.type} ${e.buttons}`)
+                    if (this.props.onDragInto && e.buttons === 1) { // left mouse button
+                        this.props.onDragInto()
+                        e.preventDefault()
+                    }
+                }}
+
+                onDragEnter={(e) => {logEvent(`onDragEnter ${e.nativeEvent.type}`)}}
+                onTouchMove={(e) => {logEvent(`onTouchMove ${e.nativeEvent.type}`)}}
+                onTouchCancel={(e) => {logEvent(`onTouchCancel ${e.nativeEvent.type}`)}}
+                onDragOver={(e) => {logEvent(`onDragOver ${e.nativeEvent.type}`)}}
+                onMouseDownCapture={(e) => {logEvent(`onMouseDownCapture ${e.nativeEvent.type}`)}}
+            >
+                {children}
+            </g>
+        )    }
+
+
 }
