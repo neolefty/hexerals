@@ -68,7 +68,7 @@ const dirs = Map<Hex, TileAndText>([
     ],
 ])
 
-export class Help extends React.Component<HelpOptions> {
+export class Help extends React.PureComponent<HelpOptions> {
     componentDidMount(): void {
         center.color = DriftColor.random()
     }

@@ -88,7 +88,9 @@ const initialState: BenchmarkState = {
 
 // TODO log somewhere — with browser, OS, date, etc
 // TODO record software version
-export class Benchmark extends React.Component<BenchmarkProps, BenchmarkState> {
+export class Benchmark
+    extends React.Component<BenchmarkProps, BenchmarkState>
+{
     constructor(props: BenchmarkProps) {
         super(props)
         this.startGame = this.startGame.bind(this)
