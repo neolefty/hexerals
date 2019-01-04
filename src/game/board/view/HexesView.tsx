@@ -11,7 +11,7 @@ import {floodShortestPath} from '../model/ShortestPath';
 
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
-export class HexTiler extends React.PureComponent<BoardViewProps> {
+export class HexesView extends React.PureComponent<BoardViewProps> {
     constructor(props: BoardViewProps) {
         super(props)
         this.makeOnDrag = this.makeOnDrag.bind(this)

@@ -4,7 +4,7 @@ import {Map} from 'immutable'
 import './Board.css'
 import {DriftColor} from '../../../color/DriftColor'
 import {Player} from '../model/players/Players'
-import {HexTiler} from './HexTiler';
+import {HexesView} from './HexesView';
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';
 
@@ -89,7 +89,7 @@ export class HexBoardView extends BoardViewBase {
                         stroke="white"
                         strokeWidth="3"
                     />
-                    <HexTiler{...this.props}/>
+                    <HexesView{...this.props}/>
                     <MoveQueueView
                         moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
