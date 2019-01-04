@@ -2,10 +2,9 @@ import * as React from 'react'
 import {Map} from 'immutable'
 
 import './Board.css'
-import {Hex} from '../model/Hex'
 import {DriftColor} from '../../../color/DriftColor'
 import {Player} from '../model/players/Players'
-import {FilterBoardView} from './FilterBoardView';
+import {HexTiler} from './HexTiler';
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';
 
@@ -19,28 +18,12 @@ export class HexBoardView extends BoardViewBase {
 
     constructor(props: BoardViewProps) {
         super(props)
-        this.filterNobody = this.filterNobody.bind(this)
-        this.filterPlayers = this.filterPlayers.bind(this)
-        this.filterCursor = this.filterCursor.bind(this)
+        // ensure there are enough colors for all the players
         if (
             !this.props.colors
             || this.props.colors.size !== this.props.boardState.players.size
         )
             this.props.onResetColors(this.props.boardState.players.size)
-    }
-
-    filterNobody(hex: Hex): boolean {
-        return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getTile(hex).owner === Player.Nobody
-    }
-
-    filterPlayers(hex: Hex): boolean {
-        return this.props.boardState.cursor !== hex
-            && this.props.boardState.board.getTile(hex).owner !== Player.Nobody
-    }
-
-    filterCursor(hex: Hex): boolean {
-        return this.props.boardState.cursor === hex
     }
 
     componentDidMount() {this.focusDiv()}
@@ -106,21 +89,7 @@ export class HexBoardView extends BoardViewBase {
                         stroke="white"
                         strokeWidth="3"
                     />
-                    <FilterBoardView
-                        key={'nobody'}
-                        filter={this.filterNobody}
-                        {...this.props}
-                    />
-                    <FilterBoardView
-                        key={'players'}
-                        filter={this.filterPlayers}
-                        {...this.props}
-                    />
-                    <FilterBoardView
-                        key={'cursor'}
-                        filter={this.filterCursor}
-                        {...this.props}
-                    />
+                    <HexTiler{...this.props}/>
                     <MoveQueueView
                         moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}

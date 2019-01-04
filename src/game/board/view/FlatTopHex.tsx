@@ -8,7 +8,7 @@ import {Terrain} from '../model/Terrain';
 import {HEX_HALF_HEIGHT, HEX_MID, HEX_RADIUS} from './HexContants';
 
 export interface FlatTopHexProps {
-    hex?: Hex
+    hex: Hex
     tile: Tile
     color: DriftColor
     selected: boolean
@@ -45,6 +45,7 @@ export class FlatTopHex
 
         const children: JSX.Element[] = [(
             <polygon
+                key="bg"
                 points={HEX_POINTS}
                 style={
                     this.props.color && {
@@ -57,6 +58,7 @@ export class FlatTopHex
         if (this.props.selected)
             children.push(
                 <polygon
+                    key="cursor"
                     className="cursor"
                     points={HEX_POINTS}
                     style={{
@@ -67,6 +69,7 @@ export class FlatTopHex
 
         children.push(
             <polygon
+                key="hover"
                 className="hover"
                 points={HEX_POINTS}
                 style={{
@@ -77,6 +80,7 @@ export class FlatTopHex
 
         if (this.props.tile.terrain !== Terrain.Empty) children.push(
             <TerrainView
+                key={this.props.hex.id}
                 tile={this.props.tile}
                 color={this.props.color}
             />
