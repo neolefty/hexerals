@@ -9,17 +9,17 @@ g.tile {
 
     .cursor {
         fill: none;
-        transform: scale(0.8);
+        transform: scale(0.85);
         stroke-linejoin: miter;
-        stroke-width: 1%;
+        stroke-width: 5px;
     }
 
     .hover {
         visibility: hidden;
         fill: none;
-        transform: scale(0.85);
+        transform: scale(0.9);
         stroke-linejoin: miter;
-        stroke-width: 0.6%;
+        stroke-width: 3px;
     }
 
     &:hover {
