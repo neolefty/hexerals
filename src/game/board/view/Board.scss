@@ -4,7 +4,7 @@ g.tile {
     polygon {
         fill: #999;
         stroke: #777;
-        stroke-width: 0.2%;
+        stroke-width: 2px;  // eliminate once we've fixed flickering
     }
 
     .cursor {
