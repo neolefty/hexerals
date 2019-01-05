@@ -10,7 +10,7 @@ export class ColorPodge {
     ];
 
     // The poor programmer's version, but still
-    static readonly ANNEAL = [16, 13, 10, 7, 5, 5, 3, 3, 2, 1, 1]
+    static readonly ANNEAL = [16, 13, 10, 7, 7, 7, 5, 5, 5, 5, 3, 3, 2, 1, 1, 1]
 
     static MAX_DISPERSION_HISTORY = 320;
     static SETTLED_THRESHOLD = 150;
