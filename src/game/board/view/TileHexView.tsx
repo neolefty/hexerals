@@ -29,19 +29,36 @@ export const textY = (tile: Tile, text: String): number => {
     // position in body of capital or question mark in mountain
     let result = 0.5 * HEX_HALF_HEIGHT
     // center in known empty & house
-    if (tile.known && tile.terrain !== Terrain.Capital)
+    if (
+        tile.known
+        && tile.terrain !== Terrain.Capital
+        && tile.terrain !== Terrain.CapturedCapital
+    )
         result = 0.35 * HEX_HALF_HEIGHT
     if (text) // longer text is small, so shift it up to compensate
         result -= 0.03 * HEX_HALF_HEIGHT * (text.length - 1)
     return result
 }
 export const textSize = (tile: Tile, text: String): number => {
-    // small in capital & house
     let result = HEX_HALF_HEIGHT
-    if (!tile.known) result *= 1.5
+    if (!tile.known) result *= 1.5 // small in capital & city
     if (text.length > 1)
         result *= (0.9 ** (text.length - 1))
     return result
+}
+
+const extraTextProps = (props: TileHexViewProps):
+    React.SVGProps<SVGTextElement> | undefined =>
+{
+    if (props.tile.terrain === Terrain.Capital) {
+        return {
+            stroke: props.color.toHexString(),
+            strokeWidth: '1px',
+            strokeLinejoin: 'miter',
+            fontWeight: 'bolder',
+        }
+    }
+    else return undefined
 }
 
 export const TileHexView = (props: TileHexViewProps) => {
@@ -54,6 +71,7 @@ export const TileHexView = (props: TileHexViewProps) => {
     if (props.text)
         children.push(
             <text
+                {...extraTextProps(props)}
                 key="pop"
                 // TODO move this into a style sheet
                 y={textY(props.tile, props.text)}

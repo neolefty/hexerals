@@ -55,7 +55,7 @@ terrainShaders.set(
 
 { // castle
     const [ w, h, doorW, doorH ] = [ 9, 16, 2.5, 11 ]
-    const [ crenH, flagH ] = [ 5, 13 ]
+    const [ crenH, flagH ] = [ 5, 20 ]
     const [ flagW, flagM ] = [ flagH * 0.7, flagH * 0.3 ]
     const dy = 4 // shift down
 
@@ -93,29 +93,34 @@ terrainShaders.set(
     ])
     terrainShaders.set(Terrain.Capital, (index, color) =>
         (index === 0)
-            ? color.contrast()
-            : CITY_SHADER(index - 1, color)
+            ? color.texture(20)
+            : color.contrast().texture((index % 2) * 9)
     )
 
     // TODO make a framework for lists of pairs that can be transformed en mass — convert to String in code?
     // captured --> without the flag, shorter ...
-    const dy2 = h * 0.125
-    const [ ul2, lr2, ll2, ur2 ] = [
-        ul.plusY(dy2), lr.plusY(-dy2), ll.plusY(-dy2), ur.plusY(dy2) ]
-    const [ dUL2, dLL2, dLR2, dUR2 ] = [
-        doorUL.plusY(-dy2), doorLL.plusY(-dy2),
-        doorLR.plusY(-dy2), doorUR.plusY(-dy2) ]
-    const crenD2 = crenD.scale(0.7)
-    terrainPolygons.set(Terrain.CapturedCapital, [
-        `${ur2} ${lr2} ${ll2} ${ul2}`
-            + ` ${ul2.plus(crenR1)} ${ul2.plus(crenR1).plus(crenD2)}`
-            + ` ${ul2.plus(crenR2).plus(crenD2)} ${ul2.plus(crenR2)}`
-            + ` ${ul2.plus(crenR3)} ${ul2.plus(crenR3).plus(crenD2)}`
-            + ` ${ul2.plus(crenR4).plus(crenD2)} ${ul2.plus(crenR4)}`,
-        `${dUL2} ${dLL2} ${dLR2} ${dUR2}`,
-    ])
-    // ... & muted
-    terrainShaders.set(Terrain.CapturedCapital, UNKNOWN_SHADER)
+    // const dy2 = h * 0.125
+    // const [ ul2, lr2, ll2, ur2 ] = [
+    //     ul.plusY(dy2), lr.plusY(-dy2), ll.plusY(-dy2), ur.plusY(dy2) ]
+    // const [ dUL2, dLL2, dLR2, dUR2 ] = [
+    //     doorUL.plusY(-dy2), doorLL.plusY(-dy2),
+    //     doorLR.plusY(-dy2), doorUR.plusY(-dy2) ]
+    // const crenD2 = crenD.scale(0.7)
+    // terrainPolygons.set(Terrain.CapturedCapital, [
+    //     `${ur2} ${lr2} ${ll2} ${ul2}`
+    //         + ` ${ul2.plus(crenR1)} ${ul2.plus(crenR1).plus(crenD2)}`
+    //         + ` ${ul2.plus(crenR2).plus(crenD2)} ${ul2.plus(crenR2)}`
+    //         + ` ${ul2.plus(crenR3)} ${ul2.plus(crenR3).plus(crenD2)}`
+    //         + ` ${ul2.plus(crenR4).plus(crenD2)} ${ul2.plus(crenR4)}`,
+    //     `${dUL2} ${dLL2} ${dLR2} ${dUR2}`,
+    // ])
+    // // ... & muted
+    // terrainShaders.set(Terrain.CapturedCapital, UNKNOWN_SHADER)
+    terrainPolygons.set(
+        Terrain.CapturedCapital,
+        terrainPolygons.get(Terrain.Capital).slice(1,3) // remove flag
+    )
+    terrainShaders.set(Terrain.CapturedCapital, CITY_SHADER)
 }
 
 export const getTerrainPolygons = (tile: Tile): string[] | undefined =>
