@@ -1,5 +1,5 @@
 import {Hex} from './Hex'
-import {Range, Seq, Set} from 'immutable'
+import {List, Range, Seq, Set} from 'immutable'
 import * as assert from 'assert'
 
 export class RectEdges {
@@ -55,7 +55,6 @@ export class RectEdges {
 
 // The shape of a board -- what hexes are in and not in the board?
 export abstract class BoardConstraints {
-    private allCache?: Set<Hex>
     // what's a good place to start if we want to enumerate this board's coordinates?
 
     // static readonly LTE = (x: number, y: number) => (x <= y)
@@ -93,10 +92,24 @@ export abstract class BoardConstraints {
         )
     }
 
+    // tslint:disable-next-line:member-ordering
+    private _allHexes?: Set<Hex>
     all(): Set<Hex> {
-        if (this.allCache === undefined)
-            this.allCache = this.buildAll()
-        return this.allCache
+        if (this._allHexes === undefined)
+            this._allHexes = this.buildAll()
+        return this._allHexes
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _allSorted?: List<Hex> = undefined
+    get allSorted(): List<Hex> {
+        if (this._allSorted === undefined) {
+            this._allSorted = List<Hex>(this.all()).sort(
+                (a: Hex, b: Hex) =>
+                    a.compareTo(b)
+            ) as List<Hex>
+        }
+        return this._allSorted
     }
 
     // Compile the set of all hexes that are in bounds and connected to this.start().

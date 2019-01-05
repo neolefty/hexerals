@@ -186,6 +186,11 @@ export class Hex {
         // y: leftDown-rightUp
         this.z = -x - y;
     }
+
+    compareTo(that: Hex): number {
+        const dy = that.cartY - this.cartY
+        return dy !== 0 ? dy : that.cartX - this.cartX
+    }
 }
 
 export const hexesToString = (s: List<Hex> | undefined) => {

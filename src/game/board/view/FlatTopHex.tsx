@@ -126,6 +126,4 @@ export class FlatTopHex
                 {children}
             </g>
         )    }
-
-
 }

@@ -23,7 +23,7 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
-                boardState.board.constraints.all().map(hex => {
+                boardState.board.constraints.allSorted.map(hex => {
                     const tile = boardState.board.getTile(hex)
                     const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
