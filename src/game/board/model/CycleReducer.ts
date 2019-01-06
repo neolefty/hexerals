@@ -22,10 +22,10 @@ export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
         numRobots: 5,
-        boardWidth: 17,
-        boardHeight: 9,
+        boardWidth: 27,
+        boardHeight: 13,
         difficulty: 0,
-        mountainPercent: 30,
+        mountainPercent: 25,
         tickMillis: 500,
         startingPop: 0,
         // booleans — non-zero is true
@@ -79,6 +79,7 @@ const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
     const players = pickNPlayers(state.localOptions.numRobots + 1)
+    console.log(players.toArray())
     const mountainFrequency = state.localOptions.mountainPercent / 100
     const messages: StatusMessage[] = []
     const newBoard = Board.constructRectangular(

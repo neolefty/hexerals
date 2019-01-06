@@ -6,6 +6,8 @@ export enum Player {
     Zero = 'Zero', One = 'One', Two = 'Two', Three = 'Three',
     Four = 'Four', Five = 'Five', Six = 'Six', Seven = 'Seven',
     Eight = 'Eight', Nine = 'Nine', Ten = 'Ten', Eleven = 'Eleven',
+    Twelve = 'Twelve', Thirteen = 'Thirteen', Fourteen = 'Fourteen',
+    Fifteen = 'Fifteen',
 }
 
 export const PLAYERS: Map<number, Player> = Map([
@@ -13,6 +15,8 @@ export const PLAYERS: Map<number, Player> = Map([
     [0, Player.Zero], [1, Player.One], [2, Player.Two], [3, Player.Three],
     [4, Player.Four], [5, Player.Five], [6, Player.Six], [7, Player.Seven],
     [8, Player.Eight], [9, Player.Nine], [10, Player.Ten], [11, Player.Eleven],
+    [12, Player.Twelve], [13, Player.Thirteen], [14, Player.Fourteen],
+    [15, Player.Fifteen],
 ])
 
 export const pickNPlayers = (n: number): List<Player> => {

@@ -20,13 +20,12 @@ export const MoveQueueView = (props: MoveQueueViewProps) => (
         props.moves.playerQueues.map(
             (moveList: List<HexMove>, player: Player) => {
                 return (
-                    <g key={player.valueOf()}>
-                        <MoveListView
-                            moveList={moveList}
-                            color={props.colors.get(player)}
-                            boardHeight={props.boardHeight}
-                        />
-                    </g>
+                    <MoveListView
+                        key={props.players.indexOf(player)}
+                        moveList={moveList}
+                        color={props.colors.get(player)}
+                        boardHeight={props.boardHeight}
+                    />
                 )
             }
         ).toArray() // is there a direct way to map to an iterator (like a list) rather than a map?
