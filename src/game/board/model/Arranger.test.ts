@@ -3,7 +3,7 @@ import {Set} from 'immutable'
 import {Hex} from './Hex'
 import {Terrain} from './Terrain'
 import {Board} from './Board'
-import {pickNPlayers} from './players/Players';
+import {pickNPlayers, PLAYERS} from './players/Players';
 import {connected} from './HexGraph';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {MAP_TOO_SMALL} from './Arranger'
@@ -60,6 +60,14 @@ it('places mountains randomly', () => {
     expect(setOfMountainSets.filter(
         s => !!(s && s.size === expectedMountains)).size
     ).toBe(nTrials)
+})
+
+it ('prevents picking too many players', () => {
+    // the first of PLAYERS is Player.Nobody (the not-a-player)
+    const n = PLAYERS.size - 1
+    // expect a list of N unique players
+    expect(Set(pickNPlayers(n)).size).toBe(n)
+    expect(() => pickNPlayers(PLAYERS.size)).toThrowError()
 })
 
 it('does not get trapped or bisect', () => {

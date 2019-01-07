@@ -1,5 +1,6 @@
 import {List, Map} from 'immutable'
 import {Robot} from './Robot'
+import * as assert from 'assert';
 
 export enum Player {
     Nobody = 'Nobody',
@@ -22,8 +23,11 @@ export const PLAYERS: Map<number, Player> = Map([
 export const pickNPlayers = (n: number): List<Player> => {
     const result: List<Player> = List()
     return result.withMutations(m => {
-        for (let i = 0; i < n; ++i)
-            m.push(PLAYERS.get(i))
+        for (let i = 0; i < n; ++i) {
+            const player = PLAYERS.get(i)
+            assert(player !== undefined)
+            m.push(player)
+        }
     })
 }
 

@@ -79,7 +79,6 @@ const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
     const players = pickNPlayers(state.localOptions.numRobots + 1)
-    console.log(players.toArray())
     const mountainFrequency = state.localOptions.mountainPercent / 100
     const messages: StatusMessage[] = []
     const newBoard = Board.constructRectangular(
