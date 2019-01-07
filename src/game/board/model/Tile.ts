@@ -40,7 +40,7 @@ export class Tile {
             case Terrain.Empty:
                 return undefined
             case Terrain.Mountain:
-                return Tile.MAYBE_MOUNTAIN
+                return seenBefore ? Tile.MOUNTAIN : Tile.MAYBE_MOUNTAIN
             case Terrain.City:
                 return seenBefore ? Tile.MAYBE_CITY : Tile.MAYBE_MOUNTAIN
             case Terrain.Capital:
