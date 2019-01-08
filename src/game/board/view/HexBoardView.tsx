@@ -12,6 +12,8 @@ import {BoardViewBase, BoardViewProps} from './BoardViewBase';
 const OUTER_BOARD_MARGIN = 1
 // space between hex viewbox and hexes
 const INNER_BOARD_MARGIN = 1
+// flags stick up above the top a bit
+const FLAG_CLEARANCE = 5
 
 export class HexBoardView extends BoardViewBase {
     private focusRef = React.createRef<HTMLDivElement>()
@@ -78,9 +80,9 @@ export class HexBoardView extends BoardViewBase {
                     height={boardHeight}
                     viewBox={[
                         -INNER_BOARD_MARGIN,
-                        -INNER_BOARD_MARGIN,
+                        -INNER_BOARD_MARGIN - FLAG_CLEARANCE,
                         scaleWidth + INNER_BOARD_MARGIN,
-                        scaleHeight + INNER_BOARD_MARGIN
+                        scaleHeight + INNER_BOARD_MARGIN + FLAG_CLEARANCE,
                     ].join(',')}
                 >
                     <rect

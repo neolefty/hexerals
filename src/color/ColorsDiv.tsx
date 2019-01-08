@@ -2,7 +2,7 @@ import {ColorWheel, ColorWheelProps} from './ColorWheel';
 import * as React from 'react';
 import {ColorBlobs} from './ColorBlobs';
 import {Ticker} from '../common/Ticker';
-import CartPair from '../common/CartPair';
+import {CartPair} from '../common/CartPair';
 
 export const ColorsDiv = (props: ColorWheelProps) => {
     const rod = Math.min(props.displaySize.x * 0.5, props.displaySize.y)

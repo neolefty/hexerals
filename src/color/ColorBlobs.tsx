@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Map} from 'immutable'
 import {ColorPodge} from './ColorPodge'
 import {DriftColor} from './DriftColor'
-import CartPair from '../common/CartPair'
+import {CartPair} from '../common/CartPair'
 
 const SPACE_FILL = 0.65
 const MIN_STEP_MILLIS = 16 // no faster than 60 fps

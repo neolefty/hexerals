@@ -5,7 +5,7 @@
 // corners starting at upper left and going counterclockwise are:
 // (-15, -26) (-30, 0) (-15, 26) (15, 26) (30, 0) (15, -26)
 
-import CartPair from '../../../common/CartPair';
+import {CartPair} from '../../../common/CartPair';
 
 export const HEX_RADIUS = 30
 export const HEX_MID = HEX_RADIUS * 0.5

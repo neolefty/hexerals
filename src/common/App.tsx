@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 
 import './App.css'
-import CartPair from './CartPair'
+import {CartPair} from './CartPair'
 import {ColorsContainer} from '../color/ColorsContainer'
 import {ColorsState} from '../color/ColorsReducer';
 import {CycleState} from '../game/board/model/CycleState'

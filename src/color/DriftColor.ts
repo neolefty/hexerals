@@ -89,7 +89,7 @@ export class DriftColor {
                     this.cie.hsl[0] + 180,
                     DriftColor.MAX_SAT,
                     this.cie.hsl[2] > DriftColor.MID_LIGHT
-                        ? DriftColor.MIN_BRIGHT
+                        ? DriftColor.MIN_BRIGHT + 5 // allow more color
                         : DriftColor.MAX_BRIGHT,
                 ]),
                 1 - this.key

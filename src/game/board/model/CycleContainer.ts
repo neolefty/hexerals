@@ -1,7 +1,7 @@
 import {Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import {CycleView} from '../view/CycleView';
-import CartPair from '../../../common/CartPair';
+import {CartPair} from '../../../common/CartPair';
 import {
     changeLocalOptionAction, closeGameAction, openLocalGameAction,
 } from './CycleReducer';

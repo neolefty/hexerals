@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import CartPair from '../../../common/CartPair'
+import {CartPair} from '../../../common/CartPair'
 import './LocalGameOptions.css'
 import {CheckInput, NumberInput} from '../../../common/Inputs';
 import {BasicRobot} from '../model/players/BasicRobot';

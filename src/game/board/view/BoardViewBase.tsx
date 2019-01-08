@@ -1,5 +1,5 @@
 import {BoardState} from '../model/BoardState';
-import CartPair from '../../../common/CartPair';
+import {CartPair} from '../../../common/CartPair';
 import {List, Map} from 'immutable';
 import {Player} from '../model/players/Players';
 import {DriftColor} from '../../../color/DriftColor';

@@ -4,10 +4,10 @@ import * as Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {shallow} from 'enzyme'
 
-import {queueMovesAction,} from '../model/BoardReducer'
+import {queueMovesAction} from '../model/BoardReducer'
 import {Board} from '../model/Board'
 import {Hex} from '../model/Hex'
-import CartPair from "../../../common/CartPair"
+import {CartPair} from "../../../common/CartPair"
 import {BoardViewBase, BOARD_STUBS} from "./BoardViewBase"
 import {BoardState} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'

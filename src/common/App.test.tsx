@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore} from 'redux';
-import CartPair from "./CartPair";
+import {CartPair} from "./CartPair";
 import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from '../game/board/model/CycleReducer';
 import {CycleState} from '../game/board/model/CycleState';
 import {CycleContainer} from '../game/board/model/CycleContainer';

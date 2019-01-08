@@ -1,6 +1,6 @@
 import {ColorPodge} from './ColorPodge';
 import {GenericAction} from '../common/App';
-import CartPair from '../common/CartPair';
+import {CartPair} from '../common/CartPair';
 
 const DRIFT = 5
 

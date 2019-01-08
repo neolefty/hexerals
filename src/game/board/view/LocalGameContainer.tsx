@@ -7,7 +7,7 @@ import {
     queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
 } from '../model/BoardReducer'
 import {AppState} from '../../../common/App'
-import CartPair from '../../../common/CartPair'
+import {CartPair} from '../../../common/CartPair'
 import {BoardState} from '../model/BoardState'
 import {DriftColor} from '../../../color/DriftColor'
 import {ColorPodge} from '../../../color/ColorPodge'

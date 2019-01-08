@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import CartPair from '../../../common/CartPair';
+import {CartPair} from '../../../common/CartPair';
 import {TileHexView} from './TileHexView';
 import {Tile} from '../model/Tile';
 import {Hex} from '../model/Hex';

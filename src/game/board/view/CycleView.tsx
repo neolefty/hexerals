@@ -1,4 +1,4 @@
-import CartPair from '../../../common/CartPair'
+import {CartPair} from '../../../common/CartPair'
 import {LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'

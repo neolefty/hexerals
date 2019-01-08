@@ -1,7 +1,7 @@
 import {HEX_HALF_HEIGHT, HEX_LL_XY, HEX_LR_XY, HEX_RIGHT_XY, HEX_UL_XY, HEX_UR_XY} from './HexContants';
 import {Tile} from '../model/Tile';
 import {Map} from 'immutable';
-import CartPair from '../../../common/CartPair';
+import {CartPair, CartChain} from '../../../common/CartPair';
 import {Terrain} from '../model/Terrain';
 import {DriftColor} from '../../../color/DriftColor';
 
@@ -55,7 +55,7 @@ terrainShaders.set(
 
 { // castle
     const [ w, h, doorW, doorH ] = [ 9, 16, 2.5, 11 ]
-    const [ crenH, flagH ] = [ 5, 13 ]
+    const [ crenH, flagH ] = [ 5, 19 ]
     const [ flagW, flagM ] = [ flagH * 0.7, flagH * 0.3 ]
     const dy = 4 // shift down
 
@@ -64,6 +64,7 @@ terrainShaders.set(
     const ll = new CartPair(-w, h + dy)
     const ul = new CartPair(-w, -h + dy)
 
+    // crenelations
     const crenR = new CartPair(w * 0.4, 0)
     const crenD = new CartPair(0, crenH)
     const crenR1 = crenR.scale(1).plusX(+.4)
@@ -82,37 +83,32 @@ terrainShaders.set(
     const flagTop = flagBase.plusY(-flagH)
     const flagMid = flagBase.plusXY(flagW * .05, -flagM)
 
+    const [ flag, building, door ] = [
+        CartChain.construct(flagBase, flagTop, flagRight, flagMid, flagBase2),
+        CartChain.construct(
+            ur, lr, ll, ul,
+            ul.plus(crenR1), ul.plus(crenR1).plus(crenD),
+            ul.plus(crenR2).plus(crenD), ul.plus(crenR2),
+            ul.plus(crenR3), ul.plus(crenR3).plus(crenD),
+            ul.plus(crenR4).plus(crenD), ul.plus(crenR4),
+        ),
+        CartChain.construct(doorUL, doorLL, doorLR, doorUR),
+    ]
+
     terrainPolygons.set(Terrain.Capital, [
-        `${flagBase} ${flagTop} ${flagRight} ${flagMid} ${flagBase2}`,
-        `${ur} ${lr} ${ll} ${ul}`
-            + ` ${ul.plus(crenR1)} ${ul.plus(crenR1).plus(crenD)}`
-            + ` ${ul.plus(crenR2).plus(crenD)} ${ul.plus(crenR2)}`
-            + ` ${ul.plus(crenR3)} ${ul.plus(crenR3).plus(crenD)}`
-            + ` ${ul.plus(crenR4).plus(crenD)} ${ul.plus(crenR4)}`,
-        `${doorUL} ${doorLL} ${doorLR} ${doorUR}`,
-    ])
+        flag.toString(), building.toString(), door.toString()])
     terrainShaders.set(Terrain.Capital, (index, color) =>
         (index === 0)
             ? color.contrast()
             : CITY_SHADER(index - 1, color)
     )
 
-    // TODO make a framework for lists of pairs that can be transformed en mass — convert to String in code?
-    // captured --> without the flag, shorter ...
-    const dy2 = h * 0.125
-    const [ ul2, lr2, ll2, ur2 ] = [
-        ul.plusY(dy2), lr.plusY(-dy2), ll.plusY(-dy2), ur.plusY(dy2) ]
-    const [ dUL2, dLL2, dLR2, dUR2 ] = [
-        doorUL.plusY(-dy2), doorLL.plusY(-dy2),
-        doorLR.plusY(-dy2), doorUR.plusY(-dy2) ]
-    const crenD2 = crenD.scale(0.7)
+    // Captured: shorter ...
+    const cap = (chain: CartChain) =>
+        chain.scaleXY(1, 0.8).plusXY(0, h * -0.25)
     terrainPolygons.set(Terrain.CapturedCapital, [
-        `${ur2} ${lr2} ${ll2} ${ul2}`
-            + ` ${ul2.plus(crenR1)} ${ul2.plus(crenR1).plus(crenD2)}`
-            + ` ${ul2.plus(crenR2).plus(crenD2)} ${ul2.plus(crenR2)}`
-            + ` ${ul2.plus(crenR3)} ${ul2.plus(crenR3).plus(crenD2)}`
-            + ` ${ul2.plus(crenR4).plus(crenD2)} ${ul2.plus(crenR4)}`,
-        `${dUL2} ${dLL2} ${dLR2} ${dUR2}`,
+        cap(building).toString(),
+        cap(door).toString(),
     ])
     // ... & muted
     terrainShaders.set(Terrain.CapturedCapital, UNKNOWN_SHADER)
