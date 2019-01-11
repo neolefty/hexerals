@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {List} from 'immutable'
 
-import {BoardState} from '../model/BoardState'
+import {BoardState, DEFAULT_CURSORS} from '../model/BoardState'
 import {HexBoardView} from './HexBoardView'
 import {ColorPodge} from '../../../color/ColorPodge'
 import {CartPair} from '../../../common/CartPair'
@@ -10,7 +10,6 @@ import './Benchmark.css'
 import {Board} from '../model/Board'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {Hex} from '../model/Hex'
 import {MovementQueue} from '../model/MovementQueue'
 import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import {BasicRobot} from '../model/players/BasicRobot'
@@ -61,7 +60,7 @@ const newBoardState = (
         ]
     ),
     turn: 0,
-    cursor: Hex.NONE,
+    cursors: DEFAULT_CURSORS,
     moves: new MovementQueue(),
     players: assignRobots(),
     curPlayer: undefined,

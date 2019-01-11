@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {List} from 'immutable'
+import {List, Map, Seq} from 'immutable'
 import * as Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {shallow} from 'enzyme'
@@ -9,7 +9,7 @@ import {Board} from '../model/Board'
 import {Hex} from '../model/Hex'
 import {CartPair} from "../../../common/CartPair"
 import {BoardViewBase, BOARD_STUBS} from "./BoardViewBase"
-import {BoardState} from '../model/BoardState'
+import {BoardState, DEFAULT_CURSORS} from '../model/BoardState'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../model/MovementQueue'
 import {Tile} from '../model/Tile';
@@ -17,6 +17,7 @@ import {PlayerMove} from '../model/Move';
 import {CornersPlayerArranger} from '../model/PlayerArranger';
 import {BoardReducerTester} from './BoardReducerTester';
 import {Terrain} from '../model/Terrain';
+import Set = Seq.Set;
 
 it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})
@@ -42,7 +43,7 @@ it('renders a board with no selection', () => {
     const boardState: BoardState = {
         board: board,
         turn: 0,
-        cursor: Hex.NONE,
+        cursors: DEFAULT_CURSORS,
         moves: EMPTY_MOVEMENT_QUEUE,
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
@@ -74,14 +75,15 @@ it('renders a board with a selection', () => {
     const bs: BoardState = {
         board: board,
         turn: 0,
-        cursor: ur,
+        cursors: Map<number, Hex>([[0, ur]]),
         moves: EMPTY_MOVEMENT_QUEUE,
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
         messages: List(),
     }
     const view = enzyme.render(
-        <OldGridView  {...BOARD_STUBS}
+        <OldGridView
+            {...BOARD_STUBS}
             boardState={bs}
             displaySize={new CartPair(1000, 1000)}
         />
@@ -187,22 +189,22 @@ it('queues multiple moves at once', () => {
 
 it('blocks illegal moves', () => {
     const brt = new BoardReducerTester()
-    expect(brt.cursor === Hex.NONE).toBeTruthy()
+    expect(brt.firstCursor === Hex.NONE).toBeTruthy()
     expect(brt.cursorRawTile).toBeUndefined()
 
-    // try to move when there's no cursor -- should have no effect
+    // try to move when there's no cursors -- should have no effect
     const boardBefore = brt.board
     expect(brt.moves.size).toEqual(0)
     brt.queueMoveDown(false)
-    expect(brt.cursor === Hex.NONE).toBeTruthy()
+    expect(brt.firstCursor === Hex.NONE).toBeTruthy()
     expect(brt.moves.size).toEqual(0)
 
-    // trying to move the cursor relative to a nonexistent cursor should have no effect
+    // trying to move the cursors relative to a nonexistent cursors should have no effect
     brt.queueMoveDown(true)
-    expect(brt.cursor === Hex.NONE).toBeTruthy()
+    expect(brt.firstCursor === Hex.NONE).toBeTruthy()
     expect(boardBefore === brt.board).toBeTruthy()  // no moves executed
     brt.doMoves() // still no legit moves requested, so no effective moves
-    expect(brt.cursor === Hex.NONE).toBeTruthy()
+    expect(brt.firstCursor === Hex.NONE).toBeTruthy()
     expect(brt.moves.size).toEqual(0)
 
     // through all this, the board should be unchanged
@@ -210,17 +212,17 @@ it('blocks illegal moves', () => {
     // this was causing memory errors for some reason but is working now?
     expect(boardBefore === brt.board).toBeTruthy()  // no effect on board
 
-    // place cursor outside bounds -- no effect
+    // place cursors outside bounds -- no effect
     brt.setCursor(Hex.LEFT_UP)
-    expect(brt.cursor === Hex.NONE).toBeTruthy()
+    expect(brt.firstCursor === Hex.NONE).toBeTruthy()
 })
 
-// it('moves the cursor', () => {
+// it('moves the cursors', () => {
 //     const st = new storeTester()
 //     const ul = st.board.edges.upperLeft
 //     st.setCursor(ul)
 //     st.queueMoveDown()
-//     expect(st.cursor === ul.getDown()).toBeTruthy()
+//     expect(st.cursors === ul.getDown()).toBeTruthy()
 //     expect(st.cursorRawTile).toBeUndefined()
 // })
 
@@ -239,23 +241,23 @@ it('cancels moves', () => {
     brt.queueMoveUp()
     expect(brt.moves.size).toBe(4)
     const up2 = brt.ll.plus(Hex.UP).plus(Hex.UP)
-    expect(brt.cursor === up2).toBeTruthy()
+    expect(brt.firstCursor === up2).toBeTruthy()
 
-    // cancel a move and expect the cursor to retreat
+    // cancel a move and expect the cursors to retreat
     brt.cancelMoves()
     expect(brt.moves.playerHasMove(Player.Zero)).toBeTruthy()
-    expect(brt.cursor === brt.ll.plus(Hex.UP)).toBeTruthy()
+    expect(brt.firstCursor === brt.ll.plus(Hex.UP)).toBeTruthy()
     expect(brt.moves.size).toBe(3)
 
-    // now cancel one of the other player's moves -- away from the cursor
+    // now cancel one of the other player's moves -- away from the cursors
     brt.cancelMoves(Player.One)
     expect(brt.moves.playerQueues.get(Player.One).size).toBe(1)
-    expect(brt.cursor === brt.ll.plus(Hex.UP)).toBeTruthy()
+    expect(brt.firstCursor === brt.ll.plus(Hex.UP)).toBeTruthy()
     expect(brt.moves.size).toBe(2)
 
     // cancel the current player's remaining move
     brt.cancelMoves()
-    expect(brt.cursor === brt.ll).toBeTruthy()
+    expect(brt.firstCursor === brt.ll).toBeTruthy()
     expect(brt.moves.playerHasMove(Player.Zero)).toBeFalsy()
     expect(brt.moves.size).toBe(1)
 
@@ -276,45 +278,45 @@ it('cancels moves', () => {
     for (let i: number = 0; i < 7; i++)
         brt.queueMoveUp()
     expect(brt.moves.size).toBe(7)
-    brt.cancelMoves(Player.Zero, 5)
+    brt.cancelMoves(Player.Zero, 0, 5)
     expect(brt.moves.size).toBe(2)
-    expect(brt.cursor === up2).toBeTruthy()
-    brt.cancelMoves(Player.Zero, -1)
+    expect(brt.firstCursor === up2).toBeTruthy()
+    brt.cancelMoves(Player.Zero, 0, -1)
     expect(brt.moves.size).toBe(0)
-    expect(brt.cursor === brt.ll).toBeTruthy()
+    expect(brt.firstCursor === brt.ll).toBeTruthy()
 })
 
 it('makes real moves', () => {
     const brt = new BoardReducerTester()
 
-    // place cursor at upper right
+    // place cursors at upper right
     const boardBefore = brt.board
     brt.setCursor(brt.ur)
-    expect(brt.cursor === brt.ur).toBeTruthy()
+    expect(brt.firstCursor === brt.ur).toBeTruthy()
     expect(brt.getRawTile(brt.ur.getDown())).toBeUndefined()
 
     brt.queueMoveDown()
     expect(brt.moves.size).toBe(0) // no current player yet
-    brt.setCurPlayer(Player.One) // cursor is on One's starting point, UR corner
+    brt.setCurPlayer(Player.One) // cursors is on One's starting point, UR corner
     brt.queueMoveDown()
-    expect(brt.cursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
+    expect(brt.firstCursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
     expect(brt.moves.size).toBe(1)
 
     // interlude: queue and cancel a move UP
     brt.queueMove(Player.One, Hex.UP)
     expect(brt.moves.size).toBe(2)
-    expect(brt.cursor === brt.ur).toBeTruthy()
+    expect(brt.firstCursor === brt.ur).toBeTruthy()
     brt.cancelMoves(Player.One)
     expect(brt.moves.size).toBe(1)
-    // cancel moved the cursor back intelligently
-    expect(brt.cursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
+    // cancel moved the cursors back intelligently
+    expect(brt.firstCursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
 
-    // also check that cancelling doesn't move the cursor back stupidly
+    // also check that cancelling doesn't move the cursors back stupidly
     brt.queueMove(Player.One, Hex.UP)
     brt.setCursor(brt.ul)
     brt.cancelMoves(Player.One)
     expect(brt.moves.size).toBe(1)
-    expect(brt.cursor === brt.ul).toBeTruthy()
+    expect(brt.firstCursor === brt.ul).toBeTruthy()
     brt.setCursor(brt.ur.plus(Hex.DOWN)) // back where we should be
 
     expect(boardBefore === brt.board).toBeTruthy() // only queued -- no board updates yet
@@ -323,14 +325,14 @@ it('makes real moves', () => {
     const boardAfter1 = brt.board
     // console.log(`-- moved --\n${boardStateToString(brt.state)}`)
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
-    expect(brt.cursor === brt.ur.getDown()).toBeTruthy()
+    expect(brt.firstCursor === brt.ur.getDown()).toBeTruthy()
     expect(brt.cursorRawTile).toEqual(
         new Tile(Player.One, BoardReducerTester.INITIAL_POP - 1)
     )
 
     // can't move more than 1 space at a time (can't jump)
     const down2 = Hex.DOWN.getDown()
-    const dest2 = brt.cursor.plus(down2)
+    const dest2 = brt.firstCursor.plus(down2)
     // even though the destination is in bounds
     expect((brt.board.inBounds(dest2)))
     brt.queueMove(Player.One, down2, true)
@@ -341,9 +343,9 @@ it('makes real moves', () => {
     // no change occurred due to rejected move
     expect(brt.board === boardAfter1).toBeTruthy()
     // expect(brt.board === boardAfter1).toBeTruthy()
-    // but we DID move the cursor
+    // but we DID move the cursors
     const down3 = brt.ur.getDown().plus(down2)
-    expect(brt.cursor === down3).toBeTruthy()
+    expect(brt.firstCursor === down3).toBeTruthy()
 
     // TODO queue from queued-to tile
 
@@ -351,7 +353,7 @@ it('makes real moves', () => {
     brt.setCursor(brt.ur.getDown())
     brt.queueMoveDown(false)
     brt.doMoves()
-    expect(brt.cursor === brt.ur.getDown()).toBeTruthy() // didn't move cursor this time
+    expect(brt.firstCursor === brt.ur.getDown()).toBeTruthy() // didn't move cursors this time
 
     // queue two moves down-left
     brt.setCursor(brt.ur)
@@ -375,7 +377,7 @@ it('makes real moves', () => {
 
     // moving contents 1 has no effect
     brt.setCursor(brt.ur.getDown())
-    expect(brt.cursorTile.owner === Player.One).toBeTruthy()
+    expect(brt.firstCursorTile.owner === Player.One).toBeTruthy()
     const before2 = brt.board
     brt.queueMoveDown(false)
     brt.doMoves()
@@ -412,6 +414,7 @@ export const OldGridTileView = (props: OldGridTileProps) => (
 export class OldGridView extends BoardViewBase {
     render(): React.ReactNode {
         const bs: BoardState = this.props.boardState
+        const cursorSet: Set<Hex> = Set<Hex>(this.props.boardState.cursors.values())
         return (
             <div
                 className="board"
@@ -433,8 +436,8 @@ export class OldGridView extends BoardViewBase {
                                         <OldGridTileView
                                             tile={bs.board.getTile(coord)}
                                             key={coord.id}
-                                            selected={coord === bs.cursor}
-                                            onSelect={() => this.props.onPlaceCursor(coord)}
+                                            selected={cursorSet.contains(coord)}
+                                            onSelect={() => this.props.onPlaceCursor(0, coord, true)}
                                             coord={coord}
                                         />
                                     )

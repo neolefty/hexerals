@@ -3,12 +3,13 @@ import {List} from 'immutable'
 import {Hex} from './Hex'
 import {HexMove, PlayerMove} from './Move';
 import {Board} from './Board'
-import {BoardState} from './BoardState'
+import {BoardState, DEFAULT_CURSORS} from './BoardState'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
 import {GenericAction} from '../../../common/App'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
 import {GameDecision, Robot} from './players/Robot';
+import {floodShortestPath} from './ShortestPath';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -16,7 +17,7 @@ import {GameDecision, Robot} from './players/Robot';
 
 export type GameAction
     = NewGame | QueueMoves | PlaceCursor | SetCurPlayer
-        | DoMoves | CancelMoves | StepPop
+        | DoMoves | CancelMoves | Drag | StepPop
         | RobotsDecide | SetRobot
 
 // should never actually see this -- we just need a default for reducers
@@ -24,7 +25,7 @@ const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
     board: Board.constructSquare(2, INITIAL_PLAYERS),
     turn: 0,
-    cursor: Hex.NONE,
+    cursors: DEFAULT_CURSORS,
     players: PlayerManager.construct(INITIAL_PLAYERS),
     curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
@@ -40,6 +41,8 @@ export const BoardReducer = (
         state = placeCursorReducer(state, action)
     else if (isDoMoves(action))
         state = doMovesReducer(state)
+    else if (isDrag(action))
+        state = dragReducer(state, action)
     else if (isStepPop(action))
         state = stepPopReducer(state)
     else if (isCancelMoves(action))
@@ -64,10 +67,10 @@ interface NewGame extends GenericAction {
 const isNewGame = (action: GameAction): action is NewGame =>
     action.type === NEW_GAME
 export const newGameAction = (board: Board): NewGame =>
-    ({ type: NEW_GAME, board: board })
+    ({ type: NEW_GAME, board })
 const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
     ...state,
-    cursor: Hex.NONE,
+    cursors: DEFAULT_CURSORS,
     board: action.board,
 })
 
@@ -144,43 +147,129 @@ const doMovesReducer = (state: BoardState): BoardState => {
         return state
 }
 
+const DRAG = 'DRAG'
+type DRAG = typeof DRAG
+interface Drag extends GenericAction {
+    type: DRAG,
+    player: Player,
+    cursorIndex: number,
+    source: Hex,
+    dest: Hex,
+}
+const isDrag = (action: GameAction): action is Drag =>
+    action.type === DRAG
+export const dragAction = (
+    player: Player, cursorIndex: number, source: Hex, dest: Hex
+): Drag => ({
+    type: DRAG, player, cursorIndex, source, dest,
+})
+// drag behavior:
+//   * cursors follows initial selection & drag
+//   * dragging adds to queue, TODO preferring high-pop hexes
+//   * backtracking (exactly) removes from queue
+
+// high-speed drag behavior (not implemented):
+//   * cursors set by drag start, follows tail of queue
+//   * dragging resets queue to be best path from cursors
+//   * no need for additional queue removal behavior
+
+// TODO move this logic elsewhere
+const dragReducer = (
+    state: BoardState, action: Drag
+): BoardState => {
+    const destTile = state.board.getTile(action.dest)
+    if (destTile.canBeOccupied) {
+        let path = floodShortestPath(state.board.hexesOccupiable, action.source, action.dest)
+
+        // console.log(`drag along ${path.map(hex => hex.toString()).toArray()} to ${destTile}`)
+
+        // cancel backtracked moves
+        const queued: List<PlayerMove> = state.moves.playerQueues.get(action.player)
+        let nCancel = 0
+        if (queued && queued.size) {
+            const rPath = path.reverse()
+            // moves for this cursor, in reverse order ...
+            // noinspection PointlessBooleanExpressionJS
+            const rQueued = queued.reverse().filter(move =>
+                !!(move && move.cursorIndex === action.cursorIndex)
+            )
+            // ... cancel the ones that are a pure backtrack
+            while (
+                nCancel < rPath.size && nCancel < rQueued.size
+                && rPath.get(nCancel) === rQueued.get(nCancel).source
+            )
+                ++nCancel
+        }
+        if (nCancel > 0) {
+            state = cancelMoveReducer(
+                state,
+                cancelMovesAction(action.player, action.cursorIndex, nCancel)
+            )
+            path = path.slice(0, path.size - nCancel) as List<Hex>
+            // console.log(`--> cancelling ${nCancel}, leaving ${path.map(hex=>hex.toString()).toArray()}`)
+        }
+
+        // queue the rest of the path
+        if (path.size > 0) {
+            const toQueue = path.pop().map((source, index) =>
+                PlayerMove.constructDest(action.player, source, path.get(index + 1))
+            ) as List<PlayerMove>
+            // console.log(`--> queueing ${toQueue.toArray()}`)
+            state = queueMovesReducer(state, queueMovesAction(toQueue))
+        }
+
+        state = placeCursorReducer(
+            state,
+            placeCursorAction(action.dest, action.cursorIndex)
+        )
+    }
+    return state
+}
+
 // forget the last move in the queue
 const CANCEL_MOVES = 'CANCEL_MOVES'
 type CANCEL_MOVES = typeof CANCEL_MOVES
 interface CancelMoves extends GenericAction {
     type: CANCEL_MOVES,
     player: Player,
+    cursorIndex: number,
     count: number,
 }
 const isCancelMoves = (action: GameAction): action is CancelMoves =>
     action.type === CANCEL_MOVES
 export const cancelMovesAction = (
-    player: Player, count: number
+    player: Player, cursorIndex: number, count: number,
 ): CancelMoves => ({
-    type: CANCEL_MOVES,
-    player: player,
-    count: count,
+    type: CANCEL_MOVES, player, cursorIndex, count,
 })
 const cancelMoveReducer = (
     state: BoardState, action: CancelMoves
 ): BoardState => {
-    const updated: QueueAndMoves | undefined
-        = state.moves.cancelMoves(action.player, action.count)
+    const updated: QueueAndMoves | undefined =
+        state.moves.cancelMoves(
+            action.player, action.cursorIndex, action.count
+        )
+
     if (updated) {
         const cancelled = updated.moves
-        const oldest = cancelled.first() as PlayerMove
-        const newest = cancelled.last() as PlayerMove
         // Cancel cursor movement too if it looks like the current player just queued this move.
-        const cursor = (
-            state.curPlayer === oldest.player
-            && state.cursor === newest.dest
-        )
-            ? oldest.source
-            : state.cursor
+        let cursors = state.cursors
+        if (action.player === state.curPlayer) {
+            // If the cursor was at the end of the chain of cancelled moves (newest), move it back before the start of the chain (oldest).
+            cursors.forEach((cursor: Hex, index: number) => {
+                // noinspection PointlessBooleanExpressionJS
+                const cursorMatch = (move: PlayerMove): boolean =>
+                    !!(move && move.cursorIndex === index)
+                const oldest = cancelled.find(cursorMatch)
+                const newest = cancelled.findLast(cursorMatch)
+                if (oldest && newest && cursors.get(index) === newest.dest)
+                    cursors = cursors.set(index, oldest.source)
+            })
+        }
         return {
             ...state,
             moves: updated.queue,
-            cursor: cursor,
+            cursors,
         }
     }
     else
@@ -203,22 +292,30 @@ const PLACE_CURSOR = 'PLACE_CURSOR'
 type PLACE_CURSOR = typeof PLACE_CURSOR
 interface PlaceCursor extends GenericAction {
     type: PLACE_CURSOR
+    index: number
     position: Hex
+    clearOthers: boolean
 }
 const isPlaceCursor = (action: GameAction): action is PlaceCursor =>
     action.type === PLACE_CURSOR
-export const placeCursorAction = (position: Hex): PlaceCursor =>
-    ({ type: PLACE_CURSOR, position: position })
+export const placeCursorAction = (
+    position: Hex, index: number = 0, clearOthers: boolean = false,
+): PlaceCursor =>
+    ({ type: PLACE_CURSOR, position, index, clearOthers })
 const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState =>
     (
-        action.position === state.cursor
+        action.position === state.cursors.get(action.index)
         || !state.board.canBeOccupied(action.position)
         || !state.board.inBounds(action.position)
     )
         ? state
         : {
             ...state,
-            cursor: action.position,
+            cursors:
+                (action.clearOthers
+                    ? DEFAULT_CURSORS
+                    : state.cursors
+                ).set(action.index, action.position),
         }
 
 const SET_CUR_PLAYER = 'SET_CUR_PLAYER'
@@ -230,7 +327,7 @@ interface SetCurPlayer extends GenericAction {
 const isSetCurPlayer = (action: GameAction): action is SetCurPlayer =>
     action.type === SET_CUR_PLAYER
 export const setCurPlayerAction = (player: Player): SetCurPlayer =>
-    ({ type: SET_CUR_PLAYER, player: player })
+    ({ type: SET_CUR_PLAYER, player })
 const setCurPlayerReducer = (state: BoardState, action: SetCurPlayer): BoardState => ({
     ...state,
     curPlayer: action.player,
@@ -246,7 +343,7 @@ interface SetRobot extends GenericAction {
 const isSetRobot = (action: GameAction): action is SetRobot =>
     action.type === SET_ROBOT
 export const setRobotAction = (player: Player, robot: Robot | undefined): SetRobot =>
-    ({ type: SET_ROBOT, player: player, robot: robot })
+    ({ type: SET_ROBOT, player, robot })
 const setRobotReducer = (state: BoardState, action: SetRobot): BoardState => ({
     ...state,
     players: state.players.setRobot(action.player, action.robot)
@@ -268,7 +365,7 @@ const robotsDecideReducer = (state: BoardState): BoardState => {
         if (decision && decision.cancelMoves)
             result = cancelMoveReducer(
                 result,
-                cancelMovesAction(player, decision.cancelMoves)
+                cancelMovesAction(player, -1, decision.cancelMoves)
             )
         if (decision && decision.makeMoves)
             result = queueMovesReducer(

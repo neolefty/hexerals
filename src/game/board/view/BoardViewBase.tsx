@@ -10,8 +10,15 @@ import {BoardKeyboardController} from './BoardKeyboardController';
 
 export interface BoardViewActions {
     onQueueMoves: (moves: List<PlayerMove>) => void
-    onCancelMoves: (player: Player, count: number) => void
-    onPlaceCursor: (position: Hex) => void
+    onDrag: (
+        player: Player, cursorIndex: number, source: Hex, dest: Hex,
+    ) => void
+    onCancelMoves: (
+        player: Player, cursorIndex: number, count: number,
+    ) => void
+    onPlaceCursor: (
+        index: number, position: Hex, clearOthers: boolean,
+    ) => void
     onEndGame: () => void
     onResetColors: (n: number) => void
 }
@@ -33,9 +40,10 @@ export class BoardViewBase extends React.PureComponent<BoardViewProps> {
 
 export const BOARD_STUBS = ({
     /* tslint:disable */
-    onPlaceCursor: () => {},
     onQueueMoves: () => {},
+    onDrag: () => {},
     onCancelMoves: () => {},
+    onPlaceCursor: () => {},
     onEndGame: () => {},
     onResetColors: () => {},
     /* tslint:enable */

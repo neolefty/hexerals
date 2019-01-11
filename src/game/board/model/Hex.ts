@@ -1,60 +1,74 @@
-import {List, Map} from 'immutable';
-import * as assert from 'assert';
+import {List, Map} from 'immutable'
+import * as assert from 'assert'
 
 // Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
-// "Cube coordinates"; for a description, see:
+// "Cube coordinates" for a description, see:
 // www.redblobgames.com/grids/hexagons/#coordinates-cube
 export class Hex {
-    // keys are x and then y
-    private static readonly instanceCache
-        = Map<number, Map<number, Hex>>().asMutable();
-    private static ID = 0;
+    // keys are hex.x and then hex.y
+    private static readonly xyCache
+        = Map<number, Map<number, Hex>>().asMutable()
+    // key is hex.id
+    private static readonly idCache
+        = Map<number, Hex>().asMutable()
+
+    private static NEXT_ID = 0
 
     // a Hex whose x, y, and z are all NaN
-    static readonly NONE = new Hex(NaN, NaN);
-    static readonly ORIGIN = Hex.get(0, 0, 0);
+    static readonly NONE = new Hex(NaN, NaN)
+    static readonly ORIGIN = Hex.get(0, 0, 0)
 
     // neighbor directions
-    static readonly RIGHT_DOWN = Hex.get(1, -1, 0);
-    static readonly RIGHT_UP = Hex.get(1, 0, -1);
-    static readonly UP = Hex.get(0, 1, -1);
-    static readonly DOWN = Hex.get(0, -1, 1);
-    static readonly LEFT_UP = Hex.get(-1, 1, 0);
-    static readonly LEFT_DOWN = Hex.get(-1, 0, 1);
+    static readonly RIGHT_DOWN = Hex.get(1, -1, 0)
+    static readonly RIGHT_UP = Hex.get(1, 0, -1)
+    static readonly UP = Hex.get(0, 1, -1)
+    static readonly DOWN = Hex.get(0, -1, 1)
+    static readonly LEFT_UP = Hex.get(-1, 1, 0)
+    static readonly LEFT_DOWN = Hex.get(-1, 0, 1)
 
-    // TODO test consistency
     static readonly DIRECTIONS: List<Hex> = List([
         Hex.RIGHT_DOWN, Hex.RIGHT_UP, Hex.UP,
         Hex.LEFT_UP, Hex.LEFT_DOWN, Hex.DOWN,
-    ]);
+    ])
 
     // z: leftUp-rightDown
-    readonly z: number;
+    readonly z: number
 
-    // useful as a key in react components
-    readonly id = Hex.ID++;
+    // useful as a key
+    readonly id = Hex.NEXT_ID++
 
-    private neighborsCache?: List<Hex>;
+    private neighborsCache?: List<Hex>
 
     static get(x: number, y: number, z: number): Hex {
-        const total = x + y + z;
-        if (isNaN(total)) return Hex.NONE;
+        const total = x + y + z
+        if (isNaN(total)) return Hex.NONE
         else {
-            assert(total === 0);
+            assert(total === 0)
             // TODO eliminate memory leak of accumulated cache
             // (tried WeakMap but couldn't get it to work -- see git log)
-            let yCache = Hex.instanceCache.get(x);
+            let yCache = Hex.xyCache.get(x)
             if (yCache === undefined) {
-                yCache = Map<number, Hex>().asMutable();
-                Hex.instanceCache.set(x, yCache);
+                yCache = Map<number, Hex>().asMutable()
+                Hex.xyCache.set(x, yCache)
             }
-            let result = yCache.get(y);
+            let result = yCache.get(y)
             if (result === undefined) {
-                result = new Hex(x, y);
-                yCache.set(y, result);
+                result = new Hex(x, y)
+                yCache.set(y, result)
+                Hex.idCache.set(result.id, result)
             }
-            return result;
+            return result
         }
+    }
+
+    static getById(id: number): Hex {
+        const result: Hex | undefined = Hex.idCache.get(id)
+        if (result)
+            return result
+        else if (isNaN(id))
+            return Hex.NONE
+        else
+            throw Error(`Unknown Hex ID ${id}`)
     }
 
     // Convert from cartesian (rectangular) coordinates.
@@ -66,73 +80,73 @@ export class Hex {
     // The origin's lower-left neighbor at (-1, 0, 1) has a cartesian coord (-1, 1).
     // In other words, (x + y) must be even.
     static getCart(cx: number, cy: number): Hex {
-        assert((cx + cy) % 2 === 0);
-        return Hex.get(cx, (cy - cx) / 2, -(cy + cx) / 2);
+        assert((cx + cy) % 2 === 0)
+        return Hex.get(cx, (cy - cx) / 2, -(cy + cx) / 2)
     }
 
     plus(that: Hex): Hex {
-        return Hex.get(this.x + that.x, this.y + that.y, this.z + that.z);
+        return Hex.get(this.x + that.x, this.y + that.y, this.z + that.z)
     }
 
     minus(that: Hex): Hex {
-        return Hex.get(this.x - that.x, this.y - that.y, this.z - that.z);
+        return Hex.get(this.x - that.x, this.y - that.y, this.z - that.z)
     }
 
     times(n: number): Hex {
-        return Hex.get(this.x * n, this.y * n, this.z * n);
+        return Hex.get(this.x * n, this.y * n, this.z * n)
     }
 
     // Maximum of absolute values of all three axes — AKA Manhattan distance from origin.
     // Note: Useful for Manhattan hex distance -- a.minus(b).maxAbs().
     maxAbs() {
         // noinspection JSSuspiciousNameCombination
-        return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z));
+        return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z))
     }
 
     get neighbors(): List<Hex> {
         if (this.neighborsCache === undefined) {
             this.neighborsCache = List<Hex>(
                 Hex.DIRECTIONS.map(c => this.plus(c))
-            );
+            )
         }
-        return this.neighborsCache;
+        return this.neighborsCache
     }
 
     getRightUp(): Hex {
-        return this.plus(Hex.RIGHT_UP);
+        return this.plus(Hex.RIGHT_UP)
     }
 
     getRightDown(): Hex {
-        return this.plus(Hex.RIGHT_DOWN);
+        return this.plus(Hex.RIGHT_DOWN)
     }
 
     getDown(): Hex {
-        return this.plus(Hex.DOWN);
+        return this.plus(Hex.DOWN)
     }
 
     getLeftDown(): Hex {
-        return this.plus(Hex.LEFT_DOWN);
+        return this.plus(Hex.LEFT_DOWN)
     }
 
     getLeftUp(): Hex {
-        return this.plus(Hex.LEFT_UP);
+        return this.plus(Hex.LEFT_UP)
     }
 
     getUp(): Hex {
-        return this.plus(Hex.UP);
+        return this.plus(Hex.UP)
     }
 
     // TODO test consistency -- maybe randomly create coords and navigate nearby using both hex & cartesian coords
     // convert to integer rectangular X
     // assuming flat-topped hexagons twice as wide as high
     get cartX(): number {
-        return this.x;
+        return this.x
     }
 
     // convert to integer rectangular Y
     // assuming flat-topped hexagons twice as wide as high
     get cartY(): number {
-        return this.y - this.z;
+        return this.y - this.z
     }
 
     // tslint:disable-next-line:member-ordering
@@ -164,7 +178,7 @@ export class Hex {
             includeCart ? this.toCartString() : ''
         }${
             includeGeo ? ' ' + this.toGeoString() : ''
-        }`;
+        }`
     }
 
     toHexString() {
@@ -172,19 +186,19 @@ export class Hex {
     }
 
     toCartString() {
-        return `(${this.cartX},${this.cartY})`;
+        return `(${this.cartX},${this.cartY})`
     }
 
     toGeoString() {
-        return `(${this.cartXGeo},${this.cartYGeo})`;
+        return `(${this.cartXGeo},${this.cartYGeo})`
     }
 
     // Private constructor: access instances through get() or getCart().
-    // Instances are interned in Hex.instanceCache
+    // Instances are interned in Hex.xyCache
     private constructor(readonly x: number, readonly y: number) {
         // x: left-right
         // y: leftDown-rightUp
-        this.z = -x - y;
+        this.z = -x - y
     }
 
     compareTo(that: Hex): number {

@@ -4,7 +4,7 @@ import {Dispatch} from 'redux'
 
 import {Hex} from '../model/Hex'
 import {
-    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction
+    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction, dragAction
 } from '../model/BoardReducer'
 import {AppState} from '../../../common/App'
 import {CartPair} from '../../../common/CartPair'
@@ -54,24 +54,40 @@ const mapStateToTickerBoardViewProps = (
     onEndGame: ownProps.onEndGame,
 })
 
-const mapDispatchToBoardViewProps = (dispatch: Dispatch<BoardState>) => ({
+const mapDispatchToBoardViewProps = (
+    dispatch: Dispatch<BoardState>
+) => ({
     onQueueMoves: (moves: List<PlayerMove>) => dispatch(
         queueMovesAction(moves)
     ),
-    onCancelMoves: (player: Player, count: number) => dispatch(
-        cancelMovesAction(player, count)
+
+    onDrag: (
+        player: Player, cursorIndex: number, source: Hex, dest: Hex
+    ) => dispatch(
+        dragAction(player, cursorIndex, source, dest)
     ),
-    onPlaceCursor: (position: Hex) => dispatch(
-        placeCursorAction(position)
+
+    onCancelMoves: (
+        player: Player, cursorIndex: number, count: number
+    ) => dispatch(
+        cancelMovesAction(player, cursorIndex, count)
     ),
+
+    onPlaceCursor: (
+        index: number, position: Hex, clearOthers: boolean
+    ) => dispatch(
+        placeCursorAction(position, index, clearOthers)
+    ),
+
     onStep: () => {
         dispatch(robotsDecideAction())
         dispatch(doMovesAction())
         dispatch(stepPopAction())
     },
-    onResetColors: (n: number) => {
-        dispatch(setColorsAction(ColorPodge.construct(n)))
-    },
+
+    onResetColors: (n: number) => dispatch(
+        setColorsAction(ColorPodge.construct(n))
+    ),
 })
 
 export const LocalGameContainer = connect(

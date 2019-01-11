@@ -1,4 +1,4 @@
-import {HEX_HALF_HEIGHT, HEX_LL_XY, HEX_LR_XY, HEX_RIGHT_XY, HEX_UL_XY, HEX_UR_XY} from './HexContants';
+import {HEX_HALF_HEIGHT, HEX_LL_XY, HEX_LR_XY, HEX_RIGHT_XY, HEX_UL_XY, HEX_UR_XY} from './HexConstants';
 import {Tile} from '../model/Tile';
 import {Map} from 'immutable';
 import {CartPair, CartChain} from '../../../common/CartPair';

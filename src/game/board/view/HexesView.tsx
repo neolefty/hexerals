@@ -4,22 +4,22 @@ import {DriftColor} from '../../../color/DriftColor';
 import {Hex} from '../model/Hex';
 import {BoardViewProps} from './BoardViewBase';
 import {TileHexView} from './TileHexView';
-import {PlayerMove} from '../model/Move';
-import {List} from 'immutable';
 import {Player} from '../model/players/Players';
-import {floodShortestPath} from '../model/ShortestPath';
+import {Set} from 'immutable';
 
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
 export class HexesView extends React.PureComponent<BoardViewProps> {
     constructor(props: BoardViewProps) {
         super(props)
-        this.makeOnDrag = this.makeOnDrag.bind(this)
+        this.onDrag = this.onDrag.bind(this)
+        this.onClearCursor = this.onClearCursor.bind(this)
     }
 
     render(): React.ReactNode {
         const boardState = this.props.boardState
         const h = viewBoxHeight(boardState.board.edges.height)
+        const cursorSet = Set<Hex>(boardState.cursors.values())
         // TODO look into SVGFactory / SVGElement
         return (
             <g id="hexMap"> {
@@ -39,10 +39,11 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                             tile={tile}
                             color={color}
                             hex={hex}
-                            selected={hex === boardState.cursor}
+                            selected={cursorSet.contains(hex)}
                             viewBoxHeight={h}
-                            onSelect={() => this.props.onPlaceCursor(hex)}
-                            onDragInto={this.makeOnDrag(hex)}
+                            onClearCursor={this.onClearCursor}
+                            onSelect={(cursorIndex: number, clearOthers: boolean) => this.props.onPlaceCursor(cursorIndex, hex, clearOthers)}
+                            onDrag={this.onDrag}
                         />
                     )
                 })
@@ -51,56 +52,14 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
         )
     }
 
-    // drag behavior:
-    //   * cursor follows initial selection & drag
-    //   * dragging adds to queue, preferring high-pop hexes
-    //   * backtracking (exactly) removes from queue
+    onClearCursor = (cursorIndex: number) =>
+        this.props.onPlaceCursor(cursorIndex, Hex.NONE, false)
 
-    // high-speed drag behavior (not implemented):
-    //   * cursor set by drag start, follows tail of queue
-    //   * dragging resets queue to be best path from cursor
-    //   * no need for additional queue removal behavior
-    makeOnDrag = (dragHex: Hex) => () => {
+    onDrag = (cursorIndex: number, dest: Hex) => {
         const bs = this.props.boardState
-        const cursor: Hex | undefined = bs.cursor
+        const source: Hex | undefined = bs.cursors.get(0)
         const player: Player | undefined = bs.curPlayer
-        if (cursor && player) {
-            const dragTile = bs.board.getTile(dragHex)
-            if (dragTile.canBeOccupied) {  // drag into mountain --> no effect
-                // path from cursor
-                let path = floodShortestPath(bs.board.hexesOccupiable, cursor, dragHex)
-
-                // did we backtrack?
-                const queued: List<PlayerMove> = bs.moves.playerQueues.get(player)
-                let nCancel = 0
-                if (queued && queued.size) {
-                    const rPath = path.reverse()
-                    const rQueued = queued.reverse()
-                    while (
-                        nCancel < rPath.size && nCancel < rQueued.size
-                        && rPath.get(nCancel) === rQueued.get(nCancel).source
-                        )
-                        ++nCancel
-                }
-                if (nCancel > 0) {
-                    this.props.onCancelMoves(player, nCancel)
-                    path = List(path.slice(0, path.size - nCancel))
-                }
-
-                // queue the rest of the path as moves
-                if (path.size > 0) {
-                    // console.log(hexesToString(path))
-                    this.props.onQueueMoves(List(
-                        // pop because path includes dest — a path of n means n-1 moves
-                        path.pop().map((source, index) =>
-                            PlayerMove.constructDest(
-                                player, source, path.get(index + 1)
-                            )
-                        )
-                    ))
-                }
-                this.props.onPlaceCursor(dragHex)
-            }
-        }
+        if (source && player && source !== dest)
+            this.props.onDrag(player, cursorIndex, source, dest)
     }
 }

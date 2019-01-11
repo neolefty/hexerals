@@ -5,7 +5,6 @@ import {isNumber} from 'util';
 import {CycleMode} from './CycleState'
 import {Board} from './Board'
 import {GenericAction} from '../../../common/App'
-import {Hex} from './Hex'
 import {GameAction, BoardReducer} from './BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
@@ -15,6 +14,7 @@ import {BasicRobot} from './players/BasicRobot'
 import {StatusMessage} from '../../../common/StatusMessage';
 import {RandomTerrainArranger} from './RandomTerrainArranger';
 import {Terrain} from './Terrain';
+import {DEFAULT_CURSORS} from './BoardState';
 
 // the meta-game
 
@@ -109,7 +109,7 @@ const openLocalGameReducer =
             board: newBoard,
             turn: 0,
             players: pm,
-            cursor: Hex.NONE,
+            cursors: DEFAULT_CURSORS,
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(messages),
             curPlayer: Player.Zero,

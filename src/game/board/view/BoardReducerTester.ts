@@ -38,7 +38,7 @@ export class BoardReducerTester {
             width, height, players, arrangers)))
     }
 
-    getRawTile = (coord: Hex): Tile | undefined => this.explicitTiles.get(coord)
+    getRawTile = (coord: Hex | undefined): Tile | undefined => coord && this.explicitTiles.get(coord)
     getTile = (hex: Hex): Tile => this.board.getTile(hex)
     setTile = (hex: Hex, tile: Tile) =>
         this.state.board = this.board.setTiles(this.explicitTiles.set(hex, tile))
@@ -46,10 +46,11 @@ export class BoardReducerTester {
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
     get explicitTiles(): Map<Hex, Tile> { return this.board.explicitTiles }
-    get cursor(): Hex { return this.state.cursor }
+    get cursors(): Map<number, Hex> { return this.state.cursors }
+    get firstCursor(): Hex { return this.cursors.get(0) }
     get messages(): List<StatusMessage> { return this.state.messages }
-    get cursorRawTile(): Tile | undefined { return this.getRawTile(this.cursor) }
-    get cursorTile(): Tile { return this.getTile(this.cursor) }
+    get cursorRawTile(): Tile | undefined { return this.getRawTile(this.firstCursor) }
+    get firstCursorTile(): Tile { return this.getTile(this.firstCursor) }
     get moves(): MovementQueue { return this.state.moves }
 
     get ll() { return this.state.board.edges.lowerLeft }
@@ -60,11 +61,11 @@ export class BoardReducerTester {
     queueMove = (player: Player, delta: Hex, alsoCursor = true) => {
         this.store.dispatch(
             queueMovesAction(
-                List([PlayerMove.constructDelta(player, this.cursor, delta)])
+                List([PlayerMove.constructDelta(player, this.firstCursor, delta)])
             )
         )
         if (alsoCursor)
-            this.setCursor(this.cursor.plus(delta))
+            this.setCursor(this.firstCursor.plus(delta))
     }
 
     queueMoveDown = (alsoCursor = true) => {
@@ -85,11 +86,14 @@ export class BoardReducerTester {
 
     cancelMoves = (
         player: Player | undefined = undefined,
+        cursorIndex: number = -1,
         count: number = 1,
     ) => {
         const actualPlayer = player || this.state.curPlayer
         if (actualPlayer)
-            this.store.dispatch(cancelMovesAction(actualPlayer, count))
+            this.store.dispatch(
+                cancelMovesAction(
+                    actualPlayer, cursorIndex, count))
         else
             throw Error('current player is undefined')
     }

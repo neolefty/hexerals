@@ -1,50 +1,111 @@
 import * as React from 'react'
 
-import {DriftColor} from '../../../color/DriftColor'
-import {Tile} from '../model/Tile'
 import {TerrainView} from './TerrainView'
 import {Hex} from '../model/Hex'
 import {Terrain} from '../model/Terrain';
-import {HEX_HALF_HEIGHT, HEX_MID, HEX_RADIUS} from './HexContants';
+import {CartPair} from '../../../common/CartPair';
+import {HEX_POINTS} from './HexConstants';
+import {HexViewProps} from './HexViewProps';
 
-export interface FlatTopHexProps {
-    hex: Hex
-    tile: Tile
-    color: DriftColor
-    selected: boolean
+export interface FlatTopHexProps extends HexViewProps {
     centerX: number
     centerY: number
-    onSelect?: () => void
-    onDragInto?: () => void
-    children?: JSX.Element | JSX.Element[]
 }
 
-const hexPoints = (x: number, y: number) => {
-    return ''
-        + (x - HEX_RADIUS) + ',' + y + ' ' // left
-        + (x - HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up left
-        + (x + HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up right
-        + (x + HEX_RADIUS) + ',' + y + ' ' // right
-        + (x + HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) + ' ' // down right
-        + (x - HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) // down left
-}
+// Attribute of the top <g>, for retrieval from Touch events
+const HEX_ID_ATTRIBUTE = 'hex-id'
 
-// hex centered at (0, 0)
-const HEX_POINTS = hexPoints(0, 0)
+// persist a touch event and connect it to a Hex
+class HexTouch {
+    readonly screen: CartPair
+    readonly client: CartPair
+    readonly page: CartPair
+    readonly id: number
+
+    // from attribute hex-id
+    readonly hex: Hex  // can be Hex.NONE
+
+    constructor(t: Touch) {
+        this.id = t.identifier
+        this.screen = new CartPair(t.screenX, t.screenY)
+        this.client = new CartPair(t.clientX, t.clientY)
+        this.page = new CartPair(t.pageX, t.pageY)
+        this.hex = this.getHexFromPoint()
+    }
+
+    private getHexFromPoint(): Hex {
+        const elements: Element[] = document.elementsFromPoint(this.client.x, this.client.y)
+        for (let elem of elements) {
+            // in the presence of malformed hex-id
+            const hexIdString: string | null = elem.getAttribute(HEX_ID_ATTRIBUTE)
+            if (hexIdString)
+                return Hex.getById(parseInt(hexIdString, 10))
+        }
+        return Hex.NONE;
+    }
+
+    toString(): string {
+        return `Touch at ${this.hex ? this.hex.toString() : 'no hex'} — id ${this.id} — screen ${this.screen} / client ${ this.client} / page ${this.page}`
+    }
+}
 
 // a hexagon centered at (x, y)
 export class FlatTopHex
     extends React.PureComponent<FlatTopHexProps>
 {
+    constructor(props: FlatTopHexProps) {
+        super(props)
+        this.logTouches = this.logTouches.bind(this)
+        this.logEvent = this.logEvent.bind(this)
+        this.suppress = this.suppress.bind(this)
+        this.onTouchStart = this.onTouchStart.bind(this)
+        this.onTouchMove = this.onTouchMove.bind(this)
+        this.onTouchEnd = this.onTouchEnd.bind(this)
+    }
+
+    onTouchStart(e: React.TouchEvent) {
+        if (this.props.onSelect)
+            for (let i = 0; i < e.touches.length; ++i)
+                this.props.onSelect(e.touches[i].identifier, false)
+    }
+
+    onTouchMove(e: React.TouchEvent) {
+        if (this.props.onDrag)
+            for (let i = 0; i < e.touches.length; ++i) {
+                const hexTouch = new HexTouch(e.touches[i])
+                if (hexTouch.hex !== Hex.NONE)
+                    this.props.onDrag(hexTouch.id, hexTouch.hex)
+            }
+    }
+
+    onTouchEnd(e: React.TouchEvent) {
+        if (this.props.onClearCursor)
+            for (let i = 0; i < e.touches.length; ++i)
+                this.props.onClearCursor(e.touches[i].identifier)
+    }
+
+    logEvent(e: React.SyntheticEvent, prefix: string = '') {
+        console.log(
+            `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.toHexString()}`)
+    }
+
+    logTouches(e: React.TouchEvent) {
+        for (let i = 0; i < e.touches.length; ++i)
+            console.log(`- touch - @${this.props.hex} ${e.nativeEvent.type} #${i} — ${new HexTouch(e.touches[i])}`)
+    }
+
+    suppress(e: React.SyntheticEvent) {
+        // this.logEvent(e, '- suppressing -')
+        e.preventDefault()
+    }
+
     render(): React.ReactNode {
-        // const logEvent = (desc: string) => console.log(
-        //     `${desc} — ${props.hex} / ${props.terrain} ${props.color.toHexString()}`
-        // )
-        // tslint:disable-next-line
-        const logEvent = (desc: string) => {}
+        const hexIdAttribute = {}
+        hexIdAttribute[HEX_ID_ATTRIBUTE] = this.props.hex.id
 
         const children: JSX.Element[] = [(
             <polygon
+                {...hexIdAttribute}
                 key="bg"
                 points={HEX_POINTS}
                 style={
@@ -95,33 +156,28 @@ export class FlatTopHex
             <g
                 transform={`translate(${this.props.centerX} ${this.props.centerY})`}
                 className={`FlatTopHex ${this.props.tile.owner} tile${this.props.selected ? ' active' : ''}`}
-                onMouseDown={(e) => {
-                    logEvent(`onMouseDown ${e}`)
-                    if (this.props.onSelect) {
-                        e.preventDefault()
-                        this.props.onSelect()
-                    }
-                }}
-                onTouchStart={(e) => { // not standard — Chrome only?
-                    logEvent(`onTouchStart ${e.nativeEvent.type}`)
-                    if (this.props.onSelect) {
-                        e.preventDefault()
-                        this.props.onSelect()
-                    }
-                }}
-                onMouseEnter={(e) => {
-                    logEvent(`onMouseEnter ${e.nativeEvent.type} ${e.buttons}`)
-                    if (this.props.onDragInto && e.buttons === 1) { // left mouse button
-                        this.props.onDragInto()
-                        e.preventDefault()
-                    }
-                }}
 
-                onDragEnter={(e) => {logEvent(`onDragEnter ${e.nativeEvent.type}`)}}
-                onTouchMove={(e) => {logEvent(`onTouchMove ${e.nativeEvent.type}`)}}
-                onTouchCancel={(e) => {logEvent(`onTouchCancel ${e.nativeEvent.type}`)}}
-                onDragOver={(e) => {logEvent(`onDragOver ${e.nativeEvent.type}`)}}
-                onMouseDownCapture={(e) => {logEvent(`onMouseDownCapture ${e.nativeEvent.type}`)}}
+                onTouchStart={this.onTouchStart}
+                onTouchMove={this.onTouchMove}
+                onTouchCancel={this.onTouchEnd}
+                onTouchEnd={this.onTouchEnd}
+
+                onMouseEnter={(e) => {
+                    // left mouse button
+                    if (this.props.onDrag && e.buttons === 1) {
+                        this.props.onDrag(0, this.props.hex)
+                        e.preventDefault()
+                    }
+                }}
+                onMouseDown={(e) => {
+                    if (this.props.onSelect) {
+                        this.props.onSelect(0, true)
+                        e.preventDefault()
+                    }
+                }}
+                // onMouseOut={this.suppress}
+                // onDragEnter={this.suppress}
+                // onDragOver={this.suppress}
             >
                 {children}
             </g>

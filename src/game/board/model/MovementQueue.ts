@@ -3,6 +3,7 @@ import {List, Map} from 'immutable'
 import {Hex} from './Hex'
 import {Player} from './players/Players'
 import {PlayerMove} from './Move';
+import * as assert from 'assert';
 
 export class MovementQueue {
     constructor(
@@ -51,18 +52,16 @@ export class MovementQueue {
     public popEach(validator: ((move: PlayerMove) => boolean)):
         QueueAndMoves | undefined
     {
-        const tmp: List<PlayerMove> = List()
         const mutMap = this.playerQueues.asMutable()
         let mutated = false
-        const playerMoves = tmp.withMutations(result =>
+        const playerMoves = List<PlayerMove>().withMutations(result =>
             this.playerQueues.forEach(
                 (moves: List<PlayerMove>, player: Player) => {
-                    const mutMoves: List<PlayerMove> = moves.asMutable()
-                    mutMap.set(player, mutMoves)
-                    while (mutMoves.size > 0) {
+                    while (moves.size > 0) {
                         mutated = true
-                        const move: PlayerMove = mutMoves.get(0)
-                        mutMoves.remove(0)
+                        const move: PlayerMove = moves.get(0)
+                        moves = moves.remove(0)
+                        mutMap.set(player, moves)
                         if (validator(move)) {
                             result.push(move)
                             break
@@ -90,42 +89,42 @@ export class MovementQueue {
         return this.playerQueues.has(player) && this.playerQueues.get(player).size > 0
     }
 
-    // Cancel most recent moves -- count = -1 to cancel all of a player's moves.
-    // If there are no moves to cancel, return undefined.
-    // Otherwise return the updated movement queue plus a single-element list
-    // containing the cancelled move.
-    cancelMoves(player: Player, count: number): QueueAndMoves | undefined {
-        const moves: List<PlayerMove> | undefined = this.playerQueues.get(player)
-        if (moves && moves.size > 0 && count !== 0) {
-            // bug workaround
-            // TODO check immutable.js future versions - does cancel work with line removed?
-            moves.asImmutable()
-            // console.log(`--> immutable? ${moves.asImmutable() === moves}`)
-            // console.log(`--> mutable? ${moves.asMutable() === moves}`)
-            const actualCount = (count < 0 || count > moves.size) ? moves.size : count
-            // console.log(`*** actual count ${actualCount} out of ${moves.size} -- ${moves}`)
-            // console.log(`  * Still here? ${moves}`)
-            const cancelledMoves: List<PlayerMove> = List(moves.slice(-actualCount))
-            // console.log(`  * Still here? ${moves}`)
-            const remainingMoves: List<PlayerMove> = List(moves.slice(0, -actualCount))
-            // console.log(`  * Still here? ${moves}`)
-            // console.log(`  * filtered true: ${moves.filter(() => true)}`)
-            // const cancelledMoves = moves.slice(-1)
-            // const remainingMoves = moves.slice(0, -1)
-            // console.log(`  * cancelling: ${cancelledMoves}`)
-            // console.log(`  * remaining: ${remainingMoves}`)
+    // Cancel most recent moves for a given player and cursor — count = -1 to cancel all of a cursor's moves, -1 to cancel all cursors' moves. If there are no moves to cancel, return undefined. Otherwise return the updated movement queue plus a list containing the cancelled moves, in order from oldest to newest
+    cancelMoves(
+        player: Player, cursorIndex: number, count: number,
+    ): QueueAndMoves | undefined {
+        const moves: List<PlayerMove> | undefined
+            = this.playerQueues.get(player)
+        if (!moves || moves.size === 0 || count === 0)
+            return undefined
+        if (count < 0) count = moves.size
 
-            // const a: List<string> = List(['a', 'b', 'c', 'd', 'e'])
-            // console.log(`--- all: ${a}`)
-            // console.log(`--- slice -1: ${a.slice(-1)}`)
+        const cancelled: PlayerMove[] = []
+        let updatedMoves = moves as List<PlayerMove>
+        // important: we're walking backwards down the list ...
+        for (let i = moves.size - 1; i >= 0 && cancelled.length < count; --i) {
+            const move = moves.get(i)
+            if (cursorIndex === -1 || move.cursorIndex === cursorIndex) {
+                // ... so it's okay to remove as we go
+                updatedMoves = updatedMoves.remove(i)
+                cancelled.push(move)
+            }
+        }
 
+        if (cancelled.length > 0) {
+            assert.equal(
+                cancelled.length + updatedMoves.size,
+                moves.size
+            )
             return new QueueAndMoves(
                 new MovementQueue(
-                    this.playerQueues.set(player, List(remainingMoves))
+                    this.playerQueues.set(
+                        player, updatedMoves.asImmutable()
+                    )
                 ),
-                cancelledMoves
-            )
+                List<PlayerMove>(cancelled.reverse()))
         }
+
         else
             return undefined
     }

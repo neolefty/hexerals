@@ -27,16 +27,16 @@ export class BoardKeyboardController {
 
     onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
         const bs = this.view.props.boardState
-        if (bs.cursor !== Hex.NONE && bs.curPlayer) {
+        if (bs.cursors.get(0) !== Hex.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, Hex.NONE)
             if (delta !== Hex.NONE) {
-                const move = PlayerMove.constructDelta(bs.curPlayer, bs.cursor, delta)
+                const move = PlayerMove.constructDelta(bs.curPlayer, bs.cursors.get(0), delta)
                 if (bs.board.canBeOccupied(move.dest))
                     this.view.props.onQueueMoves(List([move]))
                 // TODO don't move into known mountains but move right through unknown ones
                 // TODO differentiate between known & unknown mountains — add question mark to unknown, like generals does
-                const newCursor = bs.cursor.plus(delta)
-                this.view.props.onPlaceCursor(newCursor)
+                const newCursor = bs.cursors.get(0).plus(delta)
+                this.view.props.onPlaceCursor(0, newCursor, true)
                 e.preventDefault()
                 return
             }
@@ -49,11 +49,11 @@ export class BoardKeyboardController {
         }
 
         if (e.key === 'z' && bs.curPlayer) {
-            this.view.props.onCancelMoves(bs.curPlayer, 1)
+            this.view.props.onCancelMoves(bs.curPlayer, -1, 1)
             e.preventDefault()
         }
         if (e.key === 'x' && bs.curPlayer) {
-            this.view.props.onCancelMoves(bs.curPlayer, -1)
+            this.view.props.onCancelMoves(bs.curPlayer, -1, -1)
             e.preventDefault()
         }
     }

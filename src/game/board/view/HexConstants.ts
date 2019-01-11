@@ -27,3 +27,16 @@ export const HEX_LL_XY = new CartPair(HEX_MID_LEFT, HEX_BOTTOM)
 export const HEX_UR_XY = new CartPair(HEX_MID_RIGHT, HEX_TOP)
 export const HEX_RIGHT_XY = new CartPair(HEX_RIGHT, 0)
 export const HEX_LR_XY = new CartPair(HEX_MID_RIGHT, HEX_BOTTOM)
+
+const hexPoints = (x: number, y: number) => {
+    return ''
+        + (x - HEX_RADIUS) + ',' + y + ' ' // left
+        + (x - HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up left
+        + (x + HEX_MID) + ',' + (y - HEX_HALF_HEIGHT) + ' ' // up right
+        + (x + HEX_RADIUS) + ',' + y + ' ' // right
+        + (x + HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) + ' ' // down right
+        + (x - HEX_MID) + ',' + (y + HEX_HALF_HEIGHT) // down left
+}
+
+// hex centered at (0, 0)
+export const HEX_POINTS = hexPoints(0, 0)

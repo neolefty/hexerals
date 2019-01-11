@@ -1042,9 +1042,9 @@ cli-boxes@^1.0.0:
 
 cli-cursor@^2.1.0:
   version "2.1.0"
-  resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-2.1.0.tgz#b35dac376479facc3e94747d41d0d0f5238ffcb5"
+  resolved "https://registry.yarnpkg.com/cli-cursors/-/cli-cursors-2.1.0.tgz#b35dac376479facc3e94747d41d0d0f5238ffcb5"
   dependencies:
-    restore-cursor "^2.0.0"
+    restore-cursors "^2.0.0"
 
 cli-width@^2.0.0:
   version "2.2.0"
@@ -2966,7 +2966,7 @@ inquirer@3.3.0:
   dependencies:
     ansi-escapes "^3.0.0"
     chalk "^2.0.0"
-    cli-cursor "^2.1.0"
+    cli-cursors "^2.1.0"
     cli-width "^2.0.0"
     external-editor "^2.0.4"
     figures "^2.0.0"
@@ -5707,7 +5707,7 @@ resolve@^1.3.2:
 
 restore-cursor@^2.0.0:
   version "2.0.0"
-  resolved "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-2.0.0.tgz#9f7ee287f82fd326d4fd162923d62129eee0dfaf"
+  resolved "https://registry.yarnpkg.com/restore-cursors/-/restore-cursors-2.0.0.tgz#9f7ee287f82fd326d4fd162923d62129eee0dfaf"
   dependencies:
     onetime "^2.0.0"
     signal-exit "^3.0.2"

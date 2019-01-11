@@ -1,23 +1,15 @@
 import * as React from 'react';
 import {Tile} from '../model/Tile';
 import {FlatTopHex} from './FlatTopHex';
-import {Hex} from '../model/Hex';
 import {DriftColor} from '../../../color/DriftColor';
-import {HEX_COLUMN, HEX_HALF_HEIGHT, HEX_RADIUS} from './HexContants';
+import {HEX_COLUMN, HEX_HALF_HEIGHT, HEX_RADIUS} from './HexConstants';
 import {Terrain} from '../model/Terrain';
+import {HexViewProps} from './HexViewProps';
 
-interface TileHexViewProps {
-    tile: Tile
-    hex: Hex
+interface TileHexViewProps extends HexViewProps {
     viewBoxHeight: number
-    selected: boolean
-    color: DriftColor
     text?: string
     textColor?: DriftColor
-    children?: JSX.Element | JSX.Element[]
-
-    onSelect?: () => void
-    onDragInto?: () => void
 }
 
 export const centerX = (cartX: number): number =>
@@ -74,14 +66,9 @@ export const TileHexView = (props: TileHexViewProps) => {
 
     return (
         <FlatTopHex
-            hex={props.hex}
-            tile={props.tile}
-            color={props.color}
-            selected={props.selected}
+            {...props}
             centerX={x}
             centerY={y}
-            onSelect={props.onSelect}
-            onDragInto={props.onDragInto}
         >
             {children}
         </FlatTopHex>

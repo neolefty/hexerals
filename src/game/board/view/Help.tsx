@@ -10,7 +10,7 @@ import {Player} from '../model/players/Players';
 import {Terrain} from '../model/Terrain';
 import {MoveView} from './MoveQueueView';
 import {HexMove} from '../model/Move';
-import {HEX_COLUMN, HEX_MID, HEX_ROW} from './HexContants';
+import {HEX_COLUMN, HEX_MID, HEX_ROW} from './HexConstants';
 
 import './Help.css'
 
