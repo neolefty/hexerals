@@ -28,8 +28,8 @@ export const textY = (tile: Tile, text: String): number => {
     return result
 }
 export const textSize = (tile: Tile, text: String): number => {
-    // small in capital & house
     let result = HEX_HALF_HEIGHT
+    // large "?"
     if (!tile.known) result *= 1.5
     if (text.length > 1)
         result *= (0.9 ** (text.length - 1))

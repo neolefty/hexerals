@@ -55,9 +55,7 @@ export class FlatTopHex
 {
     constructor(props: FlatTopHexProps) {
         super(props)
-        this.logTouches = this.logTouches.bind(this)
         this.logEvent = this.logEvent.bind(this)
-        this.suppress = this.suppress.bind(this)
         this.onTouchStart = this.onTouchStart.bind(this)
         this.onTouchMove = this.onTouchMove.bind(this)
         this.onTouchEnd = this.onTouchEnd.bind(this)
@@ -87,16 +85,6 @@ export class FlatTopHex
     logEvent(e: React.SyntheticEvent, prefix: string = '') {
         console.log(
             `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.toHexString()}`)
-    }
-
-    logTouches(e: React.TouchEvent) {
-        for (let i = 0; i < e.touches.length; ++i)
-            console.log(`- touch - @${this.props.hex} ${e.nativeEvent.type} #${i} — ${new HexTouch(e.touches[i])}`)
-    }
-
-    suppress(e: React.SyntheticEvent) {
-        // this.logEvent(e, '- suppressing -')
-        e.preventDefault()
     }
 
     render(): React.ReactNode {
@@ -175,9 +163,6 @@ export class FlatTopHex
                         e.preventDefault()
                     }
                 }}
-                // onMouseOut={this.suppress}
-                // onDragEnter={this.suppress}
-                // onDragOver={this.suppress}
             >
                 {children}
             </g>
