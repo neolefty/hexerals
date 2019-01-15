@@ -115,7 +115,7 @@ export class HexPaths {
         this.step(source, dest).n
 
     // includes both source and dest
-    path(source: Hex, dest: Hex): ReadonlyArray<Hex> {
+    path(source: Hex, dest: Hex): List<Hex> {
         const firstStep = this.step(source, dest)
         const result = Array(firstStep.n + 1) as Hex[]
         result[0] = source
@@ -126,7 +126,7 @@ export class HexPaths {
             result[i] = nextHex
             step = this.step(nextHex, dest)
         }
-        return Object.freeze(result)
+        return List<Hex>(result)
     }
 
     private pathIndex = (hex: Hex): number =>
