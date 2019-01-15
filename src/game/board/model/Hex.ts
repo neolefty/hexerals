@@ -103,6 +103,7 @@ export class Hex {
         return Math.max(Math.abs(this.x), Math.abs(this.y), Math.abs(this.z))
     }
 
+    // TODO randomize neighbors order
     get neighbors(): List<Hex> {
         if (this.neighborsCache === undefined) {
             this.neighborsCache = List<Hex>(

@@ -1,4 +1,4 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map, Set, Range} from 'immutable'
 import {Hex} from './Hex';
 import * as assert from 'assert';
 
@@ -56,6 +56,144 @@ export const floodShortestPath = (
     return result
 }
 
+// A step in a shortest path
+// class PathStep {
+//     constructor (
+//         readonly source: Hex,
+//         readonly dest: Hex,
+//         readonly distance: number,
+//         readonly next: Hex
+//     ) {}
+//
+//     // extend this with that — that must start where this ends
+//     plus = (that: PathStep): PathStep => {
+//         assert(that.source === this.dest)
+//         return new PathStep(
+//             this.source,
+//             that.dest,
+//             this.distance + that.distance,
+//             this.next
+//         )
+//     }
+//
+//     // the shorter of the two (this or that)
+//     min = (that: PathStep): PathStep => {
+//         assert(this.sameEndpoints(that))
+//         return this.distance < that.distance ? this : that
+//     }
+//
+//     sameEndpoints = (that: PathStep): boolean =>
+//         this.source === that.source && this.dest === that.dest
+// }
+
+// TODO move ring logic out to here — it's useful in lots of places
+// export class Rings {
+//     constructor(
+//         readonly hexes: Set<Hex>,
+//         readonly origin: Hex,
+//     ) {}
+// }
+
+export class HexPaths {
+    private readonly paths: HexNum[][]
+
+    // map of hex ID to path index (to compact this.paths)
+    private readonly hexIdToPathIndex = Map<number, number>().asMutable()
+
+    constructor(readonly hexes: Set<Hex>) {
+        this.paths = Array(hexes.size) as HexNum[][]
+        this.computeLookups()
+        this.computePaths()
+    }
+
+    // How to get from source to dest? Return the distance and next step.
+    step(source: Hex, dest: Hex): HexNum {
+        return this.paths[this.pathIndex(source)][this.pathIndex(dest)]
+    }
+
+    distance = (source: Hex, dest: Hex): number =>
+        this.step(source, dest).n
+
+    // includes both source and dest
+    path(source: Hex, dest: Hex): ReadonlyArray<Hex> {
+        const firstStep = this.step(source, dest)
+        const result = Array(firstStep.n + 1) as Hex[]
+        result[0] = source
+        result[firstStep.n] = dest
+        let step = firstStep
+        for (let i = 1; i < firstStep.n; ++i) {
+            const nextHex = step.h
+            result[i] = nextHex
+            step = this.step(nextHex, dest)
+        }
+        return Object.freeze(result)
+    }
+
+    private pathIndex = (hex: Hex): number =>
+        this.hexIdToPathIndex.get(hex.id)
+
+    private computeLookups() {
+        let i: number = 0;
+        this.hexes.forEach(hex =>
+            this.hexIdToPathIndex.set(hex.id, i++)
+        )
+    }
+
+    // Kind of a universal flood fill:
+    // 1. Start with all paths of length 1 by concatenating neighbor lists.
+    // 2. Lengthen them one step at a time — backwards from the start, so we know the next step in the path — saving unique pairs as we find them and discarding pairs we've already seen.
+    // The first time we find a pair, it will be along a shortest path, since we find paths in order of increasing length.
+    private computePaths() {
+        // allocate this.paths arrays
+        Range(0, this.hexes.size).forEach(n =>
+            this.paths[n] = Array(this.hexes.size)
+        )
+        const ones = this.ones()
+        let curEndpoints: Map<Hex, List<Hex>> = ones
+        let nextLength = 2  // the length of each of the next set of paths
+        while (curEndpoints.size > 0) {
+            const nextEndpoints = Map().asMutable() as Map<Hex, List<Hex>>
+            curEndpoints.forEach((curDests: List<Hex>, curSource: Hex) => {
+                const nextStep: HexNum = Object.freeze({ h: curSource, n: nextLength })
+                curDests.forEach((dest: Hex) => {
+                    const destIndex = this.pathIndex(dest)
+                    // Lengthen each path by 1 by considering source's in-bounds neighbors.
+                    // We could use curSource.neighbors, but ones is already in-bounds filtered.
+                    ones.get(curSource).forEach((nextSource: Hex) => {
+                        const sourceIndex = this.pathIndex(nextSource)
+                        const sourcePaths: HexNum[] = this.paths[sourceIndex]
+                        if (!sourcePaths[destIndex]) {  // found a new pair!
+                            // New path starts at 1's dest, then to long path's source, then along long path to its dest.
+                            sourcePaths[destIndex] = nextStep
+                            if (!nextEndpoints.has(nextSource))
+                                nextEndpoints.set(nextSource, List<Hex>([dest]).asMutable())
+                            else
+                                nextEndpoints.get(nextSource).push(dest)
+                        }
+                    })
+                })
+            })
+            curEndpoints = nextEndpoints
+            ++nextLength
+        }
+    }
+
+    private ones(): Map<Hex, List<Hex>> {
+        return Map<Hex, List<Hex>>().withMutations(result => {
+            this.hexes.forEach(source => {
+                // 1. map source to dests that are distance 1 away (and in-bounds)
+                result.set(source, source.neighbors.filter(
+                    neighbor => this.hexes.has(neighbor)
+                ) as List<Hex>)
+                // 2. add them to the path store
+                result.get(source).forEach(neighbor =>
+                    this.paths[this.pathIndex(source)][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
+                )
+            })
+        })
+    }
+}
+
 // cache the navigated distance between pairs of hexes (but not the full path)
 export class CacheDistance {
     private cache = Map().asMutable() as Map<Hex, Map<Hex, number>>
@@ -69,7 +207,7 @@ export class CacheDistance {
             this.cache.set(a, Map().asMutable() as Map<Hex, number>)
         const aCache = this.cache.get(a) as Map<Hex, number>
         if (!aCache.has(b))
-            aCache.set(b, floodShortestPath(this.hexes, a, b).size)
+            aCache.set(b, floodShortestPath(this.hexes, a, b).size - 1)
         return aCache.get(b)
     }
 }

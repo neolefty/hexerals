@@ -13,7 +13,7 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {MovementQueue} from '../model/MovementQueue'
 import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import {BasicRobot} from '../model/players/BasicRobot'
-import {SpreadPlayersArranger} from '../model/PlayerArranger';
+import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger';
 import {YMountainArranger} from '../model/YMountainArranger';
 
 const NUM_PLAYERS = 10

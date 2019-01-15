@@ -1,7 +1,7 @@
 import {List} from 'immutable';
 
 import {Board} from './Board';
-import {CacheDistance, floodShortestPath} from './ShortestPath';
+import {CacheDistance, floodShortestPath, HexPaths} from './ShortestPath';
 import {Hex} from './Hex';
 import {Tile} from './Tile';
 import {Terrain} from './Terrain';
@@ -16,15 +16,20 @@ it ('finds a simple shortest path', () => {
     expect(lr.minus(ll).maxAbs()).toBe(9)
     expect(lr.minus(ul).maxAbs()).toBe(13)
     const cache = new CacheDistance(ten.hexesAll)
+    const paths = new HexPaths(ten.hexesAll)
 
     const simpleShortest = (a: Hex, b: Hex) => {
         // console.log(`path from ${a.toString()} to ${b.toString()} — manhattan ${a.minus(b).maxAbs()}`)
-        const path = floodShortestPath(ten.hexesAll, a, b)
+        const floodPath: List<Hex> = floodShortestPath(ten.hexesAll, a, b)
+        const globalPath = paths.path(a, b)
         // console.log(`  --> ${hexesToString(path)}`)
-        const manhattan = b.minus(a).maxAbs() + 1
-        expect(path.size).toBe(manhattan)
-        expect(path.first() === a).toBeTruthy()
-        expect(path.last() === b).toBeTruthy()
+        const manhattan = b.minus(a).maxAbs()
+        expect(floodPath.size).toBe(manhattan + 1)
+        expect(globalPath.length).toBe(manhattan + 1)
+        expect(floodPath.first() === a).toBeTruthy()
+        expect(floodPath.last() === b).toBeTruthy()
+        expect(globalPath[0] === a).toBeTruthy()
+        expect(globalPath[manhattan] === b).toBeTruthy()
         expect(cache.distance(a, b)).toBe(manhattan)
     }
 

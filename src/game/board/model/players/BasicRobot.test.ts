@@ -3,7 +3,7 @@ import {BasicRobot} from './BasicRobot';
 import {Player} from './Players';
 import {List} from 'immutable';
 import {RandomTerrainArranger} from '../RandomTerrainArranger';
-import {SpreadPlayersArranger} from '../PlayerArranger';
+import {SpreadPlayersArranger} from '../SpreadPlayerArranger';
 import {Hex} from '../Hex';
 import {Tile} from '../Tile';
 import {Terrain} from '../Terrain';
