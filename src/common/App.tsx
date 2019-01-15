@@ -8,7 +8,6 @@ import {ColorsState} from '../color/ColorsReducer';
 import {CycleState} from '../game/board/model/CycleState'
 import {CycleContainer} from '../game/board/model/CycleContainer'
 import {Help} from '../game/board/view/Help';
-import {Benchmark} from '../game/board/view/Benchmark';
 
 const MIN_WIDTH = 420
 const MIN_HEIGHT = 120
@@ -63,7 +62,6 @@ class App extends React.Component<AppProps, AppState> {
                         <Tab>Practice</Tab>
                         <Tab>Colors</Tab>
                         <Tab>Controls</Tab>
-                        <Tab>Benchmark</Tab>
                     </TabList>
                     <TabPanel>
                         <CycleContainer displaySize={displaySize}/>
@@ -73,9 +71,6 @@ class App extends React.Component<AppProps, AppState> {
                     </TabPanel>
                     <TabPanel>
                         <Help displaySize={displaySize}/>
-                    </TabPanel>
-                    <TabPanel>
-                        <Benchmark displaySize={displaySize}/>
                     </TabPanel>
                 </Tabs>
             </div>
