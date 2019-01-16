@@ -9,6 +9,8 @@ import {Tile} from '../Tile';
 import {Terrain} from '../Terrain';
 import {Robot} from './Robot';
 
+const logWinLoss = false
+
 it('makes moves', () => {
     const brt = new BoardReducerTester(10, 10)
     const stupid = BasicRobot.byIntelligence(0)
@@ -120,7 +122,7 @@ it('stops by cities', () => {
 })
 
 type RobotMaker = () => Robot
-const robotTrials = 40
+const robotTrials = logWinLoss ? 40 : 16
 const IQRobotMaker = (iq: number) => () =>
     BasicRobot.byIntelligence(iq)
 const SkillRobotMaker = (skill: number) => () =>
@@ -169,8 +171,10 @@ const countAWins = (
 
 it('control — IQ 0 vs self', () => {
     const control = countAWins(iq0, iq0)
-    console.log(`Dumb vs dumb: ${control}/${robotTrials} = ${control/robotTrials}`)
-    expect(control).toBeGreaterThanOrEqual(robotTrials * 0.35)
+    if (logWinLoss)
+        // tslint:disable-next-line
+        console.log(`Dumb vs dumb: ${control}/${robotTrials} = ${control/robotTrials}`)
+    expect(control).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.35 : 0.3))
 })
 
 it('IQ 1 not lose too much', () => {
@@ -179,14 +183,18 @@ it('IQ 1 not lose too much', () => {
     skills.forEach(skillIndex => {
         const smart = SkillRobotMaker(skillIndex)
         const wins = countAWins(smart, iq0)
-        console.log(`Skill #${skillIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart().toString()})`)
-        expect(wins).toBeGreaterThanOrEqual(robotTrials * 0.4)  // weak!
+        if (logWinLoss)
+            // tslint:disable-next-line
+            console.log(`Skill #${skillIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart().toString()})`)
+        expect(wins).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.4 : 0.35))  // weak!
     })
 })
 
 it('max IQ wins a lot', () => {
     const n = robotTrials * 2
     const wins = countAWins(iqMax, iq0, n)
-    console.log(`Max IQ: ${wins}/${n} = ${wins/n} (${iqMax().toString()})`)
-    expect(wins).toBeGreaterThanOrEqual(n * 0.55) // ugh, low
+    if (logWinLoss)
+        // tslint:disable-next-line
+        console.log(`Max IQ: ${wins}/${n} = ${wins/n} (${iqMax().toString()})`)
+    expect(wins).toBeGreaterThanOrEqual(n * (logWinLoss ? 0.6 : 0.55)) // ugh, low
 })

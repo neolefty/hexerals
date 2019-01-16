@@ -83,6 +83,7 @@ export class FlatTopHex
     }
 
     logEvent(e: React.SyntheticEvent, prefix: string = '') {
+        // tslint:disable-next-line
         console.log(
             `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.toHexString()}`)
     }

@@ -79,7 +79,7 @@ it ('finds a slightly more complex shortest path', () => {
 })
 
 const timeArranging = (
-    name: string, board: Board, arranger: Arranger
+    name: string, board: Board, arranger: Arranger, log: boolean = false
 ) => {
     const start = Date.now()
     const status = [] as StatusMessage[]
@@ -87,27 +87,35 @@ const timeArranging = (
     if (status.length > 0)
         console.log(status)
     const elapsed = Date.now() - start
-    console.log(`${name} arranger — ${board.players.size} players, ${board.edges.width} x ${board.edges.height} — ${board.hexesOccupiable.size} hexes — ${elapsed} ms`)
+    if (log)
+        // tslint:disable-next-line
+        console.log(`${name} arranger — ${board.players.size} players, ${board.edges.width} x ${board.edges.height} — ${board.hexesOccupiable.size} hexes — ${elapsed} ms`)
 }
+
+const logBenchmarks = false
 
 it ('compares performance of flood & global', () => {
     const flood = new SpreadPlayersArranger(Terrain.Capital, 0, FloodDM)
     const paths = new SpreadPlayersArranger(Terrain.Capital, 0, PathsDM)
 
-    Range(15, 36, 5).forEach(side => {
+    const log = logBenchmarks
+    const range = log
+        ? Range(15, 36, 5)
+        : Range(10, 21, 5)
+    range.forEach(side => {
         const board = Board.constructSquare(
             side, pickNPlayers(16),
             [ new RandomTerrainArranger(0.2) ],
         )
-        timeArranging("flood", board, flood)
-        timeArranging("paths", board, paths)
+        timeArranging("flood", board, flood, log)
+        timeArranging("paths", board, paths, log)
     })
 })
 
 const r = (n: number, places: number = 2, shift: number = 0) =>
     Math.round(n * (10 ** shift) * (10 ** places)) / (10 ** places)
 
-const testPerf = (side: number) => {
+const testPerf = (side: number, log: boolean = false) => {
     let board = Board.constructSquare(side, List(), [
         new RandomTerrainArranger(0.2)
     ])
@@ -115,7 +123,8 @@ const testPerf = (side: number) => {
     const start = Date.now()
     new HexPaths(board.hexesOccupiable)
     const elapsed = Date.now() - start
-    console.log(
+    // tslint:disable-next-line
+    if (log) console.log(
         `${side}x${side} (${hexes} hexes), ${elapsed} ms — ns/hex2.1|2|3|4: ${
             // r(elapsed / side, 1)}/side ${
             // r(elapsed / (side*side))}/side^2 ${
@@ -131,6 +140,16 @@ const testPerf = (side: number) => {
 }
 
 it ('benchmarks performance of global shortest path', () => {
-    Range(10, 36, 5).forEach(n => {testPerf(n)})
-    // Range(37, 49, 2).forEach(n => {testPerf(n)})
+    if (logBenchmarks) {
+        Range(10, 36, 5).forEach(
+            n => {testPerf(n, true)}
+        )
+        Range(37, 49, 2).forEach(
+            n => {testPerf(n, true)}
+        )
+    }
+    else
+        Range(10, 21, 5).forEach(
+            n => {testPerf(n, false)}
+        )
 })
