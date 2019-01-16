@@ -148,7 +148,7 @@ export class HexPaths {
         Range(0, this.hexes.size).forEach(n =>
             this.paths[n] = Array(this.hexes.size)
         )
-        const ones = this.ones()
+        const ones = this.initializeOnes()
         let curEndpoints: Map<Hex, List<Hex>> = ones
         let nextLength = 2  // the length of each of the next set of paths
         while (curEndpoints.size > 0) {
@@ -178,16 +178,19 @@ export class HexPaths {
         }
     }
 
-    private ones(): Map<Hex, List<Hex>> {
+    private initializeOnes(): Map<Hex, List<Hex>> {
+        // note two side-effects: populate 0's and 1's in this.paths
         return Map<Hex, List<Hex>>().withMutations(result => {
             this.hexes.forEach(source => {
+                const sourceIndex = this.pathIndex(source)
+                this.paths[sourceIndex][sourceIndex] = Object.freeze({ h: source, n: 0 })
                 // 1. map source to dests that are distance 1 away (and in-bounds)
                 result.set(source, source.neighbors.filter(
                     neighbor => this.hexes.has(neighbor)
                 ) as List<Hex>)
                 // 2. add them to the path store
                 result.get(source).forEach(neighbor =>
-                    this.paths[this.pathIndex(source)][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
+                    this.paths[sourceIndex][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
                 )
             })
         })

@@ -1,12 +1,13 @@
 import {BoardReducerTester} from '../../view/BoardReducerTester';
 import {BasicRobot} from './BasicRobot';
-import {Player} from './Players';
+import {pickNPlayers, Player} from './Players';
 import {List} from 'immutable';
 import {RandomTerrainArranger} from '../RandomTerrainArranger';
 import {SpreadPlayersArranger} from '../SpreadPlayerArranger';
 import {Hex} from '../Hex';
 import {Tile} from '../Tile';
 import {Terrain} from '../Terrain';
+import {Robot} from './Robot';
 
 it('makes moves', () => {
     const brt = new BoardReducerTester(10, 10)
@@ -118,15 +119,28 @@ it('stops by cities', () => {
     }
 })
 
+type RobotMaker = () => Robot
+const robotTrials = 40
+const IQRobotMaker = (iq: number) => () =>
+    BasicRobot.byIntelligence(iq)
+const SkillRobotMaker = (skill: number) => () =>
+    BasicRobot.bySkill(skill)
+const iq0 = IQRobotMaker(0)
+const iqMax = IQRobotMaker(BasicRobot.MAX_IQ)
+
 const doesABeatB = (
-    first: BasicRobot, second: BasicRobot, turnLimit: number
+    first: RobotMaker, second: RobotMaker, turnLimit: number
 ): boolean => {
-    const brt = new BoardReducerTester(13, 7, [
-        new RandomTerrainArranger(0.3),
-        new SpreadPlayersArranger(),
-    ])
-    brt.setRobot(Player.Zero, first)  // a clear prejudice in favor of player zero
-    brt.setRobot(Player.One, second)
+    const brt = new BoardReducerTester(
+        13, 7, [
+            new RandomTerrainArranger(0.3),
+            new SpreadPlayersArranger(),
+        ], pickNPlayers(4)
+    )
+    brt.setRobot(Player.Zero, first())
+    brt.setRobot(Player.One, second())
+    brt.setRobot(Player.Two, first())
+    brt.setRobot(Player.Three, second())
     while (brt.state.turn < turnLimit) {
         brt.queueRobots()
         brt.doMoves()
@@ -136,15 +150,14 @@ const doesABeatB = (
             break
     }
     // noinspection UnnecessaryLocalVariableJS
-    const zeroWins = brt.popTotal(Player.Zero) > brt.popTotal(Player.One)
-    return zeroWins
+    const firstWins
+        = brt.popTotal(Player.Zero) + brt.popTotal(Player.Two)
+        > brt.popTotal(Player.One) + brt.popTotal(Player.Three)
+    return firstWins
 }
 
-const robotTrials = 40
-const iq0 = BasicRobot.byIntelligence(0)
-
 const countAWins = (
-    first: BasicRobot, second: BasicRobot,
+    first: RobotMaker, second: RobotMaker,
     trials: number = robotTrials, turnLimit: number = 250,
 ): number => {
     let aWins = 0
@@ -155,8 +168,7 @@ const countAWins = (
 }
 
 it('control — IQ 0 vs self', () => {
-    const robot = BasicRobot.byIntelligence(0)
-    const control = countAWins(robot, robot)
+    const control = countAWins(iq0, iq0)
     console.log(`Dumb vs dumb: ${control}/${robotTrials} = ${control/robotTrials}`)
     expect(control).toBeGreaterThanOrEqual(robotTrials * 0.35)
 })
@@ -164,18 +176,17 @@ it('control — IQ 0 vs self', () => {
 it('IQ 1 not lose too much', () => {
     const skills = List(Array(BasicRobot.MAX_IQ).keys())
 
-    skills.forEach(brainIndex => {
-        const smart = BasicRobot.bySkill(brainIndex)
+    skills.forEach(skillIndex => {
+        const smart = SkillRobotMaker(skillIndex)
         const wins = countAWins(smart, iq0)
-        console.log(`Skill #${brainIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart.toString()})`)
+        console.log(`Skill #${skillIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart().toString()})`)
         expect(wins).toBeGreaterThanOrEqual(robotTrials * 0.4)  // weak!
     })
 })
 
 it('max IQ wins a lot', () => {
-    const smart = BasicRobot.byIntelligence(BasicRobot.MAX_IQ)
     const n = robotTrials * 2
-    const wins = countAWins(smart, iq0, n)
-    console.log(`Max IQ: ${wins}/${n} = ${wins/n} (${smart.toString()})`)
+    const wins = countAWins(iqMax, iq0, n)
+    console.log(`Max IQ: ${wins}/${n} = ${wins/n} (${iqMax().toString()})`)
     expect(wins).toBeGreaterThanOrEqual(n * 0.55) // ugh, low
 })

@@ -6,6 +6,10 @@ import {Hex} from './Hex'
 import {Tile} from './Tile'
 import {Terrain} from './Terrain'
 import {RandomTerrainArranger} from './RandomTerrainArranger'
+import {FloodDM, PathsDM, SpreadPlayersArranger} from './SpreadPlayerArranger';
+import {Arranger} from './Arranger';
+import {StatusMessage} from '../../../common/StatusMessage';
+import {pickNPlayers} from './players/Players';
 
 it ('finds a simple shortest path', () => {
     const ten = Board.constructSquare(10, List())
@@ -74,14 +78,59 @@ it ('finds a slightly more complex shortest path', () => {
     checkConnected(ll, ur, allPaths.path(ll, ur))
 })
 
-it ('tests performance of global shortest path', () => {
-    Range(5, 41, 5).forEach(n => {
-        let board = Board.constructSquare(n, List(), [
-            new RandomTerrainArranger(0.2)
-        ])
-        const start = Date.now()
-        new HexPaths(board.hexesOccupiable)
-        const elapsed = Date.now() - start
-        console.log(`Size: ${n} — Elapsed: ${elapsed}`)
+const timeArranging = (
+    name: string, board: Board, arranger: Arranger
+) => {
+    const start = Date.now()
+    const status = [] as StatusMessage[]
+    arranger.arrange(board, status)
+    if (status.length > 0)
+        console.log(status)
+    const elapsed = Date.now() - start
+    console.log(`${name} arranger — ${board.players.size} players, ${board.edges.width} x ${board.edges.height} — ${board.hexesOccupiable.size} hexes — ${elapsed} ms`)
+}
+
+it ('compares performance of flood & global', () => {
+    const flood = new SpreadPlayersArranger(Terrain.Capital, 0, FloodDM)
+    const paths = new SpreadPlayersArranger(Terrain.Capital, 0, PathsDM)
+
+    Range(15, 36, 5).forEach(side => {
+        const board = Board.constructSquare(
+            side, pickNPlayers(16),
+            [ new RandomTerrainArranger(0.2) ],
+        )
+        timeArranging("flood", board, flood)
+        timeArranging("paths", board, paths)
     })
+})
+
+const r = (n: number, places: number = 2, shift: number = 0) =>
+    Math.round(n * (10 ** shift) * (10 ** places)) / (10 ** places)
+
+const testPerf = (side: number) => {
+    let board = Board.constructSquare(side, List(), [
+        new RandomTerrainArranger(0.2)
+    ])
+    const hexes = board.hexesOccupiable.size
+    const start = Date.now()
+    new HexPaths(board.hexesOccupiable)
+    const elapsed = Date.now() - start
+    console.log(
+        `${side}x${side} (${hexes} hexes), ${elapsed} ms — ns/hex2.1|2|3|4: ${
+            // r(elapsed / side, 1)}/side ${
+            // r(elapsed / (side*side))}/side^2 ${
+            // r(elapsed / hexes)}/hex ${
+            // Seems to be slightly more than n^2 where n is number of hexes.
+            // Note that there are n^2 paths.
+            r(elapsed / (hexes ** 2), 0, 6)} | ${
+            r(elapsed / (hexes ** 2.1), 0, 6)} | ${
+            r(elapsed / (hexes ** 2.2), 0, 6)} | ${
+            r(elapsed / (hexes ** 2.3), 0, 6)} | ${
+            r(elapsed / (hexes ** 2.4), 0, 6)}`
+    )
+}
+
+it ('benchmarks performance of global shortest path', () => {
+    Range(10, 36, 5).forEach(n => {testPerf(n)})
+    // Range(37, 49, 2).forEach(n => {testPerf(n)})
 })
