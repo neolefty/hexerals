@@ -45,7 +45,7 @@ class HexTouch {
     }
 
     toString(): string {
-        return `Touch at ${this.hex ? this.hex.toString() : 'no hex'} — id ${this.id} — screen ${this.screen} / client ${ this.client} / page ${this.page}`
+        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round} / client ${ this.client.round} / page ${this.page.round}`
     }
 }
 
@@ -62,24 +62,43 @@ export class FlatTopHex
     }
 
     onTouchStart(e: React.TouchEvent) {
-        if (this.props.onSelect)
-            for (let i = 0; i < e.touches.length; ++i)
-                this.props.onSelect(e.touches[i].identifier, false)
+        // this.logEvent(e)
+        if (this.props.onPlaceCursor) {
+            for (let i = 0; i < e.touches.length; ++i) {
+                const hexTouch = new HexTouch(e.touches[i])
+                // console.log(`  — set cursor ${hexTouch}`)
+                this.props.onPlaceCursor(hexTouch.id, hexTouch.hex, false)
+            }
+            if (e.cancelable)
+                e.preventDefault()
+        }
     }
 
     onTouchMove(e: React.TouchEvent) {
-        if (this.props.onDrag)
+        // this.logEvent(e)
+        if (this.props.onDrag) {
             for (let i = 0; i < e.touches.length; ++i) {
                 const hexTouch = new HexTouch(e.touches[i])
+                // console.log(`  — ${hexTouch.toString()}`)
                 if (hexTouch.hex !== Hex.NONE)
                     this.props.onDrag(hexTouch.id, hexTouch.hex)
             }
+            if (e.cancelable)
+                e.preventDefault()
+        }
     }
 
     onTouchEnd(e: React.TouchEvent) {
-        if (this.props.onClearCursor)
-            for (let i = 0; i < e.touches.length; ++i)
-                this.props.onClearCursor(e.touches[i].identifier)
+        // this.logEvent(e)
+        if (this.props.onClearCursor) {
+            for (let i = 0; i < e.changedTouches.length; ++i) {
+                const hexTouch = new HexTouch(e.changedTouches[i])
+                // console.log(`  — clearing cursor — ${hexTouch}`)
+                this.props.onClearCursor(hexTouch.id)
+            }
+            if (e.cancelable)
+                e.preventDefault()
+        }
     }
 
     logEvent(e: React.SyntheticEvent, prefix: string = '') {
@@ -159,8 +178,8 @@ export class FlatTopHex
                     }
                 }}
                 onMouseDown={(e) => {
-                    if (this.props.onSelect) {
-                        this.props.onSelect(0, true)
+                    if (this.props.onPlaceCursor) {
+                        this.props.onPlaceCursor(0, this.props.hex, true)
                         e.preventDefault()
                     }
                 }}

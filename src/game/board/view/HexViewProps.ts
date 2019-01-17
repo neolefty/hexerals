@@ -8,7 +8,7 @@ export interface HexViewProps {
     color: DriftColor
     selected: boolean
 
-    onSelect?: (cursorIndex: number, clearOthers: boolean) => void
+    onPlaceCursor?: (cursorIndex: number, where: Hex, clearOthers: boolean) => void
     onDrag?: (cursorIndex: number, dest: Hex) => void
     onClearCursor?: (cursorIndex: number) => void
 

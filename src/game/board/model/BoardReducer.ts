@@ -302,21 +302,34 @@ export const placeCursorAction = (
     position: Hex, index: number = 0, clearOthers: boolean = false,
 ): PlaceCursor =>
     ({ type: PLACE_CURSOR, position, index, clearOthers })
-const placeCursorReducer = (state: BoardState, action: PlaceCursor): BoardState =>
-    (
-        action.position === state.cursors.get(action.index)
-        || !state.board.canBeOccupied(action.position)
-        || !state.board.inBounds(action.position)
-    )
+const placeCursorReducer = (
+    state: BoardState, action: PlaceCursor
+): BoardState => {
+    let result = action.clearOthers ? DEFAULT_CURSORS : state.cursors
+    if (action.position === Hex.NONE) {
+        if (state.cursors.has(action.index)) {
+            // console.log(`  >> clear cursor #${action.index} at ${result.get(action.index).toString()}`)
+            result = result.remove(action.index)
+        }
+    }
+    else {
+        if (
+            action.position !== state.cursors.get(action.index)
+            && state.board.canBeOccupied(action.position)
+        ) {
+            // console.log(`  >> set cursor #${action.index} at ${action.position.toString()}`)
+            result = result.set(action.index, action.position)
+        }
+    }
+    // if (result !== state.cursors)
+        // console.log(`  >> changed`)
+    return (result === state.cursors)
         ? state
         : {
             ...state,
-            cursors:
-                (action.clearOthers
-                    ? DEFAULT_CURSORS
-                    : state.cursors
-                ).set(action.index, action.position),
+            cursors: result,
         }
+}
 
 const SET_CUR_PLAYER = 'SET_CUR_PLAYER'
 type SET_CUR_PLAYER = typeof SET_CUR_PLAYER

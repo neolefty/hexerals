@@ -22,9 +22,9 @@ export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
         numRobots: 5,
-        boardWidth: 27,
-        boardHeight: 13,
-        difficulty: 0,
+        boardWidth: 7, // 27,
+        boardHeight: 11, // 13
+        difficulty: 2,
         mountainPercent: 25,
         tickMillis: 500,
         startingPop: 0,

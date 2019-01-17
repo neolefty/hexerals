@@ -42,7 +42,7 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                             selected={cursorSet.contains(hex)}
                             viewBoxHeight={h}
                             onClearCursor={this.onClearCursor}
-                            onSelect={(cursorIndex: number, clearOthers: boolean) => this.props.onPlaceCursor(cursorIndex, hex, clearOthers)}
+                            onPlaceCursor={this.props.onPlaceCursor}
                             onDrag={this.onDrag}
                         />
                     )
@@ -57,9 +57,11 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
 
     onDrag = (cursorIndex: number, dest: Hex) => {
         const bs = this.props.boardState
-        const source: Hex = bs.cursors.get(0, Hex.NONE)
+        const source: Hex = bs.cursors.get(cursorIndex, Hex.NONE)
         const player: Player | undefined = bs.curPlayer
-        if (source !== Hex.NONE && player && source !== dest)
+        if (source !== Hex.NONE && player && source !== dest) {
+            // console.log(`  >> dragging #${cursorIndex} from ${source.toString()} to ${dest.toString()}`)
             this.props.onDrag(player, cursorIndex, source, dest)
+        }
     }
 }

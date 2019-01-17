@@ -25,6 +25,11 @@ export class CartPair {
 
     // don't change — SVG operations depend on exactly this
     toString() { return `${this.x},${this.y}` }
+
+    get round() {
+        // noinspection JSSuspiciousNameCombination
+        return new CartPair(Math.round(this.x), Math.round(this.y))
+    }
 }
 
 export type CartPairTransform = (cp: CartPair) => CartPair
