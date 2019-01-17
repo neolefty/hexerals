@@ -305,11 +305,11 @@ export const placeCursorAction = (
 const placeCursorReducer = (
     state: BoardState, action: PlaceCursor
 ): BoardState => {
-    let result = action.clearOthers ? DEFAULT_CURSORS : state.cursors
+    const original = action.clearOthers ? DEFAULT_CURSORS : state.cursors
+    let updated = original
     if (action.position === Hex.NONE) {
         if (state.cursors.has(action.index)) {
-            // console.log(`  >> clear cursor #${action.index} at ${result.get(action.index).toString()}`)
-            result = result.remove(action.index)
+            updated = updated.remove(action.index)
         }
     }
     else {
@@ -317,17 +317,14 @@ const placeCursorReducer = (
             action.position !== state.cursors.get(action.index)
             && state.board.canBeOccupied(action.position)
         ) {
-            // console.log(`  >> set cursor #${action.index} at ${action.position.toString()}`)
-            result = result.set(action.index, action.position)
+            updated = updated.set(action.index, action.position)
         }
     }
-    // if (result !== state.cursors)
-        // console.log(`  >> changed`)
-    return (result === state.cursors)
+    return (updated === original)
         ? state
         : {
             ...state,
-            cursors: result,
+            cursors: updated,
         }
 }
 

@@ -33,8 +33,6 @@ export class BoardKeyboardController {
                 const move = PlayerMove.constructDelta(bs.curPlayer, bs.cursors.get(0), delta)
                 if (bs.board.canBeOccupied(move.dest))
                     this.view.props.onQueueMoves(List([move]))
-                // TODO don't move into known mountains but move right through unknown ones
-                // TODO differentiate between known & unknown mountains — add question mark to unknown, like generals does
                 const newCursor = bs.cursors.get(0).plus(delta)
                 this.view.props.onPlaceCursor(0, newCursor, true)
                 e.preventDefault()
