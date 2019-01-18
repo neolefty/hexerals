@@ -92,14 +92,12 @@ export class Help extends React.PureComponent<HelpOptions> {
                 }}
             >
                 <div className="Column">
-                    <p><strong>click and drag<br/>to move, or:</strong></p>
+                    <p><strong>Drag to move</strong></p>
+                    <p>or movement keys ⟶</p>{/* ➡ ⇨ */}
                     <hr/>
-                    <p>movement keys ⟶</p>{/* ➡ ⇨ */}
                     <p>end game — esc</p>
                     <p>cancel 1 move — z</p>
                     <p>cancel all moves — x</p>
-                    <hr/>
-                    <p>phone & tablet support<br/>coming soon</p>
                 </div>
                 <div className="Column">
                     <svg

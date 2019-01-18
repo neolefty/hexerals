@@ -9,6 +9,12 @@ export class CieColor {
     static readonly GREY_80: CieColor = new CieColor([0, 0, 80])
     static readonly WHITE: CieColor = new CieColor([0, 0, 100])
 
+    private static roundNumArrayToString(ns: number[]): string {
+        return `${Math.round(ns[0])}`
+            + ` ${Math.round(ns[1])}`
+            + ` ${Math.round(ns[2])}`
+    }
+
     // readonly hpl: number[]  // pastels only, with uniformity and full range
 
     // perceptually normalized, but not all hues have full saturation range
@@ -62,12 +68,6 @@ export class CieColor {
         // console.log(`${result.toFixed(2)} -- delta ${[dBright.toFixed(2), dSat.toFixed(2), dHueRaw.toFixed(2)]} --from-- ${this.toLchString()} -to- ${that.toLchString()} = `)
         return result / 1e8
         // return CieColor.d2(this.lch, that.lch)
-    }
-
-    static roundNumArrayToString(ns: number[]): string {
-        return `${Math.round(ns[0])}`
-            + ` ${Math.round(ns[1])}`
-            + ` ${Math.round(ns[2])}`
     }
 
     toHexString = () => hsluv.hsluvToHex(this.hsl)
