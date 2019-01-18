@@ -66,7 +66,7 @@ terrainPolygons.set(Terrain.Mountain, [
 terrainShaders.set(
     Terrain.Mountain, (index, color) =>
         index < 2
-            ? color.texture((index % 2 + 2) * 10)
+            ? color.darker((index % 2 + 2) * 10)
             : DriftColor.GREY_60
 )
 

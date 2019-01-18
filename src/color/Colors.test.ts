@@ -1,7 +1,7 @@
 import {ColorPodge} from "./ColorPodge";
 import {CieColor} from "./CieColor";
 import {DriftColor} from "./DriftColor";
-import {List} from "immutable";
+import {List, Range} from "immutable";
 
 it('color distance', () => {
     const c0 = new DriftColor(new CieColor([1, 2, 3]));
@@ -119,5 +119,28 @@ it('color podge random tests', () => {
         // expect(cp2.furthestTwo() > cp5.furthestTwo()).toBeTruthy();
     }
 });
+
+fit('textures', () => {
+    Range(0, 10).forEach((i: number) => {
+        const orig = DriftColor.random()
+        const texture10 = orig.texture(10)
+        const darker5 = orig.darker(5)
+        const lighter5 = orig.lighter(5)
+        const darker0 = orig.darker(0)
+        const lighter0 = orig.lighter(0)
+        expect(orig.hue).toBe(texture10.hue)
+        expect(orig.toHexString()).toEqual(lighter0.toHexString())
+        expect(orig.toHexString()).toEqual(darker0.toHexString())
+        expect(orig.saturation).toBe(texture10.saturation)
+        expect(Math.abs(orig.lightness - texture10.lightness)).toBeCloseTo(10, 6)
+        expect(orig.lightness - darker5.lightness).toBe(5)
+        expect(orig.lightness - lighter5.lightness).toBe(-5)
+        expect(orig.texture(10) === texture10) // cached
+        expect(orig.lighter(5) === lighter5) // cached
+        expect(orig.darker(5) === darker5) // cached
+        expect(orig.lighter(100).lightness).toBe(100)
+        expect(orig.darker(100).lightness).toBe(0)
+    })
+})
 
 // TODO test that mindist() of each color in a podge is similar, after convergence

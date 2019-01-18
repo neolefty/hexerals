@@ -71,7 +71,7 @@ export class HexBoardView extends BoardViewBase {
         return (
             <div
                 tabIndex={0}
-                className='board'
+                className="board"
                 onKeyDown={this.keyboardController.onKeyDown}
                 ref={this.focusRef}
             >

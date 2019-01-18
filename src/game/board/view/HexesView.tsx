@@ -28,7 +28,7 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                     const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
                     const color: DriftColor = ownerColor
-                        || (tile.known && tile.canBeOccupied ? DriftColor.GREY_60 : DriftColor.GREY_40)
+                        || (tile.known ? DriftColor.GREY_60 : DriftColor.GREY_40)
                     const text = !tile.known && !tile.isBlank() ? '?' : tile.pop !== 0 ? `${tile.pop}` : undefined
                     const textColor = !tile.known ? color.texture(20) : undefined
                     return (

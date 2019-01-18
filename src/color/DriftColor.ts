@@ -98,41 +98,46 @@ export class DriftColor {
         return this._contrast
     }
 
-    get hue() { return this.cie.hsl[0] }
-    get saturation() { return this.cie.hsl[1] }
-    get lightness() { return this.cie.hsl[2] }
+    get hue() { return this.cie.hue }
+    get saturation() { return this.cie.saturation }
+    get lightness() { return this.cie.lightness }
 
     // tslint:disable-next-line:member-ordering
-    private textureCache: Map<number, DriftColor> = new Map()
+    private lightCache: Map<number, DriftColor> = new Map()
 
-    // A color with same hue & sat, but slightly lighter or darker, for texture
-    texture(diff: number = 20): DriftColor {
-        if (!this.textureCache.has(diff)) {
-            // lightness 0-25 -- return brighter (too dark to get darker)
-            //   - 25-50 -- darker
-            //   - 50-75 -- brighter
-            //   - 75-100 -- darker (too bright to get brighter)
-            const darker: boolean = (
-                this.lightness > diff - 5
-                && this.lightness < DriftColor.MID_LIGHT
-            ) || this.lightness > (95 - diff)
-            this.textureCache.set(diff, new DriftColor(
-                new CieColor([
-                    this.cie.hsl[0],
-                    this.cie.hsl[1],
-                    darker ? this.cie.hsl[2] - diff : this.cie.hsl[2] + diff,
-                ]),
-                this.key * (1 + diff / 100)
+    darker = (diff: number = 20): DriftColor =>
+        this.withLightness(Math.max(0, this.lightness - diff))
+
+    lighter = (diff: number = 20): DriftColor =>
+        this.withLightness(Math.min(100, this.lightness + diff))
+
+    withLightness = (lightness: number): DriftColor => {
+        if (!this.lightCache.has(lightness))
+            this.lightCache.set(lightness, new DriftColor(
+                this.cie.withLightness(lightness),
+                this.key * (lightness / 100)
             ))
-        }
-        return this.textureCache.get(diff) as DriftColor
+        return this.lightCache.get(lightness) as DriftColor
     }
 
-    toHexString(): string { return this.cie.toHexString() }
-    toHslString() { return this.cie.toHslString() }
-    toLchString() { return this.cie.toLchString() }
+    // A color with same hue & sat, but slightly lighter or darker, for texture
+    texture = (diff: number = 20): DriftColor => {
+        // lightness 0-25 -- return brighter (too dark to get darker)
+        //   - 25-50 -- darker
+        //   - 50-75 -- brighter
+        //   - 75-100 -- darker (too bright to get brighter)
+        const darker: boolean = (
+            this.lightness > diff - 5
+            && this.lightness < DriftColor.MID_LIGHT
+        ) || this.lightness > (95 - diff)
+        return darker ? this.darker(diff) : this.lighter(diff)
+    }
+
+    toHexString = () => this.cie.toHexString()
+    toHslString = () => this.cie.toHslString()
+    toLchString = () => this.cie.toLchString()
 
     toString(): string {
-        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - cie: ${this.toLchString()}`
+        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - lch: ${this.toLchString()}`
     }
 }
