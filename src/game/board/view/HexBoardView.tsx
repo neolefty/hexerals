@@ -71,6 +71,7 @@ export class HexBoardView extends BoardViewBase {
         return (
             <div
                 tabIndex={0}
+                className='board'
                 onKeyDown={this.keyboardController.onKeyDown}
                 ref={this.focusRef}
             >
@@ -85,12 +86,6 @@ export class HexBoardView extends BoardViewBase {
                         scaleHeight + INNER_BOARD_MARGIN + FLAG_CLEARANCE,
                     ].join(',')}
                 >
-                    <rect
-                        width={scaleWidth}
-                        height={scaleHeight}
-                        stroke="white"
-                        strokeWidth="3"
-                    />
                     <HexesView{...this.props}/>
                     <MoveQueueView
                         moves={this.props.boardState.moves}
