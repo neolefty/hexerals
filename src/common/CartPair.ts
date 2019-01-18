@@ -17,6 +17,7 @@ export class CartPair {
     plus(that: CartPair) { return this.plusXY(that.x, that.y) }
     plusX(x: number) { return this.plusXY(x, 0) }
     plusY(y: number) { return this.plusXY(0, y) }
+    minus(that: CartPair) { return that.scale(-1).plus(this) }
 
     get min() { return Math.min(this.x, this.y) }
 

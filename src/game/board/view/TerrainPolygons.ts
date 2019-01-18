@@ -39,18 +39,35 @@ terrainShaders.set(Terrain.City, CITY_SHADER)
 
 // mtnLeft and mtnRight are points along the left and right lower segments
 // of the hex, respectively.
-const mtnLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))
-const mtnRight = HEX_LR_XY.plus(HEX_UR_XY.scale(0.7))
-const mtnMidBottom = HEX_LL_XY.plus(HEX_RIGHT_XY.scale(0.1))
+const mtnFootLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))
+const mtnFootRight = HEX_LR_XY.plus(HEX_UR_XY.scale(0.7))
+const mtnFootMid = HEX_LL_XY.plus(HEX_RIGHT_XY.scale(0.1))
+const mtnPeakL = new CartPair(-13, -11)
+const mtnPeakRL = new CartPair(3, -15)
+const mtnPeakRR = new CartPair(8, -13)
+const ctr = new CartPair(0, 0)
+const mtnLeft = CartChain.construct(
+    mtnFootLeft, HEX_LL_XY, mtnFootMid, ctr, mtnPeakL)
+const mtnRight = CartChain.construct(
+    mtnFootMid, HEX_LR_XY, mtnFootRight, mtnPeakRR, mtnPeakRL)
+
+// const slopeRight = mtnFootRight.minus(mtnPeakRR)
+// const slopeLeft = mtnFootMid.minus(mtnPeakRL)
+// const mtnSnowR = CartChain.construct(
+//     mtnPeakRL, mtnPeakRR,
+//     mtnPeakRR.plus(slopeRight.scale(0.29)),
+//     mtnPeakRL.plus(slopeLeft.scale(0.19)),
+// )
 terrainPolygons.set(Terrain.Mountain, [
-    // left mountain
-    `${mtnLeft} ${HEX_LL_XY} ${mtnMidBottom} -0,0 -13,-11`,
-    // right mountain
-    `${mtnMidBottom} ${HEX_LR_XY} ${mtnRight} 8,-13 3,-15`,
+    mtnLeft.toString(),
+    mtnRight.toString(),
+    // mtnSnowR.toString(),
 ])
 terrainShaders.set(
     Terrain.Mountain, (index, color) =>
-        color.texture((index % 2 + 2) * 10)
+        index < 2
+            ? color.texture((index % 2 + 2) * 10)
+            : DriftColor.GREY_60
 )
 
 { // castle
