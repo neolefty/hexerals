@@ -1,3 +1,9 @@
+div .board { /* hide focus outline */
+    outline: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+
 g.tile {
     cursor: default;
 
