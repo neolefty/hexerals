@@ -1,4 +1,5 @@
 import {CieColor} from './CieColor'
+import {minMax} from '../common/Math';
 
 export class DriftColor {
     // allowed limits on lightness & saturation when drifting (hsluv)
@@ -106,12 +107,13 @@ export class DriftColor {
     private lightCache: Map<number, DriftColor> = new Map()
 
     darker = (diff: number = 20): DriftColor =>
-        this.withLightness(Math.max(0, this.lightness - diff))
+        this.withLightness(this.lightness - diff)
 
     lighter = (diff: number = 20): DriftColor =>
-        this.withLightness(Math.min(100, this.lightness + diff))
+        this.withLightness(this.lightness + diff)
 
     withLightness = (lightness: number): DriftColor => {
+        lightness = minMax(lightness, 0, 100)
         if (!this.lightCache.has(lightness))
             this.lightCache.set(lightness, new DriftColor(
                 this.cie.withLightness(lightness),

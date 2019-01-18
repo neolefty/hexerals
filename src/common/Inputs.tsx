@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {minMax} from './Math';
 
 export interface NumberInputProps {
     label: string
@@ -15,8 +16,6 @@ export interface NumberInputProps {
     children?: JSX.Element | JSX.Element[];
 }
 
-const minMax = (x: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, x))
 const onEnterKey = (effect: () => void) => (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
         e.preventDefault()

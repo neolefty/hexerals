@@ -13,6 +13,7 @@ const UNKNOWN_SHADER: Shader = (index, color) =>
 
 const terrainPolygons = Map<Terrain, string[]>().asMutable()
 const terrainShaders = Map<Terrain, Shader>().asMutable()
+const unknownShaders = Map<Terrain, Shader>().asMutable()
 
 const WALL_W = HEX_HALF_HEIGHT / 2  // half the width of the house body
 const WALL_H = WALL_W * 9 / 13  // half the height of the house body
@@ -37,38 +38,51 @@ const CITY_SHADER: Shader = (index, color) =>
     color.texture((index % 2 + 2) * 9)
 terrainShaders.set(Terrain.City, CITY_SHADER)
 
-// mtnLeft and mtnRight are points along the left and right lower segments
-// of the hex, respectively.
-const mtnFootLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))
-const mtnFootRight = HEX_LR_XY.plus(HEX_UR_XY.scale(0.7))
-const mtnFootMid = HEX_LL_XY.plus(HEX_RIGHT_XY.scale(0.1))
-const mtnPeakL = new CartPair(-13, -11)
-const mtnPeakRL = new CartPair(3, -15)
-const mtnPeakRR = new CartPair(8, -13)
-const ctr = new CartPair(0, 0)
-const mtnLeft = CartChain.construct(
-    mtnFootLeft, HEX_LL_XY, mtnFootMid, ctr, mtnPeakL)
-const mtnRight = CartChain.construct(
-    mtnFootMid, HEX_LR_XY, mtnFootRight, mtnPeakRR, mtnPeakRL)
+{ // mountains
+    // mtnLeft and mtnRight are points along the left and right lower segments of the hex, respectively.
+    const footLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))
+    const footRight = HEX_LR_XY.plus(HEX_UR_XY.scale(0.7))
+    const footMid = HEX_LL_XY.plus(HEX_RIGHT_XY.scale(0.1))
+    const peakLeft = new CartPair(-13, -11)
+    const peakRightL = new CartPair(3, -15)
+    const peakRightR = new CartPair(8, -13)
+    const ctr = new CartPair(0, 0)
+    const mtnLeft = CartChain.construct(
+        footLeft, HEX_LL_XY, footMid, ctr, peakLeft)
+    const mtnRight = CartChain.construct(
+        footMid, HEX_LR_XY, footRight, peakRightR, peakRightL)
 
-// const slopeRight = mtnFootRight.minus(mtnPeakRR)
-// const slopeLeft = mtnFootMid.minus(mtnPeakRL)
-// const mtnSnowR = CartChain.construct(
-//     mtnPeakRL, mtnPeakRR,
-//     mtnPeakRR.plus(slopeRight.scale(0.29)),
-//     mtnPeakRL.plus(slopeLeft.scale(0.19)),
-// )
-terrainPolygons.set(Terrain.Mountain, [
-    mtnLeft.toString(),
-    mtnRight.toString(),
-    // mtnSnowR.toString(),
-])
-terrainShaders.set(
-    Terrain.Mountain, (index, color) =>
-        index < 2
-            ? color.darker((index % 2 + 2) * 10)
-            : DriftColor.GREY_60
-)
+    const slopeRL = footMid.minus(peakRightL)
+    const slopeRR = footRight.minus(peakRightR)
+    const snowRL = peakRightL.plus(slopeRL.scale(0.24))
+    const snowRR = peakRightR.plus(slopeRR.scale(0.35))
+    const snowMidR = snowRL.plus(snowRR).scale(0.5).plusY(-1)
+    const mtnSnowR = CartChain.construct(
+        peakRightL, peakRightR, snowRR, snowMidR, snowRL)
+
+    const slopeLL = footLeft.minus(peakLeft)
+    const slopeLR = ctr.minus(peakLeft)
+    const snowLL = peakLeft.plus(slopeLL.scale(0.45))
+    const snowLR = peakLeft.plus(slopeLR.scale(0.8))
+    const snowMidL = snowLL.plus(snowLR).scale(0.5).plusY(-1.5)
+    const mtnSnowL = CartChain.construct(
+        peakLeft, snowLL, snowMidL, snowLR)
+
+    terrainPolygons.set(Terrain.Mountain, [
+        mtnLeft.toString(),
+        mtnSnowL.toString(),
+        mtnRight.toString(),
+        mtnSnowR.toString(),
+    ])
+    terrainShaders.set(
+        Terrain.Mountain, (index, color) =>
+            color.darker([15, -10, 25, -20][index])
+    )
+    unknownShaders.set(
+        Terrain.Mountain, (index, color) =>
+            color.darker([10, -5, 20, -10][index])
+    )
+}
 
 { // castle
     const [ w, h, doorW, doorH ] = [ 9, 16, 2.5, 11 ]
@@ -134,7 +148,8 @@ terrainShaders.set(
 export const getTerrainPolygons = (tile: Tile): string[] | undefined =>
     terrainPolygons.get(tile.terrain)
 
-export const getTerrainShader = (tile: Tile) =>
-    tile.known
+export const getTerrainShader = (tile: Tile) => {
+    return tile.known
         ? terrainShaders.get(tile.terrain, CITY_SHADER)
-        : UNKNOWN_SHADER
+        : unknownShaders.get(tile.terrain, UNKNOWN_SHADER)
+}
