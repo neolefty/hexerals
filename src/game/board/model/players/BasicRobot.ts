@@ -19,7 +19,7 @@ import {Comma} from '../../../../common/Comma';
 const NONE_MOVE = new HexMove(Hex.NONE, Hex.NONE)
 
 export class BasicRobot implements Robot {
-    static readonly MAX_IQ = 6
+    static readonly MAX_IQ = 4
 
     // doesn't always move all the way until blocked
     static readonly SKILL_STOP_PARTWAY = 0
@@ -29,10 +29,12 @@ export class BasicRobot implements Robot {
     static readonly SKILL_CAPTURE_NEARBY = 2
     // stops if it's next to an opposing city
     static readonly SKILL_STOP_BY_CITIES = 3
+/*
     // captures enemy tiles
     static readonly SKILL_LIKES_CAPTURE = 4
     // prioritizes economical captures
     static readonly SKILL_SAVES_POP = 5
+*/
 
     static readonly SKILL_NAMES = [
         'stops partway', 'wastes not', 'captures nearby', 'stops by cities',
@@ -68,10 +70,12 @@ export class BasicRobot implements Robot {
         return this.skills[BasicRobot.SKILL_CAPTURE_NEARBY] }
     get stopsByCities(): boolean {
         return this.skills[BasicRobot.SKILL_STOP_BY_CITIES] }
+/*
     get likesCapture(): boolean {
         return this.skills[BasicRobot.SKILL_LIKES_CAPTURE] }
     get savesPop(): boolean {
         return this.skills[BasicRobot.SKILL_SAVES_POP] }
+*/
 
     get intelligence() {
         let result = 0
