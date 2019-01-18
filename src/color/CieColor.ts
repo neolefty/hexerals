@@ -2,12 +2,12 @@ import * as hsluv from 'hsluv';
 
 export class CieColor {
     // for descriptions of color spaces, see http://www.hsluv.org/comparison/
-    static readonly WHITE: CieColor = new CieColor([0, 0, 100]);
-    static readonly GREY_10: CieColor = new CieColor([0, 0, 10]);
+    static readonly BLACK: CieColor = new CieColor([0, 0, 0]);
     static readonly GREY_20: CieColor = new CieColor([0, 0, 20]);
     static readonly GREY_40: CieColor = new CieColor([0, 0, 40]);
     static readonly GREY_60: CieColor = new CieColor([0, 0, 60]);
-    static readonly BLACK: CieColor = new CieColor([0, 0, 0]);
+    static readonly GREY_80: CieColor = new CieColor([0, 0, 80]);
+    static readonly WHITE: CieColor = new CieColor([0, 0, 100]);
 
     // readonly hpl: number[];  // pastels only, with uniformity and full range
 

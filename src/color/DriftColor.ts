@@ -12,11 +12,12 @@ export class DriftColor {
     static readonly SPAN_SAT = DriftColor.MAX_SAT - DriftColor.MIN_SAT
     // static readonly MID_SAT = (DriftColor.MIN_SAT + DriftColor.MAX_SAT) / 2
 
-    static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
+    static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
     static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
     static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
     static readonly GREY_60: DriftColor = new DriftColor(CieColor.GREY_60);
-    static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
+    static readonly GREY_80: DriftColor = new DriftColor(CieColor.GREY_80);
+    static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
 
     static clamp_bright(b: number): number {
         return DriftColor.clamp(b, DriftColor.MIN_BRIGHT, DriftColor.MAX_BRIGHT)
