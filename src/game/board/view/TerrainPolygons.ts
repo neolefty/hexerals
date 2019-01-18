@@ -10,33 +10,44 @@ type Shader = (lineIndex: number, color: DriftColor) => DriftColor
 
 const UNKNOWN_SHADER: Shader = (index, color) =>
     color.texture((index % 2 + 2) * 6) // faded
+const CITY_SHADER: Shader = (index, color) =>
+    color.texture((index % 2 + 2) * 9)
 
 const terrainPolygons = Map<Terrain, string[]>().asMutable()
 const terrainShaders = Map<Terrain, Shader>().asMutable()
 const unknownShaders = Map<Terrain, Shader>().asMutable()
 
-const WALL_W = HEX_HALF_HEIGHT / 2  // half the width of the house body
-const WALL_H = WALL_W * 9 / 13  // half the height of the house body
-const ROOF_W = WALL_H  // eaves
-const ROOF_H = WALL_W * 15 / 13  // attic
-const Y_OFFSET = WALL_H * 0.6  // shift down
-const y = Y_OFFSET
-// const houseLL = new CartPair(-WALL_W, y + WALL_H)
-// const houseLR = new CartPair(WALL_W, y + WALL_H)
-terrainPolygons.set(Terrain.City, [
-    // roof triangle
-    ` ${-WALL_W - ROOF_W},${y - WALL_H} 0,${y - WALL_H - ROOF_H}`
-    + ` ${WALL_W + ROOF_W},${y - WALL_H}`,
-    // bottom rectangle — start bottom of left wall and go clockwise
-    `${-WALL_W},${y + WALL_H} ${-WALL_W},${y - WALL_H}` // left wall
-    + ` ${WALL_W},${y - WALL_H} ${WALL_W},${y + WALL_H}`, // right wall
-    // door
-    `${-WALL_W * .4},${y + WALL_H} ${-WALL_W * .4},${y - WALL_H * .6}`
-    + ` ${WALL_W * .4},${y - WALL_H * .6} ${WALL_W * .4},${y + WALL_H}`,
-])
-const CITY_SHADER: Shader = (index, color) =>
-    color.texture((index % 2 + 2) * 9)
-terrainShaders.set(Terrain.City, CITY_SHADER)
+{ // city (house)
+    const WALL_W = HEX_HALF_HEIGHT / 2  // half the width of the house body
+    const WALL_H = WALL_W * 9 / 13  // half the height of the house body
+    const ROOF_W = WALL_H  // eaves
+    const ROOF_H = WALL_W * 15 / 13  // attic
+    const DOOR_HEIGHT = 0.65 // fraction of house
+    const DOOR_WIDTH = 0.25
+
+    const ll = new CartPair(-WALL_W, WALL_H)
+    const ul = new CartPair(-WALL_W, -WALL_H)
+    const ur = new CartPair(WALL_W, -WALL_H)
+    const lr = new CartPair(WALL_W, WALL_H)
+
+    const peak = new CartPair(0, -WALL_H - ROOF_H)
+    const roofL = new CartPair(-WALL_W - ROOF_W, -WALL_H)
+    const roofR = roofL.scaleXY(-1, 1)
+
+    const rect = CartChain.construct(ll, ul, ur, lr)
+    const door = rect.scaleXY(DOOR_WIDTH, DOOR_HEIGHT)
+        .plusXY(0, (1 - DOOR_HEIGHT) * WALL_H)
+    const roof = CartChain.construct(roofL, peak, roofR)
+
+    const Y_OFFSET = WALL_H * 0.6  // shift down
+    terrainPolygons.set(Terrain.City, [
+        roof.plusXY(0, Y_OFFSET).toString(),
+        rect.plusXY(0, Y_OFFSET).toString(),
+        door.plusXY(0, Y_OFFSET).toString(),
+    ])
+    terrainShaders.set(Terrain.City, CITY_SHADER)
+}
+
 
 { // mountains
     // mtnLeft and mtnRight are points along the left and right lower segments of the hex, respectively.
