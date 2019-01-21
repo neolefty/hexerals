@@ -2,6 +2,10 @@ import {Hex} from './Hex';
 import {Player} from './players/Players';
 
 export class HexMove {
+    static constructDest(source: Hex, dest: Hex) {
+        return new HexMove(source, dest.minus(source))
+    }
+
     constructor(
         readonly source: Hex,
         readonly delta: Hex,
@@ -11,6 +15,12 @@ export class HexMove {
 
     public toString(): string {
         return `move from ${this.source} to ${this.dest}`
+    }
+
+    public equals(that: any) {
+        return that
+            && this.source === that.source
+            && this.delta === that.delta
     }
 }
 
@@ -46,9 +56,9 @@ export class PlayerMove {
     public toString(): string { return `${this.player} ${this.move}` }
 
     // ignores cursorIndex
-    equals(that: PlayerMove) {
-        return this.player === that.player
-            && this.source === that.source
-            && this.delta === that.delta
+    public equals(that: any) {
+        return that
+            && this.player === that.player
+            && this.move.equals(that.move)
     }
 }
