@@ -133,8 +133,8 @@ fit('textures', () => {
         expect(orig.toHexString()).toEqual(darker0.toHexString())
         expect(orig.saturation).toBe(texture10.saturation)
         expect(Math.abs(orig.lightness - texture10.lightness)).toBeCloseTo(10, 6)
-        expect(orig.lightness - darker5.lightness).toBe(5)
-        expect(orig.lightness - lighter5.lightness).toBe(-5)
+        expect(orig.lightness - darker5.lightness).toBeCloseTo(5, 6)
+        expect(orig.lightness - lighter5.lightness).toBeCloseTo(-5, 6)
         expect(orig.texture(10) === texture10) // cached
         expect(orig.lighter(5) === lighter5) // cached
         expect(orig.darker(5) === darker5) // cached
