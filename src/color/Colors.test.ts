@@ -10,11 +10,11 @@ it('color distance', () => {
     // console.log(`c0 = ${c0.toString()}`);
     // console.log(`c1 = ${c1.toString()}`);
     // console.log(`c2 = ${c2.toString()}`);
-    expect(c0.normalizedDistance2(c1)).toBeCloseTo(14);
-    expect(c0.normalizedDistance2(c2)).toBeCloseTo(14);
-    expect(c1.normalizedDistance2(c2)).toBeCloseTo(56);
+    expect(c0.hslD2(c1)).toBeCloseTo(14);
+    expect(c0.hslD2(c2)).toBeCloseTo(14);
+    expect(c1.hslD2(c2)).toBeCloseTo(56);
 
-    expect(c0.d2(c1)).toEqual(c0.perceptualDistance2(c1));
+    expect(c0.d2(c1)).toEqual(c0.perceptualD2(c1));
     // expect to tweak these numbers if the color comparison metric changes
     expect(c0.d2(c1)).toBeCloseTo(9.10, 2);
     expect(c0.d2(c2)).toBeCloseTo(9.01, 2);

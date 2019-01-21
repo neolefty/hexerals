@@ -48,7 +48,6 @@ const unknownShaders = Map<Terrain, Shader>().asMutable()
     terrainShaders.set(Terrain.City, CITY_SHADER)
 }
 
-
 { // mountains
     // mtnLeft and mtnRight are points along the left and right lower segments of the hex, respectively.
     const footLeft = HEX_LL_XY.plus(HEX_UL_XY.scale(0.5))

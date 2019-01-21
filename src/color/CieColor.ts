@@ -1,5 +1,8 @@
 import * as hsluv from 'hsluv'
 
+const roundNumArrayToString = (ns: number[]): string =>
+    `${Math.round(ns[0])} ${Math.round(ns[1])} ${Math.round(ns[2])}`
+
 export class CieColor {
     // for descriptions of color spaces, see http://www.hsluv.org/comparison/
     static readonly BLACK: CieColor = new CieColor([0, 0, 0])
@@ -9,12 +12,6 @@ export class CieColor {
     static readonly GREY_80: CieColor = new CieColor([0, 0, 80])
     static readonly WHITE: CieColor = new CieColor([0, 0, 100])
 
-    private static roundNumArrayToString(ns: number[]): string {
-        return `${Math.round(ns[0])}`
-            + ` ${Math.round(ns[1])}`
-            + ` ${Math.round(ns[2])}`
-    }
-
     // readonly hpl: number[]  // pastels only, with uniformity and full range
 
     // perceptually normalized, but not all hues have full saturation range
@@ -22,15 +19,12 @@ export class CieColor {
     readonly lch: number[]
 
     // hsl is computer-standard hue/saturation/lightness
-
-    private static d2(a: number[], b: number[]) {
+    private static d2Hsl(a: number[], b: number[]) {
         const dHueRaw = Math.abs(a[0] - b[0]),
             dSat = a[1] - b[1],
             dBright = a[2] - b[2]
         const dHue = dHueRaw < 180 ? dHueRaw : 360 - dHueRaw
-        const result = dHue * dHue + dSat * dSat + dBright * dBright
-        // console.log(`${result} -- ${a} to ${b} = ${[dHueRaw, dSat, dBright]}`)
-        return result
+        return dHue * dHue + dSat * dSat + dBright * dBright
     }
 
     constructor(readonly hsl: number[]) {
@@ -41,8 +35,8 @@ export class CieColor {
         this.lch = hsluv.rgbToLch(rgb)
     }
 
-    normalizedDistance2(that: CieColor) {
-        return CieColor.d2(this.hsl, that.hsl)
+    hslDistance2(that: CieColor) {
+        return CieColor.d2Hsl(this.hsl, that.hsl)
     }
 
     perceptualDistance2(that: CieColor) {
@@ -71,8 +65,8 @@ export class CieColor {
     }
 
     toHexString = () => hsluv.hsluvToHex(this.hsl)
-    toHslString = () => CieColor.roundNumArrayToString(this.hsl)
-    toLchString = () => CieColor.roundNumArrayToString(this.lch)
+    toHslString = () => roundNumArrayToString(this.hsl)
+    toLchString = () => roundNumArrayToString(this.lch)
 
     get hue() { return this.hsl[0] }
     get saturation() { return this.hsl[1] }

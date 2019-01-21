@@ -266,7 +266,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
             if (other !== color) {
                 const otherLoc = this.getPosition(other.key)
                 if (otherLoc.d2(location) < neighborhood2) {
-                    const colorDist = Math.sqrt(color.perceptualDistance2(other))
+                    const colorDist = Math.sqrt(color.perceptualD2(other))
                     colorDists.set(other.key, colorDist)
                     colorDistSum += colorDist
                 }

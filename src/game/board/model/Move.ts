@@ -17,6 +17,7 @@ export class HexMove {
         return `move from ${this.source} to ${this.dest}`
     }
 
+    // tslint:disable-next-line:no-any
     public equals(that: any) {
         return that
             && this.source === that.source
@@ -56,6 +57,7 @@ export class PlayerMove {
     public toString(): string { return `${this.player} ${this.move}` }
 
     // ignores cursorIndex
+    // tslint:disable-next-line:no-any
     public equals(that: any) {
         return that
             && this.player === that.player

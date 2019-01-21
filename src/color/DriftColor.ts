@@ -69,15 +69,16 @@ export class DriftColor {
     }
 
     d2(that: DriftColor) {
-        return this.perceptualDistance2(that)
+        return this.perceptualD2(that)
     }
 
-    // sum of squares distance using
-    normalizedDistance2(that: DriftColor): number {
-        return this.cie.normalizedDistance2(that.cie)
+    // sum of squares distance using HSL
+    hslD2(that: DriftColor): number {
+        return this.cie.hslDistance2(that.cie)
     }
 
-    perceptualDistance2(that: DriftColor): number {
+    // sum of squares distance using CIE LCH
+    perceptualD2(that: DriftColor): number {
         return this.cie.perceptualDistance2(that.cie)
     }
 
