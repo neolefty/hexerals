@@ -172,7 +172,7 @@ export class Hex {
         return this._degrees
     }
 
-    toString(includeCart: boolean = true, includeHex: boolean = false, includeGeo: boolean = false): string {
+    public toString(includeCart: boolean = true, includeHex: boolean = false, includeGeo: boolean = false): string {
         return `${
             includeHex ? this.toHexString() + ' ' : ''
         }${
