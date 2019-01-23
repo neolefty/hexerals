@@ -16,7 +16,8 @@ export class MovementQueue {
                 // add move to the end of this player's queue
                 this.playerQueues.set(
                     move.player,
-                    this.playerQueues.get(move.player).push(move),
+                    (this.playerQueues.get(move.player) as List<PlayerMove>)
+                        .push(move),
                 )
             )
         else
@@ -30,16 +31,17 @@ export class MovementQueue {
         let newQueues = Map<Player, List<PlayerMove>>()
         return new MovementQueue(
             this.playerQueues.has(player)
-                ? newQueues.set(player, this.playerQueues.get(player))
+                ? newQueues.set(player, this.playerQueues.get(player) as List<PlayerMove>)
                 : newQueues
         )
     }
 
     public get size(): number {
-        return this.playerQueues.reduce(
-            (n: number, q: List<PlayerMove>): number => n + q.size,
-            0,
-        )
+        const reducer = (
+            n: number | undefined,
+            q: List<PlayerMove> | undefined
+        ): number => (n !== undefined && q) ? n + q.size : (n || 0)
+        return this.playerQueues.reduce(reducer, 0)
     }
 
     public toString(): string {
@@ -59,7 +61,7 @@ export class MovementQueue {
                 (moves: List<PlayerMove>, player: Player) => {
                     while (moves.size > 0) {
                         mutated = true
-                        const move: PlayerMove = moves.get(0)
+                        const move: PlayerMove = moves.get(0) as PlayerMove
                         moves = moves.remove(0)
                         mutMap.set(player, moves)
                         if (validator(move)) {
@@ -80,13 +82,15 @@ export class MovementQueue {
 
     playerIsQueuedTo(player: Player, hex: Hex): boolean {
         const moves: List<PlayerMove> | undefined = this.playerQueues.get(player)
+        // noinspection PointlessBooleanExpressionJS
         return !!(moves && moves.find(
-            (move: PlayerMove) => move.dest === hex)
-        )
+            move => !!(move && (move.dest === hex))
+        ))
     }
 
     playerHasMove(player: Player) {
-        return this.playerQueues.has(player) && this.playerQueues.get(player).size > 0
+        return this.playerQueues.has(player)
+            && (this.playerQueues.get(player) as List<PlayerMove>).size > 0
     }
 
     // Cancel most recent moves for a given player and cursor — count = -1 to cancel all of a cursor's moves, -1 to cancel all cursors' moves. If there are no moves to cancel, return undefined. Otherwise return the updated movement queue plus a list containing the cancelled moves, in order from oldest to newest
@@ -103,7 +107,7 @@ export class MovementQueue {
         let updatedMoves = moves as List<PlayerMove>
         // important: we're walking backwards down the list ...
         for (let i = moves.size - 1; i >= 0 && cancelled.length < count; --i) {
-            const move = moves.get(i)
+            const move = moves.get(i) as PlayerMove
             if (cursorIndex === -1 || move.cursorIndex === cursorIndex) {
                 // ... so it's okay to remove as we go
                 updatedMoves = updatedMoves.remove(i)
@@ -112,10 +116,7 @@ export class MovementQueue {
         }
 
         if (cancelled.length > 0) {
-            assert.equal(
-                cancelled.length + updatedMoves.size,
-                moves.size
-            )
+            assert.strictEqual(cancelled.length + updatedMoves.size, moves.size)
             return new QueueAndMoves(
                 new MovementQueue(
                     this.playerQueues.set(

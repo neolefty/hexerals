@@ -4,9 +4,15 @@ import {Dispatch} from 'redux'
 
 import {Hex} from '../model/Hex'
 import {
-    queueMovesAction, placeCursorAction, doMovesAction, cancelMovesAction, stepPopAction, robotsDecideAction, dragAction
+    queueMovesAction,
+    placeCursorAction,
+    doMovesAction,
+    cancelMovesAction,
+    stepPopAction,
+    robotsDecideAction,
+    dragAction,
 } from '../model/BoardReducer'
-import {AppState} from '../../../common/App'
+import {AppState, GenericAction} from '../../../common/App'
 import {CartPair} from '../../../common/CartPair'
 import {BoardState} from '../model/BoardState'
 import {DriftColor} from '../../../color/DriftColor'
@@ -28,7 +34,9 @@ export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
     const result = Map<Player, DriftColor>().asMutable()
     colors.driftColors.forEach(
         (value: DriftColor, key: number) => {
-            result.set(PLAYERS.get(key), value)
+            const player: Player | undefined = PLAYERS.get(key)
+            if (player)
+                result.set(player, value)
         }
     )
     return result.asImmutable()
@@ -55,7 +63,7 @@ const mapStateToTickerBoardViewProps = (
 })
 
 const mapDispatchToBoardViewProps = (
-    dispatch: Dispatch<BoardState>
+    dispatch: Dispatch<GenericAction>
 ) => ({
     onQueueMoves: (moves: List<PlayerMove>) => dispatch(
         queueMovesAction(moves)

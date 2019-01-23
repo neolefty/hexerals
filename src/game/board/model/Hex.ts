@@ -1,5 +1,5 @@
 import {List, Map} from 'immutable'
-import * as assert from 'assert'
+import * as assert from 'assert';
 
 // Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
 // "Cube coordinates" for a description, see:
@@ -31,6 +31,8 @@ export class Hex {
         Hex.LEFT_UP, Hex.LEFT_DOWN, Hex.DOWN,
     ])
 
+    // TODO copy over tslint.json, other files? from remake
+
     // z: leftUp-rightDown
     readonly z: number
 
@@ -43,7 +45,7 @@ export class Hex {
         const total = x + y + z
         if (isNaN(total)) return Hex.NONE
         else {
-            assert(total === 0)
+            assert.strictEqual(total, 0)
             // TODO eliminate memory leak of accumulated cache
             // (tried WeakMap but couldn't get it to work -- see git log)
             let yCache = Hex.xyCache.get(x)
@@ -80,7 +82,7 @@ export class Hex {
     // The origin's lower-left neighbor at (-1, 0, 1) has a cartesian coord (-1, 1).
     // In other words, (x + y) must be even.
     static getCart(cx: number, cy: number): Hex {
-        assert((cx + cy) % 2 === 0)
+        assert.strictEqual((cx + cy) % 2, 0)
         return Hex.get(cx, (cy - cx) / 2, -(cy + cx) / 2)
     }
 

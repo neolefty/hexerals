@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import {List, Map, Set} from 'immutable';
 
 import {Tile} from './Tile';
@@ -8,6 +7,7 @@ import {Hex} from './Hex';
 import {connected} from './HexGraph';
 import {Arranger} from './Arranger';
 import {Terrain} from './Terrain';
+import * as assert from 'assert';
 
 // replace empty terrain randomly and without blocking
 export class RandomTerrainArranger extends Arranger {
@@ -22,7 +22,8 @@ export class RandomTerrainArranger extends Arranger {
         readonly bisectionFilter: TileFilter = tile => tile.canBeOccupied,
     ) {
         super()
-        assert(fractionOfEmpty <= 1 && fractionOfEmpty >= 0)
+        assert.ok(fractionOfEmpty >= 0)
+        assert.ok(fractionOfEmpty <= 1)
     }
 
     arrange(
@@ -46,7 +47,7 @@ export class RandomTerrainArranger extends Arranger {
             while (result.size < numReplacements) {
                 const r = Math.floor(Math.random() * remainingCandidates.size)
                 // pick a random empty to replace with a mountain
-                const hex = remainingCandidates.get(r)
+                const hex = remainingCandidates.get(r) as Hex
                 // can't try this one again, whether it bisects or not
                 remainingCandidates = remainingCandidates.delete(r)
                 // would it bisect the remaining empty explicitTiles?
@@ -68,10 +69,8 @@ export class RandomTerrainArranger extends Arranger {
                 }
             }
             if (!ranOutOfSpace)
-                assert.strictEqual(
-                    remainingCandidates.size,
-                    beforeEmpty - numReplacements - bisectionsAvoided,
-                )
+                assert.strictEqual(remainingCandidates.size,
+                    beforeEmpty - numReplacements - bisectionsAvoided)
         })
     }
 }

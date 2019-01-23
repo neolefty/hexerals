@@ -7,8 +7,8 @@ import {Player} from './Players';
 import {Hex} from '../Hex';
 import {Tile} from '../Tile';
 import {Board} from '../Board';
-import * as assert from 'assert';
 import {Comma} from '../../../../common/Comma';
+import * as assert from 'assert';
 
 // improvements
 // * defend capital
@@ -42,7 +42,7 @@ export class BasicRobot implements Robot {
 
     // assign N random skills
     static byIntelligence(intelligence: number): BasicRobot {
-        assert(intelligence <= BasicRobot.MAX_IQ)
+        assert.ok(intelligence <= BasicRobot.MAX_IQ, `${intelligence}`)
         let settings: boolean[] = Array(
             BasicRobot.MAX_IQ).fill(false)
         while (settings.filter(value => value).length < intelligence)
@@ -59,7 +59,7 @@ export class BasicRobot implements Robot {
     }
 
     constructor(readonly skills: boolean[]) {
-        assert(skills.length === BasicRobot.MAX_IQ)
+        assert.strictEqual(skills.length, BasicRobot.MAX_IQ)
     }
 
     get stopsPartway(): boolean {
@@ -162,7 +162,7 @@ export class BasicRobot implements Robot {
                     const takeIt: boolean =
                         (Math.random() * (totalPop + sourceTile.pop)) > totalPop
                     if (takeIt) {
-                        const dest = dests.get(Math.floor(Math.random() * dests.size))
+                        const dest = dests.get(Math.floor(Math.random() * dests.size)) as Hex
                         chosenMove = new HexMove(source, dest.minus(source))
                     }
                     totalPop += sourceTile.pop
@@ -184,7 +184,7 @@ export class BasicRobot implements Robot {
                         Math.random() * Math.random() * moves.size
                     )
                     moves = moves.slice(0, moves.size - movesToDrop) as List<HexMove>
-                    assert(moves.size >= 1)
+                    assert.ok(moves.size >= 1)
                 }
                 result.makeMoves = moves
             }

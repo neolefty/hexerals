@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Tile} from './Tile';
 import {List, Map} from 'immutable';
@@ -121,8 +120,7 @@ export class MoveValidator {
         moves.forEach((move: PlayerMove) => {
             const valid = this.validate(move, options)
             if (valid) {
-                const origin = options.tiles.get(move.source)
-                assert(origin)
+                const origin = options.tiles.get(move.source) as Tile
                 const newSourceTile = origin.setPop(1)
                 // TODO support moving only part of a stack (half etc)
                 const oldDestTile = options.tiles.get(move.dest, Tile.EMPTY)

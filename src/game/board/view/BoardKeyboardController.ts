@@ -27,13 +27,14 @@ export class BoardKeyboardController {
 
     onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
         const bs = this.view.props.boardState
-        if (bs.cursors.get(0) !== Hex.NONE && bs.curPlayer) {
+        const cursor = bs.cursors.get(0, Hex.NONE)
+        if (cursor !== Hex.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, Hex.NONE)
             if (delta !== Hex.NONE) {
-                const move = PlayerMove.constructDelta(bs.curPlayer, bs.cursors.get(0), delta)
+                const move = PlayerMove.constructDelta(bs.curPlayer, cursor, delta)
                 if (bs.board.canBeOccupied(move.dest))
                     this.view.props.onQueueMoves(List([move]))
-                const newCursor = bs.cursors.get(0).plus(delta)
+                const newCursor = cursor.plus(delta)
                 this.view.props.onPlaceCursor(0, newCursor, true)
                 e.preventDefault()
                 return

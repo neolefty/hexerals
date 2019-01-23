@@ -22,8 +22,8 @@ export class FloodResult {
         readonly flooded: Set<Hex> = Set(),
     ) {}
     transfer(hex: Hex): FloodResult {
-        assert(!this.flooded.has(hex))
-        assert(this.remaining.has(hex))
+        assert.ok(!this.flooded.has(hex))
+        assert.ok(this.remaining.has(hex))
         return new FloodResult(
             this.remaining.delete(hex),
             this.flooded.add(hex),

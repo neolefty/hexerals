@@ -49,7 +49,7 @@ it ('finds a slightly more complex shortest path', () => {
     let ten = Board.constructSquare(10, List())
     const setMountain = (hex: Hex) =>
         ten = ten.setTiles(ten.explicitTiles.set(hex, Tile.MOUNTAIN))
-    List(Array(8).keys()).forEach(index => {
+    Range(0, 8).forEach(index => {
         // line up from the bottom
         setMountain(Hex.getCart(3, index * 2 + 1))
         // line down from the top
@@ -68,10 +68,12 @@ it ('finds a slightly more complex shortest path', () => {
     const checkConnected = (a: Hex, b: Hex, path: List<Hex>) => {
         expect(path.first() === a).toBeTruthy()
         expect(path.last() === b).toBeTruthy()
-        for (let i = 0; i < path.size - 1; ++i)
+        Range(0, path.size - 1).forEach(index =>
             // steps should be adjacent
-            expect(path.get(i).neighbors.indexOf(path.get(i + 1)))
-                .toBeGreaterThanOrEqual(0)
+            expect((path.get(index) as Hex).neighbors.indexOf(
+                path.get(index + 1) as Hex)
+            ).toBeGreaterThanOrEqual(0)
+        )
     }
 
     checkConnected(ll, ur, occupiablePaths.path(ll, ur))

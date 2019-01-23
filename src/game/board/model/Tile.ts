@@ -53,7 +53,7 @@ export class Tile {
         }
     }
 
-    // using member functions instead of const function properties to avoid messing up .equals
+    // using member functions instead of const function properties to avoid messing up .is
 
     setPop(pop: number): Tile { return new Tile(this.owner, pop, this.terrain) }
     incrementPop(): Tile { return this.setPop(this.pop + 1) }

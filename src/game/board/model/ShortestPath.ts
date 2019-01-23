@@ -27,11 +27,11 @@ export const floodShortestPath = (
         if (curRing.size === 0)
             throw Error(`origin ${origin.toString()} and destination ${
                 dest.toString()} are not connected`)
-        curRing.forEach(hex => {
-            const curCost: HexNum = scratch.get(hex) // the cost to get here
+        curRing.forEach(curRingHex => {
+            const curCost: HexNum = scratch.get(curRingHex) as HexNum // the cost to get here
             // to get to a neighbor, go here first; the trip will cost you to here + 1
-            const nextCost = {h: hex, n: curCost.n + 1}
-            hex.neighbors.forEach(neighbor => {
+            const nextCost = {h: curRingHex, n: curCost.n + 1}
+            curRingHex.neighbors.forEach(neighbor => {
                 if (hexes.has(neighbor) && !curRing.has(neighbor) && !prevRing.has(neighbor)) {
                     nextRing.add(neighbor)
                     const neighborCost = scratch.get(neighbor)
@@ -51,7 +51,7 @@ export const floodShortestPath = (
     let result = List<Hex>([dest])
     // walk backwards from destination
     while (result.get(0) !== origin)
-        result = result.insert(0, scratch.get(result.get(0)).h)
+        result = result.insert(0, (scratch.get(result.get(0) as Hex) as HexNum).h)
 
     return result
 }
@@ -67,7 +67,7 @@ export const floodShortestPath = (
 //
 //     // extend this with that — that must start where this ends
 //     plus = (that: PathStep): PathStep => {
-//         assert(that.source === this.dest)
+//         assert.strictEqual(that.source, this.dest)
 //         return new PathStep(
 //             this.source,
 //             that.dest,
@@ -78,7 +78,7 @@ export const floodShortestPath = (
 //
 //     // the shorter of the two (this or that)
 //     min = (that: PathStep): PathStep => {
-//         assert(this.sameEndpoints(that))
+//         assert.ok(this.sameEndpoints(that))
 //         return this.distance < that.distance ? this : that
 //     }
 //
@@ -130,7 +130,7 @@ export class HexPaths {
     }
 
     private pathIndex = (hex: Hex): number =>
-        this.hexIdToPathIndex.get(hex.id)
+        this.hexIdToPathIndex.get(hex.id) as number
 
     private computeLookups() {
         let i: number = 0;
@@ -157,9 +157,10 @@ export class HexPaths {
                 const nextStep: HexNum = Object.freeze({ h: curSource, n: nextLength })
                 curDests.forEach((dest: Hex) => {
                     const destIndex = this.pathIndex(dest)
+                    const oneDests = ones.get(curSource) as List<Hex>
                     // Lengthen each path by 1 by considering source's in-bounds neighbors.
                     // We could use curSource.neighbors, but ones is already in-bounds filtered.
-                    ones.get(curSource).forEach((nextSource: Hex) => {
+                    oneDests.forEach((nextSource: Hex) => {
                         const sourceIndex = this.pathIndex(nextSource)
                         const sourcePaths: HexNum[] = this.paths[sourceIndex]
                         if (!sourcePaths[destIndex]) {  // found a new pair!
@@ -168,7 +169,7 @@ export class HexPaths {
                             if (!nextEndpoints.has(nextSource))
                                 nextEndpoints.set(nextSource, List<Hex>([dest]).asMutable())
                             else
-                                nextEndpoints.get(nextSource).push(dest)
+                                (nextEndpoints.get(nextSource) as List<Hex>).push(dest)
                         }
                     })
                 })
@@ -185,11 +186,12 @@ export class HexPaths {
                 const sourceIndex = this.pathIndex(source)
                 this.paths[sourceIndex][sourceIndex] = Object.freeze({ h: source, n: 0 })
                 // 1. map source to dests that are distance 1 away (and in-bounds)
-                result.set(source, source.neighbors.filter(
+                const neighbors = source.neighbors.filter(
                     neighbor => this.hexes.has(neighbor)
-                ) as List<Hex>)
+                ) as List<Hex>
+                result.set(source, neighbors)
                 // 2. add them to the path store
-                result.get(source).forEach(neighbor =>
+                neighbors.forEach(neighbor =>
                     this.paths[sourceIndex][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
                 )
             })
@@ -202,8 +204,8 @@ export class CacheDistance {
     private cache = Map().asMutable() as Map<Hex, Map<Hex, number>>
     constructor(readonly hexes: Set<Hex>) {}
     distance(a: Hex, b: Hex): number {
-        assert(this.hexes.has(a))
-        assert(this.hexes.has(b))
+        assert.ok(this.hexes.has(a))
+        assert.ok(this.hexes.has(b))
         if (b.id < a.id) // only remember from smaller to larger
             [ a, b ] = [ b, a ]
         if (!this.cache.has(a))
@@ -211,6 +213,6 @@ export class CacheDistance {
         const aCache = this.cache.get(a) as Map<Hex, number>
         if (!aCache.has(b))
             aCache.set(b, floodShortestPath(this.hexes, a, b).size - 1)
-        return aCache.get(b)
+        return aCache.get(b) as number
     }
 }

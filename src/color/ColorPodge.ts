@@ -1,6 +1,10 @@
 import {List} from 'immutable';
 import {DriftColor} from './DriftColor';
 
+interface DistCache {
+    [key: number]: number[]
+}
+
 // A collection of colors in CIE space
 export class ColorPodge {
     static readonly HSV_DELTAS: number[][] = [
@@ -148,7 +152,7 @@ export class ColorPodge {
     }
 
     /* tslint:disable:member-ordering */
-    private readonly minMaxDistCache = {};
+    private readonly minMaxDistCache: DistCache = {};
     /* tslint:enable */
     // what are the distances to the nearest and farthest other color in this podge?
     // if ignore is supplied, skip it in the list of colors

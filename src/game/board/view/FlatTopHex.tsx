@@ -25,7 +25,7 @@ class HexTouch {
     // from attribute hex-id
     readonly hex: Hex  // can be Hex.NONE
 
-    constructor(t: Touch) {
+    constructor(t: React.Touch) {
         this.id = t.identifier
         this.screen = new CartPair(t.screenX, t.screenY)
         this.client = new CartPair(t.clientX, t.clientY)
@@ -45,7 +45,7 @@ class HexTouch {
     }
 
     toString(): string {
-        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round} / client ${ this.client.round} / page ${this.page.round}`
+        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round()} / client ${ this.client.round()} / page ${this.page.round()}`
     }
 }
 

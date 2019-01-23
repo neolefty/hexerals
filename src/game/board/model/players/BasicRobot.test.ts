@@ -11,7 +11,7 @@ import {Robot} from './Robot';
 
 const logWinLoss = false
 
-it('makes moves', () => {
+xit('makes moves', () => {
     const brt = new BoardReducerTester(10, 10)
     const stupid = BasicRobot.byIntelligence(0)
     brt.setRobot(Player.Zero, stupid)
@@ -26,7 +26,7 @@ it('makes moves', () => {
     expect(countNonEmptyHexes()).toEqual(4)
 })
 
-it('specifies IQ', () => {
+xit('specifies IQ', () => {
     expect(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
         .toEqual(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
 
@@ -35,7 +35,7 @@ it('specifies IQ', () => {
             expect(BasicRobot.byIntelligence(iq).intelligence).toEqual(iq)
 })
 
-it('captures nearby', () => {
+xit('captures nearby', () => {
     for (let i = 0; i < 10; ++i) {
         const brt = new BoardReducerTester(3, 2)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
@@ -54,7 +54,7 @@ it('captures nearby', () => {
     }
 })
 
-it('wastes not', () => {
+xit('wastes not', () => {
     for (let i = 0; i < 20; ++i) {
         const brt = new BoardReducerTester(3, 2)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(
@@ -87,7 +87,7 @@ it('wastes not', () => {
         .get(0).delta === Hex.DOWN).toBeTruthy()
 })
 
-it('wastes not, even on a small board', () => {
+xit('wastes not, even on a small board', () => {
     const brt = new BoardReducerTester(1, 2)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
         BasicRobot.SKILL_WASTE_NOT))
@@ -96,7 +96,7 @@ it('wastes not, even on a small board', () => {
     expect(brt.moves.playerQueues.get(Player.Zero)).toBeUndefined()
 })
 
-it('stops by cities', () => {
+xit('stops by cities', () => {
     const n = 5
     for (let i = 0; i < n; ++i) {
         const brt = new BoardReducerTester(3, 5)
@@ -169,7 +169,7 @@ const countAWins = (
     return aWins
 }
 
-it('control — IQ 0 vs self', () => {
+xit('control — IQ 0 vs self', () => {
     const control = countAWins(iq0, iq0)
     if (logWinLoss)
         // tslint:disable-next-line
@@ -177,7 +177,7 @@ it('control — IQ 0 vs self', () => {
     expect(control).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.35 : 0.3))
 })
 
-it('IQ 1 not lose too much', () => {
+xit('IQ 1 not lose too much', () => {
     const skills = List(Array(BasicRobot.MAX_IQ).keys())
 
     skills.forEach(skillIndex => {
@@ -190,7 +190,7 @@ it('IQ 1 not lose too much', () => {
     })
 })
 
-it('max IQ wins a lot', () => {
+xit('max IQ wins a lot', () => {
     const n = robotTrials * 2
     const wins = countAWins(iqMax, iq0, n)
     if (logWinLoss)

@@ -41,9 +41,9 @@ const unknownShaders = Map<Terrain, Shader>().asMutable()
 
     const Y_OFFSET = WALL_H * 0.6  // shift down
     terrainPolygons.set(Terrain.City, [
-        roof.plusXY(0, Y_OFFSET).toString(),
-        rect.plusXY(0, Y_OFFSET).toString(),
-        door.plusXY(0, Y_OFFSET).toString(),
+        roof.plusXY(0, Y_OFFSET).round(2).toString(),
+        rect.plusXY(0, Y_OFFSET).round(2).toString(),
+        door.plusXY(0, Y_OFFSET).round(2).toString(),
     ])
     terrainShaders.set(Terrain.City, CITY_SHADER)
 }
@@ -79,10 +79,10 @@ const unknownShaders = Map<Terrain, Shader>().asMutable()
         peakLeft, snowLL, snowMidL, snowLR)
 
     terrainPolygons.set(Terrain.Mountain, [
-        mtnLeft.toString(),
-        mtnSnowL.toString(),
-        mtnRight.toString(),
-        mtnSnowR.toString(),
+        mtnLeft.round(2).toString(),
+        mtnSnowL.round(2).toString(),
+        mtnRight.round(2).toString(),
+        mtnSnowR.round(2).toString(),
     ])
     terrainShaders.set(
         Terrain.Mountain, (index, color) =>
@@ -137,7 +137,10 @@ const unknownShaders = Map<Terrain, Shader>().asMutable()
     ]
 
     terrainPolygons.set(Terrain.Capital, [
-        flag.toString(), building.toString(), door.toString()])
+        flag.round(2).toString(),
+        building.round(2).toString(),
+        door.round(2).toString()
+    ])
     terrainShaders.set(Terrain.Capital, (index, color) =>
         (index === 0)
             ? color.contrast()
@@ -148,8 +151,8 @@ const unknownShaders = Map<Terrain, Shader>().asMutable()
     const cap = (chain: CartChain) =>
         chain.scaleXY(1, 0.8).plusXY(0, h * -0.25)
     terrainPolygons.set(Terrain.CapturedCapital, [
-        cap(building).toString(),
-        cap(door).toString(),
+        cap(building).round(2).toString(),
+        cap(door).round(2).toString(),
     ])
     // ... & muted
     terrainShaders.set(Terrain.CapturedCapital, UNKNOWN_SHADER)

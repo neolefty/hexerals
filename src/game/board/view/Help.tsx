@@ -106,18 +106,18 @@ export class Help extends React.PureComponent<HelpOptions> {
                         viewBox={[-46, 103, w + 2, h + 2].join(',')}
                     >
                         {
-                            dirs.keySeq().map((hex: Hex) => (
+                            dirs.entrySeq().map(([hex, tt]) => (
                                 <TileHexView
                                     key={hex.id}
-                                    tile={dirs.get(hex).tile}
+                                    tile={tt.tile}
                                     hex={hex}
                                     selected={false}
                                     viewBoxHeight={h}
-                                    color={dirs.get(hex).color}
-                                    text={dirs.get(hex).text}
+                                    color={tt.color}
+                                    text={tt.text}
                                     textColor={DriftColor.WHITE}
                                 >{
-                                    dirs.get(hex).extraText ? (
+                                    tt.extraText ? (
                                         <text
                                             key="subtitle"
                                             fontSize="8"
@@ -125,7 +125,7 @@ export class Help extends React.PureComponent<HelpOptions> {
                                             textAnchor="middle"
                                             y={20}
                                         >
-                                            {dirs.get(hex).extraText}
+                                            {tt.extraText}
                                         </text>
                                     ) : undefined
                                 }

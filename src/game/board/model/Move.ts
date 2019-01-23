@@ -1,7 +1,8 @@
 import {Hex} from './Hex';
 import {Player} from './players/Players';
+import {hash, ValueObject} from 'immutable';
 
-export class HexMove {
+export class HexMove implements ValueObject {
     static constructDest(source: Hex, dest: Hex) {
         return new HexMove(source, dest.minus(source))
     }
@@ -23,9 +24,13 @@ export class HexMove {
             && this.source === that.source
             && this.delta === that.delta
     }
+
+    hashCode(): number {
+        return hash(this.source) + hash(this.delta)
+    }
 }
 
-export class PlayerMove {
+export class PlayerMove implements ValueObject {
     static constructDelta = (
         player: Player, source: Hex, delta: Hex, cursorIndex: number = 0,
     ) => new PlayerMove(
@@ -56,11 +61,14 @@ export class PlayerMove {
 
     public toString(): string { return `${this.player} ${this.move}` }
 
-    // ignores cursorIndex
     // tslint:disable-next-line:no-any
-    public equals(that: any) {
+    public equals(that: any) {  // ignores cursorIndex
         return that
             && this.player === that.player
             && this.move.equals(that.move)
+    }
+
+    hashCode(): number {  // ignores cursorIndex
+        return hash(this.player) + this.move.hashCode()
     }
 }

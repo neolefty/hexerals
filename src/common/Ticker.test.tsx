@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as Adapter from 'enzyme-adapter-react-16';
+import ReactSixteenAdapter from 'enzyme-adapter-react-16';
 import * as enzyme from 'enzyme';
 import {Ticker} from './Ticker';
 
@@ -25,7 +25,7 @@ const createTicker = (tick: () => void): JSX.Element => (
 )
 
 it('renders children', () => {
-    enzyme.configure({adapter: new Adapter()});
+    enzyme.configure({adapter: new ReactSixteenAdapter()});
     const ticker = createTicker(() => {})
     expect(enzyme.render(ticker).text()).toBe('12')
 })

@@ -74,13 +74,15 @@ export interface Strategy {
 
 // TODO consolidate these as cancel-next-move voters?
 export class WasteNot implements Strategy {
-    name: "wastes not"
-    type: StrategyType.Canceller
+    constructor(
+        readonly name = "wastes not",
+        readonly type = StrategyType.Canceller,
+    ) {}
     suggest(
         player: Player, board: Board, votes: List<MoveVote>
     ): List<MoveVote> {
         for (let i = 0; i < votes.size; ++i) {
-            const vote = votes.get(i)
+            const vote = votes.get(i) as MoveVote
             const dest = board.getTile(vote.move.dest)
             if (player !== dest.owner && vote.expectedPop <= dest.pop + 1)
                 return votes.slice(0, i) as List<MoveVote>
@@ -90,14 +92,16 @@ export class WasteNot implements Strategy {
 }
 
 export class StopByCities implements Strategy {
-    name: "stops by cities"
-    type: StrategyType.Canceller
+    constructor(
+        readonly name = "stops by cities",
+        readonly type = StrategyType.Canceller,
+    ) {}
     suggest(
         player: Player, board: Board, votes: List<MoveVote>
     ): List<MoveVote> {
         for (let i = 0; i < votes.size; ++i) {
             let cancel = false
-            const vote = votes.get(i)
+            const vote = votes.get(i) as MoveVote
             board.forNeighborsOccupiable(
                 vote.move.source, (neighbor: Hex, tile: Tile) => {
                     cancel = cancel || (tile.owner !== player && tile.growsFast)
@@ -111,8 +115,10 @@ export class StopByCities implements Strategy {
 }
 
 export class CaptureCities implements Strategy {
-    name: "captures cities"
-    type: StrategyType.Planner
+    constructor(
+        readonly name = "captures cities",
+        readonly type = StrategyType.Planner,
+    ) {}
     suggest(
         player: Player, board: Board, votes: List<MoveVote>
     ): List<MoveVote> {
@@ -127,11 +133,13 @@ export class CaptureCities implements Strategy {
                         && destTile.growsFast
                         && myTile.pop - 1 > destTile.pop
                     ) {
-                        const terrainValue = TERRAIN_VALUES.get(destTile.terrain)
+                        const terrainValue = TERRAIN_VALUES.get(destTile.terrain, 1)
+                        if (!TERRAIN_VALUES.has(destTile.terrain))
+                            console.warn(`Unknown terrain: ${destTile.terrain}`)
                         const sentiment = Math.max(
                             // If the loss is greater than the nominal value of the tile, it's still worth something, and if you have to choose, pick the cheaper capture.
                             terrainValue / destTile.pop,
-                             terrainValue - destTile.pop
+                            terrainValue - destTile.pop
                         )
                         votes = votes.push(makeVote(
                             HexMove.constructDest(source, dest),
@@ -158,8 +166,10 @@ export const keepNVotes = (votes: MoveVote[], n: number): MoveVote[] => {
 
 // TODO combine Expand & CaptureCities
 export class Expand implements Strategy {
-    name: "expands"
-    type: StrategyType.Planner
+    constructor(
+        readonly name = "expands",
+        readonly type = StrategyType.Planner,
+    ) {}
     suggest(
         player: Player, board: Board, votes: List<MoveVote>
     ): List<MoveVote> {
@@ -191,8 +201,10 @@ export class Expand implements Strategy {
 }
 
 export class Consolidate implements Strategy {
-    name: "consolidates"
-    type: StrategyType.Planner
+    constructor(
+        readonly name = "consolidates",
+        readonly type = StrategyType.Planner,
+    ) {}
     suggest(
         player: Player, board: Board, votes: List<MoveVote>
     ): List<MoveVote> {

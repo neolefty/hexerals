@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import {List, Map} from 'immutable'
 
 import {Board} from './Board'
@@ -39,7 +38,7 @@ it('converts between hex and cartesian coords', () => {
     const tenByFive = Board.constructRectangular(
         w, h, pickNPlayers(2), [new CornersPlayerArranger(1)])
     // h x w, but every other row (that is, h/2 rows) is short by 1
-    expect(tenByFive.constraints.all().size == w * h - Math.trunc(h/2))
+    expect(tenByFive.constraints.all.size == w * h - Math.trunc(h/2))
 
     const metaCartTile = (cx: number, cy: number) => (
         () => tenByFive.getCartTile(cx, cy)
@@ -81,18 +80,17 @@ it('navigates around a board', () => {
     const elevenByFalf = Board.constructRectangular(
         11, 5.5, pickNPlayers(2), [new CornersPlayerArranger(20)])
     expect(elevenByFalf.inBounds(Hex.ORIGIN)).toBeTruthy()
-    expect(elevenByFalf.constraints.all().contains(Hex.ORIGIN)).toBeTruthy()
+    expect(elevenByFalf.constraints.all.contains(Hex.ORIGIN)).toBeTruthy()
     expect(elevenByFalf.inBounds(Hex.NONE)).toBeFalsy()
-    expect(elevenByFalf.constraints.all().contains(Hex.NONE)).toBeFalsy()
+    expect(elevenByFalf.constraints.all.contains(Hex.NONE)).toBeFalsy()
 
     // staggered walk from origin to the right edge
     let c = Hex.ORIGIN
     while (elevenByFalf.inBounds(c.getRightUp().getRightDown())) {
         c = c.getRightUp().getRightDown()
-        expect(elevenByFalf.constraints.all().contains(c))
+        expect(elevenByFalf.constraints.all.contains(c))
     }
     expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
-    assert(c === elevenByFalf.edges.lowerRight)
     expect(c).toEqual(elevenByFalf.edges.lowerRight)
     expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
     expect(c.x).toBe(10)
@@ -120,7 +118,7 @@ it('validates moves', () => {
     expect(threeByFour.validate(PlayerMove.constructDelta(
         Player.Zero, threeByFour.edges.lowerLeft, Hex.UP
     ))).toBeTruthy()
-    expect(threeByFour.edges.lowerLeft).toEqual(Hex.ORIGIN)
+    expect(threeByFour.edges.lowerLeft).toBe(Hex.ORIGIN)
     expect(threeByFour.validate(PlayerMove.constructDelta(
         Player.One, threeByFour.edges.upperRight, Hex.DOWN
     ))).toBeTruthy()

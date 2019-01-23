@@ -4,7 +4,6 @@ import {GameDecision, Robot} from './Robot'
 import {HexMove, PlayerMove} from '../Move'
 import {BoardState} from '../BoardState'
 import {Player} from './Players'
-import * as assert from 'assert'
 import {Comma} from '../../../../common/Comma'
 import {
     // strategies
@@ -14,6 +13,7 @@ import {
     // functions
     distillVotes, makeVotes, sortBySentiment,
 } from './Strategy'
+import * as assert from 'assert';
 
 // TODO defend capital
 // TODO move towards opponents — value captures far from home?
@@ -33,7 +33,7 @@ export class StrategyBot implements Robot {
 
     // assign N random strategies
     static byIntelligence(intelligence: number): StrategyBot {
-        assert(intelligence <= StrategyBot.MAX_IQ)
+        assert.ok(intelligence <= StrategyBot.MAX_IQ)
         let settings: boolean[] = Array(
             StrategyBot.MAX_IQ).fill(false)
         while (settings.filter(value => value).length < intelligence)
@@ -50,7 +50,7 @@ export class StrategyBot implements Robot {
     }
 
     constructor(readonly strategies: boolean[]) {
-        assert(strategies.length === StrategyBot.MAX_IQ)
+        assert.strictEqual(strategies.length, StrategyBot.MAX_IQ)
     }
 
     get intelligence() {

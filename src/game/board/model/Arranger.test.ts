@@ -50,7 +50,7 @@ it('places mountains randomly', () => {
         )
     // available spaces is total spaces minus one (a capital) for each player
     const availableSpaces = Board.constructSquare(10, pickNPlayers(0))
-        .rules.constraints.all().size - numPlayers
+        .rules.constraints.all.size - numPlayers
     // number of mountains is fraction of free spaces, rounded down
     const expectedMountains = Math.floor(availableSpaces * mtnFraction)
     // each should be unique, so the set should contain all of them

@@ -21,7 +21,7 @@ export interface ColorsProps {
     tick: number
 }
 
-type ColorsAction = AddColor | RemoveColor | Diverge | SetColors
+export type ColorsAction = AddColor | RemoveColor | Diverge | SetColors
 
 const DIVERGE = 'DIVERGE'
 type DIVERGE = typeof DIVERGE

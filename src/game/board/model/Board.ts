@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import {List, Map, Set} from 'immutable'
 
 import {RectEdges} from './Constraints'
@@ -12,6 +11,7 @@ import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
 import {PopStepper} from './PopStepper';
 import {RandomPlayerArranger} from './PlayerArranger';
+import * as assert from 'assert';
 
 export class BoardAndMessages {
     constructor(
@@ -98,9 +98,7 @@ export class Board {
         this.inBounds(coord) && this.getTile(coord).canBeOccupied
 
     // All of this board's possible explicitTiles. Note that this.explicitTiles omits some blanks.
-    get hexesAll(): Set<Hex> {
-        return this.constraints.all()
-    }
+    get hexesAll(): Set<Hex> { return this.constraints.all }
 
     // tslint:disable-next-line:member-ordering
     private _occupiableCache: Set<Hex> | undefined = undefined
@@ -132,12 +130,12 @@ export class Board {
     }
 
     getTile(coord: Hex): Tile {
-        assert(this.inBounds(coord))
+        assert.ok(this.inBounds(coord))
         return this.explicitTiles.get(coord, Tile.MAYBE_EMPTY)
     }
 
     getCartTile(cx: number, cy: number): Tile {
-        assert((cx + cy) % 2 === 0)
+        assert.strictEqual(((cx + cy) % 2), 0)
         return this.getTile(Hex.getCart(cx, cy))
     }
 

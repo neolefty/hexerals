@@ -57,18 +57,18 @@ export class SpreadPlayersArranger extends Arranger {
 
         while (
             nRounds < this.minRounds ||
-            (nRounds < this.maxRounds && lastNDeltas.max() > this.settleDelta)
+            (nRounds < this.maxRounds && (lastNDeltas.max() as number) > this.settleDelta)
         ) {
             let nextStarts: Map<Hex, Tile> = Map<Hex, Tile>()
             let [maxOfMins, minOfMins] = [-Infinity, Infinity]
             curStarts.forEach((tile, hex) => {
                 // console.log(`     * ${tile.owner} at ${hex.toCartString()}`)
-                let [nextHex, minDist] = [hex, distancesToOthers(hex, tile.owner).min()]
+                let [nextHex, minDist] = [hex, distancesToOthers(hex, tile.owner).min() as number]
                 hex.neighbors.forEach(neighbor => {
                     if (!curStarts.has(neighbor) && emptyHexes.has(neighbor)) {
                         const neighborDs = distancesToOthers(neighbor, tile.owner)
-                        if (neighborDs.min() > minDist) {
-                            [nextHex, minDist] = [neighbor, neighborDs.min()]
+                        if ((neighborDs.min() as number) > minDist) {
+                            [nextHex, minDist] = [neighbor, neighborDs.min() as number]
                         }
                     }
                 })

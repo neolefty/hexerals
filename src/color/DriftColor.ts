@@ -1,5 +1,5 @@
 import {CieColor} from './CieColor'
-import {minMax} from '../common/Math';
+import {minMax} from '../common/MathFunctions';
 
 export class DriftColor {
     // allowed limits on lightness & saturation when drifting (hsluv)

@@ -33,7 +33,7 @@ export class BoardReducerTester {
         ],
         players: List<Player> = pickNPlayers(2),
     ) {
-        this.store = createStore<BoardState>(BoardReducer)
+        this.store = createStore(BoardReducer)
         this.store.dispatch(newGameAction(Board.constructRectangular(
             width, height, players, arrangers)))
     }
@@ -47,7 +47,7 @@ export class BoardReducerTester {
     get board(): Board { return this.state.board }
     get explicitTiles(): Map<Hex, Tile> { return this.board.explicitTiles }
     get cursors(): Map<number, Hex> { return this.state.cursors }
-    get firstCursor(): Hex { return this.cursors.get(0) }
+    get firstCursor(): Hex { return this.cursors.get(0, Hex.NONE) }
     get messages(): List<StatusMessage> { return this.state.messages }
     get cursorRawTile(): Tile | undefined { return this.getRawTile(this.firstCursor) }
     get firstCursorTile(): Tile { return this.getTile(this.firstCursor) }
@@ -110,8 +110,11 @@ export class BoardReducerTester {
     }
 
     get isGameOver(): boolean {
+        const firstTile = this.board.explicitTiles.first(Tile.EMPTY)
+        if (firstTile === Tile.EMPTY) return true
+
         // are all explicit occupiable explicitTiles owned by the same player?
-        const contender = this.board.explicitTiles.first().owner
+        const contender = firstTile.owner
         try {
             this.board.explicitTiles.forEach(tile => {
                 if (tile && tile.canBeOccupied && tile.owner !== contender)

@@ -9,10 +9,10 @@ import {BoardConstraints} from './Constraints';
 it('checks rectangular board geometry', () => {
     const arr = [new CornersPlayerArranger()]
     const twoPlayers = pickNPlayers(2)
-    expect(Board.constructRectangular(9, 3, twoPlayers, arr).constraints.all().size)
+    expect(Board.constructRectangular(9, 3, twoPlayers, arr).hexesAll.size)
         .toBe(5 * 3 + 4 * 2)
 
-    expect(Board.constructRectangular(19, 10.5, twoPlayers, arr).constraints.all().size)
+    expect(Board.constructRectangular(19, 10.5, twoPlayers, arr).hexesAll.size)
         .toBe(10 * 10 + 10 * 9)
     const nineByTwalf = Board.constructRectangular(9, 2.5, twoPlayers, arr)
     // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)

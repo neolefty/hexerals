@@ -10,6 +10,7 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
 import {GameDecision, Robot} from './players/Robot';
 import {floodShortestPath} from './ShortestPath';
+import {Reducer} from 'redux';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -32,7 +33,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     messages: List([]),
 }
 
-export const BoardReducer = (
+export const BoardReducer: Reducer<BoardState, GameAction> = (
     state: BoardState = INITIAL_BOARD_STATE, action: GameAction,
 ): BoardState => {
     if (isQueueMove(action))  // most common first
@@ -184,7 +185,8 @@ const dragReducer = (
         // console.log(`drag along ${path.map(hex => hex.toString()).toArray()} to ${destTile}`)
 
         // cancel backtracked moves
-        const queued: List<PlayerMove> = state.moves.playerQueues.get(action.player)
+        const queued: List<PlayerMove> | undefined
+            = state.moves.playerQueues.get(action.player)
         let nCancel = 0
         if (queued && queued.size) {
             const rPath = path.reverse()
@@ -192,11 +194,11 @@ const dragReducer = (
             // noinspection PointlessBooleanExpressionJS
             const rQueued = queued.reverse().filter(move =>
                 !!(move && move.cursorIndex === action.cursorIndex)
-            )
+            ) as List<PlayerMove>
             // ... cancel the ones that are a pure backtrack
             while (
                 nCancel < rPath.size && nCancel < rQueued.size
-                && rPath.get(nCancel) === rQueued.get(nCancel).source
+                && rPath.get(nCancel) === (rQueued.get(nCancel) as PlayerMove).source
             )
                 ++nCancel
         }
@@ -212,7 +214,8 @@ const dragReducer = (
         // queue the rest of the path
         if (path.size > 0) {
             const toQueue = path.pop().map((source, index) =>
-                PlayerMove.constructDest(action.player, source, path.get(index + 1))
+                // know path is 1 longer because we're operating on its pop()'d child
+                PlayerMove.constructDest(action.player, source, path.get(index + 1) as Hex)
             ) as List<PlayerMove>
             // console.log(`--> queueing ${toQueue.toArray()}`)
             state = queueMovesReducer(state, queueMovesAction(toQueue))

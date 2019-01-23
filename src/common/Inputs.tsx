@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {minMax} from './Math';
+import {minMax} from './MathFunctions';
 
 export interface NumberInputProps {
     label: string

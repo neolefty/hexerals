@@ -4,6 +4,7 @@ import {Player} from './players/Players';
 import {Hex} from './Hex';
 import {Tile} from './Tile';
 import {Terrain} from './Terrain';
+import * as assert from 'assert';
 
 it('fogs the board for a player', () => {
     const brt = new BoardReducerTester(5, 5)
@@ -18,7 +19,7 @@ it('fogs the board for a player', () => {
     expect(fogged.getTile(upUpUp).known).toBeFalsy()
     // where Player.One starts — fogged city
     expect(fogged.getTile(brt.ur)).toEqual(Tile.MAYBE_MOUNTAIN)
-    expect(brt.getTile(brt.ur).terrain).toEqual(Terrain.City)
+    assert.strictEqual(brt.getTile(brt.ur).terrain, Terrain.City)
 })
 
 // TODO test queueing moves in fog goes through mountains

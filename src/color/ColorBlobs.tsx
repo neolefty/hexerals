@@ -190,7 +190,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
             if (x)
                 force.mutateAdd(this.repelSquareWalls(r, location))
             force.mutateAdd(this.repelRoundWalls(r, location))
-            force.mutateAdd(this.attractDarkToCenter(color, location))
+            force.mutateAdd(ColorBlobs.attractDarkToCenter(color, location))
             // force.mutateAdd(this.attractCenter(r, location))
 
             if (this.props.colors.driftColors.size >= 2)
@@ -208,18 +208,19 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
         // update positions
         const scale = elapsed * VELOCITY_MAX
         forces.forEach((force: Coord, key: number) => {
-            const v = this.velocities.get(key)
-            const a = this.accelerations.get(key)
+            const v = this.velocities.get(key) as Coord
+            const a = this.accelerations.get(key) as Coord
             a.mutate(force.mutateScale(scale * 0.001))
             v.mutateAdd(a)
             v.mutateScale(0.95) // drag
-            this.positions.get(key).mutateAdd(v.copy().mutateScale(elapsed))
+            const p = this.positions.get(key) as Coord
+            p.mutateAdd(v.copy().mutateScale(elapsed))
         })
     }
 
-    getPosition(i: number) {
+    getPosition(i: number): Coord {
         if (this.positions.has(i))
-            return this.positions.get(i)
+            return this.positions.get(i) as Coord
         else {
             const result = Coord.rand()
             this.positions = this.positions.set(i, result)
@@ -227,9 +228,9 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
         }
     }
 
-    getVelocity(i: number) {
+    getVelocity(i: number): Coord {
         if (this.velocities.has(i))
-            return this.velocities.get(i)
+            return this.velocities.get(i) as Coord
         else {
             const result = new Coord()
             this.velocities = this.velocities.set(i, result)
@@ -237,9 +238,9 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
         }
     }
 
-    getAcceleration(i: number) {
+    getAcceleration(i: number): Coord {
         if (this.accelerations.has(i))
-            return this.accelerations.get(i)
+            return this.accelerations.get(i) as Coord
         else {
             const result = new Coord()
             this.accelerations = this.accelerations.set(i, result)
@@ -260,8 +261,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
         let colorDistSum = 0
         const neighborhood2 = neighborhood * neighborhood
         const result = new Coord()
-        const m: Map<number, number> = Map()
-        const colorDists = m.asMutable()
+        const colorDists = Map<number, number>().asMutable()
         this.props.colors.driftColors.forEach((other: DriftColor) => {
             if (other !== color) {
                 const otherLoc = this.getPosition(other.key)
@@ -277,7 +277,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
             const colorDistMean = colorDistSum * nReciprocal
             this.props.colors.driftColors.forEach((other: DriftColor) => {
                 if (colorDists.has(other.key)) {
-                    const colorDist = colorDists.get(other.key)
+                    const colorDist = colorDists.get(other.key) as number
                     const cdNorm = (colorDist - colorDistMean) * colorDistanceReciprocal
                     const otherLoc = this.getPosition(other.key)
                     // the more other colors, the more we need to scale down the forces
@@ -319,7 +319,8 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
             return new Coord()
     }
 
-    private attractDarkToCenter(color: DriftColor, location: Coord) {
+    // tslint:disable-next-line:member-order
+    private static attractDarkToCenter(color: DriftColor, location: Coord) {
         const fromDark = DriftColor.MAX_BRIGHT - color.lightness
         return location.copy().mutateScale(-.3 * DriftColor.RECIP_BRIGHT * fromDark)
     }

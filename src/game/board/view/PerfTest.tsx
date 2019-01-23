@@ -52,7 +52,7 @@ const mapStateToPerfProps = (state: PerfState) => ({
     inputs: state.inputs,
 })
 
-const mapDispatchToPerfProps = (dispatch: Dispatch<PerfState>) => ({
+const mapDispatchToPerfProps = (dispatch: Dispatch<PerfAction>) => ({
     onChange: (wh: Wh) => { dispatch(changeWhAction(wh)) },
     onQueue: (wh: Wh) => {
         setTimeout((x: Wh) => dispatch(runPerfTestAction(x)), 0, wh)
@@ -62,14 +62,14 @@ const mapDispatchToPerfProps = (dispatch: Dispatch<PerfState>) => ({
 export const runPerfTest = (wh: Wh) => {
     const start = new Date()
     const constraints = new RectangularConstraints(wh.w, wh.h)
-    const n = constraints.all().size
+    const n = constraints.all.size
     const elapsed = new Date().getTime() - start.getTime()
     return new PerfRecord(wh, elapsed, n)
 }
 
 export interface PerfProps extends PerfState {
     onChange: (wh: Wh) => void
-    onQueue: () => void
+    onQueue: (wh: Wh) => void
 }
 
 const PerfTest = (props: PerfProps) => (
@@ -83,7 +83,9 @@ const PerfTest = (props: PerfProps) => (
     </div>
 )
 
-export const PerfContainer = connect(mapStateToPerfProps, mapDispatchToPerfProps)(
+export const PerfContainer = connect(
+    mapStateToPerfProps, mapDispatchToPerfProps
+)(
     PerfTest
 )
 

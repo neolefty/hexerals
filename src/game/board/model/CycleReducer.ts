@@ -1,6 +1,4 @@
 import {List} from 'immutable'
-import * as assert from 'assert';
-import {isNumber} from 'util';
 
 import {CycleMode} from './CycleState'
 import {Board} from './Board'
@@ -15,6 +13,7 @@ import {StatusMessage} from '../../../common/StatusMessage';
 import {RandomTerrainArranger} from './RandomTerrainArranger';
 import {Terrain} from './Terrain';
 import {DEFAULT_CURSORS} from './BoardState';
+import * as assert from 'assert';
 
 // the meta-game
 
@@ -152,8 +151,8 @@ const changeLocalOptionReducer = (
     state: CycleState, action: ChangeLocalOption
 ): CycleState => {
     const result = {...state.localOptions}
-    assert(result.hasOwnProperty(action.name))
-    assert(isNumber(result[action.name]))
+    assert.ok(result.hasOwnProperty(action.name))
+    assert.strictEqual(typeof result[action.name], 'number')
     result[action.name] = action.n
     return {
         ...state,

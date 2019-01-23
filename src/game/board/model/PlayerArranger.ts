@@ -1,4 +1,3 @@
-import * as assert from 'assert';
 import {Map} from 'immutable';
 
 import {Board} from './Board';
@@ -8,6 +7,7 @@ import {Arranger, MAP_TOO_SMALL} from './Arranger';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Player} from './players/Players';
 import {Terrain} from './Terrain';
+import * as assert from 'assert';
 
 // arranges players on a board
 export class RandomPlayerArranger extends Arranger {
@@ -58,7 +58,7 @@ export class CornersPlayerArranger extends Arranger {
     ) { super() }
 
     public arrange(board: Board): Map<Hex, Tile> {
-        assert(board.players.size <= 4)
+        assert.ok(board.players.size <= 4)
         let starts = Map<Hex, Tile>()
         const corners = [
             (b: Board) => b.edges.lowerLeft,

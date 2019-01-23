@@ -23,9 +23,9 @@ export const PLAYERS: Map<number, Player> = Map([
 export const pickNPlayers = (n: number): List<Player> => {
     const result: List<Player> = List()
     return result.withMutations(m => {
-        for (let i = 0; i < n; ++i) {
-            const player = PLAYERS.get(i)
-            assert(player !== undefined)
+        for (let i = 0; i < n && i < PLAYERS.size; ++i) {
+            const player = PLAYERS.get(i) as Player
+            assert.ok(player !== undefined)
             m.push(player)
         }
     })

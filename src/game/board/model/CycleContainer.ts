@@ -3,10 +3,9 @@ import {connect} from 'react-redux';
 import {CycleView} from '../view/CycleView';
 import {CartPair} from '../../../common/CartPair';
 import {
-    changeLocalOptionAction, closeGameAction, openLocalGameAction,
+    changeLocalOptionAction, closeGameAction, CycleAction, openLocalGameAction,
 } from './CycleReducer';
 import {AppState} from '../../../common/App';
-import {CycleState} from './CycleState';
 
 export interface CycleContainerProps {
     displaySize: CartPair;
@@ -18,7 +17,7 @@ const mapStateToCycleViewProps =
         ...state.cycle,
     });
 
-const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleState>) => ({
+const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleAction>) => ({
     onOpenLocalGame: () => dispatch(openLocalGameAction()),
     onCloseGame: () => dispatch(closeGameAction()),
     onChangeLocalOption: (name: string, n: number) =>

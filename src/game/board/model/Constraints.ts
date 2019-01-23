@@ -1,6 +1,6 @@
 import {Hex} from './Hex'
 import {List, Range, Seq, Set} from 'immutable'
-import * as assert from 'assert'
+import * as assert from 'assert';
 
 export class RectEdges {
     readonly left: number
@@ -79,22 +79,28 @@ export abstract class BoardConstraints {
      * using BoardConstraints.LT. To find the largest instead, use
      * BoardConstraints.GT, or negate the sort value, or something.
      *
-     * @param {(x: Hex) => number} f indexing function
+     * @param {(x: Hex) => number} hexToNumber indexing function
      * @param {(x: number, y: number) => boolean} compare ordering function
      * @returns {Hex} that wins in comparison to all the others
      */
     extreme(
-        f: (x: Hex) => number,
+        hexToNumber: (x: Hex) => number,
         compare: (x: number, y: number) => boolean = BoardConstraints.LT
     ): Hex {
-        return this.all().reduce((champ: Hex, contender: Hex) =>
-            compare(f(contender), f(champ)) ? contender : champ
-        )
+        let champ: Hex = this.all.first()
+        this.all.forEach(contender => {
+            if (compare(
+                hexToNumber(contender),
+                hexToNumber(champ)
+            ))
+                champ = contender
+        })
+        return champ
     }
 
     // tslint:disable-next-line:member-ordering
     private _allHexes?: Set<Hex>
-    all(): Set<Hex> {
+    get all(): Set<Hex> {
         if (this._allHexes === undefined)
             this._allHexes = this.buildAll()
         return this._allHexes
@@ -104,7 +110,7 @@ export abstract class BoardConstraints {
     private _allSorted?: List<Hex> = undefined
     get allSorted(): List<Hex> {
         if (this._allSorted === undefined) {
-            this._allSorted = List<Hex>(this.all()).sort(
+            this._allSorted = List<Hex>(this.all).sort(
                 (a: Hex, b: Hex) =>
                     a.compareTo(b)
             ) as List<Hex>
@@ -117,7 +123,7 @@ export abstract class BoardConstraints {
         const result = Set<Hex>().asMutable()
 
         let floodEdge = Set<Hex>().asMutable()
-        assert(this.inBounds(this.start()))
+        assert.ok(this.inBounds(this.start()))
         floodEdge.add(this.start())
 
         // Could do this recursively but for large boards it overflows the stack

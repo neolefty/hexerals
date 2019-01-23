@@ -43,7 +43,7 @@ const slow = false, reallySlow = false
 const timeRect = (w: number, h: number) => {
     const start = new Date()
     const constraints = new RectangularConstraints(w, h)
-    const n = constraints.all().size
+    const n = constraints.all.size
     expect(n).toBe(w * h - Math.trunc(h / 2))
     if (slow || reallySlow) {
         const elapsed = new Date().getTime() - start.getTime()
