@@ -22,7 +22,7 @@ import {Arranger} from '../model/Arranger';
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
     static readonly INITIAL_WIDTH = 11
-    static readonly INITIAL_HEIGHT = 7
+    static readonly INITIAL_HEIGHT = 13
     readonly store: Store<BoardState>
 
     constructor(

@@ -149,28 +149,30 @@ export abstract class BoardConstraints {
     }
 }
 
-// Defines a board of hexes with an overall rectangular shape.
-// If width and height are x and h, then -- assuming both are odd -- the corners are:
-// (0,0,0)      (x-1, -(x-1)/2, -(x-1)/2)
-// (0, -(h-1), h-1) (x-1, -(x-1)/2 -(h-1), -(x-1)/2 +(h-1))
+// Defines a board of flat-top hexes with an overall rectangular shape.
 //
-// General formula: (cx, (cy - cx) / 2, - (cy + cx) / 2)
+// w — number of columns (which overlap slightly)
+// h — number of rows, whose hexes alternate between having even & odd cartesian x
+//
+// For example 5 x 7:
+//   - _ - _ -
+//   - _ - _ -
+//   - _ - _ -
+//   -    -   -
+//
+// Note that w should be an integer, and h can be divisible by 0.5
 export class RectangularConstraints extends BoardConstraints {
     constructor(readonly w: number, readonly h: number) {
         super()
+        assert.strictEqual(w, Math.round(w))
+        assert.strictEqual(h, Math.round(h))
     }
 
     inBounds(coord: Hex): boolean {
         const x = coord.cartX
         const y = coord.cartY
         return (
-            // 5x5 means cartesian coords 5 x 9:
-            // - _ - _ -
-            // - _ - _ -
-            // - _ - _ -
-            // - _ - _ -
-            // -    -   -
-            y >= 0 && y < this.h * 2 - 1 && x >= 0 && x < this.w
+            y >= 0 && y < this.h && x >= 0 && x < this.w
         )
     }
 

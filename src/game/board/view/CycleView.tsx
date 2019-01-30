@@ -1,9 +1,11 @@
 import {CartPair} from '../../../common/CartPair'
-import {LocalGameOptionsView} from './LocalGameOptions'
+import {LocalGameOptions, LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
 import {CycleState} from '../model/CycleState'
+import {Layered} from '../../../common/Layered';
+import {LocalGamePreview} from './LocalGamePreview';
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
@@ -12,6 +14,18 @@ export interface CycleViewProps extends CycleState {
     onCloseGame: () => void
     onChangeLocalOption: (name: string, n: number) => void
 }
+
+// freeze the options that shouldn't update the preview
+const freezeForPreview = (
+    localOptions: LocalGameOptions
+): LocalGameOptions => ({
+    ...localOptions,
+    tickMillis: 0,
+    difficulty: 0,
+    startingPop: 0,
+    fog: 0,
+    levelVisible: 0,
+})
 
 export const CycleView = (props: CycleViewProps) => {
     switch (props.mode) {
@@ -30,12 +44,18 @@ export const CycleView = (props: CycleViewProps) => {
                 )
         case CycleMode.NOT_IN_GAME:
             return (
-                <LocalGameOptionsView
-                    localOptions={props.localOptions}
-                    displaySize={props.displaySize}
-                    newGame={props.onOpenLocalGame}
-                    changeLocalOption={props.onChangeLocalOption}
-                />
+                <Layered>
+                    <LocalGamePreview
+                        localOptions={freezeForPreview(props.localOptions)}
+                        displaySize={props.displaySize}
+                    />
+                    <LocalGameOptionsView
+                        localOptions={props.localOptions}
+                        displaySize={props.displaySize}
+                        newGame={props.onOpenLocalGame}
+                        changeLocalOption={props.onChangeLocalOption}
+                    />
+                </Layered>
             )
         default:
             return <p>Unknown mode: <code>{props.mode}</code></p>

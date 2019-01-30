@@ -10,7 +10,7 @@ import {Player} from '../model/players/Players';
 import {Terrain} from '../model/Terrain';
 import {MoveView} from './MoveQueueView';
 import {HexMove} from '../model/Move';
-import {HEX_COLUMN, HEX_MID, HEX_ROW} from './HexConstants';
+import {hexPixelHeight, hexPixelWidth} from './HexConstants';
 
 import './Help.css'
 
@@ -18,8 +18,11 @@ export interface HelpOptions {
     displaySize: CartPair;
 }
 
-const h = 4.5 * HEX_ROW
-const w = 3 * HEX_COLUMN + HEX_MID
+const COLUMNS = 3
+const ROWS = 8
+
+const h = hexPixelHeight(ROWS)
+const w = hexPixelWidth(COLUMNS)
 
 interface TileAndText {
     tile: Tile

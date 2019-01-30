@@ -1,18 +1,19 @@
-import {BoardReducerTester} from '../../view/BoardReducerTester';
-import {BasicRobot} from './BasicRobot';
-import {pickNPlayers, Player} from './Players';
-import {List} from 'immutable';
-import {RandomTerrainArranger} from '../RandomTerrainArranger';
-import {SpreadPlayersArranger} from '../SpreadPlayerArranger';
-import {Hex} from '../Hex';
-import {Tile} from '../Tile';
-import {Terrain} from '../Terrain';
-import {Robot} from './Robot';
+import {BoardReducerTester} from '../../view/BoardReducerTester'
+import {BasicRobot} from './BasicRobot'
+import {pickNPlayers, Player} from './Players'
+import {List, Range} from 'immutable'
+import {RandomTerrainArranger} from '../RandomTerrainArranger'
+import {SpreadPlayersArranger} from '../SpreadPlayerArranger'
+import {Hex} from '../Hex'
+import {Tile} from '../Tile'
+import {Terrain} from '../Terrain'
+import {Robot} from './Robot'
+import {PlayerMove} from '../Move'
 
 const logWinLoss = false
 
-xit('makes moves', () => {
-    const brt = new BoardReducerTester(10, 10)
+it('makes moves', () => {
+    const brt = new BoardReducerTester(10, 19)
     const stupid = BasicRobot.byIntelligence(0)
     brt.setRobot(Player.Zero, stupid)
     brt.setRobot(Player.One, stupid)
@@ -26,7 +27,7 @@ xit('makes moves', () => {
     expect(countNonEmptyHexes()).toEqual(4)
 })
 
-xit('specifies IQ', () => {
+it('specifies IQ', () => {
     expect(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
         .toEqual(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
 
@@ -35,9 +36,9 @@ xit('specifies IQ', () => {
             expect(BasicRobot.byIntelligence(iq).intelligence).toEqual(iq)
 })
 
-xit('captures nearby', () => {
+fit('captures nearby', () => {
     for (let i = 0; i < 10; ++i) {
-        const brt = new BoardReducerTester(3, 2)
+        const brt = new BoardReducerTester(3, 3)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
         brt.setCursor(brt.ur)
         brt.queueMove(Player.One, Hex.DOWN)
@@ -54,9 +55,10 @@ xit('captures nearby', () => {
     }
 })
 
-xit('wastes not', () => {
+it('wastes not', () => {
     for (let i = 0; i < 20; ++i) {
-        const brt = new BoardReducerTester(3, 2)
+        const brt = new BoardReducerTester(3, 3)
+        expect(brt.board.hexesAll.size).toBe(5)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(
             BasicRobot.SKILL_WASTE_NOT))
         for (let turn = 0; turn < 20; ++turn) {
@@ -68,27 +70,30 @@ xit('wastes not', () => {
         expect(brt.getTile(brt.ur).pop === 20)
     }
 
-    const brt = new BoardReducerTester(1, 4)
+    const brt = new BoardReducerTester(1, 7)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
         BasicRobot.SKILL_WASTE_NOT))
     expect(brt.ur === Hex.getCart(0, 6)).toBeTruthy()
     expect(brt.getTile(brt.ur).pop).toBe(50)
     brt.queueRobots()
     // expect robot plans to move straight up to end
-    expect(brt.moves.playerQueues.get(Player.Zero).size).toBe(3)
+    const up3 = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
+    expect(up3.size).toBe(3)
     brt.doMoves()
     brt.doMoves()
-    expect(brt.moves.playerQueues.get(Player.Zero).size).toBe(1)
-    expect(brt.moves.playerQueues.get(Player.Zero)
-        .get(0).delta === Hex.UP).toBeTruthy()
+    const up1 = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
+    expect(up1.size).toBe(1)
+    const upMove = up1.first() as PlayerMove
+    expect(upMove.delta === Hex.UP).toBeTruthy()
     brt.queueRobots()
     // robot should cancel doomed move and change directions
-    expect(brt.moves.playerQueues.get(Player.Zero)
-        .get(0).delta === Hex.DOWN).toBeTruthy()
+    const downMoves = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
+    const downMove = downMoves.first() as PlayerMove
+    expect(downMove.delta === Hex.DOWN).toBeTruthy()
 })
 
-xit('wastes not, even on a small board', () => {
-    const brt = new BoardReducerTester(1, 2)
+it('wastes not, even on a small board', () => {
+    const brt = new BoardReducerTester(1, 3)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
         BasicRobot.SKILL_WASTE_NOT))
     brt.queueRobots()
@@ -96,10 +101,10 @@ xit('wastes not, even on a small board', () => {
     expect(brt.moves.playerQueues.get(Player.Zero)).toBeUndefined()
 })
 
-xit('stops by cities', () => {
+it('stops by cities', () => {
     const n = 5
     for (let i = 0; i < n; ++i) {
-        const brt = new BoardReducerTester(3, 5)
+        const brt = new BoardReducerTester(3, 9)
         let skills: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
         skills[BasicRobot.SKILL_CAPTURE_NEARBY] = true
         skills[BasicRobot.SKILL_STOP_BY_CITIES] = true
@@ -112,12 +117,14 @@ xit('stops by cities', () => {
         brt.queueMove(Player.Zero, Hex.UP)
         brt.queueMove(Player.Zero, Hex.UP)
         brt.queueRobots() // should have no effect — robot is happy with plan
-        expect(brt.moves.playerQueues.get(Player.Zero).size === 4)
+        const beforeCity = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
+        expect(beforeCity.size === 4)
         brt.doMoves()
         brt.queueRobots() // robot should notice city and plan to capture it
-        expect(brt.moves.playerQueues.get(Player.Zero).size).toBe(1)
-        expect(brt.moves.playerQueues.get(Player.Zero)
-            .get(0).delta === Hex.RIGHT_UP).toBeTruthy()
+        const noticeCity = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
+        expect(noticeCity.size).toBe(1)
+        const captureCity = noticeCity.first() as PlayerMove
+        expect(captureCity.delta === Hex.RIGHT_UP).toBeTruthy()
     }
 })
 
@@ -134,7 +141,7 @@ const doesABeatB = (
     first: RobotMaker, second: RobotMaker, turnLimit: number
 ): boolean => {
     const brt = new BoardReducerTester(
-        13, 7, [
+        13, 13, [
             new RandomTerrainArranger(0.3),
             new SpreadPlayersArranger(),
         ], pickNPlayers(4)
@@ -169,7 +176,7 @@ const countAWins = (
     return aWins
 }
 
-xit('control — IQ 0 vs self', () => {
+it('control — IQ 0 vs self', () => {
     const control = countAWins(iq0, iq0)
     if (logWinLoss)
         // tslint:disable-next-line
@@ -177,10 +184,8 @@ xit('control — IQ 0 vs self', () => {
     expect(control).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.35 : 0.3))
 })
 
-xit('IQ 1 not lose too much', () => {
-    const skills = List(Array(BasicRobot.MAX_IQ).keys())
-
-    skills.forEach(skillIndex => {
+it('IQ 1 not lose too much', () => {
+    Range(0, BasicRobot.MAX_IQ).forEach(skillIndex => {
         const smart = SkillRobotMaker(skillIndex)
         const wins = countAWins(smart, iq0)
         if (logWinLoss)
@@ -190,7 +195,7 @@ xit('IQ 1 not lose too much', () => {
     })
 })
 
-xit('max IQ wins a lot', () => {
+it('max IQ wins a lot', () => {
     const n = robotTrials * 2
     const wins = countAWins(iqMax, iq0, n)
     if (logWinLoss)

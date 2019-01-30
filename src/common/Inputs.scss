@@ -1,0 +1,40 @@
+.Dropdown-root {
+  display: inline-flex;
+  margin-left: 0.25em;
+}
+
+.Dropdown-control, .Dropdown-menu {
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+}
+
+.Dropdown-option {
+  color: white;
+  &:hover {
+    background-color: #444;
+    color: white;
+  }
+  &.is-selected {
+    color: black;
+    background-color: #bbb;
+  }
+}
+
+.Dropdown-arrow {
+  margin-top: 5px;
+}
+
+.SelectNumber {
+  margin: 0.2em 0;
+  label {
+    display: inline-flex;
+  }
+  select {
+    margin-left: 0.35em;
+    display: inline-flex;
+    font-size: 130%;
+    color: white;
+    background-color: black;
+  }
+}

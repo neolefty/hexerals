@@ -11,8 +11,8 @@ export interface BoardState {
     cursors: Map<number, Hex>
     moves: MovementQueue
     players: PlayerManager
-    curPlayer: Player | undefined
     messages: List<StatusMessage>
+    curPlayer?: Player
 }
 
 export const DEFAULT_CURSORS = Map<number, Hex>(

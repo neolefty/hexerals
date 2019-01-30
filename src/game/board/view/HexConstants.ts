@@ -8,11 +8,39 @@
 import {CartPair} from '../../../common/CartPair';
 
 export const HEX_RADIUS = 30
-export const HEX_MID = HEX_RADIUS * 0.5
 export const HEX_HALF_HEIGHT = 26
-export const HEX_ROW = HEX_HALF_HEIGHT * 2
+// approx (sqrt 3) / 2
+export const HALF_HEIGHT_RATIO = HEX_HALF_HEIGHT / HEX_RADIUS
+export const HEX_MID = HEX_RADIUS * 0.5
 export const HEX_COLUMN = 3 * HEX_MID
-export const HEX_HEIGHT = HEX_HALF_HEIGHT * 2
+
+// How wide would this many flat-top hex columns be?
+// Horizontally, hex centers are 3 radii apart, and they overlap one radius.
+export const hexPixelWidth = (hexes: number) =>
+    // radius * 1.5 * hexes + radius * .5 = (3 * hexes + 1) * 0.5 * radius
+    (hexes * HEX_COLUMN) + HEX_MID
+
+// How high would this many flat-top hex rows be?
+// Hexes rows overlap 50% vertically.
+export const hexPixelHeight = (hexes: number) =>
+    (hexes + 1) * HEX_HALF_HEIGHT
+
+// how many columns do we have room for?
+export const hexesWide = (pixels: number, hexRadius: number) =>
+    // inverse of hexPixelWidth
+    0.33333 * ((2 * pixels / hexRadius) - 1)
+
+// how many rows?
+export const hexesTall = (pixels: number, hexRadius: number) =>
+    (pixels / (hexRadius * HALF_HEIGHT_RATIO)) - 1
+
+export const countHexes = (w: number, h: number) =>
+    // even heights: 1 full zig-zaggy row for every 2 height —> w * h / 2
+    // odd heights:
+    //   - even width: 1 perforated half-row for every height —> (w / 2) * h
+    //   - odd width: 1 more long half-row than short, so round up
+    Math.ceil(w * h * .5)
+
 
 export const HEX_LEFT = -HEX_RADIUS
 export const HEX_RIGHT = HEX_RADIUS
@@ -28,6 +56,7 @@ export const HEX_UR_XY = new CartPair(HEX_MID_RIGHT, HEX_TOP)
 export const HEX_RIGHT_XY = new CartPair(HEX_RIGHT, 0)
 export const HEX_LR_XY = new CartPair(HEX_MID_RIGHT, HEX_BOTTOM)
 
+// TODO convert to CartPair / CartChain
 const hexPoints = (x: number, y: number) => {
     return ''
         + (x - HEX_RADIUS) + ',' + y + ' ' // left

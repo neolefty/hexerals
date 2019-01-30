@@ -8,6 +8,13 @@ import {Hex} from '../model/Hex';
 import * as React from 'react';
 import {BoardKeyboardController} from './BoardKeyboardController';
 
+export interface BoardViewProps extends BoardViewActions {
+    boardState: BoardState
+    displaySize: CartPair
+    colors?: Map<Player, DriftColor>
+    grabFocus?: boolean
+}
+
 export interface BoardViewActions {
     onQueueMoves: (moves: List<PlayerMove>) => void
     onDrag: (
@@ -21,12 +28,6 @@ export interface BoardViewActions {
     ) => void
     onEndGame: () => void
     onResetColors: (n: number) => void
-}
-
-export interface BoardViewProps extends BoardViewActions {
-    boardState: BoardState
-    displaySize: CartPair
-    colors?: Map<Player, DriftColor>
 }
 
 export class BoardViewBase extends React.PureComponent<BoardViewProps> {

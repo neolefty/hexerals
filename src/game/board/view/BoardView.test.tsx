@@ -37,9 +37,11 @@ it('renders a tile', () => {
 
 // TODO write test of HexBoardView
 it('renders a board with no selection', () => {
-    // const nRows = 3 // ++* / ++ / *++
+    // - _ - _ *
+    // *   -    -
+    // 8o8o8 or =-=-=
     const board = Board.constructRectangular(
-        5, 2, pickNPlayers(2), [new CornersPlayerArranger(3)])
+        5, 3, pickNPlayers(2), [new CornersPlayerArranger(3)])
     // console.log(board.toString())
     const boardState: BoardState = {
         board: board,
@@ -256,7 +258,7 @@ it('blocks illegal moves', () => {
 // })
 
 it('cancels moves', () => {
-    const brt = new BoardReducerTester(6, 21)
+    const brt = new BoardReducerTester(6, 41)
     const boardBefore = brt.state.board
 
     brt.setCurPlayer(Player.One)

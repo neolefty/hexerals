@@ -58,7 +58,7 @@ export class Board {
         players: List<Player>,
         arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
     ) {
-        return Board.constructRectangular(size, size, players, arrangers)
+        return Board.constructRectangular(size, size * 2 - 1, players, arrangers)
     }
 
     static constructRectangular(
@@ -66,7 +66,7 @@ export class Board {
         h: number,
         players: List<Player>,
         arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
-        messages: StatusMessage[] | undefined = undefined,
+        messages?: StatusMessage[],
     ): Board {
         const constraints = new RectangularConstraints(w, h)
         let result = Board.construct(constraints, players)

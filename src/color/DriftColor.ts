@@ -28,19 +28,20 @@ export class DriftColor {
     }
 
     static random(): DriftColor {
-        return new DriftColor(
-            new CieColor([
-                // TODO even p across CIELUV for uniform perceptual distribution
-                Math.random() * 360,
-                Math.random() * (this.SPAN_SAT) + DriftColor.MIN_SAT,
-                Math.random() * (this.SPAN_BRIGHT) + DriftColor.MIN_BRIGHT,
-            ]),
-            Math.random()
+        return DriftColor.constructHSL(
+            // TODO even p across CIELUV for uniform perceptual distribution
+            Math.random() * 360,
+            Math.random() * (this.SPAN_SAT) + DriftColor.MIN_SAT,
+            Math.random() * (this.SPAN_BRIGHT) + DriftColor.MIN_BRIGHT,
         )
     }
 
     static clamp(x: number, min: number, max: number): number {
         return Math.max(min, Math.min(x, max))
+    }
+
+    static constructHSL(h: number, s: number, l: number) {
+        return new DriftColor(new CieColor([h, s, l]), Math.random())
     }
 
     constructor(readonly cie: CieColor, readonly key: number = Math.random()) {}

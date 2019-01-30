@@ -20,6 +20,8 @@ export const PLAYERS: Map<number, Player> = Map([
     [15, Player.Fifteen],
 ])
 
+export const MAX_PLAYERS = PLAYERS.size - 1
+
 export const pickNPlayers = (n: number): List<Player> => {
     const result: List<Player> = List()
     return result.withMutations(m => {
@@ -62,5 +64,9 @@ export class PlayerManager {
                 this.playerIndexes,
                 this.playerRobots.delete(player),
             )
+    }
+
+    toString(): string {
+        return JSON.stringify(this.playerRobots.toJSON())
     }
 }

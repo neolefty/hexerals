@@ -7,7 +7,7 @@ import {Terrain} from './Terrain';
 import * as assert from 'assert';
 
 it('fogs the board for a player', () => {
-    const brt = new BoardReducerTester(5, 5)
+    const brt = new BoardReducerTester(5, 9)
     const fog = new PlayerFog(Player.Zero, true)
     const fogged = fog.fog(brt.state).board
     expect(fogged.getTile(Hex.ORIGIN).known).toBeTruthy()

@@ -76,7 +76,7 @@ it('does not get trapped or bisect', () => {
     for (let i = 0; i < 20; ++i) {
         // set the arranger up to fail
         const board = Board.constructRectangular(
-            1, 20, pickNPlayers(12), [
+            1, 39, pickNPlayers(12), [
                 new RandomPlayerArranger(1),
                 new RandomTerrainArranger(1, Terrain.Mountain),
             ],
@@ -98,7 +98,7 @@ it('bisection can be allowed', () => {
     for (let i = 0; i < 20; ++i) {
         // set the arranger up to bisect
         const board = Board.constructRectangular(
-            4, 12, pickNPlayers(12), [
+            4, 23, pickNPlayers(12), [
                 new RandomPlayerArranger(1),
                 new RandomTerrainArranger(
                     .9, Terrain.Mountain, true

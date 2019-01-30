@@ -18,7 +18,7 @@ import {YMountainArranger} from '../model/YMountainArranger';
 
 const NUM_PLAYERS = 10
 const BOARD_WIDTH = 21
-const BOARD_HEIGHT = 13
+const BOARD_HEIGHT = 25
 const PLAYERS = pickNPlayers(NUM_PLAYERS)
 
 interface BenchmarkProps {

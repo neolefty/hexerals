@@ -7,6 +7,7 @@ import {Player} from '../model/players/Players'
 import {HexesView} from './HexesView';
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';
+import {hexPixelHeight, hexPixelWidth} from './HexConstants';
 
 // space between bounding rect and hex viewbox
 const OUTER_BOARD_MARGIN = 1
@@ -18,6 +19,10 @@ const FLAG_CLEARANCE = 5
 export class HexBoardView extends BoardViewBase {
     private focusRef = React.createRef<HTMLDivElement>()
 
+    private shouldGrabFocus = () =>
+        this.props.grabFocus === undefined
+        || this.props.grabFocus
+
     constructor(props: BoardViewProps) {
         super(props)
         // ensure there are enough colors for all the players
@@ -28,13 +33,16 @@ export class HexBoardView extends BoardViewBase {
             this.props.onResetColors(this.props.boardState.players.size)
     }
 
-    componentDidMount() {this.focusDiv()}
-    componentDidUpdate() {this.focusDiv()}
+    componentDidMount() { this.focusDiv() }
+    componentDidUpdate() { this.focusDiv() }
 
     focusDiv() {
-        const node = this.focusRef.current
-        if (node)
-            node.focus()
+        if (this.shouldGrabFocus()) {
+            console.log(`focusing (${this.props.grabFocus})`)
+            const node = this.focusRef.current
+            if (node)
+                node.focus()
+        }
     }
 
     render(): React.ReactNode {
@@ -48,10 +56,8 @@ export class HexBoardView extends BoardViewBase {
         // coords inside viewport -- hex radius is 15, hex half-height is 13
         // row height is 26, hex diameter is 30
 
-        // horizontally, hex centers are 1.5 diameters apart
-        const scaleWidth = coordsWidth * 45 + 15
-        // vertically, hex centers are half a row apart
-        const scaleHeight = (coordsHeight + 1) * 26 // hex
+        const scaleWidth = hexPixelWidth(coordsWidth)
+        const scaleHeight = hexPixelHeight(coordsHeight)
 
         // figure out whether height or width is constraining factor
         const boardAspectRatio = scaleHeight / scaleWidth

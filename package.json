@@ -9,6 +9,7 @@
     "immutable": "^4.0.0-rc.12",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-dropdown": "^1.6.4",
     "react-redux": "^6.0.0",
     "react-tabs": "^3.0.0",
     "react-test-renderer": "^16.7.0",

@@ -42,7 +42,7 @@ export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
     return result.asImmutable()
 }
 
-// is 5 enough?
+// call onResetColors() if the number doesn't match
 const playerColorsCache = new CacheMap<ColorPodge, Map<Player, DriftColor>>(5)
 
 export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> => {

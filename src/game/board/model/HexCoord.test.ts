@@ -1,5 +1,6 @@
 import {RectangularConstraints} from './Constraints'
 import {Hex} from './Hex'
+import {countHexes} from '../view/HexConstants';
 
 it('checks hex neighbors', () => {
     expect(Hex.ORIGIN.getRightDown() === Hex.RIGHT_DOWN).toBeTruthy()
@@ -44,7 +45,7 @@ const timeRect = (w: number, h: number) => {
     const start = new Date()
     const constraints = new RectangularConstraints(w, h)
     const n = constraints.all.size
-    expect(n).toBe(w * h - Math.trunc(h / 2))
+    expect(n).toBe(countHexes(w, h))
     if (slow || reallySlow) {
         const elapsed = new Date().getTime() - start.getTime()
         const msPerCell = elapsed / n

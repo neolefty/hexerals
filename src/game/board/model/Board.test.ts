@@ -34,14 +34,14 @@ export function printBoard(board: Board) {
 }
 
 it('converts between hex and cartesian coords', () => {
-    const w = 11, h = 5
-    const tenByFive = Board.constructRectangular(
+    const w = 11, h = 9
+    const elevenByNine = Board.constructRectangular(
         w, h, pickNPlayers(2), [new CornersPlayerArranger(1)])
     // h x w, but every other row (that is, h/2 rows) is short by 1
-    expect(tenByFive.constraints.all.size == w * h - Math.trunc(h/2))
+    expect(elevenByNine.constraints.all.size == w * h - Math.trunc(h/2))
 
     const metaCartTile = (cx: number, cy: number) => (
-        () => tenByFive.getCartTile(cx, cy)
+        () => elevenByNine.getCartTile(cx, cy)
     )
 
     expect(metaCartTile(6, 3)).toThrow()  // assert sum is even
@@ -53,7 +53,7 @@ it('converts between hex and cartesian coords', () => {
     const midHex = Hex.getCart(6, 2)
     expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
     // expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
-    expect(tenByFive.getCartTile(6, 2) === Tile.MAYBE_EMPTY).toBeTruthy()
+    expect(elevenByNine.getCartTile(6, 2) === Tile.MAYBE_EMPTY).toBeTruthy()
 })
 
 it('overlays', () => {
@@ -77,22 +77,22 @@ it('overlays', () => {
 })
 
 it('navigates around a board', () => {
-    const elevenByFalf = Board.constructRectangular(
-        11, 5.5, pickNPlayers(2), [new CornersPlayerArranger(20)])
-    expect(elevenByFalf.inBounds(Hex.ORIGIN)).toBeTruthy()
-    expect(elevenByFalf.constraints.all.contains(Hex.ORIGIN)).toBeTruthy()
-    expect(elevenByFalf.inBounds(Hex.NONE)).toBeFalsy()
-    expect(elevenByFalf.constraints.all.contains(Hex.NONE)).toBeFalsy()
+    const elevenByTen = Board.constructRectangular(
+        11, 10, pickNPlayers(2), [new CornersPlayerArranger(20)])
+    expect(elevenByTen.inBounds(Hex.ORIGIN)).toBeTruthy()
+    expect(elevenByTen.constraints.all.contains(Hex.ORIGIN)).toBeTruthy()
+    expect(elevenByTen.inBounds(Hex.NONE)).toBeFalsy()
+    expect(elevenByTen.constraints.all.contains(Hex.NONE)).toBeFalsy()
 
     // staggered walk from origin to the right edge
     let c = Hex.ORIGIN
-    while (elevenByFalf.inBounds(c.getRightUp().getRightDown())) {
+    while (elevenByTen.inBounds(c.getRightUp().getRightDown())) {
         c = c.getRightUp().getRightDown()
-        expect(elevenByFalf.constraints.all.contains(c))
+        expect(elevenByTen.constraints.all.contains(c))
     }
-    expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
-    expect(c).toEqual(elevenByFalf.edges.lowerRight)
-    expect(c === elevenByFalf.edges.lowerRight).toBeTruthy()
+    expect(c === elevenByTen.edges.lowerRight).toBeTruthy()
+    expect(c).toEqual(elevenByTen.edges.lowerRight)
+    expect(c === elevenByTen.edges.lowerRight).toBeTruthy()
     expect(c.x).toBe(10)
 
     expect(
@@ -110,29 +110,29 @@ it('navigates around a board', () => {
 })
 
 it('validates moves', () => {
-    const threeByFour = Board.constructRectangular(
-        3, 4, pickNPlayers(2), [new CornersPlayerArranger(20)])
+    const threeBySeven = Board.constructRectangular(
+        3, 7, pickNPlayers(2), [new CornersPlayerArranger(20)])
     const messages: StatusMessage[] = []
-    const options = threeByFour.validationOptions(messages)
+    const options = threeBySeven.validationOptions(messages)
 
-    expect(threeByFour.validate(PlayerMove.constructDelta(
-        Player.Zero, threeByFour.edges.lowerLeft, Hex.UP
+    expect(threeBySeven.validate(PlayerMove.constructDelta(
+        Player.Zero, threeBySeven.edges.lowerLeft, Hex.UP
     ))).toBeTruthy()
-    expect(threeByFour.edges.lowerLeft).toBe(Hex.ORIGIN)
-    expect(threeByFour.validate(PlayerMove.constructDelta(
-        Player.One, threeByFour.edges.upperRight, Hex.DOWN
+    expect(threeBySeven.edges.lowerLeft).toBe(Hex.ORIGIN)
+    expect(threeBySeven.validate(PlayerMove.constructDelta(
+        Player.One, threeBySeven.edges.upperRight, Hex.DOWN
     ))).toBeTruthy()
 
     // would go off the board
-    expect(threeByFour.validate(
-        PlayerMove.constructDelta(Player.One, threeByFour.edges.upperRight, Hex.UP),
+    expect(threeBySeven.validate(
+        PlayerMove.constructDelta(Player.One, threeBySeven.edges.upperRight, Hex.UP),
         options,
     )).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('out of bounds')
     expect(messages[messages.length-1].msg.startsWith('destination')).toBeTruthy()
 
     // would start off the board
-    expect(threeByFour.validate(
+    expect(threeBySeven.validate(
         PlayerMove.constructDelta(Player.Zero, Hex.DOWN, Hex.UP),
         options,
     )).toBeFalsy()
@@ -141,7 +141,7 @@ it('validates moves', () => {
 
     // too far
     const rightUp2 = Hex.RIGHT_UP.plus(Hex.RIGHT_UP)
-    expect(threeByFour.validate(PlayerMove.constructDelta(
+    expect(threeBySeven.validate(PlayerMove.constructDelta(
         Player.Zero, Hex.ORIGIN, rightUp2),
         options,
     )).toBeFalsy()
@@ -151,12 +151,12 @@ it('validates moves', () => {
     // wrong owner
     const oneOriginUp = PlayerMove.constructDelta(
         Player.One, Hex.ORIGIN, Hex.UP)
-    expect(threeByFour.validate(oneOriginUp, options)).toBeFalsy()
+    expect(threeBySeven.validate(oneOriginUp, options)).toBeFalsy()
     expect(messages[messages.length-1].tag).toBe('wrong player')
-    expect(threeByFour.validate(oneOriginUp)).toBeFalsy()
+    expect(threeBySeven.validate(oneOriginUp)).toBeFalsy()
 
     // pop of only 1
-    const moved = threeByFour.applyMove(PlayerMove.constructDelta(
+    const moved = threeBySeven.applyMove(PlayerMove.constructDelta(
         Player.Zero, Hex.ORIGIN, Hex.UP
     )).board
     const movedOptions = moved.validationOptions(messages)
@@ -172,20 +172,20 @@ it('validates moves', () => {
 })
 
 it('steps population', () => {
-    const threeByFour = Board.constructRectangular(
-        3, 7, pickNPlayers(2),
+    const threeByThirteen = Board.constructRectangular(
+        3, 13, pickNPlayers(2),
         [new CornersPlayerArranger(20)],
     )
-    const ur = threeByFour.edges.upperRight
+    const ur = threeByThirteen.edges.upperRight
     const urd = ur.getDown()
     const urd2 = urd.getDown()
-    expect(threeByFour.getTile(ur).terrain).toBe(Terrain.City)
-    expect(threeByFour.getTile(ur).pop).toBe(20)
-    expect(threeByFour.getTile(ur).isOwned).toBeTruthy()
-    expect(threeByFour.getTile(urd).isOwned).toBeFalsy()
+    expect(threeByThirteen.getTile(ur).terrain).toBe(Terrain.City)
+    expect(threeByThirteen.getTile(ur).pop).toBe(20)
+    expect(threeByThirteen.getTile(ur).isOwned).toBeTruthy()
+    expect(threeByThirteen.getTile(urd).isOwned).toBeFalsy()
 
     // make a move
-    const moved = threeByFour.applyMove(
+    const moved = threeByThirteen.applyMove(
         PlayerMove.constructDelta(Player.One, ur, Hex.DOWN)
     ).board
     expect(moved.getTile(ur).pop).toBe(1)
@@ -213,7 +213,7 @@ it('steps population', () => {
 
 it('captures capitals', () => {
     const start = Board.constructRectangular(
-        3, 2, pickNPlayers(2),
+        3, 3, pickNPlayers(2),
         [new CornersPlayerArranger(20, Terrain.Capital)],
     )
     expect(start.getTile(Hex.ORIGIN).terrain).toBe(Terrain.Capital)
