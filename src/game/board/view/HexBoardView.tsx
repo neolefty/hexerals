@@ -38,7 +38,6 @@ export class HexBoardView extends BoardViewBase {
 
     focusDiv() {
         if (this.shouldGrabFocus()) {
-            console.log(`focusing (${this.props.grabFocus})`)
             const node = this.focusRef.current
             if (node)
                 node.focus()

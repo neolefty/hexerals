@@ -9,8 +9,8 @@ import {CycleState} from '../game/board/model/CycleState'
 import {CycleContainer} from '../game/board/model/CycleContainer'
 import {Help} from '../game/board/view/Help';
 
-const MIN_WIDTH = 420
-const MIN_HEIGHT = 120
+const MIN_WIDTH = 300
+const MIN_HEIGHT = 300
 
 export interface GenericAction {
     type: string

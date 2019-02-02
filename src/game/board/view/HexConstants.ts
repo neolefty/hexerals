@@ -25,14 +25,40 @@ export const hexPixelWidth = (hexes: number) =>
 export const hexPixelHeight = (hexes: number) =>
     (hexes + 1) * HEX_HALF_HEIGHT
 
-// how many columns do we have room for?
+// how many columns fit in this many pixels, horizontally?
 export const hexesWide = (pixels: number, hexRadius: number) =>
     // inverse of hexPixelWidth
     0.33333 * ((2 * pixels / hexRadius) - 1)
 
-// how many rows?
+// how many rows fit in this many pixels, vertically?
 export const hexesTall = (pixels: number, hexRadius: number) =>
     (pixels / (hexRadius * HALF_HEIGHT_RATIO)) - 1
+
+// what would be the hex radius if there were this many rows?
+export const radiusFromRowCount = (
+    pixelsHigh: number, rows: number
+) => pixelsHigh / ((rows + 1) * HALF_HEIGHT_RATIO)
+
+// what would be the hex radius if there were this many columns?
+export const radiusFromColumnCount = (
+    pixelsWide: number, columns: number
+) => 2 * pixelsWide / (3 * columns + 1)
+
+// for a given number of rows, how many columns fit, proportionately?
+export const widthFromHeight = (
+    displaySize: CartPair, nHexesTall: number
+): number =>
+    Math.round(hexesWide(
+        displaySize.x,
+        radiusFromRowCount(displaySize.y, nHexesTall)))
+
+// for a given number of columns, how many rows fit, proportionately?
+export const heightFromWidth = (
+    displaySize: CartPair, nHexesWide: number
+): number =>
+    Math.round(hexesTall(
+        displaySize.y,
+        radiusFromColumnCount(displaySize.x, nHexesWide)))
 
 export const countHexes = (w: number, h: number) =>
     // even heights: 1 full zig-zaggy row for every 2 height —> w * h / 2

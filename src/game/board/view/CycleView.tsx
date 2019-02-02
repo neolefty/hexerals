@@ -1,5 +1,5 @@
 import {CartPair} from '../../../common/CartPair'
-import {LocalGameOptions, LocalGameOptionsView} from './LocalGameOptions'
+import {LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
@@ -14,18 +14,6 @@ export interface CycleViewProps extends CycleState {
     onCloseGame: () => void
     onChangeLocalOption: (name: string, n: number) => void
 }
-
-// freeze the options that shouldn't update the preview
-const freezeForPreview = (
-    localOptions: LocalGameOptions
-): LocalGameOptions => ({
-    ...localOptions,
-    tickMillis: 0,
-    difficulty: 0,
-    startingPop: 0,
-    fog: 0,
-    levelVisible: 0,
-})
 
 export const CycleView = (props: CycleViewProps) => {
     switch (props.mode) {
@@ -46,7 +34,7 @@ export const CycleView = (props: CycleViewProps) => {
             return (
                 <Layered>
                     <LocalGamePreview
-                        localOptions={freezeForPreview(props.localOptions)}
+                        localOptions={props.localOptions}
                         displaySize={props.displaySize}
                     />
                     <LocalGameOptionsView

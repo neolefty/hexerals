@@ -25,6 +25,9 @@ export class CartPair {
 
     round = (places: number = 0) =>
         new CartPair(round(this.x, places), round(this.y, places))
+
+    equals = (that: any) =>
+        that.x === this.x && that.y === this.y
 }
 
 export type CartPairTransform = (cp: CartPair) => CartPair

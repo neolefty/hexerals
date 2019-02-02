@@ -125,7 +125,7 @@ export class DriftColor {
     }
 
     // A color with same hue & sat, but slightly lighter or darker, for texture
-    texture = (diff: number = 20): DriftColor => {
+    texture(diff: number = 20): DriftColor {
         // lightness 0-25 -- return brighter (too dark to get darker)
         //   - 25-50 -- darker
         //   - 50-75 -- brighter
