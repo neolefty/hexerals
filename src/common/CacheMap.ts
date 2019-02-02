@@ -1,12 +1,21 @@
 import {OrderedMap} from 'immutable';
 
+type Filler<V> = () => V
+
 // first-in first-out cache
 export class CacheMap<K, V> {
     private cache = OrderedMap<K, V>()
 
     constructor(readonly n: number) {}
 
-    get = (k: K): V | undefined => this.cache.get(k)
+    get = (k: K, filler: Filler<V>): V => {
+        let result = this.cache.get(k)
+        if (!result && !this.has(k) && filler) {
+            result = filler()
+            this.set(k, result)
+        }
+        return result as V
+    }
 
     set = (k: K, v: V) => {
         this.cache = this.cache.delete(k).set(k, v)

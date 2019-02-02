@@ -150,6 +150,9 @@ export const changeLocalOptionAction = (
 const changeLocalOptionReducer = (
     state: CycleState, action: ChangeLocalOption
 ): CycleState => {
+    if (state.localOptions[action.name] === action.n)
+        return state
+
     const result = {...state.localOptions}
     assert.ok(result.hasOwnProperty(action.name))
     assert.strictEqual(typeof result[action.name], 'number')

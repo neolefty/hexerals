@@ -16,19 +16,12 @@ import {RandomTerrainArranger} from '../model/RandomTerrainArranger';
 import {CieColor} from '../../../color/CieColor';
 import {RandomPlayerArranger} from '../model/PlayerArranger';
 import {Terrain} from '../model/Terrain';
+import {CacheMap} from '../../../common/CacheMap';
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
     displaySize: CartPair
 }
-
-// ignore changes in options not in this list
-// except for displaySize
-/*
-const OPTIONS_TRIGGER_UPDATE = [
-    'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
-]
-*/
 
 const [ MIN_BORING, MAX_BORING ] = [ 10, 30 ]
 const randomLightness = () =>
@@ -70,31 +63,19 @@ const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
     return prevGrey
 }
 
-let prevBoardState: BoardState | undefined = undefined
-
-const boardMatches = (
-    bs: BoardState, opts: LocalGameOptions
-): boolean => {
-    const hq = opts.capitals === 1 ? Terrain.Capital : Terrain.City
-    return (
-        bs.players.size === opts.numRobots + 1
-        && bs.board.edges.width === opts.boardWidth
-        && bs.board.edges.height === opts.boardHeight
-        && bs.board.explicitTiles.filter(
-            tile => tile.terrain === hq
-        ).size === bs.players.size
-        // TODO deserves a unit test or to be moved to RandomArranger ...
-        && bs.board.explicitTiles.filter(
-            tile => tile.terrain === Terrain.Mountain
-        ).size === Math.floor(
-            bs.board.hexesAll.size * opts.mountainPercent / 100
-        )
-    )
+// options that change how the preview looks
+const OPTIONS_TRIGGER_UPDATE = [
+    'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
+]
+const makeKey = (opts: LocalGameOptions): any => {
+    const result = {}
+    OPTIONS_TRIGGER_UPDATE.forEach(k => result[k] = opts[k])
+    return result
 }
 
-// TODO cache based on options? Then can remove shouldCompUpdate()
-const createBoardState = (options: LocalGameOptions): BoardState => {
-    if (!prevBoardState || !boardMatches(prevBoardState, options)) {
+const bsCache = new CacheMap<{}, BoardState>(20)
+const getBoardState = (options: LocalGameOptions): BoardState =>
+    bsCache.get(makeKey(options), () => {
         const players = pickNPlayers(options.numRobots + 1)
         const board = Board.constructRectangular(
             options.boardWidth, options.boardHeight, players, [
@@ -107,7 +88,7 @@ const createBoardState = (options: LocalGameOptions): BoardState => {
                 //     options.capitals ? Terrain.Capital : Terrain.City),
             ])
 
-        prevBoardState = {
+        return {
             board: board,
             turn: 0,
             cursors: Map<number, Hex>(),
@@ -115,28 +96,10 @@ const createBoardState = (options: LocalGameOptions): BoardState => {
             moves: new MovementQueue(),
             messages: List<StatusMessage>(),
         }
-    }
-
-    return prevBoardState
-}
+    })
 
 export const LocalGamePreview = (props: LocalGamePreviewProps) => {
-    // shouldComponentUpdate(
-    //     nextProps: Readonly<LocalGamePreviewProps>,
-    //     nextState: Readonly<{}>,
-    //     nextContext: any
-    // ): boolean {
-    //     for (let i = 0; i < OPTIONS_TRIGGER_UPDATE.length; ++i) {
-    //         const option = OPTIONS_TRIGGER_UPDATE[i]
-    //         if (nextProps.localOptions[option] !== this.props.localOptions[option])
-    //             return true
-    //     }
-    //     if (!nextProps.displaySize.equals(this.props.displaySize))
-    //         return true
-    //     return false
-    // }
-
-    const boardState = createBoardState(props.localOptions)
+    const boardState = getBoardState(props.localOptions)
     return (
         <HexBoardView
             {...BOARD_STUBS}

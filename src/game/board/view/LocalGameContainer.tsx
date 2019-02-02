@@ -30,26 +30,22 @@ export interface LocalGameProps {
     localOptions: LocalGameOptions
 }
 
-export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
-    const result = Map<Player, DriftColor>().asMutable()
-    colors.driftColors.forEach(
-        (value: DriftColor, key: number) => {
-            const player: Player | undefined = PLAYERS.get(key)
-            if (player)
-                result.set(player, value)
-        }
+export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
+    Map<Player, DriftColor>().withMutations(result =>
+        colors.driftColors.forEach(
+            (value: DriftColor, key: number) => {
+                const player: Player | undefined = PLAYERS.get(key)
+                if (player)
+                    result.set(player, value)
+            }
+        )
     )
-    return result.asImmutable()
-}
 
 // call onResetColors() if the number doesn't match
 const playerColorsCache = new CacheMap<ColorPodge, Map<Player, DriftColor>>(5)
 
-export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> => {
-    if (!playerColorsCache.has(colors))
-        playerColorsCache.set(colors, playerColors(colors))
-    return playerColorsCache.get(colors) as Map<Player, DriftColor>
-}
+export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
+    playerColorsCache.get(colors, () => playerColors(colors))
 
 const mapStateToTickerBoardViewProps = (
     state: AppState, ownProps: LocalGameProps

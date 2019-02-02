@@ -112,14 +112,11 @@ export class LocalGameOptionsView
     heightFromWidth = (hexWidth: number): number =>
         heightFromWidth(this.props.displaySize, hexWidth)
 
-    getHexCounts = (): HexCounts => {
-        let result = hexCountsCache.get(this.props.displaySize)
-        if (!result) {
-            result = this.computeHexCounts()
-            hexCountsCache.set(this.props.displaySize, result)
-        }
-        return result
-    }
+    getHexCounts = (): HexCounts =>
+        hexCountsCache.get(
+            this.props.displaySize,
+            () => this.computeHexCounts()
+        )
 
     computeHexCounts = (): HexCounts => {
         const map = Map<CartPair, number>().withMutations(
