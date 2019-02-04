@@ -28,39 +28,38 @@ it('caches a certain number of entries', () => {
     expect(cache.get('baz', () => NaN)).toEqual(5)
 })
 
-it ('tests equality and stuff', () => {
-    console.log('---- regular js types ----')
+it ('regular js objects not good cache keys', () => {
+    // console.log('---- regular js types ----')
     const x = { a: 1, b: 2 }
     const y = { a: 1, b: 2 }
     const m = Map<{}, number>([[x, 0]])
-    console.log(m.has(x)) // true
-    console.log(m.has(y)) // false
-    console.log(m.size) // 1
-    console.log(m.entrySeq().first())
+    expect(m.has(x)).toBeTruthy()
+    expect(m.has(y)).toBeFalsy()
+    expect(m.size).toBe(1)
+    expect(m.entrySeq().first()[0]).toBe(x)
 })
 
-it ('frozen', () => {
-    console.log('---- frozen ----')
+it ('neither are frozen js objects', () => {
     const x = Object.freeze({ a: 1, b: 2 })
     const y = Object.freeze({ a: 1, b: 2 })
     const m = Map<{}, number>([[x, 0]])
-    console.log(m.has(x)) // true
-    console.log(m.has(y)) // false
-    console.log(m.size) // 1
-    console.log(m.entrySeq().first())
+    expect(m.has(x)).toBeTruthy()
+    expect(m.has(y)).toBeFalsy()
+    expect(m.size).toBe(1)
+    expect(m.entrySeq().first()[0]).toBe(x)
 })
 
-it ('this time with records', () => {
-    console.log('---- records ----')
+it ('but immutable.js Records are', () => {
     type AB = { a: number, b: number }
     const ABRecord = Record<AB>({ a: 1, b: 2 })
     const x = ABRecord()
     const y = ABRecord()
     const z = ABRecord({ b: 3 })
     const m = Map<Record<AB>, number>([[x, 0]])
-    console.log(m.has(x)) // true
-    console.log(m.has(y)) // true
-    console.log(m.has(z)) // false
-    console.log(m.size) // 1
-    console.log(m.entrySeq().first())
+    expect(m.has(x)).toBeTruthy()
+    expect(m.has(y)).toBeTruthy()
+    expect(m.has(z)).toBeFalsy()
+    expect(m.size).toBe(1)
+    expect(m.entrySeq().first()[0]).toBe(x)
+    expect(m.entrySeq().first()[0]).toEqual(y)
 })
