@@ -24,4 +24,8 @@ export class CacheMap<K, V> {
     }
 
     has = (k: K): boolean => this.cache.has(k)
+
+    get size() {
+        return this.cache.size
+    }
 }

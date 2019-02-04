@@ -1,31 +1,4 @@
-.IntInput {
-  margin: 0.3em;
-  input {
-    border: 1px solid white;
-    margin-left: 0.3em;
-  }
-}
-
-.CheckInput {
-  margin: 0.3em;
-  white-space: nowrap;
-  input {
-    transform: scale(2) translate(0,-2px);
-    margin-left: 0.7em;
-  }
-}
-
-.SelectNumber {
-  select {
-
-  }
-}
-
 .LocalGameOptionsView {
-  .IntInput, .CheckInput {
-    white-space: nowrap;
-  }
-
   .Main {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 1em;
@@ -76,11 +49,35 @@
     }
   }
 
-  .input-range {
-    width: 100%;
-    margin: 1em 0;
+  .IntInput, .CheckInput {
+    white-space: nowrap;
+    margin: 0.3em;
   }
-  .input-range__label {
-    display: none;
+
+  .IntInput {
+    input {
+      border: 1px solid white;
+      margin-left: 0.3em;
+    }
+  }
+
+  .CheckInput {
+    white-space: nowrap;
+    input {
+      transform: scale(2) translate(0,-2px);
+      margin-left: 0.7em;
+    }
+  }
+
+  .InputRange {
+    .input-range {
+      min-width: 7em;
+      width: 100%;
+      margin: 1em 0.5em;
+      display: inline-flex;
+    }
+    .input-range__label {
+      display: none;
+    }
   }
 }

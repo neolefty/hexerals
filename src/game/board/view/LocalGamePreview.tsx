@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {List, Map, Set} from 'immutable'
+import {List, Map, Record, Set} from 'immutable'
 
 import {LocalGameOptions} from './LocalGameOptions'
 import {HexBoardView} from './HexBoardView'
@@ -47,9 +47,13 @@ class BoringColor extends DriftColor {
 let prevGrey = Map<Player, DriftColor>()
 let prevGreyPlayers = Set<Player>()
 const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
-    const intersectPlayers = prevGreyPlayers.intersect(
-        bs.players.playerIndexes.keys()
+    const intersectPlayers = prevGreyPlayers.sort().intersect(
+        List(bs.players.playerIndexes.keys()).sort()
     )
+    // console.log(prevGreyPlayers.toArray())
+    // console.log(List(bs.players.playerIndexes.keys()).toArray())
+    // console.log(intersectPlayers.toArray())
+    // console.log([intersectPlayers.size, bs.players.size])
     if (intersectPlayers.size !== bs.players.size) {
         prevGrey = bs.players.playerIndexes.map(
             () => new BoringColor()
@@ -64,18 +68,31 @@ const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
 }
 
 // options that change how the preview looks
-const OPTIONS_TRIGGER_UPDATE = [
+type CacheKey = {
+    numRobots: number,
+    boardWidth: number,
+    boardHeight: number,
+    mountainPercent: number,
+}
+const CacheKeyRecord = Record<CacheKey>({
+    numRobots: NaN,
+    boardWidth: NaN,
+    boardHeight: NaN,
+    mountainPercent: NaN,
+})
+const CACHE_PROP_NAMES = [
     'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
 ]
 const makeKey = (opts: LocalGameOptions): any => {
     const result = {}
-    OPTIONS_TRIGGER_UPDATE.forEach(k => result[k] = opts[k])
-    return result
+    CACHE_PROP_NAMES.forEach(k => result[k] = opts[k])
+    return CacheKeyRecord(result)
 }
 
-const bsCache = new CacheMap<{}, BoardState>(20)
+const bsCache = new CacheMap<{}, BoardState>(2000)
 const getBoardState = (options: LocalGameOptions): BoardState =>
     bsCache.get(makeKey(options), () => {
+        // console.log(`making ${JSON.stringify(makeKey(options))} (${bsCache.size})`)
         const players = pickNPlayers(options.numRobots + 1)
         const board = Board.constructRectangular(
             options.boardWidth, options.boardHeight, players, [

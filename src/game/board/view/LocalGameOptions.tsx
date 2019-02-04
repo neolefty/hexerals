@@ -4,7 +4,7 @@ import 'react-input-range/lib/css/index.css'
 
 import {CartPair} from '../../../common/CartPair'
 import './LocalGameOptions.css'
-import {CheckInput, DropdownNumber, NumberInput, SelectNumber} from '../../../common/Inputs'
+import {CheckInput, DropdownNumber, NumberInput} from '../../../common/Inputs'
 import {BasicRobot} from '../model/players/BasicRobot'
 import {List, Map, Range} from 'immutable'
 import {
@@ -31,20 +31,10 @@ export interface LocalGameOptions {
     levelVisible: number  // advanced options visible?
 }
 
-const DEFAULT_MAP_SIZE = 'Medium'
 const MAX_MAP_SIZE = 375
-const MIN_MAP_SIZE = 75
+const MIN_MAP_SIZE = 50
 const DEFAULT_HEXES_PER_PLAYER = 'A few'
 // const DEFAULT_DIFFICULTY = '2'
-
-// number of hexes in map
-const mapSizes = Map<string, number>([
-    ['Tiny', MIN_MAP_SIZE],
-    ['Small', 110],
-    [DEFAULT_MAP_SIZE, 165],
-    ['Large', 250],
-    ['Huge', MAX_MAP_SIZE],
-])
 
 // number of hexes per player
 const playerDensities = Map<string, number>([
@@ -132,7 +122,7 @@ export class LocalGameOptionsView
                             hexCount = countHexes(w, h)
                             if (hexCount >= MIN_MAP_SIZE) {
                                 result.set(new CartPair(w, h), hexCount)
-                                console.log(`${w} x ${h} —> ${hexCount}`)
+                                // console.log(`${w} x ${h} —> ${hexCount}`)
                             }
                         }
                         ++w
@@ -172,14 +162,6 @@ export class LocalGameOptionsView
             this.props.localOptions.boardWidth,
             this.props.localOptions.boardHeight)
 
-    // What map size gives us the number of hexes closest to the one requested in props?
-    closestMapSize = (): number =>
-        mapSizes.get(
-            roundToMap(
-                this.nHexesFromProps(), mapSizes, DEFAULT_MAP_SIZE,
-            )[0]
-        ) as number
-
     // map of player density name ("Lots", "Very Few", etc) to total number of players
     playerCountMap = (): Map<string, number> =>
         playerDensities.mapEntries(([label, density]) =>
@@ -196,30 +178,27 @@ export class LocalGameOptionsView
             )[0]
         ) as number
 
+    setBoardSize = (wh: CartPair) => {
+        this.props.changeLocalOption('boardWidth', wh.x)
+        this.props.changeLocalOption('boardHeight', wh.y)
+    }
+
+    fitToShape = (hexCount: number) =>
+        this.setBoardSize(
+            roundToMap(
+                hexCount,
+                this.getHexCounts().counts,
+                new CartPair(10, 10)
+            )[0]
+        )
+
     render(): React.ReactNode {
+        // TODO move this up, to avoid mutating state in render() ...
+        this.fitToShape(this.nHexesFromProps())
         const optionChanger = (name: string) =>
             (n: number) => this.props.changeLocalOption(name, n)
         const optionToggler = (optionName: string) =>
             () => this.toggleOption(optionName)
-
-        const selectNumber = (
-            label: string, title: string, value: number,
-            choices: Map<string, number>,
-            level: number = 0
-        ) => (
-            <SelectNumber
-                value={value}
-                choices={choices}
-                onChange={
-                    // optionChanger(option)
-                    (x: number) => console.log(`${label} = ${x}`)
-                }
-                label={label}
-                title={title}
-                onEnter={this.props.newGame}
-                blockTabbing={!this.isLevelVisible(level)}
-            />
-        )
 
         const dropdownNumber = (
             label: string,
@@ -275,9 +254,34 @@ export class LocalGameOptionsView
             />
         )
 
-        const setBoardSize = (wh: CartPair) => {
-            this.props.changeLocalOption('boardWidth', wh.x)
-            this.props.changeLocalOption('boardHeight', wh.y)
+        function numberRange<V>(
+            label: string, title: string, value: number,
+            choices: Map<V, number>,
+            onChange: (n: number) => void,
+            formatLabel: (n: number) => string = (n => `${n}`),
+        ) {
+            let [ min, max ] = [ Infinity, -Infinity ]
+            choices.forEach(n => {
+                min = Math.min(n, min)
+                max = Math.max(n, max)
+            })
+            return (
+                <label
+                    className="InputRange Row"
+                    title={title}
+                >
+                    {label}
+                    <InputRange
+                        minValue={min}
+                        maxValue={max}
+                        value={value}
+                        formatLabel={formatLabel}
+                        onChange={(value: number | MinMax) =>
+                            onChange(value as number)
+                        }
+                    />
+                </label>
+            )
         }
 
         return (
@@ -293,18 +297,13 @@ export class LocalGameOptionsView
                 <div className="Main">
                     <div className="Row">
                         <div className="Level0 Column">
-                            <InputRange
-                                minValue={Math.min(this.nHexesFromProps(), MIN_MAP_SIZE)}
-                                maxValue={Math.max(this.nHexesFromProps(), MAX_MAP_SIZE)}
-                                value={this.nHexesFromProps()}
-                                formatLabel={value => `${value} hexes`}
-                                onChange={(value: number | MinMax) => {
-                                    const n = value as number
-                                    const wh = roundToMap(n, this.getHexCounts().counts, new CartPair(10, 10))[0]
-                                    setBoardSize(wh)
-                                }}
-                            />
-                            {dropdownNumber('Map', 'How big of a map?', mapSizes, this.closestMapSize())}
+                            {numberRange(
+                                'Map',
+                                'How big of a map?',
+                                this.nHexesFromProps(),
+                                this.getHexCounts().counts,
+                                this.fitToShape,
+                            )}
                             {dropdownNumber(
                                 'Robots',
                                 'How many AI opponents?',
@@ -324,9 +323,6 @@ export class LocalGameOptionsView
                             {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
                         </div>
                         <div className="Level2 Column">
-                            {selectNumber('Map Size', 'How big of a map?', this.closestMapSize(), mapSizes, 2)}
-                            {selectNumber('Robots', 'How many AI opponents?', this.closestPlayerDensity(), playerDensities, 2)}
-                            {numberInput('Difficulty', 'difficulty', 'How smart should those robots be?', 2)}
                             {numberInput('', 'startingPop', 'Population of your initial tile.', 2, (
                                 <div><span>Starting</span><br/><span>Population</span></div>
                             ))}
