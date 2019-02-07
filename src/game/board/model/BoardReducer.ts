@@ -1,16 +1,17 @@
 import {List} from 'immutable'
 
 import {Hex} from './Hex'
-import {HexMove, PlayerMove} from './Move';
+import {HexMove, PlayerMove} from './Move'
 import {Board} from './Board'
 import {BoardState, DEFAULT_CURSORS} from './BoardState'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
 import {GenericAction} from '../../../common/App'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
-import {GameDecision, Robot} from './players/Robot';
-import {floodShortestPath} from './ShortestPath';
-import {Reducer} from 'redux';
+import {GameDecision, Robot} from './players/Robot'
+import {floodShortestPath} from './ShortestPath'
+import {Reducer} from 'redux'
+import {GamePhase} from './GamePhase'
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -31,6 +32,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     curPlayer: INITIAL_PLAYERS[0],
     moves: EMPTY_MOVEMENT_QUEUE,
     messages: List([]),
+    phase: GamePhase.BeforeStart,
 }
 
 export const BoardReducer: Reducer<BoardState, GameAction> = (

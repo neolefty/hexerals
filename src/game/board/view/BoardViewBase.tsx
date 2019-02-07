@@ -1,12 +1,12 @@
-import {BoardState} from '../model/BoardState';
-import {CartPair} from '../../../common/CartPair';
-import {List, Map} from 'immutable';
-import {Player} from '../model/players/Players';
-import {DriftColor} from '../../../color/DriftColor';
-import {PlayerMove} from '../model/Move';
-import {Hex} from '../model/Hex';
-import * as React from 'react';
-import {BoardKeyboardController} from './BoardKeyboardController';
+import {BoardState} from '../model/BoardState'
+import {CartPair} from '../../../common/CartPair'
+import {List, Map} from 'immutable'
+import {Player} from '../model/players/Players'
+import {DriftColor} from '../../../color/DriftColor'
+import {PlayerMove} from '../model/Move'
+import {Hex} from '../model/Hex'
+import * as React from 'react'
+import {BoardKeyboardController} from './BoardKeyboardController'
 
 export interface BoardViewProps extends BoardViewActions {
     boardState: BoardState
@@ -39,7 +39,7 @@ export class BoardViewBase extends React.PureComponent<BoardViewProps> {
     }
 }
 
-export const BOARD_STUBS = ({
+export const BOARD_STUBS: BoardViewActions = ({
     /* tslint:disable */
     onQueueMoves: () => {},
     onDrag: () => {},

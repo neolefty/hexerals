@@ -4,8 +4,8 @@ import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
 import {CycleState} from '../model/CycleState'
-import {Layered} from '../../../common/Layered';
-import {LocalGamePreview} from './LocalGamePreview';
+import {Layered} from '../../../common/Layered'
+import {LocalGamePreview} from './LocalGamePreview'
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair

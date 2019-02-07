@@ -4,6 +4,7 @@ import {MovementQueue} from './MovementQueue'
 import {Player, PlayerManager} from './players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {List, Map} from 'immutable'
+import {GamePhase} from './GamePhase';
 
 export interface BoardState {
     board: Board
@@ -13,6 +14,7 @@ export interface BoardState {
     players: PlayerManager
     messages: List<StatusMessage>
     curPlayer?: Player
+    phase: GamePhase
 }
 
 export const DEFAULT_CURSORS = Map<number, Hex>(

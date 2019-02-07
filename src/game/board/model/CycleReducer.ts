@@ -9,11 +9,12 @@ import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
 import {SpreadPlayersArranger} from './SpreadPlayerArranger'
 import {BasicRobot} from './players/BasicRobot'
-import {StatusMessage} from '../../../common/StatusMessage';
-import {RandomTerrainArranger} from './RandomTerrainArranger';
-import {Terrain} from './Terrain';
-import {DEFAULT_CURSORS} from './BoardState';
-import * as assert from 'assert';
+import {StatusMessage} from '../../../common/StatusMessage'
+import {RandomTerrainArranger} from './RandomTerrainArranger'
+import {Terrain} from './Terrain'
+import {DEFAULT_CURSORS} from './BoardState'
+import * as assert from 'assert'
+import {GamePhase} from './GamePhase'
 
 // the meta-game
 
@@ -112,6 +113,7 @@ const openLocalGameReducer =
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(messages),
             curPlayer: Player.Zero,
+            phase: GamePhase.Started,
         },
     }
 }

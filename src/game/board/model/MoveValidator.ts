@@ -7,7 +7,7 @@ import {BoardConstraints} from './Constraints';
 import {Terrain} from './Terrain';
 
 export class MoveValidatorOptions {
-    // the explicitTiles under consideration, which start out as the current board's explicitTiles
+    // the tiles under consideration, which start out as the current board's explicitTiles
     // but may get speculatively reassigned in internal scratch values during validation
     tiles: Map<Hex, Tile>
 
@@ -116,7 +116,10 @@ export class MoveValidator {
     // Do some moves.
     // Mutates options.messages and options.explicitTiles.
     // Invalid moves are skipped.
-    applyMoves(moves: List<PlayerMove>, options: MoveValidatorOptions) {
+    applyMoves(
+        moves: List<PlayerMove>,
+        options: MoveValidatorOptions,
+    ) {
         moves.forEach((move: PlayerMove) => {
             const valid = this.validate(move, options)
             if (valid) {
@@ -126,8 +129,9 @@ export class MoveValidator {
                 const oldDestTile = options.tiles.get(move.dest, Tile.EMPTY)
                 const march = new Tile(origin.owner, origin.pop - 1)
                 const newDestTile = oldDestTile.settle(march)
+                const isCapture = oldDestTile.owner !== newDestTile.owner
                 // was it a capital capture?
-                if (newDestTile.owner !== oldDestTile.owner && oldDestTile.terrain === Terrain.Capital)
+                if (isCapture && oldDestTile.terrain === Terrain.Capital)
                     // noinspection PointlessBooleanExpressionJS
                     options.tiles = options.tiles.withMutations(m =>
                         options.tiles.filter(tile =>

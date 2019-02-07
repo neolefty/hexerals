@@ -13,8 +13,9 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {MovementQueue} from '../model/MovementQueue'
 import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import {BasicRobot} from '../model/players/BasicRobot'
-import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger';
-import {YMountainArranger} from '../model/YMountainArranger';
+import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger'
+import {YMountainArranger} from '../model/YMountainArranger'
+import {GamePhase} from '../model/GamePhase'
 
 const NUM_PLAYERS = 10
 const BOARD_WIDTH = 21
@@ -65,6 +66,7 @@ const newBoardState = (
     players: assignRobots(),
     curPlayer: undefined,
     messages: List<StatusMessage>(),
+    phase: GamePhase.Started,
 })
 
 // the parts of BoardViewProps that don't change — everything except boardState: BoardState

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from 'react'
 import {List, Map, Record, Set} from 'immutable'
 
 import {LocalGameOptions} from './LocalGameOptions'
@@ -7,16 +7,17 @@ import {CartPair} from '../../../common/CartPair'
 import {BOARD_STUBS} from './BoardViewBase'
 import {DriftColor} from '../../../color/DriftColor'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
-import {BoardState} from '../model/BoardState';
-import {Board} from '../model/Board';
-import {Hex} from '../model/Hex';
-import {MovementQueue} from '../model/MovementQueue';
-import {StatusMessage} from '../../../common/StatusMessage';
-import {RandomTerrainArranger} from '../model/RandomTerrainArranger';
-import {CieColor} from '../../../color/CieColor';
-import {RandomPlayerArranger} from '../model/PlayerArranger';
-import {Terrain} from '../model/Terrain';
-import {CacheMap} from '../../../common/CacheMap';
+import {BoardState} from '../model/BoardState'
+import {Board} from '../model/Board'
+import {Hex} from '../model/Hex'
+import {MovementQueue} from '../model/MovementQueue'
+import {StatusMessage} from '../../../common/StatusMessage'
+import {RandomTerrainArranger} from '../model/RandomTerrainArranger'
+import {CieColor} from '../../../color/CieColor'
+import {RandomPlayerArranger} from '../model/PlayerArranger'
+import {Terrain} from '../model/Terrain'
+import {CacheMap} from '../../../common/CacheMap'
+import {GamePhase} from '../model/GamePhase'
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
@@ -40,7 +41,7 @@ class BoringColor extends DriftColor {
 
 
     texture(diff: number = 20): DriftColor {
-        return super.texture(diff / 2);
+        return super.texture(diff / 2)
     }
 }
 
@@ -112,6 +113,7 @@ const getBoardState = (options: LocalGameOptions): BoardState =>
             players: PlayerManager.construct(players),
             moves: new MovementQueue(),
             messages: List<StatusMessage>(),
+            phase: GamePhase.BeforeStart,
         }
     })
 

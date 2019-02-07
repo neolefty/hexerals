@@ -129,6 +129,46 @@ export class Board {
         })
     }
 
+    gatherStatistics<K, V>(
+        initialValue: V,
+        keyer: (tile: Tile, hex: Hex) => K,
+        collector: (tile: Tile, hex: Hex, curVal: V) => V,
+    ): Map<K, V> {
+        return Map<K, V>().withMutations(result =>
+            this.explicitTiles.forEach((tile, hex) => {
+                const k = keyer(tile, hex)
+                const oldV = result.get(k, initialValue)
+                result.set(k, collector(tile, hex, oldV))
+            })
+        )
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _tileStatistics: Map<Player, number> | undefined = undefined
+    // how many tiles each player controls
+    getTileStatistics(): Map<Player, number> {
+        if (!this._tileStatistics)
+            this._tileStatistics = this.gatherStatistics<Player, number>(
+                0,
+                    tile => tile.owner,
+                (tile, hex, cur) => cur + 1,
+            )
+        return this._tileStatistics
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _popStatistics: Map<Player, number> | undefined = undefined
+    // how much total population each player has
+    getPopStatistics(): Map<Player, number> {
+        if (this._popStatistics === undefined)
+            this._popStatistics = this.gatherStatistics(
+                0,
+                    tile => tile.owner,
+                (tile, hex, cur) => tile.pop + cur,
+            )
+        return this._popStatistics
+    }
+
     getTile(coord: Hex): Tile {
         assert.ok(this.inBounds(coord))
         return this.explicitTiles.get(coord, Tile.MAYBE_EMPTY)

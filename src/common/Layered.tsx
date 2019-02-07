@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from 'react'
 import './Layered.css'
 
 export const Layered: React.FunctionComponent = ({children}) => {
