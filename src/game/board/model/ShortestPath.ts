@@ -121,11 +121,11 @@ export class HexPaths {
         result[0] = source
         result[firstStep.n] = dest
         let step = firstStep
-        for (let i = 1; i < firstStep.n; ++i) {
+        Range(1, firstStep.n).forEach(i => {
             const nextHex = step.h
             result[i] = nextHex
             step = this.step(nextHex, dest)
-        }
+        })
         return List<Hex>(result)
     }
 
@@ -133,7 +133,7 @@ export class HexPaths {
         this.hexIdToPathIndex.get(hex.id) as number
 
     private computeLookups() {
-        let i: number = 0;
+        let i: number = 0
         this.hexes.forEach(hex =>
             this.hexIdToPathIndex.set(hex.id, i++)
         )

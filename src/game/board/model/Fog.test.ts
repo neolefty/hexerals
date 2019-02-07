@@ -1,4 +1,4 @@
-import {BoardReducerTester} from '../view/BoardReducerTester';
+import {BoardReducerTester} from './BoardReducerTester';
 import {PlayerFog} from './Fog';
 import {Player} from './players/Players';
 import {Hex} from './Hex';

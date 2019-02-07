@@ -1,6 +1,6 @@
-import {List, Map} from 'immutable'
+import {List, Map, Range} from 'immutable'
 import {Robot} from './Robot'
-import * as assert from 'assert';
+import * as assert from 'assert'
 
 export enum Player {
     Nobody = 'Nobody',
@@ -25,11 +25,11 @@ export const MAX_PLAYERS = PLAYERS.size - 1
 export const pickNPlayers = (n: number): List<Player> => {
     const result: List<Player> = List()
     return result.withMutations(m => {
-        for (let i = 0; i < n && i < PLAYERS.size; ++i) {
+        Range(0, Math.min(n, PLAYERS.size)).forEach(i => {
             const player = PLAYERS.get(i) as Player
             assert.ok(player !== undefined)
             m.push(player)
-        }
+        })
     })
 }
 

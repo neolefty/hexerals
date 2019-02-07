@@ -1,23 +1,24 @@
-import {List, Map} from 'immutable';
-import {createStore, Store} from 'redux';
+import {List, Map} from 'immutable'
+import {createStore, Store} from 'redux'
 
-import {BoardState, boardStateToString} from '../model/BoardState';
+import {BoardState, boardStateToString} from './BoardState'
 import {
     BoardReducer,
     cancelMovesAction, doMovesAction, newGameAction, placeCursorAction,
     queueMovesAction, robotsDecideAction, setCurPlayerAction,
     setRobotAction, stepPopAction,
-} from '../model/BoardReducer';
-import {Board} from '../model/Board';
-import {pickNPlayers, Player} from '../model/players/Players';
-import {CornersPlayerArranger} from '../model/PlayerArranger';
-import {Hex} from '../model/Hex';
-import {Tile} from '../model/Tile';
-import {StatusMessage} from '../../../common/StatusMessage';
-import {MovementQueue} from '../model/MovementQueue';
-import {PlayerMove} from '../model/Move';
-import {Robot} from '../model/players/Robot';
-import {Arranger} from '../model/Arranger';
+} from './BoardReducer'
+import {Board} from './Board'
+import {pickNPlayers, Player} from './players/Players'
+import {CornersPlayerArranger} from './PlayerArranger'
+import {Hex} from './Hex'
+import {Tile} from './Tile'
+import {StatusMessage} from '../../../common/StatusMessage'
+import {MovementQueue} from './MovementQueue'
+import {PlayerMove} from './Move'
+import {Robot} from './players/Robot'
+import {Arranger} from './Arranger'
+import {GamePhase} from './GamePhase'
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
@@ -45,6 +46,7 @@ export class BoardReducerTester {
 
     get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
+    get phase(): GamePhase { return this.state.phase }
     get explicitTiles(): Map<Hex, Tile> { return this.board.explicitTiles }
     get cursors(): Map<number, Hex> { return this.state.cursors }
     get firstCursor(): Hex { return this.cursors.get(0, Hex.NONE) }

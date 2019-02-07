@@ -1,3 +1,4 @@
+import {Range} from 'immutable';
 import {RectangularConstraints} from './Constraints'
 import {Hex} from './Hex'
 import {countHexes} from '../view/HexConstants';
@@ -33,10 +34,10 @@ it('checks hex neighbors', () => {
     expect(Hex.NONE.getRightUp() === Hex.NONE).toBeTruthy()
 
     function r() { return Math.floor(Math.random() * 20) } // 0 - 19
-    for (let i = 0; i < 20; ++i) {
+    Range(0, 20).forEach(() => {
         const x = r(), y = r()
         checkHexNeighbors(Hex.get(x, y, - x - y))
-    }
+    })
 })
 
 const slow = false, reallySlow = false

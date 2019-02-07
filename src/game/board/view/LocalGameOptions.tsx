@@ -294,7 +294,7 @@ export class LocalGameOptionsView
                     height: this.props.displaySize.y,
                 }}
             >
-                <div className="Main">
+                <div className="Floater">
                     <div className="Row">
                         <div className="Level0 Column">
                             {numberRange(

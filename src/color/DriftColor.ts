@@ -1,5 +1,6 @@
 import {CieColor} from './CieColor'
 import {minMax} from '../common/MathFunctions';
+import {Map} from 'immutable';
 
 export class DriftColor {
     // allowed limits on lightness & saturation when drifting (hsluv)
@@ -106,7 +107,7 @@ export class DriftColor {
     get lightness() { return this.cie.lightness }
 
     // tslint:disable-next-line:member-ordering
-    private lightCache: Map<number, DriftColor> = new Map()
+    private lightCache = Map<number, DriftColor>().asMutable()
 
     darker = (diff: number = 20): DriftColor =>
         this.withLightness(this.lightness - diff)
@@ -143,5 +144,15 @@ export class DriftColor {
 
     toString(): string {
         return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - lch: ${this.toLchString()}`
+    }
+
+    equals(that: any): boolean {
+        const thatCie = that && that['cie']
+        return thatCie
+            && Array.isArray(thatCie)
+            && thatCie.length === 3
+            && thatCie[0] === this.cie[0]
+            && thatCie[1] === this.cie[1]
+            && thatCie[2] === this.cie[2]
     }
 }

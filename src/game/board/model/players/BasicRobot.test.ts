@@ -1,4 +1,4 @@
-import {BoardReducerTester} from '../../view/BoardReducerTester'
+import {BoardReducerTester} from '../BoardReducerTester'
 import {BasicRobot} from './BasicRobot'
 import {pickNPlayers, Player} from './Players'
 import {List, Range} from 'immutable'
@@ -31,13 +31,15 @@ it('specifies IQ', () => {
     expect(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
         .toEqual(BasicRobot.byIntelligence(BasicRobot.MAX_IQ).skills)
 
-    for (let i = 0; i < 10; ++i)
-        for (let iq = 0; iq <= BasicRobot.MAX_IQ; ++iq)
+    Range(0, 10).forEach(() =>
+        Range(0, BasicRobot.MAX_IQ + 1).forEach(iq =>
             expect(BasicRobot.byIntelligence(iq).intelligence).toEqual(iq)
+        )
+    )
 })
 
 fit('captures nearby', () => {
-    for (let i = 0; i < 10; ++i) {
+    Range(0, 10).forEach(() => {
         const brt = new BoardReducerTester(3, 3)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
         brt.setCursor(brt.ur)
@@ -52,11 +54,11 @@ fit('captures nearby', () => {
         brt.doMoves()
         expect(brt.getTile(brt.ur)).toEqual(
             new Tile(Player.Zero, 47, Terrain.City))
-    }
+    })
 })
 
 it('wastes not', () => {
-    for (let i = 0; i < 20; ++i) {
+    Range(0, 20).forEach(() => {
         const brt = new BoardReducerTester(3, 3)
         expect(brt.board.hexesAll.size).toBe(5)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(
@@ -68,7 +70,7 @@ it('wastes not', () => {
         expect(brt.explicitTiles.size === 5)
         // Zero never attacked One because it would lose
         expect(brt.getTile(brt.ur).pop === 20)
-    }
+    })
 
     const brt = new BoardReducerTester(1, 7)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
@@ -103,7 +105,7 @@ it('wastes not, even on a small board', () => {
 
 it('stops by cities', () => {
     const n = 5
-    for (let i = 0; i < n; ++i) {
+    Range(0, n).forEach(() => {
         const brt = new BoardReducerTester(3, 9)
         let skills: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
         skills[BasicRobot.SKILL_CAPTURE_NEARBY] = true
@@ -125,7 +127,7 @@ it('stops by cities', () => {
         expect(noticeCity.size).toBe(1)
         const captureCity = noticeCity.first() as PlayerMove
         expect(captureCity.delta === Hex.RIGHT_UP).toBeTruthy()
-    }
+    })
 })
 
 type RobotMaker = () => Robot
@@ -170,9 +172,10 @@ const countAWins = (
     trials: number = robotTrials, turnLimit: number = 250,
 ): number => {
     let aWins = 0
-    for (let i = 0; i < trials; ++i)
+    Range(0, trials).forEach(() => {
         if (doesABeatB(first, second, turnLimit))
             ++aWins
+    })
     return aWins
 }
 

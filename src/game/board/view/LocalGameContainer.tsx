@@ -19,10 +19,10 @@ import {DriftColor} from '../../../color/DriftColor'
 import {ColorPodge} from '../../../color/ColorPodge'
 import {Player, PLAYERS} from '../model/players/Players'
 import {PlayerMove} from '../model/Move'
-import {TickerBoardView} from './TickerBoardView'
 import {LocalGameOptions} from './LocalGameOptions'
 import {CacheMap} from '../../../common/CacheMap'
 import {setColorsAction} from '../../../color/ColorsReducer'
+import {LocalGameView} from './LocalGameView';
 
 export interface LocalGameProps {
     displaySize: CartPair
@@ -97,5 +97,5 @@ const mapDispatchToBoardViewProps = (
 export const LocalGameContainer = connect(
     mapStateToTickerBoardViewProps, mapDispatchToBoardViewProps
 )(
-    TickerBoardView
+    LocalGameView
 )

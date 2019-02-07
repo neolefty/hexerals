@@ -51,10 +51,6 @@ const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
     const intersectPlayers = prevGreyPlayers.sort().intersect(
         List(bs.players.playerIndexes.keys()).sort()
     )
-    // console.log(prevGreyPlayers.toArray())
-    // console.log(List(bs.players.playerIndexes.keys()).toArray())
-    // console.log(intersectPlayers.toArray())
-    // console.log([intersectPlayers.size, bs.players.size])
     if (intersectPlayers.size !== bs.players.size) {
         prevGrey = bs.players.playerIndexes.map(
             () => new BoringColor()
