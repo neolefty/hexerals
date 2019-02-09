@@ -1,10 +1,24 @@
+$w: 40vmin;
+$h: 55vmin;
+
 .GamePhaseView {
   .Modal {
-    width: 30vmin;
-    height: 20vmin;
+    width: $w;
+    height: $h;
     position: fixed;
     text-align: center;
-    top: calc(50vh - 10vmin);
-    left: calc(50vw - 15vmin);
+    top: calc(50vh - (#{$h}/2));
+    left: calc(50vw - (#{$w}/2));
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  .Row {
+    margin: .3em 0;
+    strong {
+      font-size: 150%;
+      font-weight: bold;
+    }
+  }
+  button {
+    padding: 0.6em 1em;
   }
 }
