@@ -36,7 +36,7 @@ class App extends React.Component<AppProps, AppState> {
     updateDimensions() {
         const dim = new CartPair(
             Math.max(window.innerWidth, MIN_WIDTH),
-            Math.max(window.innerHeight - 25, MIN_HEIGHT)
+            Math.max(window.innerHeight * 0.96, MIN_HEIGHT)
         )
         this.setState({
             ...this.state,
