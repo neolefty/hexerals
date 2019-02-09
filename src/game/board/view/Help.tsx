@@ -78,7 +78,7 @@ export class Help extends React.PureComponent<HelpOptions> {
 
     render(): React.ReactNode {
         // make space for other elements in this panel
-        const hexSpace = this.props.displaySize.plusXY(-400, 0)
+        const hexSpace = this.props.displaySize.scaleXY(.5, 1)
         const spaceRatio = hexSpace.y / Math.max(hexSpace.x, 10)
         const hexRatio = h / w
         const size = (hexRatio > spaceRatio)
@@ -89,10 +89,7 @@ export class Help extends React.PureComponent<HelpOptions> {
         return (
             <div
                 className="Help Row"
-                style={{
-                    width: this.props.displaySize.x,
-                    height: this.props.displaySize.y,
-                }}
+                style={ this.props.displaySize.sizeStyle }
             >
                 <div className="Column">
                     <p><strong>Drag to move</strong></p>

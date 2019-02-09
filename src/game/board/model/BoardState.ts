@@ -5,6 +5,7 @@ import {Player, PlayerManager} from './players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {List, Map} from 'immutable'
 import {GamePhase} from './GamePhase';
+import {Capture} from './Capture';
 
 export interface BoardState {
     board: Board
@@ -13,8 +14,9 @@ export interface BoardState {
     moves: MovementQueue
     players: PlayerManager
     messages: List<StatusMessage>
-    curPlayer?: Player
     phase: GamePhase
+    curPlayer?: Player
+    captures?: List<Capture>
 }
 
 export const DEFAULT_CURSORS = Map<number, Hex>(
@@ -28,9 +30,12 @@ export const boardStateToString = (s: BoardState): string =>
                 .map(([i, hex]) =>
                     `${i}:${hex.toString()}`).toArray()
         }\n`
-    + `players: ${s.players.toString()}\n`
-    + `current: ${s.curPlayer}\n`
+    + `players: ${s.players.toString()} (current: ${s.curPlayer})\n`
     + `board: ${s.board.toString()}\n`
     + `moves: ${s.moves}\n`
-    + `messages: ${s.messages}\n`
+    + (s.messages.size > 0 ? `messages: ${s.messages}\n` : '')
     + `turn: ${s.turn}\n`
+    + `phase: ${s.phase}\n`
+    + (s.captures && s.captures.size > 0 ? `captures: ${
+            s.captures.join('\n          ')
+        }\n` : '')

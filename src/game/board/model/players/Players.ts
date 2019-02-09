@@ -67,6 +67,10 @@ export class PlayerManager {
     }
 
     toString(): string {
-        return JSON.stringify(this.playerRobots.toJSON())
+        return JSON.stringify(this.playerIndexes.toJSON())
+            + (this.playerRobots.size > 0 ? ` — ${
+                JSON.stringify(this.playerRobots.toJSON())
+            }` : '')
+
     }
 }

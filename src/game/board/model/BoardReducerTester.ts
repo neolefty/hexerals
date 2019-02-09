@@ -6,7 +6,7 @@ import {
     BoardReducer,
     cancelMovesAction, doMovesAction, newGameAction, placeCursorAction,
     queueMovesAction, robotsDecideAction, setCurPlayerAction,
-    setRobotAction, stepPopAction,
+    setRobotAction, gameTickAction,
 } from './BoardReducer'
 import {Board} from './Board'
 import {pickNPlayers, Player} from './players/Players'
@@ -82,7 +82,11 @@ export class BoardReducerTester {
 
     setCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
     doMoves = () => this.store.dispatch(doMovesAction())
-    stepPop = () => this.store.dispatch(stepPopAction())
+    doAllMoves = () => {
+        while (this.moves.size > 0)
+            this.doMoves()
+    }
+    gameTick = () => this.store.dispatch(gameTickAction())
     queueRobots = () => this.store.dispatch(robotsDecideAction())
     setCurPlayer = (player: Player) => this.store.dispatch(setCurPlayerAction(player))
 

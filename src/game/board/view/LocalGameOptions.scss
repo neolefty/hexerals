@@ -8,44 +8,90 @@
   }
 
   input {
-    font-size: 100%;
     text-align: right;
   }
 
-  .Level1, .Level2 {
+  .Modal {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 1em;
+    border-radius: 1em;
+    transition: all 400ms;
+    border: 2px solid #777;
+    width: 50vmin;
+  }
+
+  // specify height explicitly because auto doesn't animate
+  $float-height: 12vmin;
+  $level0-height: 24vmin;
+  $level1-height: 28vmin;
+  $level2-height: 9vmin;
+
+  .LevelButton {
     transition: all 400ms;
   }
 
+  .Level0, .Level1, .Level2 {
+    transition: all 400ms;
+    width: 100%;
+  }
+
+  .Level0 {
+    height: $level0-height;
+  }
+
   &.Show0 {
+    .Modal {
+      height: $float-height + $level0-height;
+    }
     .Level1, .Level2 {
-      transform: scaleX(0);
+      transform: scaleY(0);
       opacity: 0;
-      width: 0;
+      height: 0;
     }
   }
 
   &.Show1 {
+    .Modal {
+      height: $float-height + $level0-height + $level1-height;
+    }
     .Level1 {
-      width: 8.5em;  // because auto doesn't animate
       opacity: 1;
+      height: $level1-height;
+      border-top: 2px solid #777;
     }
     .Level2 {
-      transform: scaleX(0);
+      transform: scaleY(0);
       opacity: 0;
-      width: 0;
+      height: 0;
     }
   }
 
   &.Show2 {
-    .Level1, .Level2 {
-      width: 8.5em;  // because auto doesn't animate
-      opacity: 1;
+    .Modal {
+      height: $float-height + $level0-height + $level1-height + $level2-height;
     }
+    .Level1 {
+      height: $level1-height;
+      opacity: 1;
+      border-top: 2px solid #777;
+    }
+    .Level2 {
+      height: $level2-height;
+      opacity: 1;
+      border-top: 2px solid #777;
+    }
+  }
+
+  .Label {
+    flex-grow: 1;
+    text-align: right;
+    border: 1px solid #444;
+    right: 0;
   }
 
   .IntInput, .CheckInput {
     white-space: nowrap;
-    margin: 0.3em;
+    margin: 0.2em 0.3em;
   }
 
   .IntInput {
@@ -64,10 +110,11 @@
   }
 
   .InputRange {
+    flex-grow: 3;
     .input-range {
       min-width: 7em;
       width: 100%;
-      margin: 1em 0.5em;
+      margin: 0.7em 0.5em;
       display: inline-flex;
     }
     .input-range__label {

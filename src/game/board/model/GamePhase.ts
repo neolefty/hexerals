@@ -1,5 +1,5 @@
 export enum GamePhase {
-    BeforeStart,
-    Started,
-    Ended,
+    BeforeStart = 'before start',
+    Started = 'started',
+    Ended = 'ended',
 }

@@ -155,7 +155,7 @@ const doesABeatB = (
     while (brt.state.turn < turnLimit) {
         brt.queueRobots()
         brt.doMoves()
-        brt.stepPop()
+        brt.gameTick()
         // every 10 turns check for a winner
         if (brt.state.turn % 10 == 0 && brt.isGameOver)
             break

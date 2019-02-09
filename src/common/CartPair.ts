@@ -28,6 +28,13 @@ export class CartPair {
 
     equals = (that: any) =>
         that.x === this.x && that.y === this.y
+
+    get sizeStyle() {
+        return {
+            width: this.x,
+            height: this.y,
+        }
+    }
 }
 
 export type CartPairTransform = (cp: CartPair) => CartPair

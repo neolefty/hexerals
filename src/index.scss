@@ -10,16 +10,16 @@ body {
 }
 
 body,input {
+  font-size: 4vmin;
   background-color: black;
   color: white;
-  font-size: 140%;
 }
 
 button {
+  font-size: 4.5vmin;
   background: linear-gradient(#222, #444);
   color: white;
   margin: 0.3em;
-  font-size: 110%;
   padding: 0.3em 0.5em;
   &:hover{ background: linear-gradient(#666, #333); }
   &:active { background: linear-gradient(#444, #222); }

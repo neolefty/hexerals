@@ -1,6 +1,17 @@
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.Column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 400ms;
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  transition: all 400ms;
 }
 
 .App {
@@ -8,11 +19,6 @@
   flex-flow: row wrap;
   justify-content: space-evenly;
   align-items: center;
-
-  &-logo {
-    animation: App-logo-spin infinite 20s linear;
-    height: 80px;
-  }
 
   .react-tabs {
     -webkit-tap-highlight-color: transparent;
@@ -32,8 +38,9 @@
       bottom: -1px;
       position: relative;
       list-style: none;
-      padding: 6px 12px;
       cursor: pointer;
+      padding: 0.5vmin 1.2vmin;
+      font-size: 3.5vmin;
     }
 
     &__tab--selected {
@@ -76,24 +83,4 @@
       align-items: center;
     }
   }
-}
-
-.Column {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.Row {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
-.Floater {
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 1em;
-  border-radius: 1em;
 }

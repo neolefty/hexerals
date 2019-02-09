@@ -110,7 +110,7 @@ it('renders a board with a selection', () => {
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
         messages: List(),
-        phase: GamePhase.Started,
+        phase: GamePhase.BeforeStart,
     }
     const view = enzyme.render(
         <OldGridView

@@ -86,4 +86,12 @@ export class Tile {
         return `${this.owner}'s ${this.terrain}${
             this.pop === 0 ? '' : ` pop ${this.pop}`}`
     }
+
+    equals(that: any) {
+        return that !== undefined
+            && this.owner === that.owner
+            && this.pop === that.pop
+            && this.terrain === that.terrain
+            && this.known === that.known
+    }
 }

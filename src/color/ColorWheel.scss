@@ -27,17 +27,9 @@ g.colorWedge {
   cursor: alias; // default;
   text.debug {
     font-size: 0.09px;
-    //fill: #777;
-    //paint-order: stroke;
-    //stroke: #000;
-    //stroke-width: 0.014px;
-    //stroke-linecap: butt;
-    //stroke-linejoin: miter;
     font-weight: 600;
   }
   polygon {
-    //strokeWidth: 1%;
     strokeWidth: 0;
   }
-
 }

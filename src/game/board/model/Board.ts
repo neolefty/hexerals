@@ -12,11 +12,13 @@ import {MoveValidator, MoveValidatorOptions} from './MoveValidator';
 import {PopStepper} from './PopStepper';
 import {RandomPlayerArranger} from './PlayerArranger';
 import * as assert from 'assert';
+import {Capture} from './Capture';
 
 export class BoardAndMessages {
     constructor(
         readonly board: Board,
         readonly messages: List<StatusMessage>,
+        readonly captures: List<Capture>,
     ) {}
 
     addToMessages = (curMessages: List<StatusMessage>): List<StatusMessage> =>
@@ -136,9 +138,11 @@ export class Board {
     ): Map<K, V> {
         return Map<K, V>().withMutations(result =>
             this.explicitTiles.forEach((tile, hex) => {
-                const k = keyer(tile, hex)
-                const oldV = result.get(k, initialValue)
-                result.set(k, collector(tile, hex, oldV))
+                if (tile.owner != Player.Nobody) {
+                    const k = keyer(tile, hex)
+                    const oldV = result.get(k, initialValue)
+                    result.set(k, collector(tile, hex, oldV))
+                }
             })
         )
     }
@@ -208,6 +212,7 @@ export class Board {
         return new BoardAndMessages(
             this.setTiles(options.tiles),
             List(options.status || []),
+            List(options.captures),
         )
     }
 

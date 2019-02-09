@@ -66,7 +66,7 @@ const newBoardState = (
     players: assignRobots(),
     curPlayer: undefined,
     messages: List<StatusMessage>(),
-    phase: GamePhase.Started,
+    phase: GamePhase.BeforeStart,
 })
 
 // the parts of BoardViewProps that don't change — everything except boardState: BoardState

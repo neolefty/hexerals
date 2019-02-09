@@ -8,7 +8,7 @@ import {
     placeCursorAction,
     doMovesAction,
     cancelMovesAction,
-    stepPopAction,
+    gameTickAction,
     robotsDecideAction,
     dragAction,
 } from '../model/BoardReducer'
@@ -86,7 +86,7 @@ const mapDispatchToBoardViewProps = (
     onStep: () => {
         dispatch(robotsDecideAction())
         dispatch(doMovesAction())
-        dispatch(stepPopAction())
+        dispatch(gameTickAction())
     },
 
     onResetColors: (n: number) => dispatch(

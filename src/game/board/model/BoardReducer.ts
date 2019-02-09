@@ -19,7 +19,7 @@ import {GamePhase} from './GamePhase'
 
 export type GameAction
     = NewGame | QueueMoves | PlaceCursor | SetCurPlayer
-        | DoMoves | CancelMoves | Drag | StepPop
+        | DoMoves | CancelMoves | Drag | GameTick
         | RobotsDecide | SetRobot
 
 // should never actually see this -- we just need a default for reducers
@@ -46,8 +46,8 @@ export const BoardReducer: Reducer<BoardState, GameAction> = (
         state = doMovesReducer(state)
     else if (isDrag(action))
         state = dragReducer(state, action)
-    else if (isStepPop(action))
-        state = stepPopReducer(state)
+    else if (isGameTick(action))
+        state = gameTickReducer(state)
     else if (isCancelMoves(action))
         state = cancelMoveReducer(state, action)
     else if (isNewGame(action))
@@ -139,11 +139,22 @@ const doMovesReducer = (state: BoardState): BoardState => {
         (move: PlayerMove) => state.board.validate(move))
     if (movesAndQ) { // undefined if no moves to apply
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves)
+        const captures = boardAndMessages.captures
+        let phase = state.phase
+        if (
+            captures.size > 0  // can only end on a capture
+            && state.phase !== GamePhase.Ended  // not already ended
+            // 1 player remains
+            && boardAndMessages.board.getTileStatistics().size <= 1
+        )
+            phase = GamePhase.Ended
         return {
             ...state,
-            messages: boardAndMessages.addToMessages(state.messages),
-            moves: movesAndQ.queue,
             board: boardAndMessages.board,
+            moves: movesAndQ.queue,
+            messages: boardAndMessages.addToMessages(state.messages),
+            captures: captures,
+            phase: phase,
         }
     }
     else
@@ -281,16 +292,19 @@ const cancelMoveReducer = (
         return state
 }
 
-// TODO combine DO_MOVES and STEP_POP into STEP?
-const STEP_POP = 'STEP_POP'
-type STEP_POP = 'STEP_POP'
-interface StepPop extends GenericAction {type: STEP_POP}
-const isStepPop = (action: GameAction): action is StepPop => action.type === STEP_POP
-export const stepPopAction = (): StepPop => ({ type: STEP_POP })
-const stepPopReducer = (state: BoardState): BoardState => ({
+// TODO combine DO_MOVES and GAME_TICK?
+const GAME_TICK = 'GAME_TICK'
+type GAME_TICK = 'GAME_TICK'
+interface GameTick extends GenericAction {type: GAME_TICK}
+const isGameTick = (action: GameAction): action is GameTick => action.type === GAME_TICK
+export const gameTickAction = (): GameTick => ({ type: GAME_TICK })
+const gameTickReducer = (state: BoardState): BoardState => ({
     ...state,
     board: state.board.stepPop(state.turn),
     turn: state.turn + 1,
+    // at least mark the game as started
+    phase: state.phase === GamePhase.BeforeStart
+        ? GamePhase.Started : state.phase
 })
 
 const PLACE_CURSOR = 'PLACE_CURSOR'

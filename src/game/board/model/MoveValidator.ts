@@ -5,6 +5,7 @@ import {Hex} from './Hex';
 import {PlayerMove} from './Move';
 import {BoardConstraints} from './Constraints';
 import {Terrain} from './Terrain';
+import {Capture} from './Capture';
 
 export class MoveValidatorOptions {
     // the tiles under consideration, which start out as the current board's explicitTiles
@@ -26,6 +27,8 @@ export class MoveValidatorOptions {
         tiles: Map<Hex, Tile>,
         // status messages to add to
         readonly status: StatusMessage[] | undefined = undefined,
+        // captures to record
+        readonly captures: Capture[] = []
     ) {
         this.tiles = tiles
     }
@@ -130,24 +133,29 @@ export class MoveValidator {
                 const march = new Tile(origin.owner, origin.pop - 1)
                 const newDestTile = oldDestTile.settle(march)
                 const isCapture = oldDestTile.owner !== newDestTile.owner
-                // was it a capital capture?
-                if (isCapture && oldDestTile.terrain === Terrain.Capital)
-                    // noinspection PointlessBooleanExpressionJS
-                    options.tiles = options.tiles.withMutations(m =>
-                        options.tiles.filter(tile =>
-                            !!(tile && tile.owner === oldDestTile.owner)
-                        ).forEach((tile, hex) =>
-                            // give territory to attacker, with half pop (rounded up)
-                            m.set(hex, tile.setOwner(move.player)
-                                .setPop(Math.ceil(tile.pop * 0.5)))
-                        )
-                    )
                 // do the move
                 options.tiles = options.tiles.withMutations(
                     (m: Map<Hex, Tile>) => {
                         m.set(move.source, newSourceTile)
                         m.set(move.dest, newDestTile)
                     })
+                if (isCapture)
+                    options.captures.push(
+                        new Capture(move.dest, oldDestTile, newDestTile))
+                // was it a capital capture?
+                if (isCapture && oldDestTile.terrain === Terrain.Capital)
+                // noinspection PointlessBooleanExpressionJS
+                    options.tiles = options.tiles.withMutations(m =>
+                        options.tiles.filter(tile =>
+                            !!(tile && tile.owner === oldDestTile.owner)
+                        ).forEach((tile, hex) => {
+                            // give territory to attacker, with half pop (rounded up)
+                            const capTile = tile.setOwner(move.player)
+                                .setPop(Math.ceil(tile.pop * 0.5))
+                            options.captures.push(new Capture(hex, tile, capTile))
+                            m.set(hex, capTile)
+                        })
+                    )
             }
         })
     }

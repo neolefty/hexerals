@@ -113,7 +113,7 @@ const openLocalGameReducer =
             moves: EMPTY_MOVEMENT_QUEUE,
             messages: List(messages),
             curPlayer: Player.Zero,
-            phase: GamePhase.Started,
+            phase: GamePhase.BeforeStart,
         },
     }
 }

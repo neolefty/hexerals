@@ -4,9 +4,9 @@ import 'react-input-range/lib/css/index.css'
 
 import {CartPair} from '../../../common/CartPair'
 import './LocalGameOptions.css'
-import {CheckInput, DropdownNumber, NumberInput} from '../../../common/Inputs'
+import {CheckInput, NumberInput} from '../../../common/Inputs'
 import {BasicRobot} from '../model/players/BasicRobot'
-import {List, Map, Range} from 'immutable'
+import {List, Map} from 'immutable'
 import {
     countHexes, widthFromHeight, heightFromWidth,
 } from './HexConstants'
@@ -47,12 +47,6 @@ const playerDensities = Map<string, number>([
     ['None', Infinity],
 ])
 
-const difficulties = Map<string, number>(
-    Range(0, BasicRobot.MAX_IQ + 1).map(
-        iq => [`${iq}`, iq]
-    )
-)
-
 const LocalGameOptionsLimits = {
     numRobots: [ 0, 15 ],
     difficulty: [ 0, BasicRobot.MAX_IQ ],
@@ -62,7 +56,6 @@ const LocalGameOptionsLimits = {
     tickMillis: [ 1, 9999 ],
     startingPop: [ 0, 999 ],
 }
-
 
 interface HexCounts {
     dimensions: List<CartPair>
@@ -154,7 +147,8 @@ export class LocalGameOptionsView
     nPlayers = (nHexes: number, hexesPerPlayer: number): number =>
         hexesPerPlayer === Infinity ? 1
             : minMax(
-                nHexes / hexesPerPlayer, 1, MAX_PLAYERS
+                // always at least one opponent unless "None" is selected
+                nHexes / hexesPerPlayer, 2, MAX_PLAYERS
             )
 
     nHexesFromProps = (): number =>
@@ -200,6 +194,7 @@ export class LocalGameOptionsView
         const optionToggler = (optionName: string) =>
             () => this.toggleOption(optionName)
 
+/*
         const dropdownNumber = (
             label: string,
             title: string,
@@ -223,6 +218,7 @@ export class LocalGameOptionsView
                 blockTabbing={!this.isLevelVisible(level)}
             />
         )
+*/
 
         const numberInput = (
             label: string, option: string, title: string,
@@ -254,23 +250,38 @@ export class LocalGameOptionsView
             />
         )
 
-        function numberRange<V>(
+        function numberRangeFromMap<V>(
             label: string, title: string, value: number,
             choices: Map<V, number>,
             onChange: (n: number) => void,
-            formatLabel: (n: number) => string = (n => `${n}`),
+            valueLabel: (n: number) => string = n => `${n}`,
+            formatLabel?: (n: number) => string,
         ) {
             let [ min, max ] = [ Infinity, -Infinity ]
             choices.forEach(n => {
                 min = Math.min(n, min)
                 max = Math.max(n, max)
             })
+            return numberRange(
+                label, title, value, min, max, onChange, formatLabel,
+            )
+        }
+
+        function numberRange<V>(
+            label: string, title: string, value: number,
+            min: number, max: number,
+            onChange: (n: number) => void,
+            valueLabel: (n: number) => string = n => `${n}`,
+            formatLabel?: (n: number) => string,
+        ) {
             return (
                 <label
                     className="InputRange Row"
                     title={title}
                 >
-                    {label}
+                    <span className="Label">
+                        {label}
+                    </span>
                     <InputRange
                         minValue={min}
                         maxValue={max}
@@ -289,56 +300,43 @@ export class LocalGameOptionsView
                 className={`LocalGameOptionsView Column Show${
                     this.props.localOptions.levelVisible
                 }`}
-                style={{
-                    width: this.props.displaySize.x,
-                    height: this.props.displaySize.y,
-                }}
+                style={this.props.displaySize.sizeStyle}
             >
-                <div className="Floater">
-                    <div className="Row">
-                        <div className="Level0 Column">
-                            {numberRange(
-                                'Map',
-                                'How big of a map?',
-                                this.nHexesFromProps(),
-                                this.getHexCounts().counts,
-                                this.fitToShape,
-                            )}
-                            {dropdownNumber(
-                                'Robots',
-                                'How many AI opponents?',
+                <div className="Modal Column">
+                    <div className="Level0 Column">
+                        {numberRangeFromMap(
+                            'Map',
+                            'How big of a map?',
+                            this.nHexesFromProps(),
+                            this.getHexCounts().counts,
+                            this.fitToShape,
+                        )}
+                        {numberRange(
+                            'Robots', 'How many AI opponents?',
+                            this.props.localOptions.numRobots,
+                            0, MAX_PLAYERS - 1,
+                            optionChanger('numRobots'),
+                            value => roundToMap(
+                                this.nHexesFromProps() / value,
                                 playerDensities,
-                                this.closestPlayerDensity(),
-                                density => {
-                                    const nPlayers = this.nPlayers(this.nHexesFromProps(), density)
-                                    this.props.changeLocalOption('numRobots', nPlayers - 1)
-                                }
-                            )}
-                            {dropdownNumber('Difficulty', 'How smart should those robots be?', difficulties, this.props.localOptions.difficulty, undefined, 0, 'difficulty')}
-                        </div>
-                        <div className="Level1 Column">
-                            {numberInput('Mountains', 'mountainPercent', 'Percent of the map covered by mountains', 1)}
-                            {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
-                            {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
-                            {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
-                        </div>
-                        <div className="Level2 Column">
-                            {numberInput('', 'startingPop', 'Population of your initial tile.', 2, (
-                                <div><span>Starting</span><br/><span>Population</span></div>
-                            ))}
-                        </div>
-                        <div>
-                            <button
-                                onClick={this.toggleAdvanced}
-                                title={[
-                                    'Advanced',
-                                    'Advanced-er',
-                                    'Basic',
-                                ][this.props.localOptions.levelVisible]}
-                            >
-                                {['>>>', '>>>', '<<<'][this.props.localOptions.levelVisible]}
-                            </button>
-                        </div>
+                                'None'
+                            )[0]
+                        )}
+                        {numberRange(
+                            'Difficulty', 'How smart should these robots be?',
+                            this.props.localOptions.difficulty,
+                            0, BasicRobot.MAX_IQ,
+                            optionChanger('difficulty'),
+                        )}
+                    </div>
+                    <div className="Level1 Column">
+                        {numberInput('Mountains', 'mountainPercent', 'Percent of the map covered by mountains', 1)}
+                        {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
+                        {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
+                        {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
+                    </div>
+                    <div className="Level2 Column">
+                        {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
                     </div>
                     <div>
                         <button
@@ -346,6 +344,17 @@ export class LocalGameOptionsView
                             className='start'
                         >
                             Start
+                        </button>
+                        <button
+                            className="LevelButton"
+                            onClick={this.toggleAdvanced}
+                            title={[
+                                'More Options',
+                                'Even More Options',
+                                'Hide Options',
+                            ][this.props.localOptions.levelVisible]}
+                        >
+                            {['...', '...', '...'][this.props.localOptions.levelVisible]}
                         </button>
                     </div>
                 </div>

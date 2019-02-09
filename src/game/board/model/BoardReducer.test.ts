@@ -2,12 +2,15 @@ import {BoardReducerTester} from './BoardReducerTester';
 import {QueueAndMoves} from './MovementQueue';
 import {List, Range} from 'immutable';
 import {PlayerMove} from './Move';
-import {Player} from './players/Players';
+import {pickNPlayers, Player} from './players/Players';
 import {Hex} from './Hex';
 import {queueMovesAction} from './BoardReducer';
 import {Terrain} from './Terrain';
 import {Tile} from './Tile';
 import {StatusMessage} from '../../../common/StatusMessage';
+import {CornersPlayerArranger} from './PlayerArranger';
+import {GamePhase} from './GamePhase';
+import {Capture} from './Capture';
 
 it('ensures things are not mutable', () => {
     // check our assumptions
@@ -269,4 +272,96 @@ it('makes real moves', () => {
 
     // TODO test that you can't move someone else's stuff?
     // TODO test that multiple players' queued moves all work simultaneously
+})
+
+fit('notices captures', () => {
+    const brt = new BoardReducerTester(3, 3, [
+        new CornersPlayerArranger(49, Terrain.Capital)
+    ])
+    expect(brt.state.phase).toBe(GamePhase.BeforeStart)
+    brt.gameTick()
+    expect(brt.state.phase).toBe(GamePhase.Started)
+    expect(brt.getTile(Hex.ORIGIN).pop).toBe(50)
+
+    // move player zero to center
+    brt.setCursor(brt.ll)
+    brt.queueMove(Player.Zero, Hex.RIGHT_UP)
+    brt.doMoves()
+    const captures0 = brt.state.captures
+    expect(captures0 && captures0.size).toBe(1)
+    if (captures0) {
+        const cap = captures0.get(0) as Capture
+        const synth = new Capture(
+            Hex.RIGHT_UP, Tile.EMPTY, brt.getTile(Hex.RIGHT_UP)
+        )
+        expect(cap.equals(synth)).toBeTruthy()
+    }
+
+    // move player one out of the way
+    brt.setCursor(brt.ur)
+    brt.queueMove(Player.One, Hex.DOWN)
+    brt.doMoves()
+    const captures1 = brt.state.captures
+    expect(captures1).not.toBeUndefined()
+    if (captures1) {
+        const cap = captures1.last() as Capture
+        expect(cap.equals(new Capture(
+            brt.firstCursor, Tile.EMPTY, new Tile(Player.One, 49)
+        ))).toBeTruthy()
+    }
+    const capitalTileBefore = brt.getTile(brt.ur)
+    const otherHex = brt.firstCursor
+    const otherBefore = brt.firstCursorTile
+
+    // zero captures one's capital
+    brt.setCursor(Hex.RIGHT_UP)
+    brt.queueMove(Player.Zero, Hex.RIGHT_UP)
+    brt.doMoves()
+    expect(brt.board.getTileStatistics().get(Player.Zero)).toBe(4)
+    expect(brt.board.getPopStatistics().get(Player.Zero)).toBe(74)
+    const captures2 = brt.state.captures
+    expect(captures2).not.toBeUndefined()
+    // the last two capture should be from the capital capture
+    if (captures2) {
+        const actualCaptures = captures2.slice(-2)
+        expect(actualCaptures.size).toBe(2)
+        const capitalCap = new Capture(
+            brt.ur, capitalTileBefore, brt.getTile(brt.ur))
+        const otherCap = new Capture(
+            otherHex, otherBefore, brt.getTile(otherHex))
+        const inActual = (cap: Capture): boolean =>
+            actualCaptures.find(
+                val => val.equals(cap)
+            ) !== undefined
+        expect(inActual(capitalCap)).toBeTruthy()
+        expect(inActual(otherCap)).toBeTruthy()
+    }
+    expect(brt.state.phase).toBe(GamePhase.Ended)
+})
+
+fit ('advances game phases', () => {
+    const brt = new BoardReducerTester(3, 3, [
+        new CornersPlayerArranger(20)
+    ], pickNPlayers(4))
+    expect(brt.phase).toBe(GamePhase.BeforeStart)
+    expect(brt.board.hexesAll.size).toBe(5) // X-shaped
+    expect(brt.getTile(brt.ul).owner).toBe(Player.Two)
+    expect(brt.getTile(brt.lr).owner).toBe(Player.Three)
+    brt.setCursor(brt.ul)
+    brt.queueMove(Player.Two, Hex.RIGHT_DOWN)
+    brt.setCursor(brt.lr)
+    brt.queueMove(Player.Three, Hex.LEFT_UP)
+    brt.gameTick()
+    brt.doMoves()
+    expect(brt.getTile(Hex.RIGHT_UP)).toEqual(new Tile(Player.Two, 0))
+    brt.setCursor(brt.ll)
+    brt.queueMove(Player.Zero, Hex.RIGHT_UP)
+    brt.queueMove(Player.Zero, Hex.RIGHT_DOWN)
+    brt.queueMove(Player.Zero, Hex.LEFT_UP)
+    brt.queueMove(Player.Zero, Hex.LEFT_UP)
+    brt.doAllMoves()
+    expect(brt.moves.size).toBe(0)
+    expect(brt.board.getTileStatistics().get(Player.Zero)).toBe(4)
+    expect(brt.board.getTileStatistics().get(Player.Two, 0)).toBe(0)
+    expect(brt.board.getTileStatistics().get(Player.Three, 0)).toBe(0)
 })

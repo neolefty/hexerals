@@ -1,10 +1,10 @@
-import {List, Map} from 'immutable'
+import {List, Map, ValueObject} from 'immutable'
 import * as assert from 'assert';
 
 // Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
 // "Cube coordinates" for a description, see:
 // www.redblobgames.com/grids/hexagons/#coordinates-cube
-export class Hex {
+export class Hex implements ValueObject {
     // keys are hex.x and then hex.y
     private static readonly xyCache
         = Map<number, Map<number, Hex>>().asMutable()
@@ -174,7 +174,11 @@ export class Hex {
         return this._degrees
     }
 
-    public toString(includeCart: boolean = true, includeHex: boolean = false, includeGeo: boolean = false): string {
+    toString(
+        includeCart: boolean = true,
+        includeHex: boolean = false,
+        includeGeo: boolean = false,
+    ): string {
         return `${
             includeHex ? this.toHexString() + ' ' : ''
         }${
@@ -208,6 +212,9 @@ export class Hex {
         const dy = that.cartY - this.cartY
         return dy !== 0 ? dy : that.cartX - this.cartX
     }
+
+    equals(other: any): boolean { return other === this }
+    hashCode(): number { return this.id; }
 }
 
 export const hexesToString = (s: List<Hex> | undefined) => {
