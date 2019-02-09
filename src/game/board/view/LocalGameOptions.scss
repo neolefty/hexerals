@@ -11,15 +11,6 @@
     text-align: right;
   }
 
-  .Modal {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 1em;
-    border-radius: 1em;
-    transition: all 400ms;
-    border: 2px solid #777;
-    width: 50vmin;
-  }
-
   // specify height explicitly because auto doesn't animate
   $float-height: 12vmin;
   $level0-height: 24vmin;

@@ -1,0 +1,10 @@
+.GamePhaseView {
+  .Modal {
+    width: 30vmin;
+    height: 20vmin;
+    position: fixed;
+    text-align: center;
+    top: calc(50vh - 10vmin);
+    left: calc(50vw - 15vmin);
+  }
+}

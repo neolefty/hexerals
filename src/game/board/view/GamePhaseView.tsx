@@ -1,33 +1,14 @@
 import * as React from 'react'
 import {BoardViewProps} from './BoardViewBase'
-
-export const BeforeStart = (props: BoardViewProps) => (
-    <div className='Modal Row'>
-        <div className='Column'>
-            Starting ...
-        </div>
-    </div>
-)
+import './GamePhaseView.css'
 
 export const Ended = (props: BoardViewProps) => (
-    <div
-        className='Column'
-        style={ props.displaySize.sizeStyle }
-    >
-        <div className='Modal Row'>
+    <div className='GamePhaseView'>
+        <div className='Modal'>
             It's Over!
+            <button onMouseDown={props.onEndGame}>
+                Done
+            </button>
         </div>
     </div>
 )
-
-export const Started = (props: BoardViewProps) => (
-    <div
-        className='Column'
-        style={ props.displaySize.sizeStyle }
-    >
-        <div className='Row Modal'>
-            Wheeee!
-        </div>
-    </div>
-)
-
