@@ -83,10 +83,10 @@
   }
 
   .Label {
-    flex-grow: 1;
     text-align: right;
-    border: 1px solid #444;
-    right: 0;
+    margin-right: 0.5em;
+    margin-left: -0.5em;
+    width: 15vmin;
   }
 
   .IntInput, .CheckInput {
@@ -110,11 +110,9 @@
   }
 
   .InputRange {
-    flex-grow: 3;
+    margin: 0.2em 0.3em;
     .input-range {
-      min-width: 7em;
-      width: 100%;
-      margin: 0.7em 0.5em;
+      width: 33vmin;
       display: inline-flex;
     }
     .input-range__label {

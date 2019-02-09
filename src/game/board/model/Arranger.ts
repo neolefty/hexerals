@@ -6,7 +6,7 @@ import {Tile} from './Tile'
 import {StatusMessage} from '../../../common/StatusMessage';
 
 export class Arranger {
-    // return a set of explicitTiles to overlay on board — blank explicitTiles will be ignored
+    // return a set of tiles to overlay on board — blank tiles will be ignored
     arrange(
         board: Board,
         status: StatusMessage[] | undefined = undefined,

@@ -119,7 +119,7 @@ export class BoardReducerTester {
         const firstTile = this.board.explicitTiles.first(Tile.EMPTY)
         if (firstTile === Tile.EMPTY) return true
 
-        // are all explicit occupiable explicitTiles owned by the same player?
+        // are all explicit occupiable tiles owned by the same player?
         const contender = firstTile.owner
         try {
             this.board.explicitTiles.forEach(tile => {

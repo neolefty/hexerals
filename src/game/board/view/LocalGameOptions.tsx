@@ -47,6 +47,14 @@ const playerDensities = Map<string, number>([
     ['None', Infinity],
 ])
 
+const difficultyNames = Object.freeze([
+    'Easy',
+    'Basic',
+    'Medium',
+    'Tough',
+    'Hard',
+])
+
 const LocalGameOptionsLimits = {
     numRobots: [ 0, 15 ],
     difficulty: [ 0, BasicRobot.MAX_IQ ],
@@ -254,25 +262,19 @@ export class LocalGameOptionsView
             label: string, title: string, value: number,
             choices: Map<V, number>,
             onChange: (n: number) => void,
-            valueLabel: (n: number) => string = n => `${n}`,
-            formatLabel?: (n: number) => string,
         ) {
             let [ min, max ] = [ Infinity, -Infinity ]
             choices.forEach(n => {
                 min = Math.min(n, min)
                 max = Math.max(n, max)
             })
-            return numberRange(
-                label, title, value, min, max, onChange, formatLabel,
-            )
+            return numberRange(label, title, value, min, max, onChange)
         }
 
         function numberRange<V>(
             label: string, title: string, value: number,
             min: number, max: number,
             onChange: (n: number) => void,
-            valueLabel: (n: number) => string = n => `${n}`,
-            formatLabel?: (n: number) => string,
         ) {
             return (
                 <label
@@ -286,7 +288,7 @@ export class LocalGameOptionsView
                         minValue={min}
                         maxValue={max}
                         value={value}
-                        formatLabel={formatLabel}
+                        formatLabel={() => ''}
                         onChange={(value: number | MinMax) =>
                             onChange(value as number)
                         }
@@ -316,14 +318,10 @@ export class LocalGameOptionsView
                             this.props.localOptions.numRobots,
                             0, MAX_PLAYERS - 1,
                             optionChanger('numRobots'),
-                            value => roundToMap(
-                                this.nHexesFromProps() / value,
-                                playerDensities,
-                                'None'
-                            )[0]
                         )}
                         {numberRange(
-                            'Difficulty', 'How smart should these robots be?',
+                            difficultyNames[this.props.localOptions.difficulty],
+                            'How smart should these robots be?',
                             this.props.localOptions.difficulty,
                             0, BasicRobot.MAX_IQ,
                             optionChanger('difficulty'),

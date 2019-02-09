@@ -18,7 +18,7 @@ export class RandomPlayerArranger extends Arranger {
         super()
     }
 
-    // return a map of starting explicitTiles
+    // return a map of starting tiles
     public arrange(
         board: Board,
         status: StatusMessage[] | undefined = undefined,

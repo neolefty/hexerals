@@ -8,7 +8,7 @@ import {Terrain} from './Terrain';
 import {Capture} from './Capture';
 
 export class MoveValidatorOptions {
-    // the tiles under consideration, which start out as the current board's explicitTiles
+    // the tiles under consideration, which start out as the current board's tiles
     // but may get speculatively reassigned in internal scratch values during validation
     tiles: Map<Hex, Tile>
 
@@ -117,7 +117,7 @@ export class MoveValidator {
     }
 
     // Do some moves.
-    // Mutates options.messages and options.explicitTiles.
+    // Mutates options.messages and options.tiles.
     // Invalid moves are skipped.
     applyMoves(
         moves: List<PlayerMove>,

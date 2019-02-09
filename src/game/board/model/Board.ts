@@ -13,6 +13,8 @@ import {PopStepper} from './PopStepper';
 import {RandomPlayerArranger} from './PlayerArranger';
 import * as assert from 'assert';
 import {Capture} from './Capture';
+import {HexPaths} from './ShortestPath';
+import {Terrain} from './Terrain';
 
 export class BoardAndMessages {
     constructor(
@@ -45,7 +47,7 @@ export class Board {
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
-        // there may be blank explicitTiles not listed here -- see allTiles
+        // there may be blank tiles not listed here -- see allTiles
         explicitTiles: Map<Hex, Tile> = Map(),
     ) {
         return new Board(
@@ -84,9 +86,13 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // empty explicitTiles are implied — see this.hexesAll
+        // empty tiles are implied — see this.hexesAll
         readonly explicitTiles: Map<Hex, Tile>,
     ) {}
+
+    // change who is playing
+    withPlayers = (players: List<Player>) =>
+        new Board(this.rules, players, this.explicitTiles)
 
     get moveValidator(): MoveValidator { return this.rules.validator }
     get constraints(): BoardConstraints { return this.rules.constraints }
@@ -99,7 +105,7 @@ export class Board {
     canBeOccupied = (coord: Hex) =>
         this.inBounds(coord) && this.getTile(coord).canBeOccupied
 
-    // All of this board's possible explicitTiles. Note that this.explicitTiles omits some blanks.
+    // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
     get hexesAll(): Set<Hex> { return this.constraints.all }
 
     // tslint:disable-next-line:member-ordering
@@ -110,6 +116,17 @@ export class Board {
                 tile => tile.canBeOccupied
             )
         return this._occupiableCache
+    }
+
+    // tslint:disable-next-line:member-ordering
+    private _hexPaths?: HexPaths
+    // path-finding for this board's empty hexes
+    get emptyHexPaths(): HexPaths {
+        if (!this._hexPaths)
+            this._hexPaths = new HexPaths(
+                this.filterTiles(tile => tile.terrain === Terrain.Empty)
+            )
+        return this._hexPaths
     }
 
     // noinspection PointlessBooleanExpressionJS

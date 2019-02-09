@@ -14,10 +14,10 @@ import {MovementQueue} from '../model/MovementQueue'
 import {StatusMessage} from '../../../common/StatusMessage'
 import {RandomTerrainArranger} from '../model/RandomTerrainArranger'
 import {CieColor} from '../../../color/CieColor'
-import {RandomPlayerArranger} from '../model/PlayerArranger'
 import {Terrain} from '../model/Terrain'
 import {CacheMap} from '../../../common/CacheMap'
 import {GamePhase} from '../model/GamePhase'
+import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger';
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
@@ -66,13 +66,13 @@ const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
 
 // options that change how the preview looks
 type CacheKey = {
-    numRobots: number,
+    numRobots?: number,
     boardWidth: number,
     boardHeight: number,
     mountainPercent: number,
 }
 const CacheKeyRecord = Record<CacheKey>({
-    numRobots: NaN,
+    numRobots: undefined,
     boardWidth: NaN,
     boardHeight: NaN,
     mountainPercent: NaN,
@@ -80,38 +80,59 @@ const CacheKeyRecord = Record<CacheKey>({
 const CACHE_PROP_NAMES = [
     'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
 ]
-const makeKey = (opts: LocalGameOptions): any => {
+const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
     const result = {}
     CACHE_PROP_NAMES.forEach(k => result[k] = opts[k])
     return CacheKeyRecord(result)
 }
 
 const bsCache = new CacheMap<{}, BoardState>(2000)
-const getBoardState = (options: LocalGameOptions): BoardState =>
-    bsCache.get(makeKey(options), () => {
+const getBoardState = (options: LocalGameOptions): BoardState => {
+    const key = makeKey(options)
+
+    // first, cache with no players
+    const noRobots = bsCache.get(key.remove('numRobots'), () => {
+        const noPlayers = List<Player>()
         // console.log(`making ${JSON.stringify(makeKey(options))} (${bsCache.size})`)
-        const players = pickNPlayers(options.numRobots + 1)
         const board = Board.constructRectangular(
-            options.boardWidth, options.boardHeight, players, [
+            options.boardWidth, options.boardHeight, noPlayers, [
                 new RandomTerrainArranger(
                     options.mountainPercent / 100),
-                new RandomPlayerArranger(
-                    0, options.capitals ? Terrain.Capital : Terrain.City),
                 // TODO cache mountains & path maps for a given size so we can use SpreadPlayersArranger
                 // new SpreadPlayersArranger(
                 //     options.capitals ? Terrain.Capital : Terrain.City),
             ])
 
-        return {
+        return Object.freeze({
             board: board,
             turn: 0,
             cursors: Map<number, Hex>(),
-            players: PlayerManager.construct(players),
+            players: PlayerManager.construct(noPlayers),
             moves: new MovementQueue(),
             messages: List<StatusMessage>(),
             phase: GamePhase.BeforeStart,
-        }
+        })
     })
+
+    // then, keeping mountains the same, add players
+    return bsCache.get(key, () => {
+        const players = pickNPlayers(options.numRobots + 1)
+        const board = noRobots.board.overlayTiles(
+            new SpreadPlayersArranger(
+                options.capitals ? Terrain.Capital : Terrain.City,
+                0,
+                // reuse shortest paths
+                () => noRobots.board.emptyHexPaths,
+                2, 4, 6, 3,
+            ).arrange(noRobots.board.withPlayers(players))
+        )
+        return Object.freeze({
+            ...noRobots,
+            board: board,
+            players: PlayerManager.construct(players)
+        })
+    })
+}
 
 export const LocalGamePreview = (props: LocalGamePreviewProps) => {
     const boardState = getBoardState(props.localOptions)

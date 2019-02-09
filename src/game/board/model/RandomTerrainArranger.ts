@@ -18,7 +18,7 @@ export class RandomTerrainArranger extends Arranger {
         readonly terrain: Terrain = Terrain.Mountain,
         // is it okay to bisect the map using this terrain?
         readonly allowBisection: boolean = false,
-        // what explicitTiles should be considered when avoiding bisection?
+        // what tiles should be considered when avoiding bisection?
         readonly bisectionFilter: TileFilter = tile => tile.canBeOccupied,
     ) {
         super()
@@ -30,10 +30,10 @@ export class RandomTerrainArranger extends Arranger {
         board: Board,
         status: StatusMessage[] | undefined = undefined,
     ): Map<Hex, Tile> {
-        // remaining explicitTiles we don't want to bisect -- may contain some that
+        // remaining tiles we don't want to bisect -- may contain some that
         // are not candidates for replacement because it would bisect the map
         let notToBisect: Set<Hex> = board.filterTiles(this.bisectionFilter)
-        // explicitTiles we might replace with terrain
+        // tiles we might replace with terrain
         let remainingCandidates: List<Hex> = List(board.filterTiles(
             tile => tile.isBlank()
         ))
@@ -50,7 +50,7 @@ export class RandomTerrainArranger extends Arranger {
                 const hex = remainingCandidates.get(r) as Hex
                 // can't try this one again, whether it bisects or not
                 remainingCandidates = remainingCandidates.delete(r)
-                // would it bisect the remaining empty explicitTiles?
+                // would it bisect the remaining empty tiles?
                 const remainingWithoutThisOne = notToBisect.remove(hex)
                 if (this.allowBisection || connected(remainingWithoutThisOne)) {
                     result.set(hex, board.getTile(hex).setTerrain(this.terrain))
