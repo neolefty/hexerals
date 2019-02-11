@@ -14,7 +14,6 @@ import {
 } from '../model/BoardReducer'
 import {AppState, GenericAction} from '../../../common/App'
 import {CartPair} from '../../../common/CartPair'
-import {BoardState} from '../model/BoardState'
 import {DriftColor} from '../../../color/DriftColor'
 import {ColorPodge} from '../../../color/ColorPodge'
 import {Player, PLAYERS} from '../model/players/Players'
@@ -23,6 +22,7 @@ import {LocalGameOptions} from './LocalGameOptions'
 import {CacheMap} from '../../../common/CacheMap'
 import {setColorsAction} from '../../../color/ColorsReducer'
 import {LocalGameView} from './LocalGameView';
+import {LocalGameState} from '../model/CycleState';
 
 export interface LocalGameProps {
     displaySize: CartPair
@@ -49,14 +49,23 @@ export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> 
 
 const mapStateToTickerBoardViewProps = (
     state: AppState, ownProps: LocalGameProps
-) => ({
-    boardState: state.cycle.localGame as BoardState, // assert it's not undefined
-    displaySize: ownProps.displaySize,
-    // colors: playerColors(state.colors.colors),
-    colors: cachedPlayerColors(state.colors.colors),
-    tickMillis: state.cycle.localOptions.tickMillis,
-    onEndGame: ownProps.onEndGame,
-})
+) => {
+    // assert localGame is not undefined
+    const game = state.cycle.localGame as LocalGameState
+    const options = state.cycle.localOptions
+    const board = options.fog && game.boardState.curPlayer
+        ? game.fogs.getFog(game.boardState.curPlayer).fog(game.boardState)
+        : game.boardState
+
+    return ({
+        boardState: board,
+        displaySize: ownProps.displaySize,
+        // colors: playerColors(state.colors.colors),
+        colors: cachedPlayerColors(state.colors.colors),
+        tickMillis: state.cycle.localOptions.tickMillis,
+        onEndGame: ownProps.onEndGame,
+    })
+}
 
 const mapDispatchToBoardViewProps = (
     dispatch: Dispatch<GenericAction>

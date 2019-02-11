@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {BoardViewProps} from './BoardViewBase'
+import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import './GamePhaseView.css'
 import {Tile} from '../model/Tile'
 import {Hex} from '../model/Hex'
@@ -16,6 +16,7 @@ const singleHexBoard = (
     grabFocus: boolean = false, fraction: number = 3,
 ): BoardViewProps => ({
     ...props,
+    ...BOARD_STUBS, // avoid actual actions
     grabFocus: grabFocus,
     displaySize: new CartPair(
         props.displaySize.min / fraction,
@@ -23,6 +24,7 @@ const singleHexBoard = (
     ),
     boardState: {
         ...props.boardState,
+        cursors: Map(),
         board: Board.constructSquare(
             1, List<Player>(props.boardState.curPlayer || Player.Zero)
         ).setTiles(Map<Hex, Tile>([[Hex.ORIGIN, tile]])),

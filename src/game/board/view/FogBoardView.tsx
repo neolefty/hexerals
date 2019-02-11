@@ -38,5 +38,4 @@ export class FogBoardView extends React.PureComponent<FogBoardProps, FogBoardSta
             />
         )
     }
-
 }

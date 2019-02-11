@@ -3,7 +3,6 @@ import {HexBoardView} from './HexBoardView'
 import {Ticker} from '../../../common/Ticker'
 import {BoardViewProps} from './BoardViewBase';
 import {LocalGameOptions} from './LocalGameOptions';
-import {FogBoardView} from './FogBoardView';
 
 export interface TickerBoardViewProps extends BoardViewProps {
     tickMillis: number
@@ -12,9 +11,7 @@ export interface TickerBoardViewProps extends BoardViewProps {
 }
 
 export const TickerBoardView = (props: TickerBoardViewProps) => (
-    <Ticker tick={props.onStep} tickMillis={props.tickMillis}>{
-        props.localOptions.fog > 0
-            ? (<FogBoardView {...props} />)
-            : (<HexBoardView {...props} />)
-    }</Ticker>
+    <Ticker tick={props.onStep} tickMillis={props.tickMillis}>
+        <HexBoardView {...props} />
+    </Ticker>
 )

@@ -6,6 +6,18 @@ import {Hex} from './Hex';
 import {Board} from './Board';
 import {Tile} from './Tile';
 
+export class PlayerFogs {
+    private readonly _fogs = Map<Player, PlayerFog>().asMutable()
+
+    constructor(readonly showAllIfLose: boolean) {}
+
+    getFog(player: Player): PlayerFog {
+        if (!this._fogs.has(player))
+            this._fogs.set(player, new PlayerFog(player, this.showAllIfLose))
+        return this._fogs.get(player) as PlayerFog
+    }
+}
+
 export class PlayerFog {
     private prevGlobal?: BoardState
     private prevFog?: BoardState

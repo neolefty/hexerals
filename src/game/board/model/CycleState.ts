@@ -1,5 +1,6 @@
 import {LocalGameOptions} from '../view/LocalGameOptions';
 import {BoardState} from './BoardState';
+import {PlayerFogs} from './Fog';
 
 export enum CycleMode {
     IN_LOCAL_GAME = 'in local game',
@@ -9,5 +10,10 @@ export enum CycleMode {
 export interface CycleState {
     mode: CycleMode;
     localOptions: LocalGameOptions;
-    localGame?: BoardState;
+    localGame?: LocalGameState;
+}
+
+export interface LocalGameState {
+    fogs: PlayerFogs
+    boardState: BoardState
 }

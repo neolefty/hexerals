@@ -3,7 +3,7 @@ import {List} from 'immutable'
 import {CycleMode} from './CycleState'
 import {Board} from './Board'
 import {GenericAction} from '../../../common/App'
-import {GameAction, BoardReducer} from './BoardReducer'
+import {GameAction, BoardReducer, isGameAction} from './BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
@@ -15,6 +15,7 @@ import {Terrain} from './Terrain'
 import {DEFAULT_CURSORS} from './BoardState'
 import * as assert from 'assert'
 import {GamePhase} from './GamePhase'
+import {PlayerFogs} from './Fog'
 
 // the meta-game
 
@@ -47,30 +48,53 @@ export type CycleAction = GameAction
 //     expect(crt.messages.get(0).tag === MAP_TOO_SMALL)
 // })
 
-export const CycleReducer =
-    (state: CycleState = INITIAL_CYCLE_STATE, action: CycleAction): CycleState =>
-{
-    if (isOpenLocalGame(action))
-        return openLocalGameReducer(state, action)
-    else if (isCloseGame(action))
-        return closeGameReducer(state, action)
-    else if (isChangeLocalOption(action))
-        return changeLocalOptionReducer(state, action)
-    else { // must be a GameAction, by process of elimination
-        const newLocalGame = BoardReducer(state.localGame, action)
-        if (newLocalGame === state.localGame)
-            return state
-        else return {
-            ...state,
-            localGame: newLocalGame,
+export const CycleReducer = (
+    state: CycleState = INITIAL_CYCLE_STATE, action: GenericAction,
+): CycleState => {
+    if (!isCycleAction(action))
+        return state
+    else {
+        // CycleActions that are not GameActions
+        if (isOpenLocalGame(action))
+            return openLocalGameReducer(state, action)
+        else if (isCloseGame(action))
+            return closeGameReducer(state, action)
+        else if (isChangeLocalOption(action))
+            return changeLocalOptionReducer(state, action)
+        else { // must be a GameAction, by process of elimination
+            const localGame = state.localGame
+            if (localGame === undefined) {
+                console.error(action)
+                return state
+            }
+            else {
+                const localBoard = localGame.boardState
+                const newLocalBoard = BoardReducer(localBoard, action)
+                if (newLocalBoard === localBoard)
+                    return state
+                else {
+                    return {
+                        ...state,
+                        localGame: {
+                            ...localGame,
+                            boardState: newLocalBoard,
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
+const isCycleAction = (action: GenericAction): action is CycleAction =>
+    isGameAction(action)
+    || isOpenLocalGame(action) || isCloseGame(action)
+    || isChangeLocalOption(action)
+
 const OPEN_LOCAL_GAME = 'OPEN_LOCAL_GAME'
 type OPEN_LOCAL_GAME = typeof OPEN_LOCAL_GAME
 interface OpenLocalGame extends GenericAction { type: OPEN_LOCAL_GAME }
-const isOpenLocalGame = (action: CycleAction): action is OpenLocalGame =>
+const isOpenLocalGame = (action: GenericAction): action is OpenLocalGame =>
     action.type === OPEN_LOCAL_GAME
 export const openLocalGameAction = (): OpenLocalGame =>
     ({ type: OPEN_LOCAL_GAME })
@@ -106,14 +130,17 @@ const openLocalGameReducer =
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
         localGame: {
-            board: newBoard,
-            turn: 0,
-            players: pm,
-            cursors: DEFAULT_CURSORS,
-            moves: EMPTY_MOVEMENT_QUEUE,
-            messages: List(messages),
-            curPlayer: Player.Zero,
-            phase: GamePhase.BeforeStart,
+            fogs: new PlayerFogs(true),
+            boardState: {
+                board: newBoard,
+                turn: 0,
+                players: pm,
+                cursors: DEFAULT_CURSORS,
+                moves: EMPTY_MOVEMENT_QUEUE,
+                messages: List(messages),
+                curPlayer: Player.Zero,
+                phase: GamePhase.BeforeStart,
+            }
         },
     }
 }
@@ -121,7 +148,7 @@ const openLocalGameReducer =
 const CLOSE_GAME = 'CLOSE_GAME'
 type CLOSE_GAME = typeof CLOSE_GAME
 interface CloseGame extends GenericAction { type: CLOSE_GAME }
-const isCloseGame = (action: CycleAction): action is CloseGame =>
+const isCloseGame = (action: GenericAction): action is CloseGame =>
     action.type === CLOSE_GAME
 export const closeGameAction = (): CloseGame => ({ type: CLOSE_GAME })
 // noinspection JSUnusedLocalSymbols
@@ -139,7 +166,7 @@ interface ChangeLocalOption extends GenericAction {
     name: string
     n: number  // TODO add string field
 }
-const isChangeLocalOption = (action: CycleAction): action is ChangeLocalOption =>
+const isChangeLocalOption = (action: GenericAction): action is ChangeLocalOption =>
     action.type === CHANGE_LOCAL_OPTION
 // TODO split into changeLocalOptionNumberAction and changeLocalOptionStringAction if necessary
 export const changeLocalOptionAction = (
