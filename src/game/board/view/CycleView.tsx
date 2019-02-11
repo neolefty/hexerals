@@ -23,6 +23,7 @@ export const CycleView = (props: CycleViewProps) => {
                     <LocalGameContainer
                         displaySize={props.displaySize}
                         onEndGame={props.onCloseGame}
+                        onRestartGame={props.onOpenLocalGame}
                         localOptions={props.localOptions}
                     />
                 )

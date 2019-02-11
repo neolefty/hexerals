@@ -27,6 +27,7 @@ export interface BoardViewActions {
         index: number, position: Hex, clearOthers: boolean,
     ) => void
     onEndGame: () => void
+    onRestartGame: () => void
     onResetColors: (n: number) => void
 }
 
@@ -46,6 +47,7 @@ export const BOARD_STUBS: BoardViewActions = ({
     onCancelMoves: () => {},
     onPlaceCursor: () => {},
     onEndGame: () => {},
+    onRestartGame: () => {},
     onResetColors: () => {},
     /* tslint:enable */
 })

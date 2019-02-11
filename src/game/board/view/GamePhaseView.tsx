@@ -46,8 +46,11 @@ export const Victory = (props: BoardViewProps) => (
                     <strong>Victory!</strong>
                 </div>
                 <div className='Row'>
+                    <button onClick={props.onRestartGame}>
+                        Again
+                    </button>
                     <button onClick={props.onEndGame}>
-                        Back
+                        Exit
                     </button>
                 </div>
             </div>
@@ -71,8 +74,11 @@ export const Defeat = (props: BoardViewProps) => (
                     <strong>Defeat.</strong>
                 </div>
                 <div className='Row'>
+                    <button onClick={props.onRestartGame}>
+                        Again
+                    </button>
                     <button onClick={props.onEndGame}>
-                        Back
+                        Exit
                     </button>
                 </div>
             </div>
