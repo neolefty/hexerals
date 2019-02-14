@@ -68,7 +68,7 @@ export class Board {
     static constructRectangular(
         w: number,
         h: number,
-        players: List<Player>,
+        players: List<Player> = List(),
         arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
         messages?: StatusMessage[],
     ): Board {

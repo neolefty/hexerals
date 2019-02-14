@@ -10,7 +10,7 @@ import {List, Map} from 'immutable'
 import {
     countHexes, widthFromHeight, heightFromWidth,
 } from './HexConstants'
-import {minMax, roundToMap} from '../../../common/MathFunctions'
+import {minMax, minRatio, roundToMap} from '../../../common/MathFunctions'
 import {MAX_PLAYERS} from '../model/players/Players'
 import {CacheMap} from '../../../common/CacheMap'
 
@@ -76,7 +76,9 @@ export interface LGOProps {
     localOptions: LocalGameOptions
     displaySize: CartPair
 
-    changeLocalOption: (name: string, n: number) => void
+    changeLocalOption: (
+        name: string, n: number, highFidelity: boolean
+    ) => void
     newGame: () => void
 }
 
@@ -86,7 +88,11 @@ export class LocalGameOptionsView
     private isOption = (optionName: string): boolean =>
         this.props.localOptions[optionName] > 0
     private toggleOption = (optionName: string) =>
-        this.props.changeLocalOption(optionName, this.isOption(optionName) ? 0 : 1)
+        this.props.changeLocalOption(
+            optionName,
+            this.isOption(optionName) ? 0 : 1,
+            true,
+        )
 
     isLevelVisible = (level: number) =>
         this.props.localOptions.levelVisible >= level
@@ -94,7 +100,8 @@ export class LocalGameOptionsView
     toggleAdvanced = () =>
         this.props.changeLocalOption(
             'levelVisible',
-            (this.props.localOptions.levelVisible + 1) % 3 // 0, 1, 2
+            (this.props.localOptions.levelVisible + 1) % 3, // 0, 1, 2
+            true,
         )
 
     // How many hexes fit, proportionately?
@@ -180,25 +187,49 @@ export class LocalGameOptionsView
             )[0]
         ) as number
 
-    setBoardSize = (wh: CartPair) => {
-        this.props.changeLocalOption('boardWidth', wh.x)
-        this.props.changeLocalOption('boardHeight', wh.y)
+    setBoardSize = (wh: CartPair, highFidelity: boolean) => {
+        // order not preserved — if 1st is low fidelity, it may overwrite 2nd
+        this.props.changeLocalOption('boardWidth', wh.x, highFidelity)
+        this.props.changeLocalOption('boardHeight', wh.y, highFidelity)
     }
 
-    fitToShape = (hexCount: number) =>
-        this.setBoardSize(
-            roundToMap(
-                hexCount,
-                this.getHexCounts().counts,
-                new CartPair(10, 10)
-            )[0]
+    nearestBoardSize(hexCount: number): CartPair {
+        return roundToMap(
+            hexCount,
+            this.getHexCounts().counts,
+            new CartPair(10, 10)
+        )[0]
+    }
+
+    // Are the current hex proportions a close enough fit to the window?
+    // margin of 0 means must be exact match; .1 means within 10%, etc.
+    shapeMatches(margin: number = 0.2): boolean {
+        const wh = this.nearestBoardSize(this.nHexesFromProps())
+        // Divide margin by 2 - margin is extra forgiving because it's kinda operating on geometric mean instead of what you'd expect, since x and y are proportional to square root of number of hexes.
+        const ratio = (1 - margin / 2)
+        const xRatio = minRatio(wh.x, this.props.localOptions.boardWidth)
+        const yRatio = minRatio(wh.y, this.props.localOptions.boardHeight)
+        return (
+            xRatio >= ratio && yRatio >= ratio
         )
+    }
+
+    fitToShape = (hexCount: number, highFidelity: boolean) => {
+        // console.log(`set board size to ${hexCount} hexes — ${highFidelity ? 'high' : 'low'} fidelity`)
+        this.setBoardSize(
+            this.nearestBoardSize(hexCount), highFidelity
+        )
+    }
 
     render(): React.ReactNode {
         // TODO move this up, to avoid mutating state in render() ...
-        this.fitToShape(this.nHexesFromProps())
+        if (!this.shapeMatches())
+            this.fitToShape(this.nHexesFromProps(), true)
         const optionChanger = (name: string) =>
-            (n: number) => this.props.changeLocalOption(name, n)
+            (n: number, highFidelity: boolean = true) => {
+                // console.log(`change ${name} to ${n} — ${highFidelity ? 'high': 'low'} fidelity`)
+                this.props.changeLocalOption(name, n, highFidelity)
+            }
         const optionToggler = (optionName: string) =>
             () => this.toggleOption(optionName)
 
@@ -261,7 +292,7 @@ export class LocalGameOptionsView
         function numberRangeFromMap<V>(
             label: string, title: string, value: number,
             choices: Map<V, number>,
-            onChange: (n: number) => void,
+            onChange: (n: number, highFidelity: boolean) => void,
         ) {
             let [ min, max ] = [ Infinity, -Infinity ]
             choices.forEach(n => {
@@ -274,7 +305,7 @@ export class LocalGameOptionsView
         function numberRange<V>(
             label: string, title: string, value: number,
             min: number, max: number,
-            onChange: (n: number) => void,
+            onChange: (n: number, highFidelity: boolean) => void,
         ) {
             return (
                 <label
@@ -289,8 +320,11 @@ export class LocalGameOptionsView
                         maxValue={max}
                         value={value}
                         formatLabel={() => ''}
+                        onChangeComplete={(value: number | MinMax) =>
+                            onChange(value as number, true)
+                        }
                         onChange={(value: number | MinMax) =>
-                            onChange(value as number)
+                            onChange(value as number, false)
                         }
                     />
                 </label>

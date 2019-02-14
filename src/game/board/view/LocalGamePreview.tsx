@@ -17,10 +17,11 @@ import {CieColor} from '../../../color/CieColor'
 import {Terrain} from '../model/Terrain'
 import {CacheMap} from '../../../common/CacheMap'
 import {GamePhase} from '../model/GamePhase'
-import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger';
+import {SpreadPlayersArranger} from '../model/SpreadPlayerArranger'
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
+    highFidelity: boolean
     displaySize: CartPair
 }
 
@@ -66,13 +67,13 @@ const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
 
 // options that change how the preview looks
 type CacheKey = {
-    numRobots?: number,
+    numRobots: number,
     boardWidth: number,
     boardHeight: number,
     mountainPercent: number,
 }
 const CacheKeyRecord = Record<CacheKey>({
-    numRobots: undefined,
+    numRobots: NaN,
     boardWidth: NaN,
     boardHeight: NaN,
     mountainPercent: NaN,
@@ -86,14 +87,43 @@ const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
     return CacheKeyRecord(result)
 }
 
-const bsCache = new CacheMap<{}, BoardState>(2000)
-const getBoardState = (options: LocalGameOptions): BoardState => {
-    const key = makeKey(options)
+const EmptyBoardState = {
+    turn: 0,
+    cursors: Map<number, Hex>(),
+    players: PlayerManager.construct(List()),
+    moves: new MovementQueue(),
+    messages: List<StatusMessage>(),
+    phase: GamePhase.BeforeStart,
+}
 
-    // first, cache with no players
-    const noRobots = bsCache.get(key.remove('numRobots'), () => {
+const bsCache = new CacheMap<{}, BoardState>(2000)
+const getBoardState = (
+    options: LocalGameOptions,
+    highFidelity: boolean,
+): BoardState => {
+    const key = makeKey(options)
+    const keyNoRobots = key.set('numRobots', -1)
+    const keyNoMtns = keyNoRobots.set('mountainPercent', 0)
+
+    // low-fidelity is just blank hexes of the right shape
+    if (!highFidelity) {
+        if (!bsCache.has(keyNoRobots)) {
+            // console.log(`  ==> create low-fidelity board`)
+            return bsCache.get(keyNoMtns, () =>
+                Object.freeze({
+                    ...EmptyBoardState,
+                    board: Board.constructRectangular(
+                        options.boardWidth, options.boardHeight
+                    )
+                })
+            )
+        }
+    }
+
+    // cache with mountains (no players)
+    const noRobots = bsCache.get(keyNoRobots, () => {
         const noPlayers = List<Player>()
-        // console.log(`making ${JSON.stringify(makeKey(options))} (${bsCache.size})`)
+        // console.log(`  —> make ${JSON.stringify(makeKey(options))} (${bsCache.size})`)
         const board = Board.constructRectangular(
             options.boardWidth, options.boardHeight, noPlayers, [
                 new RandomTerrainArranger(
@@ -104,18 +134,14 @@ const getBoardState = (options: LocalGameOptions): BoardState => {
             ])
 
         return Object.freeze({
+            ...EmptyBoardState,
             board: board,
-            turn: 0,
-            cursors: Map<number, Hex>(),
-            players: PlayerManager.construct(noPlayers),
-            moves: new MovementQueue(),
-            messages: List<StatusMessage>(),
-            phase: GamePhase.BeforeStart,
         })
     })
 
     // then, keeping mountains the same, add players
     return bsCache.get(key, () => {
+        // console.log(`  ——> fill in ${options.numRobots} robots`)
         const players = pickNPlayers(options.numRobots + 1)
         const board = noRobots.board.overlayTiles(
             new SpreadPlayersArranger(
@@ -135,7 +161,7 @@ const getBoardState = (options: LocalGameOptions): BoardState => {
 }
 
 export const LocalGamePreview = (props: LocalGamePreviewProps) => {
-    const boardState = getBoardState(props.localOptions)
+    const boardState = getBoardState(props.localOptions, props.highFidelity)
     return (
         <HexBoardView
             {...BOARD_STUBS}

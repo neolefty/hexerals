@@ -101,7 +101,7 @@
   }
 
   .InputRange {
-    margin: 0.2em 0.3em;
+    margin: 0.4em 0.3em;
     .input-range {
       width: 33vmin;
       display: inline-flex;
@@ -109,5 +109,14 @@
     .input-range__label {
       display: none;
     }
+    /*
+    .input-range__slider {
+      height: 3vmin;
+      width: 3vmin;
+    }
+    .input-range__track {
+      height: 1vmin;
+    }
+    */
   }
 }

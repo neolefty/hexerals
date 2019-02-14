@@ -41,6 +41,8 @@
     "build": "npm-run-all build-css build-react",
     "build-react": "react-scripts build",
     "build-css": "node-sass-chokidar src/ -o src/",
+    "serve": "ln -fs . build/hexerals && serve -s build -o",
+    "build-serve": "npm-run-all build serve",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
