@@ -73,7 +73,7 @@ export const Defeat = (props: BoardViewProps) => (
                     }/>
                 </div>
                 <div className='Row'>
-                    <strong>Defeat.</strong>
+                    <strong>defeat.</strong>
                 </div>
                 <div className='Row'>
                     <button onClick={props.onRestartGame}>
