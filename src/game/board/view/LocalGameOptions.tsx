@@ -225,11 +225,10 @@ export class LocalGameOptionsView
         // TODO move this up, to avoid mutating state in render() ...
         if (!this.shapeMatches())
             this.fitToShape(this.nHexesFromProps(), true)
-        const optionChanger = (name: string) =>
-            (n: number, highFidelity: boolean = true) => {
-                // console.log(`change ${name} to ${n} — ${highFidelity ? 'high': 'low'} fidelity`)
-                this.props.changeLocalOption(name, n, highFidelity)
-            }
+        const optionChanger = (
+            name: string, forceHighFi = false
+        ) => (n: number, highFidelity: boolean = true) =>
+            this.props.changeLocalOption(name, n, highFidelity || forceHighFi)
         const optionToggler = (optionName: string) =>
             () => this.toggleOption(optionName)
 
@@ -351,14 +350,14 @@ export class LocalGameOptionsView
                             'Robots', 'How many AI opponents?',
                             this.props.localOptions.numRobots,
                             0, MAX_PLAYERS - 1,
-                            optionChanger('numRobots'),
+                            optionChanger('numRobots', true),
                         )}
                         {numberRange(
                             difficultyNames[this.props.localOptions.difficulty],
                             'How smart should these robots be?',
                             this.props.localOptions.difficulty,
                             0, BasicRobot.MAX_IQ,
-                            optionChanger('difficulty'),
+                            optionChanger('difficulty', true),
                         )}
                     </div>
                     <div className="Level1 Column">

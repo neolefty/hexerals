@@ -103,45 +103,37 @@ const getBoardState = (
 ): BoardState => {
     const key = makeKey(options)
     const keyNoRobots = key.set('numRobots', -1)
-    const keyNoMtns = keyNoRobots.set('mountainPercent', 0)
+    const keyBlank = keyNoRobots.set('mountainPercent', 0)
 
-    // low-fidelity is just blank hexes of the right shape
-    if (!highFidelity) {
-        if (!bsCache.has(keyNoRobots)) {
-            // console.log(`  ==> create low-fidelity board`)
-            return bsCache.get(keyNoMtns, () =>
-                Object.freeze({
-                    ...EmptyBoardState,
-                    board: Board.constructRectangular(
-                        options.boardWidth, options.boardHeight
-                    )
-                })
+    // cache low-fidelity of blank hexes (computes set of all tiles)
+    const blankState = bsCache.get(keyBlank, () =>
+        Object.freeze({
+            ...EmptyBoardState,
+            board: Board.constructRectangular(
+                options.boardWidth, options.boardHeight
             )
-        }
-    }
+        })
+    )
+
+    // while scrubbing board size, always show blank for consistency
+    // (even if we have precomputed terrain + players)
+    if (!highFidelity)
+        return blankState
 
     // cache with mountains (no players)
-    const noRobots = bsCache.get(keyNoRobots, () => {
-        const noPlayers = List<Player>()
-        // console.log(`  —> make ${JSON.stringify(makeKey(options))} (${bsCache.size})`)
-        const board = Board.constructRectangular(
-            options.boardWidth, options.boardHeight, noPlayers, [
+    const noRobots = bsCache.get(keyNoRobots, () =>
+        Object.freeze({
+            ...blankState,
+            board: blankState.board.overlayTiles(  // reuse blank board
                 new RandomTerrainArranger(
-                    options.mountainPercent / 100),
-                // TODO cache mountains & path maps for a given size so we can use SpreadPlayersArranger
-                // new SpreadPlayersArranger(
-                //     options.capitals ? Terrain.Capital : Terrain.City),
-            ])
-
-        return Object.freeze({
-            ...EmptyBoardState,
-            board: board,
+                    options.mountainPercent / 100
+                ).arrange(blankState.board)
+            )
         })
-    })
+    )
 
     // then, keeping mountains the same, add players
     return bsCache.get(key, () => {
-        // console.log(`  ——> fill in ${options.numRobots} robots`)
         const players = pickNPlayers(options.numRobots + 1)
         const board = noRobots.board.overlayTiles(
             new SpreadPlayersArranger(
