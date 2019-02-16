@@ -71,18 +71,29 @@ type CacheKey = {
     boardWidth: number,
     boardHeight: number,
     mountainPercent: number,
+    capitals: number,
 }
+type Partial<T> = {
+    [P in keyof T]?: T[P]
+}
+type CacheKeyPartial = Partial<CacheKey>
+// that's an abstract way of saying:
+// type CacheKeyPartial = {
+//     [K in keyof CacheKey]?: CacheKey[K]
+// }
 const CacheKeyRecord = Record<CacheKey>({
     numRobots: NaN,
     boardWidth: NaN,
     boardHeight: NaN,
     mountainPercent: NaN,
+    capitals: NaN,
 })
-const CACHE_PROP_NAMES = [
+type CacheKeyKey = keyof CacheKey
+const CACHE_PROP_NAMES: CacheKeyKey[] = [
     'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
 ]
 const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
-    const result = {}
+    const result: CacheKeyPartial = {}
     CACHE_PROP_NAMES.forEach(k => result[k] = opts[k])
     return CacheKeyRecord(result)
 }
@@ -102,7 +113,7 @@ const getBoardState = (
     highFidelity: boolean,
 ): BoardState => {
     const key = makeKey(options)
-    const keyNoRobots = key.set('numRobots', -1)
+    const keyNoRobots = key.set('numRobots', -1).set('capitals', 0)
     const keyBlank = keyNoRobots.set('mountainPercent', 0)
 
     // cache low-fidelity of blank hexes (computes set of all tiles)

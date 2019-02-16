@@ -14,6 +14,24 @@ import {minMax, minRatio, roundToMap} from '../../../common/MathFunctions'
 import {MAX_PLAYERS} from '../model/players/Players'
 import {CacheMap} from '../../../common/CacheMap'
 
+// export type LGOKey =
+//     'numRobots' | 'tickMillis' | 'boardWidth' | 'boardHeight'
+//     | 'mountainPercent' | 'difficulty' | 'startingPop' | 'fog' | 'capitals'
+//     | 'levelVisible'
+
+// export enum LGOKey {
+//     numRobots = 'numRobots',
+//     tickMillis = 'tickMillis',
+//     boardWidth = 'boardWidth',
+//     boardHeight = 'boardHeight',
+//     mountainPercent = 'mountainPercent',
+//     difficulty = 'difficulty',
+//     startingPop = 'startingPop',
+//     fog = 'fog',
+//     capitals = 'capitals',
+//     levelVisible = 'levelVisible',
+// }
+
 export interface LocalGameOptions {
     // All numbers because our reducer assumes it.
     // If we need a non-number, the reducer should be easy to modify.
@@ -29,6 +47,9 @@ export interface LocalGameOptions {
     fog: number
     capitals: number
     levelVisible: number  // advanced options visible?
+
+    // allow indexing
+    // [key: LGOKey]: number
 }
 
 const MAX_MAP_SIZE = 375
@@ -55,15 +76,19 @@ const difficultyNames = Object.freeze([
     'Hard',
 ])
 
-const LocalGameOptionsLimits = {
-    numRobots: [ 0, 15 ],
-    difficulty: [ 0, BasicRobot.MAX_IQ ],
-    boardWidth: [ 1, 45 ],
-    boardHeight: [ 2, 21 ],
-    mountainPercent: [ 0, 50 ],
-    tickMillis: [ 1, 9999 ],
-    startingPop: [ 0, 999 ],
-}
+// "Index types" — typescriptlang.org/docs/handbook/advanced-types.html
+type LGOKey = keyof LocalGameOptions
+
+const LocalGameOptionsLimits =
+    Map<LGOKey, [number, number]>([
+        ['numRobots', [ 0, 15 ]],
+        ['difficulty', [ 0, BasicRobot.MAX_IQ ]],
+        ['boardWidth', [ 1, 45 ]],
+        ['boardHeight', [ 2, 21 ]],
+        ['mountainPercent', [ 0, 50 ]],
+        ['tickMillis', [ 1, 9999 ]],
+        ['startingPop', [ 0, 999 ]],
+    ])
 
 interface HexCounts {
     dimensions: List<CartPair>
@@ -77,7 +102,7 @@ export interface LGOProps {
     displaySize: CartPair
 
     changeLocalOption: (
-        name: string, n: number, highFidelity: boolean
+        name: keyof LocalGameOptions, n: number, highFidelity: boolean
     ) => void
     newGame: () => void
 }
@@ -85,9 +110,9 @@ export interface LGOProps {
 export class LocalGameOptionsView
     extends React.PureComponent<LGOProps>
 {
-    private isOption = (optionName: string): boolean =>
+    private isOption = (optionName: LGOKey): boolean =>
         this.props.localOptions[optionName] > 0
-    private toggleOption = (optionName: string) =>
+    private toggleOption = (optionName: LGOKey) =>
         this.props.changeLocalOption(
             optionName,
             this.isOption(optionName) ? 0 : 1,
@@ -116,11 +141,14 @@ export class LocalGameOptionsView
             () => this.computeHexCounts()
         )
 
+    getOptionLimits = (key: LGOKey): [ number, number ] =>
+        LocalGameOptionsLimits.get(key) as [ number, number ]
+
     computeHexCounts = (): HexCounts => {
         const map = Map<CartPair, number>().withMutations(
             result => {
-                const minWidth = LocalGameOptionsLimits.boardWidth[0]
-                const minHeight = LocalGameOptionsLimits.boardHeight[0]
+                const minWidth = this.getOptionLimits('boardWidth')[0]
+                const minHeight = this.getOptionLimits('boardHeight')[0]
                 {
                     let w = minWidth
                     let hexCount = 0;
@@ -226,10 +254,10 @@ export class LocalGameOptionsView
         if (!this.shapeMatches())
             this.fitToShape(this.nHexesFromProps(), true)
         const optionChanger = (
-            name: string, forceHighFi = false
+            name: keyof LocalGameOptions, forceHighFi = false
         ) => (n: number, highFidelity: boolean = true) =>
             this.props.changeLocalOption(name, n, highFidelity || forceHighFi)
-        const optionToggler = (optionName: string) =>
+        const optionToggler = (optionName: LGOKey) =>
             () => this.toggleOption(optionName)
 
 /*
@@ -259,15 +287,15 @@ export class LocalGameOptionsView
 */
 
         const numberInput = (
-            label: string, option: string, title: string,
+            label: string, option: LGOKey, title: string,
             level: number = 0, children?: JSX.Element | JSX.Element[],
         ) => (
             <NumberInput
                 label={label}
                 value={this.props.localOptions[option]}
                 title={title}
-                min={LocalGameOptionsLimits[option][0]}
-                max={LocalGameOptionsLimits[option][1]}
+                min={this.getOptionLimits(option)[0]}
+                max={this.getOptionLimits(option)[1]}
                 onChange={optionChanger(option)}
                 onEnter={this.props.newGame}
                 blockTabbing={!this.isLevelVisible(level)}
@@ -276,7 +304,7 @@ export class LocalGameOptionsView
         )
 
         const checkInput = (
-            label: string, option: string, title: string, level: number = 0
+            label: string, option: LGOKey, title: string, level: number = 0
         ) => (
             <CheckInput
                 label={label}

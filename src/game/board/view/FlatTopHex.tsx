@@ -12,9 +12,6 @@ export interface FlatTopHexProps extends HexViewProps {
     centerY: number
 }
 
-// Attribute of the top <g>, for retrieval from Touch events
-const HEX_ID_ATTRIBUTE = 'hex-id'
-
 // persist a touch event and connect it to a Hex
 class HexTouch {
     readonly screen: CartPair
@@ -37,7 +34,7 @@ class HexTouch {
         const elements: Element[] = document.elementsFromPoint(this.client.x, this.client.y)
         for (let elem of elements) {
             // in the presence of malformed hex-id
-            const hexIdString: string | null = elem.getAttribute(HEX_ID_ATTRIBUTE)
+            const hexIdString: string | null = elem.getAttribute('hex-id')
             if (hexIdString)
                 return Hex.getById(parseInt(hexIdString, 10))
         }
@@ -108,8 +105,10 @@ export class FlatTopHex
     }
 
     render(): React.ReactNode {
-        const hexIdAttribute = {}
-        hexIdAttribute[HEX_ID_ATTRIBUTE] = this.props.hex.id
+        const hexIdAttribute = {
+            // Attribute of the top SVG element, for retrieval from Touch events
+            'hex-id': this.props.hex.id
+        }
 
         const children: JSX.Element[] = [(
             <polygon

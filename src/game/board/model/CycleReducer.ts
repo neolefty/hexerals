@@ -16,6 +16,7 @@ import {DEFAULT_CURSORS} from './BoardState'
 import * as assert from 'assert'
 import {GamePhase} from './GamePhase'
 import {PlayerFogs} from './Fog'
+import {LocalGameOptions} from '../view/LocalGameOptions';
 
 // the meta-game
 
@@ -163,14 +164,14 @@ const CHANGE_LOCAL_OPTION = 'CHANGE_LOCAL_OPTION'
 type CHANGE_LOCAL_OPTION = typeof CHANGE_LOCAL_OPTION
 interface ChangeLocalOption extends GenericAction {
     type: CHANGE_LOCAL_OPTION
-    name: string
+    name: keyof LocalGameOptions
     n: number  // TODO add string field
 }
 const isChangeLocalOption = (action: GenericAction): action is ChangeLocalOption =>
     action.type === CHANGE_LOCAL_OPTION
 // TODO split into changeLocalOptionNumberAction and changeLocalOptionStringAction if necessary
 export const changeLocalOptionAction = (
-    name: string, n: number
+    name: keyof LocalGameOptions, n: number
 ): ChangeLocalOption => ({
     type: CHANGE_LOCAL_OPTION,
     name: name,

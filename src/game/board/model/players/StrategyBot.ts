@@ -108,7 +108,9 @@ export class StrategyBot implements Robot {
         const comma = new Comma(' — ', ', ')
         this.strategies.forEach((has, i) =>
             result += has
-                ? `${comma}${StrategyBot.STRATEGIES[i].name}`
+                ? `${comma}${
+                        (StrategyBot.STRATEGIES.get(i) as Strategy).name
+                    }`
                 : ''
         )
         return result

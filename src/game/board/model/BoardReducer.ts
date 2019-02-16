@@ -48,7 +48,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     turn: 0,
     cursors: DEFAULT_CURSORS,
     players: PlayerManager.construct(INITIAL_PLAYERS),
-    curPlayer: INITIAL_PLAYERS[0],
+    curPlayer: undefined,
     moves: EMPTY_MOVEMENT_QUEUE,
     messages: List([]),
     phase: GamePhase.BeforeStart,

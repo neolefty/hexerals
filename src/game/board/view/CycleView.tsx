@@ -1,5 +1,5 @@
 import {CartPair} from '../../../common/CartPair'
-import {LocalGameOptionsView} from './LocalGameOptions'
+import {LocalGameOptions, LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/CycleState'
 import {LocalGameContainer} from './LocalGameContainer'
 import * as React from 'react'
@@ -12,7 +12,9 @@ export interface CycleViewProps extends CycleState {
 
     onOpenLocalGame: () => void
     onCloseGame: () => void
-    onChangeLocalOption: (name: string, n: number) => void
+    onChangeLocalOption: (
+        name: keyof LocalGameOptions, n: number
+    ) => void
 }
 
 interface CycleViewState {
@@ -42,7 +44,9 @@ export class CycleView
             })
     }
 
-    changeLocalOption(name: string, n: number, highFidelity: boolean) {
+    changeLocalOption(
+        name: keyof LocalGameOptions, n: number, highFidelity: boolean
+    ) {
         this.setHighFidelity(highFidelity)
         this.props.onChangeLocalOption(name, n)
     }

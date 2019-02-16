@@ -6,6 +6,7 @@ import {
     changeLocalOptionAction, closeGameAction, CycleAction, openLocalGameAction,
 } from './CycleReducer';
 import {AppState} from '../../../common/App';
+import {LocalGameOptions} from '../view/LocalGameOptions';
 
 export interface CycleContainerProps {
     displaySize: CartPair;
@@ -20,7 +21,7 @@ const mapStateToCycleViewProps =
 const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleAction>) => ({
     onOpenLocalGame: () => dispatch(openLocalGameAction()),
     onCloseGame: () => dispatch(closeGameAction()),
-    onChangeLocalOption: (name: string, n: number) =>
+    onChangeLocalOption: (name: keyof LocalGameOptions, n: number) =>
         dispatch(changeLocalOptionAction(name, n)),
 });
 

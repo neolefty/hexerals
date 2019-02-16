@@ -147,12 +147,12 @@ export class DriftColor {
     }
 
     equals(that: any): boolean {
-        const thatCie = that && that['cie']
-        return thatCie
-            && Array.isArray(thatCie)
-            && thatCie.length === 3
-            && thatCie[0] === this.cie[0]
-            && thatCie[1] === this.cie[1]
-            && thatCie[2] === this.cie[2]
+        const thatHsl = that && that['cie'] && that['hsl']['cie']
+        return thatHsl
+            && Array.isArray(thatHsl)
+            && thatHsl.length === 3
+            && thatHsl[0] === this.cie.hsl[0]
+            && thatHsl[1] === this.cie.hsl[1]
+            && thatHsl[2] === this.cie.hsl[2]
     }
 }
