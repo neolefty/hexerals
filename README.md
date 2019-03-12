@@ -1,3 +1,3 @@
-https://Colonies.io -- A game!
+[colonies.io](https://colonies.io) -- A game!
 
 Inspired by https://generals.io/
