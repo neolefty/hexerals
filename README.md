@@ -1,3 +1,3 @@
-[colonies.io](https://colonies.io) -- A game!
+[Hexerals](https://neolefty.org/hexerals/) -- A game!
 
 Inspired by https://generals.io/
