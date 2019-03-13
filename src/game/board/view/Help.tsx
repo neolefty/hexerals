@@ -99,7 +99,7 @@ export class Help extends React.PureComponent<HelpOptions> {
                     <p>cancel 1 move — z</p>
                     <p>cancel all moves — x</p>
                     <hr/>
-                    <p>Inspired by <a href="http://generals.io/">generals.io</a></p>
+                    <p>Inspired by <a target='_blank' href="http://generals.io/">generals.io</a></p>
                 </div>
                 <div className="Column">
                     <svg
