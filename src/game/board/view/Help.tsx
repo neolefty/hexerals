@@ -98,6 +98,8 @@ export class Help extends React.PureComponent<HelpOptions> {
                     <p>end game — esc</p>
                     <p>cancel 1 move — z</p>
                     <p>cancel all moves — x</p>
+                    <hr/>
+                    <p>Inspired by <a href="http://generals.io/">generals.io</a></p>
                 </div>
                 <div className="Column">
                     <svg
@@ -106,31 +108,33 @@ export class Help extends React.PureComponent<HelpOptions> {
                         viewBox={[-46, 103, w + 2, h + 2].join(',')}
                     >
                         {
-                            dirs.entrySeq().map(([hex, tt]) => (
-                                <TileHexView
-                                    key={hex.id}
-                                    tile={tt.tile}
-                                    hex={hex}
-                                    selected={false}
-                                    viewBoxHeight={h}
-                                    color={tt.color}
-                                    text={tt.text}
-                                    textColor={DriftColor.WHITE}
-                                >{
-                                    tt.extraText ? (
-                                        <text
-                                            key="subtitle"
-                                            fontSize="8"
-                                            fill="#aaa"
-                                            textAnchor="middle"
-                                            y={20}
-                                        >
-                                            {tt.extraText}
-                                        </text>
-                                    ) : undefined
-                                }
-                                </TileHexView>
-                            ))
+                            dirs.entrySeq()
+                                .sort((a, b) => a[0].compareTo(b[0]))
+                                .map(([hex, tt]) => (
+                                    <TileHexView
+                                        key={hex.id}
+                                        tile={tt.tile}
+                                        hex={hex}
+                                        selected={false}
+                                        viewBoxHeight={h}
+                                        color={tt.color}
+                                        text={tt.text}
+                                        textColor={DriftColor.WHITE}
+                                    >{
+                                        tt.extraText ? (
+                                            <text
+                                                key="subtitle"
+                                                fontSize="8"
+                                                fill="#aaa"
+                                                textAnchor="middle"
+                                                y={20}
+                                            >
+                                                {tt.extraText}
+                                            </text>
+                                        ) : undefined
+                                    }
+                                    </TileHexView>
+                                ))
                         }
                         {
                             Hex.DIRECTIONS.map(dir => (
