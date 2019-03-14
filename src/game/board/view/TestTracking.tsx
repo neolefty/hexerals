@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {logEvent} from '../../../common/Analytics';
+import {AnalyticsAction, AnalyticsCategory, logEvent} from '../../../common/Analytics';
 import './TestTracking.css'
 
 const nodeEnv = process.env.NODE_ENV
@@ -10,15 +10,11 @@ const gtagId = process.env.REACT_APP_GTAG_ID
 
 interface TestTrackingProps {}
 interface TestTrackingState {
-    action: string
-    category: string
     label: string
     value: string
 }
 
 const DEFAULT_STATE = {
-    action: 'test',
-    category: 'debugging',
     label: 'foo',
     value: 'bar',
 }
@@ -52,30 +48,6 @@ export class TestTracking
                 </table>
                 <h3>Test Event</h3>
                 <div><label>
-                    <span>action</span>
-                    <input
-                        type='text'
-                        id='action'
-                        value={this.state.action}
-                        onChange={e => this.setState({
-                            ...this.state,
-                            action: e.currentTarget.value
-                        })}
-                    />
-                </label></div>
-                <div><label>
-                    <span>category</span>
-                    <input
-                        type='text'
-                        id='category'
-                        value={this.state.category}
-                        onChange={e => this.setState({
-                            ...this.state,
-                            category: e.currentTarget.value
-                        })}
-                    />
-                </label></div>
-                <div><label>
                     <span>label</span>
                     <input
                         type='text'
@@ -102,8 +74,8 @@ export class TestTracking
                 <div><button
                     onClick={() =>
                         logEvent(
-                            this.state.action,
-                            this.state.category,
+                            AnalyticsAction.test,
+                            AnalyticsCategory.testing,
                             this.state.label,
                             this.state.value,
                         )

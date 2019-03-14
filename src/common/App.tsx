@@ -9,6 +9,7 @@ import {CycleState} from '../game/board/model/CycleState'
 import {CycleContainer} from '../game/board/model/CycleContainer'
 import {Help} from '../game/board/view/Help';
 import {TestTracking} from '../game/board/view/TestTracking';
+import {inDev} from './Analytics';
 
 const MIN_WIDTH = 300
 const MIN_HEIGHT = 300
@@ -56,7 +57,6 @@ class App extends React.Component<AppProps, AppState> {
 
     render() {
         const displaySize = this.getDisplaySize().plusXY(0, -30)
-        const dev = process.env.NODE_ENV === 'development'
         return (
             <div className="App">
                 <Tabs>
@@ -65,7 +65,7 @@ class App extends React.Component<AppProps, AppState> {
                         <Tab>Colors</Tab>
                         <Tab>Controls</Tab>
                         {
-                            dev ? (<Tab>Track</Tab>) : undefined
+                            inDev() ? (<Tab>Track</Tab>) : undefined
                         }
                     </TabList>
                     <TabPanel>
@@ -78,7 +78,7 @@ class App extends React.Component<AppProps, AppState> {
                         <Help displaySize={displaySize}/>
                     </TabPanel>
                     {
-                        dev ? (
+                        inDev() ? (
                             <TabPanel>
                                 <TestTracking/>
                             </TabPanel>

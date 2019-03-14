@@ -29,16 +29,34 @@ interface GTagDetails {
 
 declare function gtag(event: GTagEvent, action: string, details: GTagDetails): void
 
+export enum AnalyticsCategory {
+    testing = 'testing', local = 'local'
+}
+
+export enum AnalyticsAction {
+    test = 'test',
+    start = 'start',
+    quit = 'quit', win = 'win', lose = 'lose',
+    again = 'again',
+}
+
 export const logEvent = (
-    action: string,
-    category?: string,
+    action: AnalyticsAction,
+    category?: AnalyticsCategory,
     label?: string,
     value?: string,
 ) => {
-    // noinspection TypeScriptUnresolvedFunction
-    gtag('event', action, {
+    const deets = {
         event_category: category,
         event_label: label,
         value,
-    })
+    }
+    if (inDev)
+        console.log(`Analytics event: ${action} — ${JSON.stringify(deets)}`)
+    // noinspection TypeScriptUnresolvedFunction
+    gtag('event', action, deets)
 }
+
+export const inDev = () => process.env.NODE_ENV === 'development'
+export const inProd = () => process.env.NODE_ENV === 'production'
+export const inTest = () => process.env.NODE_ENV === 'test'
