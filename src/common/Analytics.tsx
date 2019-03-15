@@ -51,10 +51,11 @@ export const logEvent = (
         event_label: label,
         value,
     }
-    if (inDev)
+    if (inDev())
         console.log(`Analytics event: ${action} — ${JSON.stringify(deets)}`)
     // noinspection TypeScriptUnresolvedFunction
-    gtag('event', action, deets)
+    if (!inTest())
+        gtag('event', action, deets)
 }
 
 export const inDev = () => process.env.NODE_ENV === 'development'
