@@ -1,14 +1,8 @@
 import * as React from 'react'
 import {TickerBoardView, TickerBoardViewProps} from './TickerBoardView'
 import {Layered} from '../../../common/Layered'
-import {GamePhase} from '../model/GamePhase'
 import {Defeat, Victory} from './GamePhaseView'
-
-const curPlayerTileCount = (props: TickerBoardViewProps) => (
-    props.boardState.curPlayer !== undefined
-    && props.boardState.board.getTileStatistics()
-        .get(props.boardState.curPlayer, 0)
-) || 0
+import {isDefeat, isVictory} from '../model/BoardState';
 
 export const LocalGameView = (
     props: TickerBoardViewProps
@@ -16,13 +10,12 @@ export const LocalGameView = (
     <Layered>
         <TickerBoardView {...props} />
         {
-            props.boardState.phase === GamePhase.Ended
-            && curPlayerTileCount(props) > 0
+            isVictory(props.boardState)
                 ? <Victory{...props}/>
                 : undefined
         }
         {
-            curPlayerTileCount(props) === 0
+            isDefeat(props.boardState)
                 ? <Defeat{...props}/>
                 : undefined
         }

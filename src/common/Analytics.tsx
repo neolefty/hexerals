@@ -36,17 +36,23 @@ export enum AnalyticsCategory {
 export enum AnalyticsAction {
     test = 'test',
     start = 'start',
-    quit = 'quit', win = 'win', lose = 'lose',
+    end = 'end',
     again = 'again',
 }
 
-export const logEvent = (
+export enum AnalyticsLabel {
+    quit = 'quit', win = 'win', lose = 'lose',
+}
+
+export const logAnalyticsEvent = (
     action: AnalyticsAction,
     category?: AnalyticsCategory,
-    label?: string,
+    additionalTags: {} = {},
+    label?: AnalyticsLabel,
     value?: string,
 ) => {
     const deets = {
+        ...additionalTags,
         event_category: category,
         event_label: label,
         value,

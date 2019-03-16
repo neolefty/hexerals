@@ -3,7 +3,7 @@ import {Set, List} from 'immutable'
 import {Hex} from './Hex'
 import {HexMove, PlayerMove} from './Move'
 import {Board} from './Board'
-import {BoardState, DEFAULT_CURSORS} from './BoardState'
+import {analyticsLabel, BoardState, DEFAULT_CURSORS} from './BoardState'
 import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from './MovementQueue'
 import {GenericAction} from '../../../common/App'
 import {StatusMessage} from '../../../common/StatusMessage'
@@ -12,6 +12,7 @@ import {GameDecision, Robot} from './players/Robot'
 import {floodShortestPath} from './ShortestPath'
 import {Reducer} from 'redux'
 import {GamePhase} from './GamePhase'
+import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -164,8 +165,11 @@ const doMovesReducer = (state: BoardState): BoardState => {
             && state.phase !== GamePhase.Ended  // not already ended
             // 1 player remains
             && boardAndMessages.board.getTileStatistics().size <= 1
-        )
+        ) {
             phase = GamePhase.Ended
+            // TODO log local game options
+            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, {}, analyticsLabel(state))
+        }
         return {
             ...state,
             board: boardAndMessages.board,

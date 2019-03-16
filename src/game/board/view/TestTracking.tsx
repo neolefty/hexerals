@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {AnalyticsAction, AnalyticsCategory, logEvent} from '../../../common/Analytics';
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
 import './TestTracking.css'
 
 const nodeEnv = process.env.NODE_ENV
@@ -48,18 +48,6 @@ export class TestTracking
                 </table>
                 <h3>Test Event</h3>
                 <div><label>
-                    <span>label</span>
-                    <input
-                        type='text'
-                        id='label'
-                        value={this.state.label}
-                        onChange={e => this.setState({
-                            ...this.state,
-                            label: e.currentTarget.value
-                        })}
-                    />
-                </label></div>
-                <div><label>
                     <span>value</span>
                     <input
                         type='text'
@@ -73,11 +61,9 @@ export class TestTracking
                 </label></div>
                 <div><button
                     onClick={() =>
-                        logEvent(
-                            AnalyticsAction.test,
-                            AnalyticsCategory.testing,
-                            this.state.label,
-                            this.state.value,
+                        logAnalyticsEvent(
+                            AnalyticsAction.test, AnalyticsCategory.testing,
+                            {}, undefined, this.state.value,
                         )
                     }
                 >Track</button></div>

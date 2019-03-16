@@ -17,7 +17,7 @@ import * as assert from 'assert'
 import {GamePhase} from './GamePhase'
 import {PlayerFogs} from './Fog'
 import {LocalGameOptions} from '../view/LocalGameOptions';
-import {AnalyticsAction, AnalyticsCategory, logEvent} from '../../../common/Analytics';
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
 import {countHexes} from '../view/HexConstants';
 
 // the meta-game
@@ -129,13 +129,14 @@ const openLocalGameReducer =
                 BasicRobot.byIntelligence(state.localOptions.difficulty)
             )
     })
-    logEvent(AnalyticsAction.start, AnalyticsCategory.local, undefined, JSON.stringify({
+    // TODO log local game options better — can we send general tags?
+    logAnalyticsEvent(AnalyticsAction.start, AnalyticsCategory.local, {
         robots: state.localOptions.numRobots,
         difficulty: state.localOptions.difficulty,
         w: state.localOptions.boardWidth,
         h: state.localOptions.boardHeight,
         n: countHexes(state.localOptions.boardWidth, state.localOptions.boardHeight),
-    }))
+    })
     return {
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
