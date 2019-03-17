@@ -1,3 +1,5 @@
+import {Map} from 'immutable';
+
 type GTagEvent = 'event'
 interface GTagDetails {
     event_category?: string
@@ -44,6 +46,18 @@ export enum AnalyticsLabel {
     quit = 'quit', win = 'win', lose = 'lose',
 }
 
+export type Tagger = (action: AnalyticsAction, deets: {}) => void
+
+let taggers: Map<Symbol, Tagger> = Map()
+
+export const registerTagger = (key: Symbol, tagger: Tagger): void => {
+    taggers = taggers.set(key, tagger)
+}
+
+export const unregisterTagger = (key: Symbol): void => {
+    taggers = taggers.remove(key)
+}
+
 export const logAnalyticsEvent = (
     action: AnalyticsAction,
     category?: AnalyticsCategory,
@@ -57,13 +71,26 @@ export const logAnalyticsEvent = (
         event_label: label,
         value,
     }
-    if (inDev())
-        console.log(`Analytics event: ${action} — ${JSON.stringify(deets)}`)
-    // noinspection TypeScriptUnresolvedFunction
-    if (!inTest())
-        gtag('event', action, deets)
+    taggers.forEach(
+        tagger => tagger(action, deets)
+    )
 }
 
 export const inDev = () => process.env.NODE_ENV === 'development'
 export const inProd = () => process.env.NODE_ENV === 'production'
 export const inTest = () => process.env.NODE_ENV === 'test'
+
+if (inDev())
+    registerTagger(
+        Symbol('console'),
+        (action: AnalyticsAction, deets: {}) =>
+            console.log(`Analytics event: ${action} — ${JSON.stringify(deets)}`)
+    )
+
+if (!inTest())
+    // noinspection TypeScriptUnresolvedFunction
+    registerTagger(
+        Symbol('google analytics'),
+        (action: AnalyticsAction, deets: {}) =>
+            gtag('event', action, deets)
+    )
