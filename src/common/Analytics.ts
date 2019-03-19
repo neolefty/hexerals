@@ -12,6 +12,7 @@ export enum AnalyticsAction {
 }
 
 export enum AnalyticsLabel {
+    // end of game
     quit = 'quit', win = 'win', lose = 'lose',
 }
 

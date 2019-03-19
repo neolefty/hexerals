@@ -30,6 +30,7 @@ export class TestTracking
     render(): React.ReactNode {
         return (
             <div>
+
                 <table>
                     <tbody>
                     <tr>
@@ -46,6 +47,7 @@ export class TestTracking
                     </tr>
                     </tbody>
                 </table>
+
                 <h3>Test Event</h3>
                 <div><label>
                     <span>value</span>
@@ -62,8 +64,7 @@ export class TestTracking
                 <div><button
                     onClick={() =>
                         logAnalyticsEvent(
-                            AnalyticsAction.test, AnalyticsCategory.testing,
-                            {}, undefined, this.state.value,
+                            AnalyticsAction.test, AnalyticsCategory.testing, undefined, this.state.value,
                         )
                     }
                 >Track</button></div>

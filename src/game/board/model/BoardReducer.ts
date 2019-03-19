@@ -12,7 +12,7 @@ import {GameDecision, Robot} from './players/Robot'
 import {floodShortestPath} from './ShortestPath'
 import {Reducer} from 'redux'
 import {GamePhase} from './GamePhase'
-import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -88,7 +88,7 @@ interface NewGame extends GenericAction {
     type: NEW_GAME
     board: Board
 }
-const isNewGame = (action: GenericAction): action is NewGame =>
+export const isNewGame = (action: GenericAction): action is NewGame =>
     action.type === NEW_GAME
 export const newGameAction = (board: Board): NewGame =>
     ({ type: NEW_GAME, board })
@@ -168,7 +168,7 @@ const doMovesReducer = (state: BoardState): BoardState => {
         ) {
             phase = GamePhase.Ended
             // TODO log local game options
-            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, {}, analyticsLabel(state))
+            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(state))
         }
         return {
             ...state,

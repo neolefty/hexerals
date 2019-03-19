@@ -3,7 +3,7 @@ import {List} from 'immutable'
 import {CycleMode} from './CycleState'
 import {Board} from './Board'
 import {GenericAction} from '../../../common/App'
-import {GameAction, BoardReducer, isGameAction} from './BoardReducer'
+import {GameAction, BoardReducer, isGameAction, isNewGame} from './BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
@@ -130,13 +130,15 @@ const openLocalGameReducer =
             )
     })
     // TODO log local game options better — can we send general tags?
-    logAnalyticsEvent(AnalyticsAction.start, AnalyticsCategory.local, {
-        robots: state.localOptions.numRobots,
-        difficulty: state.localOptions.difficulty,
-        w: state.localOptions.boardWidth,
-        h: state.localOptions.boardHeight,
-        n: countHexes(state.localOptions.boardWidth, state.localOptions.boardHeight),
-    })
+    logAnalyticsEvent(
+        AnalyticsAction.start, AnalyticsCategory.local, undefined, undefined, {
+            robots: state.localOptions.numRobots,
+            difficulty: state.localOptions.difficulty,
+            w: state.localOptions.boardWidth,
+            h: state.localOptions.boardHeight,
+            n: countHexes(state.localOptions.boardWidth, state.localOptions.boardHeight),
+        }
+    )
     return {
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
