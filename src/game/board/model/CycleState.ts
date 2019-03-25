@@ -1,5 +1,5 @@
 import {LocalGameOptions} from '../view/LocalGameOptions';
-import {BoardState} from './BoardState';
+import {BoardState, boardStateToString} from './BoardState';
 import {PlayerFogs} from './Fog';
 
 export enum CycleMode {
@@ -17,3 +17,13 @@ export interface LocalGameState {
     fogs: PlayerFogs
     boardState: BoardState
 }
+
+export const cycleStateToString = (s: CycleState): string =>
+    ''
+    + `mode: ${s.mode}\n`
+    + `localOptions: ${JSON.stringify(s.localOptions)}\n`
+    + `localGame.boardState: ${
+            s.localGame
+                ? boardStateToString(s.localGame.boardState)
+                : 'undefined'
+        }`

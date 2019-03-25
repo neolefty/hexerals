@@ -47,6 +47,7 @@ export interface LocalGameOptions {
     fog: number
     capitals: number
     levelVisible: number  // advanced options visible?
+    randomStart: number  // players start in random locations?
 
     // allow indexing
     // [key: LGOKey]: number

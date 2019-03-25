@@ -34,7 +34,7 @@ export const boardStateToString = (s: BoardState): string =>
     + `players: ${s.players.toString()} (current: ${s.curPlayer})\n`
     + `board: ${s.board.toString()}\n`
     + `moves: ${s.moves}\n`
-    + (s.messages.size > 0 ? `messages: ${s.messages}\n` : '')
+    + `messages: ${s.messages}\n`
     + `turn: ${s.turn}\n`
     + `phase: ${s.phase}\n`
     + (s.captures && s.captures.size > 0 ? `captures: ${

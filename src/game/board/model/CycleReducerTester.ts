@@ -1,17 +1,17 @@
 import {createStore, Store} from 'redux';
 import {List} from 'immutable';
 
-import {CycleState, LocalGameState} from './CycleState';
+import {CycleState, cycleStateToString, LocalGameState} from './CycleState';
 import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from './CycleReducer';
-import {pickNPlayers, Player} from './players/Players';
+import {Player} from './players/Players';
 import {Hex} from './Hex';
-import {newGameAction, queueMovesAction} from './BoardReducer';
+import {doMovesAction, placeCursorAction, queueMovesAction, robotsDecideAction} from './BoardReducer';
 import {PlayerMove} from './Move';
 import {BoardState} from './BoardState';
 import {BoardReducerTester} from './BoardReducerTester';
-import {Board} from './Board';
-import {CornersPlayerArranger} from './PlayerArranger';
-import {Arranger} from './Arranger';
+import {Tile} from './Tile';
+import {StatusMessage} from '../../../common/StatusMessage';
+import {LocalGameOptions} from '../view/LocalGameOptions';
 
 export class CycleReducerTester {
     readonly store: Store<CycleState>
@@ -28,12 +28,41 @@ export class CycleReducerTester {
         return (this.localBoard && this.localBoard.cursors.get(0, Hex.NONE))
             || Hex.NONE
     }
+    get edges() { return this.localBoard && this.localBoard.board.edges }
+    get ll() { return this.edges && this.edges.lowerLeft || Hex.NONE }
+    get ul() { return this.edges && this.edges.upperLeft || Hex.NONE }
+    get ur() { return this.edges && this.edges.upperRight || Hex.NONE }
+    get lr() { return this.edges && this.edges.lowerRight || Hex.NONE }
 
-    queueMove = (player: Player = Player.Zero, delta: Hex = Hex.UP) => {
+    get messages(): List<StatusMessage> {
+        return this.localBoard && this.localBoard.messages || List()
+    }
+
+    getTile = (hex: Hex) =>
+        this.localBoard && this.localBoard.board.getTile(hex) || Tile.EMPTY
+
+    queueMove = (
+        from: Hex = Hex.ORIGIN,
+        delta: Hex = Hex.UP,
+        player: Player = Player.Zero,
+    ) => {
+        this.store.dispatch(placeCursorAction(from))
         this.store.dispatch(queueMovesAction(List([
-            PlayerMove.constructDelta(player, this.cursor, delta, 0)
+            PlayerMove.constructDelta(player, from, delta)
         ])))
     }
+
+    robotsDecide = () => { this.store.dispatch(robotsDecideAction()) }
+    doMoves = () => { this.store.dispatch(doMovesAction()) }
+
+    changeLocalOption = (name: keyof LocalGameOptions, n: number) =>
+        this.store.dispatch(changeLocalOptionAction(name, n))
+
+    // true by default
+    useSpreadArranger = (spread: boolean = true) =>
+        this.changeLocalOption('randomStart', spread ? 1 : 0)
+    useCornersArranger = (corners: boolean = true) =>
+        this.useSpreadArranger(!corners)
 
     openLocalGame = (
         width = BoardReducerTester.INITIAL_WIDTH,
@@ -42,11 +71,13 @@ export class CycleReducerTester {
         difficulty = 0,
         mountainPercent = 0,
     ) => {
-        this.store.dispatch(changeLocalOptionAction('boardWidth', width))
-        this.store.dispatch(changeLocalOptionAction('boardHeight', height))
-        this.store.dispatch(changeLocalOptionAction('numRobots', numRobots))
-        this.store.dispatch(changeLocalOptionAction('difficulty', difficulty))
-        this.store.dispatch(changeLocalOptionAction('mountainPercent', mountainPercent))
+        this.changeLocalOption('boardWidth', width)
+        this.changeLocalOption('boardHeight', height)
+        this.changeLocalOption('numRobots', numRobots)
+        this.changeLocalOption('difficulty', difficulty)
+        this.changeLocalOption('mountainPercent', mountainPercent)
         this.store.dispatch(openLocalGameAction())
     }
+
+    toString = () => cycleStateToString(this.state)
 }

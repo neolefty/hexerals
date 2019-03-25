@@ -3,7 +3,7 @@ import {List} from 'immutable'
 import {CycleMode} from './CycleState'
 import {Board} from './Board'
 import {GenericAction} from '../../../common/App'
-import {GameAction, BoardReducer, isGameAction, isNewGame} from './BoardReducer'
+import {GameAction, BoardReducer, isGameAction} from './BoardReducer'
 import {CycleState} from './CycleState'
 import {EMPTY_MOVEMENT_QUEUE} from './MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from './players/Players'
@@ -19,6 +19,7 @@ import {PlayerFogs} from './Fog'
 import {LocalGameOptions} from '../view/LocalGameOptions';
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
 import {countHexes} from '../view/HexConstants';
+import {CornersPlayerArranger} from './PlayerArranger';
 
 // the meta-game
 
@@ -36,6 +37,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         fog: 1,
         capitals: 1,
         levelVisible: 0,
+        randomStart: 1,
     },
     localGame: undefined,
 }
@@ -43,13 +45,6 @@ export const INITIAL_CYCLE_STATE: CycleState = {
 export type CycleAction = GameAction
     | OpenLocalGame | CloseGame
     | ChangeLocalOption
-
-// TODO write CycleReducerTester like BoardReducerTester
-// it('messages show up in game state', () => {
-//     const crt: CycleReducerTester = new CycleReducerTester(1,1)
-//     expect(crt.messages.size).toBe(1)
-//     expect(crt.messages.get(0).tag === MAP_TOO_SMALL)
-// })
 
 export const CycleReducer = (
     state: CycleState = INITIAL_CYCLE_STATE, action: GenericAction,
@@ -105,38 +100,41 @@ export const openLocalGameAction = (): OpenLocalGame =>
 const openLocalGameReducer =
     (state: CycleState, action: OpenLocalGame): CycleState =>
 {
-    const players = pickNPlayers(state.localOptions.numRobots + 1)
-    const mountainFrequency = state.localOptions.mountainPercent / 100
+    const opts = state.localOptions
+    const players = pickNPlayers(opts.numRobots + 1)
+    const mountainFrequency = opts.mountainPercent / 100
     const messages: StatusMessage[] = []
+    const capitalTerrain = opts.capitals === 0 ? Terrain.City : Terrain.Capital
+    const arranger = opts.randomStart
+        ? new SpreadPlayersArranger(capitalTerrain, opts.startingPop)
+        : new CornersPlayerArranger(opts.startingPop, capitalTerrain)
     const newBoard = Board.constructRectangular(
-        state.localOptions.boardWidth,
-        state.localOptions.boardHeight,
+        opts.boardWidth,
+        opts.boardHeight,
         players,
         [
-            new SpreadPlayersArranger(
-                state.localOptions.capitals === 0 ? Terrain.City : Terrain.Capital, state.localOptions.startingPop,
-            ),
+            arranger,
             new RandomTerrainArranger(mountainFrequency),
         ],
         messages,
     )
-    // assign stupid AI to all non-humans
+    // assign AI to all non-humans
     let pm: PlayerManager = PlayerManager.construct(players)
     players.forEach((player: Player) => {
         if (player !== Player.Zero) // human
             pm = pm.setRobot(
                 player,
-                BasicRobot.byIntelligence(state.localOptions.difficulty)
+                BasicRobot.byIntelligence(opts.difficulty)
             )
     })
     // TODO log local game options better — can we send general tags?
     logAnalyticsEvent(
         AnalyticsAction.start, AnalyticsCategory.local, undefined, undefined, {
-            robots: state.localOptions.numRobots,
-            difficulty: state.localOptions.difficulty,
-            w: state.localOptions.boardWidth,
-            h: state.localOptions.boardHeight,
-            n: countHexes(state.localOptions.boardWidth, state.localOptions.boardHeight),
+            robots: opts.numRobots,
+            difficulty: opts.difficulty,
+            w: opts.boardWidth,
+            h: opts.boardHeight,
+            n: countHexes(opts.boardWidth, opts.boardHeight),
         }
     )
     return {

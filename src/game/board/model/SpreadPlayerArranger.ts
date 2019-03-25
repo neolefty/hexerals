@@ -87,4 +87,7 @@ export class SpreadPlayersArranger extends Arranger {
         }
         return curStarts
     }
+
+    toString = (): string =>
+        `spread arranger — capital: ${this.startingTerrain}; pop: ${this.startingPop}`
 }

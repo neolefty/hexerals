@@ -7,6 +7,8 @@
 
 // For now, they just accumulate in a List in the game state
 export class StatusMessage {
+    static readonly BLANK = new StatusMessage('', '')
+
     constructor(
         readonly tag: string,
         readonly msg: string,

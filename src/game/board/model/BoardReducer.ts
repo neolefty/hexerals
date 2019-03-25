@@ -160,17 +160,15 @@ const doMovesReducer = (state: BoardState): BoardState => {
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves)
         const captures = boardAndMessages.captures
         let phase = state.phase
-        if (
+        const ended = (
             captures.size > 0  // can only end on a capture
             && state.phase !== GamePhase.Ended  // not already ended
             // 1 player remains
             && boardAndMessages.board.getTileStatistics().size <= 1
-        ) {
+        )
+        if (ended)
             phase = GamePhase.Ended
-            // TODO log local game options
-            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(state))
-        }
-        return {
+        const result: BoardState = {
             ...state,
             board: boardAndMessages.board,
             moves: movesAndQ.queue,
@@ -178,6 +176,10 @@ const doMovesReducer = (state: BoardState): BoardState => {
             captures: captures,
             phase: phase,
         }
+        if (ended)
+            // TODO log local game options — but we don't have them here ...
+            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(result))
+        return result
     }
     else
         return state

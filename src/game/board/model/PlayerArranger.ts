@@ -1,13 +1,13 @@
-import {Map} from 'immutable';
+import {List, Map} from 'immutable';
+import * as assert from 'assert';
 
 import {Board} from './Board';
-import {Hex} from './Hex';
+import {Hex, hexesToString} from './Hex';
 import {Tile} from './Tile';
 import {Arranger, MAP_TOO_SMALL} from './Arranger';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Player} from './players/Players';
 import {Terrain} from './Terrain';
-import * as assert from 'assert';
 
 // arranges players on a board
 export class RandomPlayerArranger extends Arranger {
@@ -23,12 +23,15 @@ export class RandomPlayerArranger extends Arranger {
         board: Board,
         status: StatusMessage[] | undefined = undefined,
     ): Map<Hex, Tile> {
-        const allHexes: Hex[] = board.filterTiles(tile => tile.terrain === Terrain.Empty).toArray()
+        let emptyHexes: Hex[] = board.filterTiles(
+            tile => tile.terrain === Terrain.Empty
+        ).toArray()
         let starts = Map<Hex, Tile>()
         board.players.forEach((player: Player) => {
-            if (allHexes.length > 0) {
-                const i = Math.floor(Math.random() * allHexes.length)
-                const hex = allHexes.splice(i, 1)[0]
+            if (emptyHexes.length > 0) {
+                const i = Math.floor(Math.random() * emptyHexes.length)
+                // shorten emptyHexes by 1
+                const hex = emptyHexes.splice(i, 1)[0]
                 starts = starts.set(hex, new Tile(
                     player,
                     this.startingPop,
@@ -57,7 +60,10 @@ export class CornersPlayerArranger extends Arranger {
         readonly terrain: Terrain = Terrain.City,
     ) { super() }
 
-    public arrange(board: Board): Map<Hex, Tile> {
+    public arrange(
+        board: Board,
+        status: StatusMessage[] | undefined = undefined,
+    ): Map<Hex, Tile> {
         assert.ok(board.players.size <= 4)
         let starts = Map<Hex, Tile>()
         const corners = [
@@ -66,14 +72,25 @@ export class CornersPlayerArranger extends Arranger {
             (b: Board) => b.edges.upperLeft,
             (b: Board) => b.edges.lowerRight,
         ]
-        board.players.forEach((player, i) =>
-            starts = starts.set(
-                corners[i](board),
-                new Tile(player, this.startingPop, this.terrain),
-            )
-        )
+        board.players.forEach((player, i) => {
+            const hex = corners[i](board)
+            const prevOwner = starts.get(hex, Tile.EMPTY).owner
+            if (prevOwner !== Player.Nobody) {
+                if (status)
+                    status.push(new StatusMessage(
+                        MAP_TOO_SMALL,
+                        `Could not place player ${player} in corner #${i}.`,
+                        `Hex at ${hex.toString()} already occupied by ${prevOwner}`,
+                    ))
+            }
+            else
+                starts = starts.set(hex, new Tile(player, this.startingPop, this.terrain))
+        })
         return starts
     }
+
+    toString = (): string =>
+        `corners arranger — capital: ${this.terrain}; pop: ${this.startingPop}`
 }
 
 // Spread out players — maximize each player's distance to their nearest neighbor,
