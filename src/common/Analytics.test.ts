@@ -40,7 +40,7 @@ class TestTagger {
     }
 }
 
-fit('logs game events', () => {
+it('logs game events', () => {
     const key = Symbol('test')
     const tagger = new TestTagger()
     registerTagger(key, tagger.tagger)
