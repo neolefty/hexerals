@@ -10,6 +10,7 @@ import {HexBoardView} from './HexBoardView';
 import {CartPair} from '../../../common/CartPair';
 import {Board} from '../model/Board';
 import {MovementQueue} from '../model/MovementQueue';
+import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
 
 const singleHexBoard = (
     props: BoardViewProps, tile: Tile,
@@ -51,7 +52,12 @@ export const Victory = (props: BoardViewProps) => (
                     <button onClick={props.onRestartGame}>
                         Again
                     </button>
-                    <button onClick={props.onEndGame}>
+                    <button onClick={() => {
+                        logAnalyticsEvent(
+                            AnalyticsAction.return, AnalyticsCategory.local, AnalyticsLabel.win
+                        )
+                        props.onEndGame()
+                    }}>
                         Exit
                     </button>
                 </div>
@@ -79,7 +85,12 @@ export const Defeat = (props: BoardViewProps) => (
                     <button onClick={props.onRestartGame}>
                         Again
                     </button>
-                    <button onClick={props.onEndGame}>
+                    <button onClick={() => {
+                        logAnalyticsEvent(
+                            AnalyticsAction.return, AnalyticsCategory.local, AnalyticsLabel.lose
+                        )
+                        props.onEndGame()
+                    }}>
                         Exit
                     </button>
                 </div>

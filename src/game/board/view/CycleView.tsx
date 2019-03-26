@@ -6,6 +6,7 @@ import * as React from 'react'
 import {CycleState} from '../model/CycleState'
 import {Layered} from '../../../common/Layered'
 import {LocalGamePreview} from './LocalGamePreview'
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
@@ -59,7 +60,10 @@ export class CycleView
                         <LocalGameContainer
                             displaySize={this.props.displaySize}
                             onEndGame={this.props.onCloseGame}
-                            onRestartGame={this.props.onOpenLocalGame}
+                            onRestartGame={() => {
+                                logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
+                                this.props.onOpenLocalGame
+                            }}
                             localOptions={this.props.localOptions}
                         />
                     )

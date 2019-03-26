@@ -6,9 +6,10 @@ export enum AnalyticsCategory {
 
 export enum AnalyticsAction {
     test = 'test',
-    start = 'start',
-    end = 'end',
-    again = 'again',
+    start = 'start', // game start
+    end = 'end', // game end
+    return = 'return', // return to menu or lobby
+    again = 'again', // do the same thing again
 }
 
 export enum AnalyticsLabel {
