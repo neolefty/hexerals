@@ -5,7 +5,7 @@ import {LocalBoardContainer} from './LocalBoardContainer'
 import * as React from 'react'
 import {CycleState} from '../model/cycle/CycleState'
 import {Layered} from '../../common/Layered'
-import {LocalGamePreview} from './LocalGamePreview'
+import {LocalBoardPreview} from './LocalBoardPreview'
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../common/Analytics';
 
 export interface CycleViewProps extends CycleState {
@@ -74,7 +74,7 @@ export class CycleView
             case CycleMode.NOT_IN_GAME:
                 return (
                     <Layered>
-                        <LocalGamePreview
+                        <LocalBoardPreview
                             localOptions={this.props.localOptions}
                             displaySize={this.props.displaySize}
                             highFidelity={this.getHighFidelity()}

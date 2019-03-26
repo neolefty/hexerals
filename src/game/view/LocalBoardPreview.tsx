@@ -163,7 +163,7 @@ const getBoardState = (
     })
 }
 
-export const LocalGamePreview = (props: LocalBoardPreviewProps) => {
+export const LocalBoardPreview = (props: LocalBoardPreviewProps) => {
     const boardState = getBoardState(props.localOptions, props.highFidelity)
     return (
         <HexBoardView

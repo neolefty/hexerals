@@ -95,9 +95,9 @@ export class Help extends React.PureComponent<HelpOptions> {
                     <p><strong>Drag to move</strong></p>
                     <p>or movement keys ⟶</p>{/* ➡ ⇨ */}
                     <hr/>
-                    <p>end game — esc</p>
                     <p>cancel 1 move — z</p>
                     <p>cancel all moves — x</p>
+                    <p>end game — esc</p>
                     <hr/>
                     <p>Inspired by <a target='_blank' href="http://generals.io/">generals.io</a></p>
                 </div>
