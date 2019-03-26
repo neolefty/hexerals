@@ -61,9 +61,9 @@ class App extends React.Component<AppProps, AppState> {
             <div className="App">
                 <Tabs>
                     <TabList>
-                        <Tab>Practice</Tab>
-                        <Tab>Colors</Tab>
+                        <Tab>Play</Tab>
                         <Tab>Controls</Tab>
+                        <Tab>Colors</Tab>
                         {
                             inDev() ? (<Tab>Track</Tab>) : undefined
                         }
@@ -72,10 +72,10 @@ class App extends React.Component<AppProps, AppState> {
                         <CycleContainer displaySize={displaySize}/>
                     </TabPanel>
                     <TabPanel>
-                        <ColorsContainer displaySize={displaySize}/>
+                        <Help displaySize={displaySize}/>
                     </TabPanel>
                     <TabPanel>
-                        <Help displaySize={displaySize}/>
+                        <ColorsContainer displaySize={displaySize}/>
                     </TabPanel>
                     {
                         inDev() ? (
