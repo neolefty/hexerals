@@ -62,7 +62,7 @@ export class CycleView
                             onEndGame={this.props.onCloseGame}
                             onRestartGame={() => {
                                 logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
-                                this.props.onOpenLocalGame
+                                this.props.onOpenLocalGame()
                             }}
                             localOptions={this.props.localOptions}
                         />
