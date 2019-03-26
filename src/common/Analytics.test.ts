@@ -6,9 +6,9 @@ import {
     Tagger,
     unregisterTagger
 } from './Analytics';
-import {CycleReducerTester} from '../game/board/model/CycleReducerTester';
-import {Hex} from '../game/board/model/Hex';
-import {Player} from '../game/board/model/players/Players';
+import {CycleReducerTester} from '../game/model/cycle/CycleReducerTester';
+import {Hex} from '../game/model/hex/Hex';
+import {Player} from '../game/model/players/Players';
 
 it('registers and unregisters taggers', () => {
     let n = 0

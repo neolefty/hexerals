@@ -7,8 +7,8 @@ import {CartPair} from "./CartPair"
 import {
     CycleReducer,
     changeLocalOptionAction, openLocalGameAction,
-} from '../game/board/model/CycleReducer'
-import {CycleContainer} from '../game/board/model/CycleContainer'
+} from '../game/model/cycle/CycleReducer'
+import {CycleContainer} from '../game/model/cycle/CycleContainer'
 
 it('renders without crashing', () => {
     const store = createStore(CycleReducer)

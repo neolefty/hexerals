@@ -5,11 +5,11 @@ import './App.css'
 import {CartPair} from './CartPair'
 import {ColorsContainer} from '../color/ColorsContainer'
 import {ColorsState} from '../color/ColorsReducer';
-import {CycleState} from '../game/board/model/CycleState'
-import {CycleContainer} from '../game/board/model/CycleContainer'
-import {Help} from '../game/board/view/Help';
-import {TestTracking} from '../game/board/view/TestTracking';
 import {inDev} from './Analytics';
+import {CycleState} from '../game/model/cycle/CycleState';
+import {CycleContainer} from '../game/model/cycle/CycleContainer';
+import {Help} from '../game/view/Help';
+import {TestTracking} from '../game/view/TestTracking';
 
 const MIN_WIDTH = 300
 const MIN_HEIGHT = 300
