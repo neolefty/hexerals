@@ -1,0 +1,121 @@
+0. Time
+
+    * sync a reference time -- simplified time server protocol
+
+        - server establishes a reference time, clients sync to it
+        - measure round trips; assume timestamp in the middle?
+        - resolution in milliseconds
+
+    * measure latency as a factor in fairness
+
+        - where possible, match players with similar latency
+
+1. Initial map & players
+
+    * geometry --> consistent indexing of hexes
+
+        - { shape: rectangular; width: 10; height: 12 }
+        - render ordering of hexes establishes a single linear coordinate
+
+    * players
+        - name
+        - index
+        - robot?
+
+    * terrain & start position
+        - generate a blank map locally
+        - send terrain & start positions, indexed as established by geometry
+
+3. Tile
+
+    * position: number
+    * terrain: character (number?)
+    * owner: number
+    * pop: number
+
+4. Diff
+
+    * version
+
+    * Fog & diff with blank
+
+    * add, delete, change
+        - delete = list of indexes
+        - add & change = list of tiles
+        - are add & change the same?
+
+    * stats
+        - { player: [ pop, hexes ] }
+
+    * checksum of whole board
+        - integrity check
+        - re-send if mismatch
+
+5. Examples
+
+    * Initial
+
+        {
+            v: 1,
+            shape: 'rectangular',
+            width: 10,
+            height: 12,
+            rules: {
+                v: 1,
+                growth: {
+                    empty: 50,
+                    capital: 2,
+                    captured_capital: 2,
+                    city: 2,
+                }
+            }
+            players: [
+                { name: 'foo', robot: 0 },
+                { name: 'bar', robot: 1 },
+                ...
+            ]
+        }
+
+    * Start diff -- terrain & capitals
+
+        {
+            v: 1,
+            n: 0,  // turn number
+            add: [ // quads of [ position, terrain, owner, pop ]
+                // mountains
+                1, 3, -1, 0,
+                15, 3, -1, 0,
+                // own capital (opponent hidden by fog)
+                8, 2, 0, 0,
+            ],
+            sum: 2938238,  // checksum of whole fogged board
+        }
+
+    * Growth can be as expected?
+
+    * Diff -- movement
+
+        {
+            v: 1,
+            n: 3,
+            add: [ 2, 0, 0, 1 ] // player zero takes neighboring empty hex
+            del: [],
+            sum: 312938,
+        }
+
+        {
+            v: 1,
+            n: 77,
+            add: [
+                47, 0, 0, 17,  // player zero takes a hex
+                48, 0, 1, 5,   // opponent hex is revealed
+                15, 0, 1, 3,   // player one captures a visible hex
+            ],
+            del: [ 14, 13 ],   // lose visibility from player one's capture
+            sum: 238912,
+        }
+
+6. Checksum of whole board
+
+    * monitor integrity
+    * Re-send if disagree
