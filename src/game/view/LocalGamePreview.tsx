@@ -19,7 +19,7 @@ import {CacheMap} from '../../common/CacheMap'
 import {GamePhase} from '../model/cycle/GamePhase'
 import {SpreadPlayersArranger} from '../model/setup/SpreadPlayerArranger'
 
-export interface LocalGamePreviewProps {
+export interface LocalBoardPreviewProps {
     localOptions: LocalGameOptions
     highFidelity: boolean
     displaySize: CartPair
@@ -163,7 +163,7 @@ const getBoardState = (
     })
 }
 
-export const LocalGamePreview = (props: LocalGamePreviewProps) => {
+export const LocalGamePreview = (props: LocalBoardPreviewProps) => {
     const boardState = getBoardState(props.localOptions, props.highFidelity)
     return (
         <HexBoardView

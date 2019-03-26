@@ -1,7 +1,7 @@
 import {CartPair} from '../../common/CartPair'
 import {LocalGameOptions, LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/cycle/CycleState'
-import {LocalGameContainer} from './LocalGameContainer'
+import {LocalBoardContainer} from './LocalBoardContainer'
 import * as React from 'react'
 import {CycleState} from '../model/cycle/CycleState'
 import {Layered} from '../../common/Layered'
@@ -57,7 +57,7 @@ export class CycleView
             case CycleMode.IN_LOCAL_GAME:
                 if (this.props.localGame)
                     return (
-                        <LocalGameContainer
+                        <LocalBoardContainer
                             displaySize={this.props.displaySize}
                             onEndGame={this.props.onCloseGame}
                             onRestartGame={() => {

@@ -21,10 +21,10 @@ import {PlayerMove} from '../model/move/Move'
 import {LocalGameOptions} from './LocalGameOptions'
 import {CacheMap} from '../../common/CacheMap'
 import {setColorsAction} from '../../color/ColorsReducer'
-import {LocalGameView} from './LocalGameView';
+import {LocalBoardView} from './LocalBoardView';
 import {LocalGameState} from '../model/cycle/CycleState';
 
-export interface LocalGameProps {
+export interface LocalBoardProps {
     displaySize: CartPair
     onEndGame: () => void
     localOptions: LocalGameOptions
@@ -48,7 +48,7 @@ export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> 
     playerColorsCache.get(colors, () => playerColors(colors))
 
 const mapStateToTickerBoardViewProps = (
-    state: AppState, ownProps: LocalGameProps
+    state: AppState, ownProps: LocalBoardProps
 ) => {
     // assert localGame is not undefined
     const game = state.cycle.localGame as LocalGameState
@@ -103,8 +103,8 @@ const mapDispatchToBoardViewProps = (
     ),
 })
 
-export const LocalGameContainer = connect(
+export const LocalBoardContainer = connect(
     mapStateToTickerBoardViewProps, mapDispatchToBoardViewProps
 )(
-    LocalGameView
+    LocalBoardView
 )
