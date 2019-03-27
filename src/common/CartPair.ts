@@ -1,6 +1,11 @@
 import {List} from 'immutable';
 import {round} from './MathFunctions';
 
+export interface SizeStyle {
+    width: number,
+    height: number,
+}
+
 // Cartesian Pair (x, y)
 export class CartPair {
     constructor(readonly x: number, readonly y: number) {}
@@ -14,6 +19,8 @@ export class CartPair {
     plusX = (x: number) => this.plusXY(x, 0)
     plusY = (y: number) => this.plusXY(0, y)
     minus = (that: CartPair) => that.scale(-1).plus(this)
+    setY = (newY: number) => new CartPair(this.x, newY)
+    setX = (newX: number) => new CartPair(newX, this.y)
 
     get min() { return Math.min(this.x, this.y) }
 
@@ -29,12 +36,13 @@ export class CartPair {
     equals = (that: any) =>
         that.x === this.x && that.y === this.y
 
-    get sizeStyle() {
+    get sizeStyle(): SizeStyle {
         return {
             width: this.x,
             height: this.y,
         }
     }
+
 }
 
 export type CartPairTransform = (cp: CartPair) => CartPair
