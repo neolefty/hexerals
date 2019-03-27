@@ -18,7 +18,7 @@ import {PlayerFogs} from '../board/Fog'
 import {CornersPlayerArranger} from '../setup/PlayerArranger';
 import {GenericAction} from '../../../common/App';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
+import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
 import {countHexes} from '../../view/HexConstants';
 import {LocalGameOptions} from '../../view/LocalGameOptions';
 
@@ -44,7 +44,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
 }
 
 export type CycleAction = GameAction
-    | OpenLocalGame | CloseGame
+    | OpenLocalGame | CloseLocalGame
     | ChangeLocalOption
 
 export const CycleReducer = (
@@ -56,8 +56,8 @@ export const CycleReducer = (
         // CycleActions that are not GameActions
         if (isOpenLocalGame(action))
             return openLocalGameReducer(state, action)
-        else if (isCloseGame(action))
-            return closeGameReducer(state, action)
+        else if (isCloseLocalGame(action))
+            return closeLocalGameReducer(state, action)
         else if (isChangeLocalOption(action))
             return changeLocalOptionReducer(state, action)
         else { // must be a GameAction, by process of elimination
@@ -87,7 +87,7 @@ export const CycleReducer = (
 
 const isCycleAction = (action: GenericAction): action is CycleAction =>
     isGameAction(action)
-    || isOpenLocalGame(action) || isCloseGame(action)
+    || isOpenLocalGame(action) || isCloseLocalGame(action)
     || isChangeLocalOption(action)
 
 const OPEN_LOCAL_GAME = 'OPEN_LOCAL_GAME'
@@ -157,20 +157,25 @@ const openLocalGameReducer =
     }
 }
 
-const CLOSE_GAME = 'CLOSE_GAME'
-type CLOSE_GAME = typeof CLOSE_GAME
-interface CloseGame extends GenericAction { type: CLOSE_GAME }
-const isCloseGame = (action: GenericAction): action is CloseGame =>
-    action.type === CLOSE_GAME
-export const closeGameAction = (): CloseGame => ({ type: CLOSE_GAME })
+const CLOSE_LOCAL_GAME = 'CLOSE_LOCAL_GAME'
+type CLOSE_LOCAL_GAME = typeof CLOSE_LOCAL_GAME
+interface CloseLocalGame extends GenericAction { type: CLOSE_LOCAL_GAME }
+const isCloseLocalGame = (action: GenericAction): action is CloseLocalGame =>
+    action.type === CLOSE_LOCAL_GAME
+export const closeLocalGameAction = (): CloseLocalGame => ({ type: CLOSE_LOCAL_GAME })
 // noinspection JSUnusedLocalSymbols
-const closeGameReducer =
-    (state: CycleState, action: CloseGame): CycleState => ({
-        ...state,
-        mode: CycleMode.NOT_IN_GAME,
-        localGame: undefined,
-    })
-
+const closeLocalGameReducer =
+    (state: CycleState, action: CloseLocalGame): CycleState => {
+        logAnalyticsEvent(
+            AnalyticsAction.end, AnalyticsCategory.local, AnalyticsLabel.quit, undefined,
+            state.localOptions,
+        )
+        return {
+            ...state,
+            mode: CycleMode.NOT_IN_GAME,
+            localGame: undefined,
+        }
+    }
 const CHANGE_LOCAL_OPTION = 'CHANGE_LOCAL_OPTION'
 type CHANGE_LOCAL_OPTION = typeof CHANGE_LOCAL_OPTION
 interface ChangeLocalOption extends GenericAction {

@@ -6,19 +6,18 @@ import * as React from 'react'
 import {CycleState} from '../model/cycle/CycleState'
 import {Layered} from '../../common/Layered'
 import {LocalBoardPreview} from './LocalBoardPreview'
-import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../common/Analytics';
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
 
     onOpenLocalGame: () => void
-    onCloseGame: () => void
     onChangeLocalOption: (
         name: keyof LocalGameOptions, n: number
     ) => void
 }
 
 interface CycleViewState {
+    // Render a detailed preview (true, slow) or a rough one (false, fast)?
     highFidelity: boolean
 }
 
@@ -59,12 +58,6 @@ export class CycleView
                     return (
                         <LocalBoardContainer
                             displaySize={this.props.displaySize}
-                            onEndGame={this.props.onCloseGame}
-                            onRestartGame={() => {
-                                logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
-                                this.props.onOpenLocalGame()
-                            }}
-                            localOptions={this.props.localOptions}
                         />
                     )
                 else

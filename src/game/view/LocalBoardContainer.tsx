@@ -18,16 +18,15 @@ import {DriftColor} from '../../color/DriftColor'
 import {ColorPodge} from '../../color/ColorPodge'
 import {Player, PLAYERS} from '../model/players/Players'
 import {PlayerMove} from '../model/move/Move'
-import {LocalGameOptions} from './LocalGameOptions'
 import {CacheMap} from '../../common/CacheMap'
 import {setColorsAction} from '../../color/ColorsReducer'
 import {LocalBoardView} from './LocalBoardView';
 import {LocalGameState} from '../model/cycle/CycleState';
+import {closeLocalGameAction, openLocalGameAction} from '../model/cycle/CycleReducer';
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../common/Analytics';
 
 export interface LocalBoardProps {
     displaySize: CartPair
-    onEndGame: () => void
-    localOptions: LocalGameOptions
 }
 
 export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
@@ -60,10 +59,10 @@ const mapStateToTickerBoardViewProps = (
     return ({
         boardState: board,
         displaySize: ownProps.displaySize,
+        localOptions: options,
         // colors: playerColors(state.colors.colors),
         colors: cachedPlayerColors(state.colors.colors),
         tickMillis: state.cycle.localOptions.tickMillis,
-        onEndGame: ownProps.onEndGame,
     })
 }
 
@@ -101,6 +100,15 @@ const mapDispatchToBoardViewProps = (
     onResetColors: (n: number) => dispatch(
         setColorsAction(ColorPodge.construct(n))
     ),
+
+    onEndGame: () => {
+        dispatch(closeLocalGameAction())
+    },
+
+    onRestartGame: () => {
+        logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
+        dispatch(openLocalGameAction())
+    }
 })
 
 export const LocalBoardContainer = connect(
