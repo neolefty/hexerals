@@ -1,11 +1,11 @@
 import {CartPair} from '../../common/CartPair'
 import {LocalGameOptions, LocalGameOptionsView} from './LocalGameOptions'
 import {CycleMode} from '../model/cycle/CycleState'
-import {LocalBoardContainer} from './LocalBoardContainer'
 import * as React from 'react'
 import {CycleState} from '../model/cycle/CycleState'
 import {Layered} from '../../common/Layered'
-import {LocalBoardPreview} from './LocalBoardPreview'
+import {LocalGamePreview} from './LocalGamePreview'
+import {LocalGameDisplay} from './LocalGameDisplay'
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
@@ -56,7 +56,7 @@ export class CycleView
             case CycleMode.IN_LOCAL_GAME:
                 if (this.props.localGame)
                     return (
-                        <LocalBoardContainer
+                        <LocalGameDisplay
                             displaySize={this.props.displaySize}
                         />
                     )
@@ -67,7 +67,7 @@ export class CycleView
             case CycleMode.NOT_IN_GAME:
                 return (
                     <Layered>
-                        <LocalBoardPreview
+                        <LocalGamePreview
                             localOptions={this.props.localOptions}
                             displaySize={this.props.displaySize}
                             highFidelity={this.getHighFidelity()}
