@@ -29,7 +29,7 @@ export class TestTracking
 
     render(): React.ReactNode {
         return (
-            <div>
+            <>
 
                 <table>
                     <tbody>
@@ -69,7 +69,7 @@ export class TestTracking
                     }
                 >Track</button></div>
 
-            </div>
+            </>
         )
     }
 }

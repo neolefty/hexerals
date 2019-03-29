@@ -1,14 +1,14 @@
 import * as React from 'react'
-import {TickerBoardView, TickerBoardViewProps} from './TickerBoardView'
+import {TickerGameView, TickerGameViewProps} from './TickerGameView'
 import {Defeat, Victory} from './GamePhaseView'
 import {isDefeat, isVictory} from '../model/board/BoardState';
 import {Layered} from '../../common/Layered';
 
-export const LocalBoardView = (
-    props: TickerBoardViewProps
+export const LocalGameView = (
+    props: TickerGameViewProps
 ) => (
     <Layered>
-        <TickerBoardView {...props} />
+        <TickerGameView {...props} />
         {
             isVictory(props.boardState)
                 ? <Victory{...props}/>

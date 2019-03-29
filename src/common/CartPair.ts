@@ -27,6 +27,9 @@ export class CartPair {
     // for destructuring calls e.g. [x,y] = dim.xy
     get xy() { return [this.x, this.y] }
 
+    get isVertical() { return this.y > this.x }
+    get isHorizontal() { return !this.isVertical }
+
     // don't change — SVG operations depend on exactly this
     toString() { return `${this.x},${this.y}` }
 

@@ -20,7 +20,7 @@ import {Player, PLAYERS} from '../model/players/Players'
 import {PlayerMove} from '../model/move/Move'
 import {CacheMap} from '../../common/CacheMap'
 import {setColorsAction} from '../../color/ColorsReducer'
-import {LocalBoardView} from './LocalBoardView';
+import {LocalGameView} from './LocalGameView';
 import {LocalGameState} from '../model/cycle/CycleState';
 import {closeLocalGameAction, openLocalGameAction} from '../model/cycle/CycleReducer';
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../common/Analytics';
@@ -111,8 +111,8 @@ const mapDispatchToBoardViewProps = (
     }
 })
 
-export const LocalBoardContainer = connect(
+export const LocalGameContainer = connect(
     mapStateToTickerBoardViewProps, mapDispatchToBoardViewProps
 )(
-    LocalBoardView
+    LocalGameView
 )

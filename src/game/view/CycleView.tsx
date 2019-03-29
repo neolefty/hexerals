@@ -5,7 +5,7 @@ import * as React from 'react'
 import {CycleState} from '../model/cycle/CycleState'
 import {Layered} from '../../common/Layered'
 import {LocalGamePreview} from './LocalGamePreview'
-import {LocalGameDisplay} from './LocalGameDisplay'
+import {LocalGameContainer} from './LocalGameContainer'
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair
@@ -56,7 +56,7 @@ export class CycleView
             case CycleMode.IN_LOCAL_GAME:
                 if (this.props.localGame)
                     return (
-                        <LocalGameDisplay
+                        <LocalGameContainer
                             displaySize={this.props.displaySize}
                         />
                     )

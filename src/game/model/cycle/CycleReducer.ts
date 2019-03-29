@@ -37,8 +37,10 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         // booleans — non-zero is true
         fog: 1,
         capitals: 1,
-        levelVisible: 0,
+        statsVisible: 1,
         randomStart: 1,
+        // meta — what options are visible
+        levelVisible: 0,
     },
     localGame: undefined,
 }

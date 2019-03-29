@@ -45,7 +45,10 @@ export interface LocalGameOptions {
 
     // booleans
     fog: number
+    // Players start with capitals (true) or towns (false)?
+    // Note that capturing a capital captures whole territory, but town does not.
     capitals: number
+    statsVisible: number  // changes shape of board
     levelVisible: number  // advanced options visible?
     randomStart: number  // players start in random locations?
 
@@ -254,6 +257,7 @@ export class LocalGameOptionsView
         // TODO move this up, to avoid mutating state in render() ...
         if (!this.shapeMatches())
             this.fitToShape(this.nHexesFromProps(), true)
+
         const optionChanger = (
             name: keyof LocalGameOptions, forceHighFi = false
         ) => (n: number, highFidelity: boolean = true) =>
@@ -394,6 +398,7 @@ export class LocalGameOptionsView
                         {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
                         {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
                         {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
+                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 1)}
                     </div>
                     <div className="Level2 Column">
                         {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
