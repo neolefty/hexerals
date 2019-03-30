@@ -13,6 +13,7 @@ import {
 import {minMax, minRatio, roundToMap} from '../../common/MathFunctions'
 import {MAX_PLAYERS} from '../model/players/Players'
 import {CacheMap} from '../../common/CacheMap'
+import {statSizesAndStyles} from './BoardAndStats'
 
 // export type LGOKey =
 //     'numRobots' | 'tickMillis' | 'boardWidth' | 'boardHeight'
@@ -114,6 +115,7 @@ export interface LGOProps {
 export class LocalGameOptionsView
     extends React.PureComponent<LGOProps>
 {
+    private boardDisplaySize: CartPair = CartPair.ORIGIN
     private isOption = (optionName: LGOKey): boolean =>
         this.props.localOptions[optionName] > 0
     private toggleOption = (optionName: LGOKey) =>
@@ -122,6 +124,9 @@ export class LocalGameOptionsView
             this.isOption(optionName) ? 0 : 1,
             true,
         )
+
+    componentWillMount(): void {
+    }
 
     isLevelVisible = (level: number) =>
         this.props.localOptions.levelVisible >= level
@@ -135,13 +140,13 @@ export class LocalGameOptionsView
 
     // How many hexes fit, proportionately?
     widthFromHeight = (hexHeight: number): number =>
-        widthFromHeight(this.props.displaySize, hexHeight)
+        widthFromHeight(this.boardDisplaySize, hexHeight)
     heightFromWidth = (hexWidth: number): number =>
-        heightFromWidth(this.props.displaySize, hexWidth)
+        heightFromWidth(this.boardDisplaySize, hexWidth)
 
     getHexCounts = (): HexCounts =>
         hexCountsCache.get(
-            this.props.displaySize,
+            this.boardDisplaySize,
             () => this.computeHexCounts()
         )
 
@@ -254,6 +259,11 @@ export class LocalGameOptionsView
     }
 
     render(): React.ReactNode {
+        this.boardDisplaySize = statSizesAndStyles(
+            this.props.displaySize, this.props.localOptions.statsVisible !== 0
+        ).board.displaySize
+        console.log(`${this.props.displaySize.round(1)} => ${this.boardDisplaySize.round(1)}`)
+
         // TODO move this up, to avoid mutating state in render() ...
         if (!this.shapeMatches())
             this.fitToShape(this.nHexesFromProps(), true)

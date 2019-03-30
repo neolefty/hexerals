@@ -8,6 +8,8 @@ export interface SizeStyle {
 
 // Cartesian Pair (x, y)
 export class CartPair {
+    static readonly ORIGIN = new CartPair(0, 0)
+
     constructor(readonly x: number, readonly y: number) {}
 
     scale = (scale: number) => this.scaleXY(scale, scale)
@@ -45,7 +47,6 @@ export class CartPair {
             height: this.y,
         }
     }
-
 }
 
 export type CartPairTransform = (cp: CartPair) => CartPair

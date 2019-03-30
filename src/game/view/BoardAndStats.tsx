@@ -3,7 +3,6 @@ import * as React from 'react'
 import {BoardViewProps} from './BoardViewBase'
 import {HexBoardView} from './HexBoardView'
 import {CartPair} from '../../common/CartPair'
-import {SetStateAction} from 'react'
 import {useLocalStorageState} from '../../common/MoreHooks'
 
 export interface BoardAndStatsProps extends BoardViewProps {
@@ -69,6 +68,8 @@ export const statSizesAndStyles = (
         const boardWidth = displaySize.x - statsWidth
         statsStyle.width = statsWidth
         boardStyle.width = boardWidth
+        boardDisplay = boardDisplay.setX(boardWidth)
+        statsDisplay = statsDisplay.setX(statsWidth)
     }
 
     return {
