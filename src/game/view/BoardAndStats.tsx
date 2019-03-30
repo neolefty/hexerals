@@ -37,15 +37,18 @@ export const statSizesAndStyles = (
 ): BoardAndStatsDisplayStuff => {
     const containerStyle: React.CSSProperties = {
         display: 'flex',
+        justifyContent: 'center',
         flexDirection: displaySize.isVertical ?
             (state.statsRight ? 'column' : 'column-reverse'):
             (state.statsDown ? 'row' : 'row-reverse'),
     }
     const boardStyle: React.CSSProperties = {
         ...displaySize.sizeStyle,
+        alignSelf: 'center',
     }
     const statsStyle: React.CSSProperties = {
         ...boardStyle,
+        alignSelf: 'flex-end',
         background: 'green',
     }
 
