@@ -50,26 +50,28 @@ export const statSizesAndStyles = (
     }
 
     let boardDisplay = displaySize
-    let statsDisplay = displaySize
-    if (displaySize.isVertical) { // stats is horizontal
-        // noinspection UnnecessaryLocalVariableJS
-        const statsWidth = displaySize.x
-        const statsHeight = statsWidth * STATS_ASPECT
-        const boardHeight = displaySize.y - statsHeight
-        statsStyle.height = statsHeight
-        boardStyle.height = boardHeight
-        boardDisplay = boardDisplay.setY(boardHeight)
-        statsDisplay = statsDisplay.setY(statsHeight)
-    }
-    else { // stats is vertical
-        // noinspection UnnecessaryLocalVariableJS
-        const statsHeight = displaySize.y
-        const statsWidth = statsHeight * STATS_ASPECT
-        const boardWidth = displaySize.x - statsWidth
-        statsStyle.width = statsWidth
-        boardStyle.width = boardWidth
-        boardDisplay = boardDisplay.setX(boardWidth)
-        statsDisplay = statsDisplay.setX(statsWidth)
+    let statsDisplay = statsVisible ? displaySize : CartPair.ORIGIN
+    if (statsVisible) {
+        if (displaySize.isVertical) { // stats is horizontal
+            // noinspection UnnecessaryLocalVariableJS
+            const statsWidth = displaySize.x
+            const statsHeight = statsWidth * STATS_ASPECT
+            const boardHeight = displaySize.y - statsHeight
+            statsStyle.height = statsHeight
+            boardStyle.height = boardHeight
+            boardDisplay = boardDisplay.setY(boardHeight)
+            statsDisplay = statsDisplay.setY(statsHeight)
+        }
+        else { // stats is vertical
+            // noinspection UnnecessaryLocalVariableJS
+            const statsHeight = displaySize.y
+            const statsWidth = statsHeight * STATS_ASPECT
+            const boardWidth = displaySize.x - statsWidth
+            statsStyle.width = statsWidth
+            boardStyle.width = boardWidth
+            boardDisplay = boardDisplay.setX(boardWidth)
+            statsDisplay = statsDisplay.setX(statsWidth)
+        }
     }
 
     return {
@@ -99,15 +101,19 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
                     displaySize={displayStuff.board.displaySize}
                 />
             </div>
-            <div style={displayStuff.stats.style}>
-                Stats
-                <button onClick={() =>
-                    setState({
-                        statsRight: !state.statsRight,
-                        statsDown: !state.statsDown,
-                    })
-                }>Toggle</button>
-            </div>
+            {
+                props.statsVisible ? (
+                    <div style={displayStuff.stats.style}>
+                        Stats
+                        <button onClick={() =>
+                            setState({
+                                statsRight: !state.statsRight,
+                                statsDown: !state.statsDown,
+                            })
+                        }>Toggle</button>
+                    </div>
+                ) : undefined
+            }
         </div>
     )
 }

@@ -258,13 +258,13 @@ export class LocalGameOptionsView
         )
     }
 
+
+
     render(): React.ReactNode {
         this.boardDisplaySize = statSizesAndStyles(
             this.props.displaySize, this.props.localOptions.statsVisible !== 0
         ).board.displaySize
-        console.log(`${this.props.displaySize.round(1)} => ${this.boardDisplaySize.round(1)}`)
-
-        // TODO move this up, to avoid mutating state in render() ...
+        // TODO move this up to parent, to avoid mutating state in render() ...
         if (!this.shapeMatches())
             this.fitToShape(this.nHexesFromProps(), true)
 
