@@ -408,9 +408,9 @@ export class LocalGameOptionsView
                         {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
                         {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
                         {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
-                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 1)}
                     </div>
                     <div className="Level2 Column">
+                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
                         {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
                     </div>
                     <div>

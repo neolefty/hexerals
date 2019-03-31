@@ -6,6 +6,8 @@ import {PlayerMove} from './Move';
 import * as assert from 'assert';
 
 export class MovementQueue {
+    static readonly EMPTY = new MovementQueue(Map())
+
     constructor(
         readonly playerQueues: Map<Player, List<PlayerMove>> = Map()
     ) {}
@@ -130,8 +132,6 @@ export class MovementQueue {
             return undefined
     }
 }
-
-export const EMPTY_MOVEMENT_QUEUE = new MovementQueue(Map())
 
 export class QueueAndMoves {
     constructor(

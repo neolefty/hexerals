@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {List, Map, Set} from 'immutable'
+import {Map, Set} from 'immutable'
 import Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {mount, shallow} from 'enzyme'
@@ -8,16 +8,14 @@ import {Board} from '../model/board/Board'
 import {Hex} from '../model/hex/Hex'
 import {CartPair} from "../../common/CartPair"
 import {BoardViewBase, BOARD_STUBS} from "./BoardViewBase"
-import {BoardState, DEFAULT_CURSORS} from '../model/board/BoardState'
+import {BoardState, BOARD_STATE_STARTER} from '../model/board/BoardState'
 import {
     pickNPlayers, Player, PlayerManager
 } from '../model/players/Players'
-import {EMPTY_MOVEMENT_QUEUE} from '../model/move/MovementQueue'
 import {Tile} from '../model/hex/Tile'
 import {CornersPlayerArranger} from '../model/setup/PlayerArranger'
 import {BoardReducerTester} from '../model/board/BoardReducerTester'
 import {Terrain} from '../model/hex/Terrain'
-import {GamePhase} from '../model/cycle/GamePhase'
 
 it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})
@@ -44,14 +42,10 @@ it('renders a board with no selection', () => {
         5, 3, pickNPlayers(2), [new CornersPlayerArranger(3)])
     // console.log(board.toString())
     const boardState: BoardState = {
+        ...BOARD_STATE_STARTER,
         board: board,
-        turn: 0,
-        cursors: DEFAULT_CURSORS,
-        moves: EMPTY_MOVEMENT_QUEUE,
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
-        messages: List(),
-        phase: GamePhase.BeforeStart,
     }
 
     // TODO redo this whole thing with HexesView & react-test-renderer — https://reactjs.org/docs/test-renderer.html
@@ -103,14 +97,11 @@ it('renders a board with a selection', () => {
         3, pickNPlayers(2), [new CornersPlayerArranger(2)])
     const ur = board.edges.upperRight
     const bs: BoardState = {
+        ...BOARD_STATE_STARTER,
         board: board,
-        turn: 0,
         cursors: Map<number, Hex>([[0, ur]]),
-        moves: EMPTY_MOVEMENT_QUEUE,
         players: PlayerManager.construct(board.players),
         curPlayer: Player.One,
-        messages: List(),
-        phase: GamePhase.BeforeStart,
     }
     const view = enzyme.render(
         <OldGridView

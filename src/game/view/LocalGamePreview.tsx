@@ -6,7 +6,7 @@ import {CartPair} from '../../common/CartPair'
 import {BOARD_STUBS} from './BoardViewBase'
 import {DriftColor} from '../../color/DriftColor'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
-import {BoardState} from '../model/board/BoardState'
+import {BOARD_STATE_STARTER, BoardState} from '../model/board/BoardState'
 import {Board} from '../model/board/Board'
 import {Hex} from '../model/hex/Hex'
 import {MovementQueue} from '../model/move/MovementQueue'
@@ -98,15 +98,6 @@ const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
     return CacheKeyRecord(result)
 }
 
-const EmptyBoardState = {
-    turn: 0,
-    cursors: Map<number, Hex>(),
-    players: PlayerManager.construct(List()),
-    moves: new MovementQueue(),
-    messages: List<StatusMessage>(),
-    phase: GamePhase.BeforeStart,
-}
-
 const bsCache = new CacheMap<{}, BoardState>(2000)
 const getBoardState = (
     options: LocalGameOptions,
@@ -119,7 +110,8 @@ const getBoardState = (
     // cache low-fidelity of blank hexes (computes set of all tiles)
     const blankState = bsCache.get(keyBlank, () =>
         Object.freeze({
-            ...EmptyBoardState,
+            ...BOARD_STATE_STARTER,
+            players: PlayerManager.construct(List()),
             board: Board.constructRectangular(
                 options.boardWidth, options.boardHeight
             )

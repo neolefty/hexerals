@@ -5,15 +5,13 @@ import {CycleMode} from './CycleState'
 import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
 import {CycleState} from './CycleState'
-import {EMPTY_MOVEMENT_QUEUE} from '../move/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
 import {BasicRobot} from '../players/BasicRobot'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {Terrain} from '../hex/Terrain'
-import {DEFAULT_CURSORS} from '../board/BoardState'
+import {BOARD_STATE_STARTER} from '../board/BoardState'
 import * as assert from 'assert'
-import {GamePhase} from './GamePhase'
 import {PlayerFogs} from '../board/Fog'
 import {CornersPlayerArranger} from '../setup/PlayerArranger';
 import {GenericAction} from '../../../common/App';
@@ -37,7 +35,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         // booleans — non-zero is true
         fog: 1,
         capitals: 1,
-        statsVisible: 1,
+        statsVisible: 0,
         randomStart: 1,
         // meta — what options are visible
         levelVisible: 0,
@@ -146,14 +144,11 @@ const openLocalGameReducer =
         localGame: {
             fogs: new PlayerFogs(true),
             boardState: {
+                ...BOARD_STATE_STARTER,
                 board: newBoard,
-                turn: 0,
                 players: pm,
-                cursors: DEFAULT_CURSORS,
-                moves: EMPTY_MOVEMENT_QUEUE,
                 messages: List(messages),
                 curPlayer: Player.Zero,
-                phase: GamePhase.BeforeStart,
             }
         },
     }

@@ -3,8 +3,8 @@ import {Set, List} from 'immutable'
 import {Hex} from '../hex/Hex'
 import {HexMove, PlayerMove} from '../move/Move'
 import {Board} from './Board'
-import {analyticsLabel, BoardState, DEFAULT_CURSORS} from './BoardState'
-import {EMPTY_MOVEMENT_QUEUE, QueueAndMoves} from '../move/MovementQueue'
+import {analyticsLabel, BoardState, DEFAULT_CURSORS, BOARD_STATE_STARTER} from './BoardState'
+import {MovementQueue, QueueAndMoves} from '../move/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {GameDecision, Robot} from '../players/Robot'
 import {floodShortestPath} from '../hex/ShortestPath'
@@ -13,6 +13,7 @@ import {GamePhase} from '../cycle/GamePhase'
 import {GenericAction} from '../../../common/App';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
+import {StatHistory} from '../stats/StatHistory'
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
@@ -45,14 +46,9 @@ export const isGameAction = (action: GenericAction): action is GameAction =>
 // should never actually see this -- we just need a default for reducers
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
+    ...BOARD_STATE_STARTER,
     board: Board.constructSquare(2, INITIAL_PLAYERS),
-    turn: 0,
-    cursors: DEFAULT_CURSORS,
     players: PlayerManager.construct(INITIAL_PLAYERS),
-    curPlayer: undefined,
-    moves: EMPTY_MOVEMENT_QUEUE,
-    messages: List([]),
-    phase: GamePhase.BeforeStart,
 }
 
 export const BoardReducer: Reducer<BoardState, GameAction> = (
@@ -304,11 +300,11 @@ const cancelMoveReducer = (
                     cursors = cursors.set(index, oldest.source)
             })
         }
-        return {
+        return Object.freeze({
             ...state,
             moves: updated.queue,
             cursors,
-        }
+        })
     }
     else
         return state
@@ -319,14 +315,18 @@ type GAME_TICK = 'GAME_TICK'
 interface GameTick extends GenericAction {type: GAME_TICK}
 const isGameTick = (action: GenericAction): action is GameTick => action.type === GAME_TICK
 export const gameTickAction = (): GameTick => ({ type: GAME_TICK })
-const gameTickReducer = (state: BoardState): BoardState => ({
-    ...state,
-    board: state.board.stepPop(state.turn),
-    turn: state.turn + 1,
-    // at least mark the game as started
-    phase: state.phase === GamePhase.BeforeStart
-        ? GamePhase.Started : state.phase
-})
+const gameTickReducer = (state: BoardState): BoardState => {
+    const result: BoardState = {
+        ...state,
+        board: state.board.stepPop(state.turn),
+        turn: state.turn + 1,
+        // at least mark the game as started
+        phase: state.phase === GamePhase.BeforeStart
+            ? GamePhase.Started : state.phase
+    }
+    result.stats = result.stats.update(result)
+    return Object.freeze(result)
+}
 
 type PLACE_CURSOR = typeof PLACE_CURSOR
 interface PlaceCursor extends GenericAction {
@@ -361,10 +361,10 @@ const placeCursorReducer = (
     }
     return (updated === original)
         ? state
-        : {
+        : Object.freeze({
             ...state,
             cursors: updated,
-        }
+        })
 }
 
 type SET_CUR_PLAYER = typeof SET_CUR_PLAYER

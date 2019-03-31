@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {List} from 'immutable'
 
-import {BoardState, DEFAULT_CURSORS} from '../model/board/BoardState'
+import {BOARD_STATE_STARTER, BoardState} from '../model/board/BoardState'
 import {HexBoardView} from './HexBoardView'
 import {ColorPodge} from '../../color/ColorPodge'
 import {CartPair} from '../../common/CartPair'
@@ -9,13 +9,10 @@ import {playerColors} from './LocalGameContainer'
 import './Benchmark.css'
 import {Board} from '../model/board/Board'
 import {pickNPlayers, Player, PlayerManager} from '../model/players/Players'
-import {StatusMessage} from '../../common/StatusMessage'
-import {MovementQueue} from '../model/move/MovementQueue'
 import {BOARD_STUBS, BoardViewProps} from './BoardViewBase'
 import {BasicRobot} from '../model/players/BasicRobot'
 import {SpreadPlayersArranger} from '../model/setup/SpreadPlayerArranger'
 import {YMountainArranger} from '../model/setup/YMountainArranger'
-import {GamePhase} from '../model/cycle/GamePhase'
 
 const NUM_PLAYERS = 10
 const BOARD_WIDTH = 21
@@ -54,19 +51,14 @@ const newBoardState = (
     h: number = BOARD_HEIGHT,
     players: List<Player> = PLAYERS,
 ): BoardState => ({
+    ...BOARD_STATE_STARTER,
     board: Board.constructRectangular(
         w, h, players, [
             new YMountainArranger(0, 2),
             new SpreadPlayersArranger(),
         ]
     ),
-    turn: 0,
-    cursors: DEFAULT_CURSORS,
-    moves: new MovementQueue(),
     players: assignRobots(),
-    curPlayer: undefined,
-    messages: List<StatusMessage>(),
-    phase: GamePhase.BeforeStart,
 })
 
 // the parts of BoardViewProps that don't change — everything except boardState: BoardState

@@ -7,6 +7,7 @@ import {GamePhase} from '../cycle/GamePhase';
 import {Capture} from '../move/Capture';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {AnalyticsLabel} from '../../../common/Analytics';
+import {StatHistory} from '../stats/StatHistory'
 
 export interface BoardState {
     board: Board
@@ -16,6 +17,7 @@ export interface BoardState {
     players: PlayerManager
     messages: List<StatusMessage>
     phase: GamePhase
+    stats: StatHistory
     curPlayer?: Player
     captures?: List<Capture>
 }
@@ -23,6 +25,15 @@ export interface BoardState {
 export const DEFAULT_CURSORS = Map<number, Hex>(
     [[0, Hex.NONE]]
 )
+
+export const BOARD_STATE_STARTER = Object.freeze({
+    turn: 0,
+    cursors: DEFAULT_CURSORS,
+    moves: MovementQueue.EMPTY,
+    messages: List<StatusMessage>(),
+    phase: GamePhase.BeforeStart,
+    stats: StatHistory.EMPTY,
+})
 
 export const boardStateToString = (s: BoardState): string =>
     ''
