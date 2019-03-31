@@ -216,9 +216,9 @@ it('captures capitals and checks stats', () => {
         3, 3, pickNPlayers(2),
         [new CornersPlayerArranger(20, Terrain.Capital)],
     )
-    expect(start.getTileStatistics().get(Player.Zero)).toBe(1)
+    expect(start.getHexStatistics().get(Player.Zero)).toBe(1)
     expect(start.getPopStatistics().get(Player.Zero)).toBe(20)
-    expect(start.getTileStatistics().size).toBe(2)
+    expect(start.getHexStatistics().size).toBe(2)
     expect(start.getTile(Hex.ORIGIN).terrain).toBe(Terrain.Capital)
     // move player one to lower right corner
     const moved = start.applyMoves(List([
@@ -238,7 +238,7 @@ it('captures capitals and checks stats', () => {
         new Tile(Player.Zero, 16, Terrain.CapturedCapital))
     expect(captured.getCartTile(2, 0)).toEqual(
         new Tile(Player.Zero, 9))
-    expect(captured.getTileStatistics().get(Player.One, 0)).toBe(0)
-    expect(captured.getTileStatistics().get(Player.Zero)).toBe(4)
+    expect(captured.getHexStatistics().get(Player.One, 0)).toBe(0)
+    expect(captured.getHexStatistics().get(Player.Zero)).toBe(4)
     expect(captured.getPopStatistics().get(Player.Zero)).toBe(27)
 })

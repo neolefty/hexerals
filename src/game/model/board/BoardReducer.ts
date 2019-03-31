@@ -98,7 +98,7 @@ const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
     board: action.board,
 })
 
-// add to the player's movement queue
+// update to the player's movement queue
 type QUEUE_MOVES = typeof QUEUE_MOVES
 interface QueueMoves extends GenericAction {
     type: QUEUE_MOVES
@@ -164,7 +164,7 @@ const doMovesReducer = (state: BoardState): BoardState => {
             captures.size > 0  // can only end on a capture
             && state.phase !== GamePhase.Ended  // not already ended
             // 1 player remains
-            && boardAndMessages.board.getTileStatistics().size <= 1
+            && boardAndMessages.board.getHexStatistics().size <= 1
         )
         if (ended)
             phase = GamePhase.Ended

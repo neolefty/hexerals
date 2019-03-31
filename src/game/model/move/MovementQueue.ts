@@ -13,7 +13,7 @@ export class MovementQueue {
     public addMove(move: PlayerMove): MovementQueue {
         if (this.playerQueues.has(move.player))
             return new MovementQueue(
-                // add move to the end of this player's queue
+                // update move to the end of this player's queue
                 this.playerQueues.set(
                     move.player,
                     (this.playerQueues.get(move.player) as List<PlayerMove>)

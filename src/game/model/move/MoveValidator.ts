@@ -25,7 +25,7 @@ export class MoveValidatorOptions {
 
     constructor(
         tiles: Map<Hex, Tile>,
-        // status messages to add to
+        // status messages to update to
         readonly status: StatusMessage[] | undefined = undefined,
         // captures to record
         readonly captures: Capture[] = []

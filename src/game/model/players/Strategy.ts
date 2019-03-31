@@ -293,7 +293,7 @@ export const detangleNVotes(
         ++i
     ) {
         const dest = sortedHexes.get(i)
-        destinations.add(dest)
+        destinations.update(dest)
         for (const vote of votes) {
             if (
                 !destinations.has(vote.move.source)

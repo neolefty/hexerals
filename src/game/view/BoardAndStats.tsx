@@ -4,6 +4,7 @@ import {BoardViewProps} from './BoardViewBase'
 import {HexBoardView} from './HexBoardView'
 import {CartPair} from '../../common/CartPair'
 import {useLocalStorageState} from '../../common/MoreHooks'
+import {StatsPanel} from './StatsPanel'
 
 export interface BoardAndStatsProps extends BoardViewProps {
     statsVisible: boolean
@@ -39,8 +40,8 @@ export const statSizesAndStyles = (
         display: 'flex',
         justifyContent: 'center',
         flexDirection: displaySize.isVertical ?
-            (state.statsRight ? 'column' : 'column-reverse'):
-            (state.statsDown ? 'row' : 'row-reverse'),
+            (state.statsDown ? 'column' : 'column-reverse'):
+            (state.statsRight ? 'row' : 'row-reverse'),
     }
     const boardStyle: React.CSSProperties = {
         ...displaySize.sizeStyle,
@@ -96,6 +97,7 @@ export const statSizesAndStyles = (
 export const BoardAndStats = (props: BoardAndStatsProps) => {
     const [state, setState] = useLocalStorageState('BoardAndStats.state', defaultState)
     const displayStuff = statSizesAndStyles(props.displaySize, props.statsVisible, state)
+    const vert = props.displaySize.isVertical
     return (
         <div style={displayStuff.container.style}>
             <div style={displayStuff.board.style}>
@@ -107,13 +109,16 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
             {
                 props.statsVisible ? (
                     <div style={displayStuff.stats.style}>
-                        Stats
-                        <button onClick={() =>
-                            setState({
-                                statsRight: !state.statsRight,
-                                statsDown: !state.statsDown,
-                            })
-                        }>Toggle</button>
+                        <StatsPanel
+                            boardState={props.boardState}
+                            onTogglePosition={() => {
+                                setState({
+                                    statsRight: vert ? state.statsRight : !state.statsRight,
+                                    statsDown: vert ? !state.statsDown : state.statsDown,
+                                })
+                            }}
+                            displaySize={displayStuff.stats.displaySize}
+                        />
                     </div>
                 ) : undefined
             }

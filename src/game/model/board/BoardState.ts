@@ -43,7 +43,7 @@ export const boardStateToString = (s: BoardState): string =>
 
 export const curPlayerTileCount = (state: BoardState) => (
     state.curPlayer !== undefined
-    && state.board.getTileStatistics().get(state.curPlayer, 0)
+    && state.board.getHexStatistics().get(state.curPlayer, 0)
 ) || 0
 
 export const isVictory = (state: BoardState) => (

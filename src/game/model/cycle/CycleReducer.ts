@@ -183,7 +183,7 @@ type CHANGE_LOCAL_OPTION = typeof CHANGE_LOCAL_OPTION
 interface ChangeLocalOption extends GenericAction {
     type: CHANGE_LOCAL_OPTION
     name: keyof LocalGameOptions
-    n: number  // TODO add string field
+    n: number  // TODO update string field
 }
 const isChangeLocalOption = (action: GenericAction): action is ChangeLocalOption =>
     action.type === CHANGE_LOCAL_OPTION

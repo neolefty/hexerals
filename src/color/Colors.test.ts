@@ -63,7 +63,7 @@ it('color podge basics', () => {
     // spread them apart
     cp = cp.disperse(10).disperse(1)
 
-    // add 6 more random colors
+    // update 6 more random colors
     Range(0, 6).forEach(() =>
         cp = cp.addRandomColor()
     )

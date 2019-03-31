@@ -883,7 +883,7 @@
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.0.0":
   version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-4.0.0.tgz#5acf239cd2747b1a36ec7e708de05d914cb9b948"
+  resolved "https://registry.yarnpkg.com/@svgr/babel-plugin-update-jsx-attribute/-/babel-plugin-update-jsx-attribute-4.0.0.tgz#5acf239cd2747b1a36ec7e708de05d914cb9b948"
   integrity sha512-PDvHV2WhSGCSExp+eIMEKxYd1Q0SBvXLb4gAOXbdh0dswHFFgXWzxGjCmx5aln4qGrhkuN81khzYzR/44DYaMA==
 
 "@svgr/babel-plugin-remove-jsx-attribute@^4.0.3":
@@ -926,7 +926,7 @@
   resolved "https://registry.yarnpkg.com/@svgr/babel-preset/-/babel-preset-4.1.0.tgz#f6fa8ad90064b85dd7a3566a70b7006e789e8385"
   integrity sha512-Nat5aJ3VO3LE8KfMyIbd3sGWnaWPiFCeWIdEV+lalga0To/tpmzsnPDdnrR9fNYhvSSLJbwhU/lrLYt9wXY0ZQ==
   dependencies:
-    "@svgr/babel-plugin-add-jsx-attribute" "^4.0.0"
+    "@svgr/babel-plugin-update-jsx-attribute" "^4.0.0"
     "@svgr/babel-plugin-remove-jsx-attribute" "^4.0.3"
     "@svgr/babel-plugin-remove-jsx-empty-expression" "^4.0.0"
     "@svgr/babel-plugin-replace-jsx-attribute-value" "^4.0.0"

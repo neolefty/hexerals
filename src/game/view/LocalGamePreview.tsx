@@ -143,7 +143,7 @@ const getBoardState = (
         })
     )
 
-    // then, keeping mountains the same, add players
+    // then, keeping mountains the same, update players
     return bsCache.get(key, () => {
         const players = pickNPlayers(options.numRobots + 1)
         const board = noRobots.board.overlayTiles(

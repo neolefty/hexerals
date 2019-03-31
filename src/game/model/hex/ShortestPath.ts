@@ -11,7 +11,7 @@ interface HexNum {
 
 // Find the best path by flooding (simplified Dijkstra's algorithm).
 // extraBenefit: Extra (negative) value of visiting a particular hex. Should be between 0 and -1.
-// Note: extraBenefit complicates things because we can't just stop when we reach the dest. Instead, we have to figure out when to stop looking for better paths. Full Dijkstra I guess if you want to add that.
+// Note: extraBenefit complicates things because we can't just stop when we reach the dest. Instead, we have to figure out when to stop looking for better paths. Full Dijkstra I guess if you want to update that.
 export const floodShortestPath = (
     hexes: Set<Hex>, origin: Hex, dest: Hex // , extraBenefit: HexEvaluator | undefined = undefined
 ): List<Hex> => {
@@ -190,7 +190,7 @@ export class HexPaths {
                     neighbor => this.hexes.has(neighbor)
                 ) as List<Hex>
                 result.set(source, neighbors)
-                // 2. add them to the path store
+                // 2. update them to the path store
                 neighbors.forEach(neighbor =>
                     this.paths[sourceIndex][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
                 )

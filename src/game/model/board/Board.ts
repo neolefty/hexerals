@@ -165,20 +165,20 @@ export class Board {
     }
 
     // tslint:disable-next-line:member-ordering
-    private _tileStatistics: Map<Player, number> | undefined = undefined
-    // how many tiles each player controls
-    getTileStatistics(): Map<Player, number> {
-        if (!this._tileStatistics)
-            this._tileStatistics = this.gatherStatistics<Player, number>(
+    private _hexStatistics?: Map<Player, number>
+    // how many hexes each player controls
+    getHexStatistics(): Map<Player, number> {
+        if (!this._hexStatistics)
+            this._hexStatistics = this.gatherStatistics<Player, number>(
                 0,
                     tile => tile.owner,
                 (tile, hex, cur) => cur + 1,
             )
-        return this._tileStatistics
+        return this._hexStatistics
     }
 
     // tslint:disable-next-line:member-ordering
-    private _popStatistics: Map<Player, number> | undefined = undefined
+    private _popStatistics?: Map<Player, number>
     // how much total population each player has
     getPopStatistics(): Map<Player, number> {
         if (this._popStatistics === undefined)
