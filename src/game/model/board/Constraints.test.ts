@@ -5,7 +5,7 @@ import {Hex} from '../hex/Hex';
 import {Board} from './Board';
 import {pickNPlayers} from '../players/Players';
 import {BoardConstraints} from './Constraints';
-import {countHexes} from '../../view/HexConstants';
+import {countHexes} from '../../view/board/HexConstants';
 
 it('counts hexes', () => {
     // all 4 permutations of even & odd

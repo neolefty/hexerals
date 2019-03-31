@@ -7,7 +7,7 @@ import {GamePhase} from '../cycle/GamePhase';
 import {Capture} from '../move/Capture';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {AnalyticsLabel} from '../../../common/Analytics';
-import {StatHistory} from '../stats/StatHistory'
+import {StatHistory} from './StatHistory'
 
 export interface BoardState {
     board: Board

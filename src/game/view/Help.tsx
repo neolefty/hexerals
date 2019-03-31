@@ -1,21 +1,21 @@
-import * as React from 'react';
+import * as React from 'react'
+import {Map} from 'immutable'
 
-import {CartPair} from '../../common/CartPair';
-import {TileHexView} from './TileHexView';
-import {Tile} from '../model/hex/Tile';
-import {Hex} from '../model/hex/Hex';
-import {DriftColor} from '../../color/DriftColor';
-import {Map} from 'immutable';
-import {Player} from '../model/players/Players';
-import {Terrain} from '../model/hex/Terrain';
-import {MoveView} from './MoveQueueView';
-import {HexMove} from '../model/move/Move';
-import {hexPixelHeight, hexPixelWidth} from './HexConstants';
+import {CartPair} from '../../common/CartPair'
+import {DriftColor} from '../../color/DriftColor'
+import {Tile} from '../model/hex/Tile'
+import {Hex} from '../model/hex/Hex'
+import {Player} from '../model/players/Players'
+import {Terrain} from '../model/hex/Terrain'
+import {HexMove} from '../model/move/Move'
+import {MoveView} from './board/MoveQueueView'
+import {TileHexView} from './board/TileHexView'
+import {hexPixelHeight, hexPixelWidth} from './board/HexConstants'
 
 import './Help.css'
 
 export interface HelpOptions {
-    displaySize: CartPair;
+    displaySize: CartPair
 }
 
 const COLUMNS = 3

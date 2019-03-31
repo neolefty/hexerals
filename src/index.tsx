@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {combineReducers, createStore} from 'redux';
-import App from './common/App';
+import App from './game/view/App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 import {ColorsReducer} from './color/ColorsReducer';

@@ -1,19 +1,18 @@
+import {Reducer} from 'redux'
 import {Set, List} from 'immutable'
 
+import {StatusMessage} from '../../../common/StatusMessage'
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
 import {Hex} from '../hex/Hex'
 import {HexMove, PlayerMove} from '../move/Move'
-import {Board} from './Board'
 import {analyticsLabel, BoardState, DEFAULT_CURSORS, BOARD_STATE_STARTER} from './BoardState'
-import {MovementQueue, QueueAndMoves} from '../move/MovementQueue'
+import {QueueAndMoves} from '../move/MovementQueue'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {GameDecision, Robot} from '../players/Robot'
 import {floodShortestPath} from '../hex/ShortestPath'
-import {Reducer} from 'redux'
 import {GamePhase} from '../cycle/GamePhase'
-import {GenericAction} from '../../../common/App';
-import {StatusMessage} from '../../../common/StatusMessage';
-import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics';
-import {StatHistory} from '../stats/StatHistory'
+import {GenericAction} from '../../../common/GenericAction'
+import {Board} from './Board'
 
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions

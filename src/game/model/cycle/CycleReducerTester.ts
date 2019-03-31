@@ -1,17 +1,17 @@
-import {createStore, Store} from 'redux';
-import {List} from 'immutable';
+import {createStore, Store} from 'redux'
+import {List} from 'immutable'
 
-import {CycleState, cycleStateToString, LocalGameState} from './CycleState';
-import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from './CycleReducer';
-import {Player} from '../players/Players';
-import {Hex} from '../hex/Hex';
-import {doMovesAction, placeCursorAction, queueMovesAction, robotsDecideAction} from '../board/BoardReducer';
-import {PlayerMove} from '../move/Move';
-import {BoardState} from '../board/BoardState';
-import {BoardReducerTester} from '../board/BoardReducerTester';
-import {Tile} from '../hex/Tile';
-import {StatusMessage} from '../../../common/StatusMessage';
-import {LocalGameOptions} from '../../view/LocalGameOptions';
+import {StatusMessage} from '../../../common/StatusMessage'
+import {doMovesAction, placeCursorAction, queueMovesAction, robotsDecideAction} from '../board/BoardReducer'
+import {BoardReducerTester} from '../board/BoardReducerTester'
+import {BoardState} from '../board/BoardState'
+import {Hex} from '../hex/Hex'
+import {Tile} from '../hex/Tile'
+import {PlayerMove} from '../move/Move'
+import {Player} from '../players/Players'
+import {CycleState, cycleStateToString, LocalGameState} from './CycleState'
+import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from './CycleReducer'
+import {LocalGameOptions} from './LocalGameOptions'
 
 export class CycleReducerTester {
     readonly store: Store<CycleState>

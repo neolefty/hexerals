@@ -1,27 +1,25 @@
 ///<reference path="../../../common/Analytics.ts"/>
 import {List} from 'immutable'
+import * as assert from 'assert'
 
-import {CycleMode} from './CycleState'
+import {StatusMessage} from '../../../common/StatusMessage';
+import {GenericAction} from '../../../common/GenericAction'
+import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
+import {countHexes} from '../../view/board/HexConstants'
+import {LocalGameOptions} from './LocalGameOptions'
 import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
-import {CycleState} from './CycleState'
-import {pickNPlayers, Player, PlayerManager} from '../players/Players'
-import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
-import {BasicRobot} from '../players/BasicRobot'
-import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
-import {Terrain} from '../hex/Terrain'
 import {BOARD_STATE_STARTER} from '../board/BoardState'
-import * as assert from 'assert'
 import {PlayerFogs} from '../board/Fog'
+import {Terrain} from '../hex/Terrain'
+import {pickNPlayers, Player, PlayerManager} from '../players/Players'
+import {BasicRobot} from '../players/BasicRobot'
+import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
+import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger';
-import {GenericAction} from '../../../common/App';
-import {StatusMessage} from '../../../common/StatusMessage';
-import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
-import {countHexes} from '../../view/HexConstants';
-import {LocalGameOptions} from '../../view/LocalGameOptions';
+import {CycleState, CycleMode} from './CycleState'
 
 // the meta-game
-
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
     localOptions: {
