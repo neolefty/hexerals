@@ -10,6 +10,7 @@ import {CycleContainer} from './cycle/CycleContainer'
 import {TestTracking} from './test/TestTracking'
 import {Help} from './Help'
 import './App.css'
+import {isIOS} from '../../common/BrowserUtil'
 
 const MIN_WIDTH = 300
 const MIN_HEIGHT = 300
@@ -32,10 +33,12 @@ class App extends React.Component<AppProps, AppState> {
     private dimensionListener = this.updateDimensions.bind(this)
 
     updateDimensions() {
-        const dim = new CartPair(
+        let dim = new CartPair(
             Math.max(window.innerWidth, MIN_WIDTH),
             Math.max(window.innerHeight * 0.96, MIN_HEIGHT)
         )
+        if (isIOS())
+            dim = dim.plusX(-48) // avoid forward & back gesture areas in iOS
         this.setState({
             ...this.state,
             displaySize: dim,
