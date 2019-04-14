@@ -64,7 +64,12 @@ export class CieColor {
         // return CieColor.d2(this.lch, that.lch)
     }
 
-    toHexString = () => hsluv.hsluvToHex(this.hsl)
+    private _hexString?: string = undefined
+    toHexString = (): string => {
+        if (this._hexString === undefined)
+            this._hexString = hsluv.hsluvToHex(this.hsl)
+        return this._hexString as string
+    }
     toHslString = () => roundNumArrayToString(this.hsl)
     toLchString = () => roundNumArrayToString(this.lch)
 
