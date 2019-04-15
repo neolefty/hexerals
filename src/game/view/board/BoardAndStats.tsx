@@ -1,10 +1,11 @@
 import * as React from 'react'
+import {Map} from 'immutable'
 
-import {BoardViewProps} from './BoardViewBase'
-import {HexBoardView} from './HexBoardView'
 import {CartPair} from '../../../common/CartPair'
 import {useLocalStorageState} from '../../../common/MoreHooks'
 import {StatsPanel} from '../stats/StatsPanel'
+import {BoardViewProps} from './BoardViewBase'
+import {HexBoardView} from './HexBoardView'
 
 export interface BoardAndStatsProps extends BoardViewProps {
     statsVisible: boolean
@@ -39,6 +40,9 @@ export const statSizesAndStyles = (
     const containerStyle: React.CSSProperties = {
         display: 'flex',
         justifyContent: 'center',
+        // really want graph to be against edge of display
+        // width: '100%',
+        // height: '100%',
         flexDirection: displaySize.isVertical ?
             (state.statsDown ? 'column' : 'column-reverse'):
             (state.statsRight ? 'row' : 'row-reverse'),
@@ -50,7 +54,6 @@ export const statSizesAndStyles = (
     const statsStyle: React.CSSProperties = {
         ...boardStyle,
         alignSelf: 'flex-end',
-        background: 'green',
     }
 
     let boardDisplay = displaySize
@@ -118,6 +121,7 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
                                 })
                             }}
                             displaySize={displayStuff.stats.displaySize}
+                            colors={props.colors || Map()}
                         />
                     </div>
                 ) : undefined

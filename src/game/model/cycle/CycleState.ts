@@ -27,3 +27,4 @@ export const cycleStateToString = (s: CycleState): string =>
                 ? boardStateToString(s.localGame.boardState)
                 : 'undefined'
         }`
+    + `${s.localGame ? `stats: ${s.localGame.boardState.stats.toString()}` : ''}`

@@ -153,31 +153,51 @@ const doMovesReducer = (state: BoardState): BoardState => {
         (move: PlayerMove) => state.board.validate(move))
     if (movesAndQ) { // undefined if no moves to apply
         const boardAndMessages = state.board.applyMoves(movesAndQ.moves)
-        const captures = boardAndMessages.captures
-        let phase = state.phase
-        const ended = (
-            captures.size > 0  // can only end on a capture
-            && state.phase !== GamePhase.Ended  // not already ended
-            // 1 player remains
-            && boardAndMessages.board.getHexStatistics().size <= 1
-        )
-        if (ended)
-            phase = GamePhase.Ended
         const result: BoardState = {
             ...state,
-            board: boardAndMessages.board,
             moves: movesAndQ.queue,
+            board: boardAndMessages.board,
+            captures: boardAndMessages.captures,
             messages: boardAndMessages.addToMessages(state.messages),
-            captures: captures,
-            phase: phase,
         }
-        if (ended)
-            // TODO log local game options — but we don't have them here ...
-            logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(result))
-        return result
+        return Object.freeze(result)
     }
     else
         return state
+}
+
+type GAME_TICK = 'GAME_TICK'
+interface GameTick extends GenericAction {type: GAME_TICK}
+const isGameTick = (action: GenericAction): action is GameTick => action.type === GAME_TICK
+export const gameTickAction = (): GameTick => ({ type: GAME_TICK })
+const gameTickReducer = (state: BoardState): BoardState => {
+
+    // 1. advance pop
+    const result: BoardState = {
+        ...state,
+        board: state.board.stepPop(state.turn),
+        turn: state.turn + 1,
+        // at least mark the game as started
+        phase: state.phase === GamePhase.BeforeStart
+            ? GamePhase.Started : state.phase
+    }
+
+    // 2. gather stats
+    if (state.phase !== GamePhase.Ended)
+        result.stats = result.stats.update(result)
+
+    // 3. update phase
+    if (
+        state.captures  // only end on a capture
+        && state.phase !== GamePhase.Ended  // didn't already end
+        && result.stats.last.hexes.size <= 1 // no more than one player remains
+    ) {
+        result.phase = GamePhase.Ended
+        // TODO log local game options — but we don't have them here ...
+        logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(result))
+    }
+
+    return Object.freeze(result)
 }
 
 type DRAG = typeof DRAG
@@ -307,24 +327,6 @@ const cancelMoveReducer = (
     }
     else
         return state
-}
-
-// TODO combine DO_MOVES and GAME_TICK?
-type GAME_TICK = 'GAME_TICK'
-interface GameTick extends GenericAction {type: GAME_TICK}
-const isGameTick = (action: GenericAction): action is GameTick => action.type === GAME_TICK
-export const gameTickAction = (): GameTick => ({ type: GAME_TICK })
-const gameTickReducer = (state: BoardState): BoardState => {
-    const result: BoardState = {
-        ...state,
-        board: state.board.stepPop(state.turn),
-        turn: state.turn + 1,
-        // at least mark the game as started
-        phase: state.phase === GamePhase.BeforeStart
-            ? GamePhase.Started : state.phase
-    }
-    result.stats = result.stats.update(result)
-    return Object.freeze(result)
 }
 
 type PLACE_CURSOR = typeof PLACE_CURSOR

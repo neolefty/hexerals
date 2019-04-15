@@ -47,7 +47,6 @@ it('logs a win', () => {
 
     const crt = new CycleReducerTester()
     crt.useCornersArranger()
-    crt.changeLocalOption('startingPop', 20)
     crt.openLocalGame(3, 3)
     expect(tagger.lastAction).toBe(AnalyticsAction.start)
 
@@ -58,6 +57,8 @@ it('logs a win', () => {
     expect(crt.getTile(crt.lr).owner).toBe(Player.One) // not captured yet
     expect(tagger.lastAction).toBe(AnalyticsAction.start)
     crt.doMoves()
+    expect(tagger.lastAction).toBe(AnalyticsAction.start)
+    crt.tick()
     expect(tagger.lastAction).toBe(AnalyticsAction.end)
     expect(crt.getTile(crt.ur).owner).toBe(Player.Zero)
     // captured capital, so should also own player one's old tile
@@ -74,7 +75,6 @@ it('logs a loss', () => {
 
     const crt = new CycleReducerTester()
     crt.useCornersArranger()
-    crt.changeLocalOption('startingPop', 20)
     crt.openLocalGame(3, 3)
     expect(tagger.lastAction).toBe(AnalyticsAction.start)
 
@@ -84,6 +84,7 @@ it('logs a loss', () => {
     crt.doMoves()
     expect(tagger.lastAction).toBe(AnalyticsAction.start)
     crt.doMoves()
+    crt.tick()
     expect(tagger.lastAction).toBe(AnalyticsAction.end)
     expect(crt.getTile(crt.ll).owner).toBe(Player.One)
     // captured capital, so should also own player one's old tile

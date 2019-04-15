@@ -2,7 +2,13 @@ import {createStore, Store} from 'redux'
 import {List} from 'immutable'
 
 import {StatusMessage} from '../../../common/StatusMessage'
-import {doMovesAction, placeCursorAction, queueMovesAction, robotsDecideAction} from '../board/BoardReducer'
+import {
+    doMovesAction,
+    gameTickAction,
+    placeCursorAction,
+    queueMovesAction,
+    robotsDecideAction
+} from '../board/BoardReducer'
 import {BoardReducerTester} from '../board/BoardReducerTester'
 import {BoardState} from '../board/BoardState'
 import {Hex} from '../hex/Hex'
@@ -17,6 +23,7 @@ export class CycleReducerTester {
     readonly store: Store<CycleState>
     constructor() {
         this.store = createStore(CycleReducer)
+        this.changeLocalOption('startingPop', 20)
     }
 
     get state(): CycleState { return this.store.getState() }
@@ -54,6 +61,7 @@ export class CycleReducerTester {
 
     robotsDecide = () => { this.store.dispatch(robotsDecideAction()) }
     doMoves = () => { this.store.dispatch(doMovesAction()) }
+    tick = () => { this.store.dispatch(gameTickAction()) }
 
     changeLocalOption = (name: keyof LocalGameOptions, n: number) =>
         this.store.dispatch(changeLocalOptionAction(name, n))

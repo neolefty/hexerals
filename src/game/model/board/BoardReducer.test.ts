@@ -7,7 +7,7 @@ import {Hex} from '../hex/Hex';
 import {queueMovesAction} from './BoardReducer';
 import {Terrain} from '../hex/Terrain';
 import {Tile} from '../hex/Tile';
-import {StatusMessage} from '../../../../common/StatusMessage';
+import {StatusMessage} from '../../../common/StatusMessage'
 import {CornersPlayerArranger} from '../setup/PlayerArranger';
 import {GamePhase} from '../cycle/GamePhase';
 import {Capture} from '../move/Capture';
@@ -336,6 +336,8 @@ fit('notices captures', () => {
         expect(inActual(capitalCap)).toBeTruthy()
         expect(inActual(otherCap)).toBeTruthy()
     }
+    expect(brt.state.phase).toBe(GamePhase.Started)
+    brt.gameTick()
     expect(brt.state.phase).toBe(GamePhase.Ended)
 })
 

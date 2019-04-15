@@ -15,6 +15,7 @@ import * as assert from 'assert';
 import {Capture} from '../move/Capture';
 import {HexPaths} from '../hex/ShortestPath';
 import {Terrain} from '../hex/Terrain';
+import {BoardStat} from './BoardStat'
 
 export class BoardAndMessages {
     constructor(
@@ -148,44 +149,49 @@ export class Board {
         })
     }
 
-    gatherStatistics<K, V>(
-        initialValue: V,
+    // reduce over all explicit tiles, separating by a key
+    gatherStatistics<K>(
+        initialValue: number,
         keyer: (tile: Tile, hex: Hex) => K,
-        collector: (tile: Tile, hex: Hex, curVal: V) => V,
-    ): Map<K, V> {
-        return Map<K, V>().withMutations(result =>
+        extractor: (tile: Tile, hex: Hex) => number,
+    ): BoardStat<K> {
+        let total = initialValue
+        const stats: Map<K, number> = Map<K, number>().withMutations(result =>
             this.explicitTiles.forEach((tile, hex) => {
                 if (tile.owner != Player.Nobody) {
                     const k = keyer(tile, hex)
-                    const oldV = result.get(k, initialValue)
-                    result.set(k, collector(tile, hex, oldV))
+                    const curV = result.get(k, initialValue)
+                    const thisV = extractor(tile, hex)
+                    total = total + thisV
+                    result.set(k, curV + thisV)
                 }
             })
         )
+        return new BoardStat<K>(stats, total)
     }
 
     // tslint:disable-next-line:member-ordering
-    private _hexStatistics?: Map<Player, number>
+    private _hexStatistics?: BoardStat<Player>
     // how many hexes each player controls
-    getHexStatistics(): Map<Player, number> {
-        if (!this._hexStatistics)
-            this._hexStatistics = this.gatherStatistics<Player, number>(
+    getHexStatistics(): BoardStat<Player> {
+        if (this._hexStatistics === undefined)
+            this._hexStatistics = this.gatherStatistics<Player>(
                 0,
-                    tile => tile.owner,
-                (tile, hex, cur) => cur + 1,
+                tile => tile.owner,
+                (tile, hex) => 1,
             )
         return this._hexStatistics
     }
 
     // tslint:disable-next-line:member-ordering
-    private _popStatistics?: Map<Player, number>
+    private _popStatistics?: BoardStat<Player>
     // how much total population each player has
-    getPopStatistics(): Map<Player, number> {
+    getPopStatistics(): BoardStat<Player> {
         if (this._popStatistics === undefined)
             this._popStatistics = this.gatherStatistics(
                 0,
-                    tile => tile.owner,
-                (tile, hex, cur) => tile.pop + cur,
+                tile => tile.owner,
+                (tile, hex) => tile.pop,
             )
         return this._popStatistics
     }

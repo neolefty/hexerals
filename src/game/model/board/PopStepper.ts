@@ -20,7 +20,7 @@ export class PopStepper {
                         mut.set(hex, tile.incrementPop())
                 })
             )
-        if (turn % this.countrysideTurns === 0)
+        if (turn > 0 && turn % this.countrysideTurns === 0)
             result = result.withMutations(mut =>
                 result.forEach((tile, hex) => {
                     if (tile.terrain === Terrain.Empty && tile.isOwned)

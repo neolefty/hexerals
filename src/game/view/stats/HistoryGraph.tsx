@@ -1,21 +1,36 @@
 import * as React from 'react'
+import {List, Map} from 'immutable'
 
 import {CartPair} from '../../../common/CartPair'
 import {BoardState} from '../../model/board/BoardState'
-import {StatHistory} from '../../model/board/StatHistory'
+import {TurnStat} from '../../model/stats/TurnStat'
+import {Player} from '../../model/players/Players'
+import {DriftColor} from '../../../color/DriftColor'
+import {BoardStat} from '../../model/board/BoardStat'
+import {StatsPoly} from './StatsPoly'
 
-interface HistoryGraphProps {
+export interface HistoryGraphProps {
     boardState: BoardState
     displaySize: CartPair
+    colors: Map<Player, DriftColor>
+    picker: StatPicker
+    stacked: boolean
+    area: boolean // if false, draw lines instead
 }
 
-export const HistoryGraph = (props: HistoryGraphProps) => {
-    const [history, updateHistory] = React.useState(StatHistory.EMPTY)
-    const newHistory = history.update(props.boardState)
-    if (newHistory !== history)
-        updateHistory(newHistory)
+type StatPicker = (stat: TurnStat) => BoardStat<Player>
 
+export const HistoryGraph = (props: HistoryGraphProps) => {
     return (
-        <text>Graph</text>
+        <>
+            {new StatsPoly(props).polys}
+            <text
+                x={20}
+                y={30}
+                fill='#ccc'
+            >
+                {`${props.boardState.turn > 0 ? Math.floor(props.boardState.turn / 2) : ''}`}
+            </text>
+        </>
     )
 }

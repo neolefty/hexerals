@@ -6,7 +6,6 @@ import {StatusMessage} from '../../../common/StatusMessage';
 import {GenericAction} from '../../../common/GenericAction'
 import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
 import {countHexes} from '../../view/board/HexConstants'
-import {LocalGameOptions} from './LocalGameOptions'
 import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
 import {BOARD_STATE_STARTER} from '../board/BoardState'
@@ -16,7 +15,8 @@ import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {BasicRobot} from '../players/BasicRobot'
 import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
-import {CornersPlayerArranger} from '../setup/PlayerArranger';
+import {CornersPlayerArranger} from '../setup/PlayerArranger'
+import {LocalGameOptions} from './LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
 
 // the meta-game
@@ -33,7 +33,7 @@ export const INITIAL_CYCLE_STATE: CycleState = {
         // booleans — non-zero is true
         fog: 1,
         capitals: 1,
-        statsVisible: 0,
+        statsVisible: 0, // 1,
         randomStart: 1,
         // meta — what options are visible
         levelVisible: 0,
