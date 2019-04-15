@@ -32,7 +32,8 @@ const zeroY = (pair: string) => {
     return `${pair.substring(0, pair.lastIndexOf(','))},0`
 }
 
-const MIN_Y_RANGE = 10
+const MIN_Y_RANGE = 5
+const MIN_X_RANGE = 25
 
 export class StatsPoly {
     readonly history: StatHistory
@@ -53,6 +54,25 @@ export class StatsPoly {
     private _pointLists?: Map<Player, Array<string>>
     get pointLists(): Map<Player, Array<string>> {
         if (this._pointLists === undefined) {
+            // scale
+            const xRange = Math.max(MIN_X_RANGE, this.history.size)
+            const maxStat = this.props.picker(this.history.maxes)
+            const yMax = this.props.stacked
+                ? this.props.picker(this.history.maxTotals).total
+                : maxStat.maxValue
+            const yRange = Math.max(
+                MIN_Y_RANGE * (this.props.stacked ? Math.max(this.players.size, 1) : 1),
+                yMax
+            )
+            const transform = ''
+                + `translate(0 ${this.props.displaySize.y}) `
+                + `scale(${this.props.displaySize.x / xRange} ${- this.props.displaySize.y / yRange})`
+
+            // TODO scale BEFORE conversion to string
+            // TODO flip & rotate for orientation
+            const xScale = this.props.displaySize.x / xRange
+            const yScale = this.props.displaySize.y / yRange
+
             // initialize empty
             const playerLines = Map<Player, Array<string>>().withMutations(
                 mut => this.players.forEach(
@@ -93,20 +113,23 @@ export class StatsPoly {
 
     get polys(): React.ReactNode {
         // scale so that graph fits naturally — height and width match data
-        const xRange = Math.max(10, this.history.size)
-        const maxStat = this.props.picker(this.history.max)
-        const max = Math.max(
+        const xRange = Math.max(MIN_X_RANGE, this.history.size)
+        const maxStat = this.props.picker(this.history.maxes)
+        const yMax = this.props.stacked
+            ? this.props.picker(this.history.maxTotals).total
+            : maxStat.maxValue
+        const yRange = Math.max(
             MIN_Y_RANGE * (this.props.stacked ? Math.max(this.players.size, 1) : 1),
-            this.props.stacked ? maxStat.total : maxStat.maxValue
+            yMax
         )
         const transform = ''
             + `translate(0 ${this.props.displaySize.y}) `
-            + `scale(${this.props.displaySize.x / xRange} ${- this.props.displaySize.y / max})`
+            + `scale(${this.props.displaySize.x / xRange} ${- this.props.displaySize.y / yRange})`
 
         // TODO scale BEFORE conversion to string
         // TODO flip & rotate for orientation
         const xScale = this.props.displaySize.x / xRange
-        const yScale = this.props.displaySize.y / max
+        const yScale = this.props.displaySize.y / yRange
 
         return (
             <g transform={transform}>

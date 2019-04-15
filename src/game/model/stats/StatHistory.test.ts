@@ -61,10 +61,10 @@ it('tracks stat history', () => {
     expect(stats().lastTurns.get(Player.Two, -1)).toBe(1)
 
     // Player Two peaked at 21 pop in 2 hexes
-    expect(stats().max.pop.get(Player.Two, -1)).toBe(21)
-    expect(stats().max.hexes.get(Player.Two, -1)).toBe(2)
-    expect(stats().max.pop.get(Player.Zero, -1)).toBe(29)
-    expect(stats().max.pop.maxValue).toBe(29)
+    expect(stats().maxes.pop.get(Player.Two, -1)).toBe(21)
+    expect(stats().maxes.hexes.get(Player.Two, -1)).toBe(2)
+    expect(stats().maxes.pop.get(Player.Zero, -1)).toBe(29)
+    expect(stats().maxes.pop.maxValue).toBe(29)
 
     // 3. Three captures One
     crt.queueMove(crt.ur, Hex.LEFT_DOWN, Player.One) // get out of the way

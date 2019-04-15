@@ -3,7 +3,7 @@ import {BoardStat} from '../board/BoardStat'
 import {Player} from '../players/Players'
 import {Map} from 'immutable'
 
-const EMPTY_BOARD_STAT: BoardStat<Player> =
+export const EMPTY_BOARD_STAT: BoardStat<Player> =
     new BoardStat(Map(), 0)
 
 export class TurnStat {

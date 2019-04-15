@@ -38,7 +38,6 @@ export class BoardStat<K> {
         return result
     }
 
-    // BUG: max.total is the wrong value — it's the sum of all maxes at any time, oops — instead, we want it to be the max of all totals.
     max(that: BoardStat<K>): BoardStat<K> {
         let result: BoardStat<K> = this
         // all keys in this
