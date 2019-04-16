@@ -144,12 +144,12 @@ export class StatsPoly {
                                         // close shape
                                         line.length > 0 ? zeroY(line[line.length - 1]) : ''
                                     }`}
-                                    fill={color.toHexString()}
+                                    fill={color.hexString}
                                 />)
                             : (<polyline
                                     key={player}
                                     points={`0,0 ${line.join(' ')}`}
-                                    stroke={color.toHexString()}
+                                    stroke={color.hexString}
                                     fill='none'
                                 />)
                     })

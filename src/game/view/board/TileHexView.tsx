@@ -59,7 +59,7 @@ export const TileHexView = (props: TileHexViewProps) => {
             <text
                 key="pop"
                 y={textY(props.tile, props.text)}
-                fill={(props.textColor || props.color.contrast()).toHexString()}
+                fill={(props.textColor || props.color.contrast()).hexString}
                 fontSize={textSize(props.tile, props.text)}
                 // TODO move this into a style sheet?
                 fontFamily="Sans-Serif"

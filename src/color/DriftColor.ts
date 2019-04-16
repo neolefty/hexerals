@@ -106,6 +106,10 @@ export class DriftColor {
     get saturation() { return this.cie.saturation }
     get lightness() { return this.cie.lightness }
 
+    get hexString() { return this.cie.hexString }
+    get hslString() { return this.cie.hslString }
+    get lchString() { return this.cie.lchString }
+
     // tslint:disable-next-line:member-ordering
     private lightCache = Map<number, DriftColor>().asMutable()
 
@@ -138,12 +142,8 @@ export class DriftColor {
         return darker ? this.darker(diff) : this.lighter(diff)
     }
 
-    toHexString = () => this.cie.toHexString()
-    toHslString = () => this.cie.toHslString()
-    toLchString = () => this.cie.toLchString()
-
     toString(): string {
-        return `${this.cie.toHexString()} - hsl: ${this.toHslString()} - lch: ${this.toLchString()}`
+        return `${this.hexString} - hsl: ${this.hslString} - lch: ${this.lchString}`
     }
 
     equals(that: any): boolean {

@@ -86,21 +86,21 @@ export const ColorBlob = (props: ColorBlobProps) => {
                 r={props.radius}
                 cx={props.position.x}
                 cy={props.position.y}
-                style={{fill: props.color.toHexString()}}
+                style={{fill: props.color.hexString}}
                 onClick={() => props.onRemove()}
             />
             <circle
                 r={props.radius * 0.7}
                 cx={pos1.x}
                 cy={pos1.y}
-                style={{fill: props.color.texture(contrast1).toHexString()}}
+                style={{fill: props.color.texture(contrast1).hexString}}
                 onClick={() => props.onRemove()}
             />
             <circle
                 r={props.radius * 0.5}
                 cx={pos2.x}
                 cy={pos2.y}
-                style={{fill: props.color.texture(contrast2).toHexString()}}
+                style={{fill: props.color.texture(contrast2).hexString}}
                 onClick={() => props.onRemove()}
             />
         </g>
@@ -180,7 +180,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
         // walls
         this.log(`*** cycle: ${closestColors.toFixed(this.f)} to ${furthestColors.toFixed(this.f)}`)
         this.props.colors.driftColors.forEach((color: DriftColor) => {
-            this.log(`${color.toHslString()}`)
+            this.log(`${color.hslString}`)
 
             const force = new Coord()
             forces.set(color.key, force)
@@ -283,7 +283,7 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
                     // the more other colors, the more we need to scale down the forces
                     const unit = location.diff(otherLoc).mutateUnit()
                     // roughly -1 (attract) to 1 (repel)
-                    this.log(`     - to ${other.toHslString()}: norm ${cdNorm} (unit ${unit}) | raw ${colorDist} | `)
+                    this.log(`     - to ${other.hslString}: norm ${cdNorm} (unit ${unit}) | raw ${colorDist} | `)
                     const vec = unit.mutateScale(cdNorm * nRecipActual * VELOCITY_MAX * 300)
                     result.mutateAdd(vec)
                 }

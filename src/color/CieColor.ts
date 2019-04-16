@@ -65,13 +65,13 @@ export class CieColor {
     }
 
     private _hexString?: string = undefined
-    toHexString = (): string => {
+    get hexString(): string {
         if (this._hexString === undefined)
             this._hexString = hsluv.hsluvToHex(this.hsl)
         return this._hexString as string
     }
-    toHslString = () => roundNumArrayToString(this.hsl)
-    toLchString = () => roundNumArrayToString(this.lch)
+    get hslString() { return roundNumArrayToString(this.hsl) }
+    get lchString() { return roundNumArrayToString(this.lch) }
 
     get hue() { return this.hsl[0] }
     get saturation() { return this.hsl[1] }
@@ -87,6 +87,6 @@ export class CieColor {
         new CieColor([this.hsl[0], this.hsl[1], light])
 
     toString(): string {
-        return this.toHexString()
+        return this.hexString
     }
 }

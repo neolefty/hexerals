@@ -84,7 +84,7 @@ export const MoveView = (props: MoveViewProps) => {
                 transform={`rotate(${-delta.degrees} ${x1} ${y1})`}
                 style={
                     props.color && {
-                        stroke: props.color.texture().toHexString(),
+                        stroke: props.color.texture().hexString,
                         strokeWidth: sw,
                         strokeLinecap: 'square',
                         fill: 'none',

@@ -101,7 +101,7 @@ export class FlatTopHex
     logEvent(e: React.SyntheticEvent, prefix: string = '') {
         // tslint:disable-next-line
         console.log(
-            `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.toHexString()}`)
+            `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.hexString}`)
     }
 
     render(): React.ReactNode {
@@ -117,7 +117,7 @@ export class FlatTopHex
                 points={HEX_POINTS}
                 style={
                     this.props.color && {
-                        fill: this.props.color.toHexString()
+                        fill: this.props.color.hexString
                     }
                 }
             />
@@ -130,7 +130,7 @@ export class FlatTopHex
                     className="cursor"
                     points={HEX_POINTS}
                     style={{
-                        stroke: this.props.color.contrast().toHexString(),
+                        stroke: this.props.color.contrast().hexString,
                     }}
                 />
             )
@@ -141,7 +141,7 @@ export class FlatTopHex
                 className="hover"
                 points={HEX_POINTS}
                 style={{
-                    stroke: this.props.color.contrast().toHexString(),
+                    stroke: this.props.color.contrast().hexString,
                 }}
             />
         )

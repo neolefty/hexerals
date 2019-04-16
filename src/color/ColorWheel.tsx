@@ -20,7 +20,7 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                     this.props.colors.driftColors.map((driftColor, i) => {
                         const wedgeStyle = {
                             // stroke: driftColor.toHex(),
-                            fill: driftColor.toHexString(),
+                            fill: driftColor.hexString,
                         }
                         const r1 = 2.5 // inner radius fraction (2 = half, 3 = third)
                         const r2 = 0.5 // outer radius fraction
@@ -41,7 +41,7 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                         const textX = cosM / rText
                         const textY = sinM / rText
                         const textStyle = {
-                            fill: driftColor.contrast().toHexString(),
+                            fill: driftColor.contrast().hexString,
                         }
                         return (
                             <g
@@ -62,7 +62,7 @@ export class ColorWheel extends React.PureComponent<ColorWheelProps> {
                                         `rotate(${m * 180 / Math.PI} ${textX},${textY})`
                                         + ` translate(0 0.043)`} // center vertically in wedge
                                 >
-                                    {driftColor.cie.toLchString()}
+                                    {driftColor.cie.lchString}
                                 </text>
                             </g>
                         )
