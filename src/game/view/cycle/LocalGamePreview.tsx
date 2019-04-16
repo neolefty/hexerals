@@ -68,6 +68,7 @@ type CacheKey = {
     boardHeight: number,
     mountainPercent: number,
     capitals: number,
+    statsVisible: number,
 }
 type Partial<T> = {
     [P in keyof T]?: T[P]
@@ -83,10 +84,11 @@ const CacheKeyRecord = Record<CacheKey>({
     boardHeight: NaN,
     mountainPercent: NaN,
     capitals: NaN,
+    statsVisible: NaN,
 })
 type CacheKeyKey = keyof CacheKey
 const CACHE_PROP_NAMES: CacheKeyKey[] = [
-    'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals',
+    'numRobots', 'boardWidth', 'boardHeight', 'mountainPercent', 'capitals', 'statsVisible',
 ]
 const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
     const result: CacheKeyPartial = {}
