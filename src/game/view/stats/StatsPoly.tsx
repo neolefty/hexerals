@@ -87,7 +87,7 @@ export class StatsPoly {
             //   — drawing — reverse order (large first, behind others)
             // non-stacked lines: small last
             //   — smallest & dead longest drawn last (in front)
-            this.history.values.forEach((stat: TurnStat) => {
+            this.history.values.forEach((stat: TurnStat, index: number) => {
                 const boardStat = this.props.picker(stat)
                 if (this.props.stacked) {
                     let total = 0
@@ -96,13 +96,13 @@ export class StatsPoly {
                         total += n;
                         if (n > 0) // avoid drawing horizontal line for dead players
                             // TODO scale
-                            (playerLines.get(player) as Array<string>).push(`${stat.turn},${total}`)
+                            (playerLines.get(player) as Array<string>).push(`${index},${total}`)
                     })
                 }
                 else { // not stacked
-                    boardStat.stats.forEach((n, player) => {
+                    boardStat.stats.forEach((value, player) => {
                         // TODO scale
-                        (playerLines.get(player) as Array<string>).push(`${stat.turn},${n}`)
+                        (playerLines.get(player) as Array<string>).push(`${index},${value}`)
                     })
                 }
             })
