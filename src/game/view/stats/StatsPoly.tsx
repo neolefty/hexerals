@@ -6,6 +6,7 @@ import {HistoryGraphProps} from './HistoryGraph'
 import {TurnStat} from '../../model/stats/TurnStat'
 import * as React from 'react'
 import {DriftColor} from '../../../color/DriftColor'
+import {CartPair} from '../../../common/CartPair'
 
 const compareStat = (
     a: Player, b: Player,
@@ -41,6 +42,19 @@ export class StatsPoly {
     readonly smallFirst: List<Player>
     readonly largeFirst: List<Player>
 
+    readonly range: CartPair
+    readonly scale: CartPair
+    readonly graphSize: CartPair  // transposed to always be horizontal
+
+    // ordering:
+    // stacked area
+    //   — computing
+    //      > smallest & dead longest first (at the bottom)
+    //      > largest currently alive last (at top)
+    //   — drawing — reverse order (large first, behind others)
+    // non-stacked lines: small last
+    //   — largest first (in back)
+
     constructor(readonly props: HistoryGraphProps) {
         this.history = props.boardState.stats
         this.players = this.props.boardState.board.players
@@ -49,44 +63,39 @@ export class StatsPoly {
                 compareStat(a, b, this.props.picker(this.history.last), this.history.lastTurns)
         )
         this.smallFirst = this.largeFirst.reverse()
+
+        const maxStat = this.props.picker(this.history.maxes)
+        const yMax = this.props.stacked
+            ? this.props.picker(this.history.maxTotals).total
+            : maxStat.maxValue
+
+        this.range = new CartPair(
+            Math.max(MIN_X_RANGE, this.history.size),
+            Math.max(
+                MIN_Y_RANGE * (this.props.stacked ? Math.max(this.players.size, 1) : 1),
+                yMax
+            )
+        )
+
+        this.graphSize = this.props.displaySize.isHorizontal
+            ? this.props.displaySize
+            : this.props.displaySize.transpose
+        this.scale = new CartPair(
+            this.graphSize.x / this.range.x,
+            this.graphSize.y / this.range.y
+        )
     }
+    // TODO maybe shift over to right edge and grow to left until it fills the whole X axis (instead of growing from left)?
 
     private _pointLists?: Map<Player, Array<string>>
     get pointLists(): Map<Player, Array<string>> {
         if (this._pointLists === undefined) {
-            // scale
-            const xRange = Math.max(MIN_X_RANGE, this.history.size)
-            const maxStat = this.props.picker(this.history.maxes)
-            const yMax = this.props.stacked
-                ? this.props.picker(this.history.maxTotals).total
-                : maxStat.maxValue
-            const yRange = Math.max(
-                MIN_Y_RANGE * (this.props.stacked ? Math.max(this.players.size, 1) : 1),
-                yMax
-            )
-            const transform = ''
-                + `translate(0 ${this.props.displaySize.y}) `
-                + `scale(${this.props.displaySize.x / xRange} ${- this.props.displaySize.y / yRange})`
-
-            // TODO scale BEFORE conversion to string
-            // TODO flip & rotate for orientation
-            const xScale = this.props.displaySize.x / xRange
-            const yScale = this.props.displaySize.y / yRange
-
             // initialize empty
             const playerLines = Map<Player, Array<string>>().withMutations(
                 mut => this.players.forEach(
                     player => mut.set(player, [])
                 )
             )
-            // ordering:
-            // stacked area
-            //   — computing
-            //      > smallest & dead longest first (at the bottom)
-            //      > largest currently alive last (at top)
-            //   — drawing — reverse order (large first, behind others)
-            // non-stacked lines: small last
-            //   — smallest & dead longest drawn last (in front)
             this.history.values.forEach((stat: TurnStat, index: number) => {
                 const boardStat = this.props.picker(stat)
                 if (this.props.stacked) {
@@ -95,14 +104,16 @@ export class StatsPoly {
                         const n = boardStat.get(player, 0)
                         total += n;
                         if (n > 0) // avoid drawing horizontal line for dead players
-                            // TODO scale
-                            (playerLines.get(player) as Array<string>).push(`${index},${total}`)
+                            (playerLines.get(player) as Array<string>).push(
+                                `${index * this.scale.x},${total * this.scale.y}`
+                            )
                     })
                 }
                 else { // not stacked
                     boardStat.stats.forEach((value, player) => {
-                        // TODO scale
-                        (playerLines.get(player) as Array<string>).push(`${index},${value}`)
+                        (playerLines.get(player) as Array<string>).push(
+                            `${index * this.scale.x},${value * this.scale.y}`
+                        )
                     })
                 }
             })
@@ -112,24 +123,9 @@ export class StatsPoly {
     }
 
     get polys(): React.ReactNode {
-        // scale so that graph fits naturally — height and width match data
-        const xRange = Math.max(MIN_X_RANGE, this.history.size)
-        const maxStat = this.props.picker(this.history.maxes)
-        const yMax = this.props.stacked
-            ? this.props.picker(this.history.maxTotals).total
-            : maxStat.maxValue
-        const yRange = Math.max(
-            MIN_Y_RANGE * (this.props.stacked ? Math.max(this.players.size, 1) : 1),
-            yMax
-        )
-        const transform = ''
-            + `translate(0 ${this.props.displaySize.y}) `
-            + `scale(${this.props.displaySize.x / xRange} ${- this.props.displaySize.y / yRange})`
-
-        // TODO scale BEFORE conversion to string
-        // TODO flip & rotate for orientation
-        const xScale = this.props.displaySize.x / xRange
-        const yScale = this.props.displaySize.y / yRange
+        const transform = this.props.displaySize.isHorizontal
+            ? `translate(0 ${this.props.displaySize.y}) scale(1 -1)`
+            : `rotate(90 0 0) scale(-1 1) translate(${-this.graphSize.x} ${-this.graphSize.y})`
 
         return (
             <g transform={transform}>
