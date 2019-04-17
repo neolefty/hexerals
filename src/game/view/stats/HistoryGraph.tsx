@@ -24,13 +24,6 @@ export const HistoryGraph = (props: HistoryGraphProps) => {
     return (
         <>
             {new StatsPoly(props).polys}
-            <text
-                x={20}
-                y={props.displaySize.isVertical ? props.displaySize.y - 30 : 30}
-                fill='#ccc'
-            >
-                {`${props.boardState.turn > 0 ? Math.floor(props.boardState.turn / 2) : ''}`}
-            </text>
         </>
     )
 }
