@@ -8,7 +8,7 @@ import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} f
 import {countHexes} from '../../view/board/HexConstants'
 import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
-import {BOARD_STATE_STARTER} from '../board/BoardState'
+import {BOARD_STATE_STARTER, BoardState} from '../board/BoardState'
 import {PlayerFogs} from '../board/Fog'
 import {Terrain} from '../hex/Terrain'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
@@ -18,6 +18,7 @@ import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger'
 import {LocalGameOptions} from './LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
+import {StatHistory} from '../stats/StatHistory'
 
 // the meta-game
 export const INITIAL_CYCLE_STATE: CycleState = {
@@ -70,13 +71,13 @@ export const CycleReducer = (
                 if (newLocalBoard === localBoard)
                     return state
                 else {
-                    return {
+                    return Object.freeze({
                         ...state,
                         localGame: {
                             ...localGame,
                             boardState: newLocalBoard,
                         }
-                    }
+                    })
                 }
             }
         }
@@ -136,20 +137,24 @@ const openLocalGameReducer =
             n: countHexes(opts.boardWidth, opts.boardHeight),
         }
     )
-    return {
+    const boardState: BoardState = {
+        ...BOARD_STATE_STARTER,
+        board: newBoard,
+        players: pm,
+        messages: List(messages),
+        curPlayer: Player.Zero,
+    }
+    // initialize history with zeroes
+    boardState.stats = boardState.stats.update(boardState)
+
+    return Object.freeze({
         ...state,
         mode: CycleMode.IN_LOCAL_GAME,
-        localGame: {
+        localGame: Object.freeze({
             fogs: new PlayerFogs(true),
-            boardState: {
-                ...BOARD_STATE_STARTER,
-                board: newBoard,
-                players: pm,
-                messages: List(messages),
-                curPlayer: Player.Zero,
-            }
-        },
-    }
+            boardState: Object.freeze(boardState)
+        }),
+    })
 }
 
 const CLOSE_LOCAL_GAME = 'CLOSE_LOCAL_GAME'
