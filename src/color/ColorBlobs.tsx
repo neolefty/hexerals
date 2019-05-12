@@ -339,7 +339,6 @@ export class ColorBlobs extends React.PureComponent<ColorBlobsProps> {
                 // repel any overlap
                 const diam2 = diam * diam
                 if (dist2 < diam2) { // overlap?
-                    // TODO make more efficient?
                     const centerDist = vec.mag()
                     vec.mutateScale(1 / centerDist) // unit vector
                     const overlap = diam - centerDist

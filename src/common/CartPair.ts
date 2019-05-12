@@ -25,6 +25,7 @@ export class CartPair {
     setX = (newX: number) => new CartPair(newX, this.y)
 
     get min() { return Math.min(this.x, this.y) }
+    get max() { return Math.max(this.x, this.y) }
 
     // for destructuring calls e.g. [x,y] = dim.xy
     get xy() { return [this.x, this.y] }
@@ -35,7 +36,7 @@ export class CartPair {
     get isHorizontal() { return !this.isVertical }
 
     // don't change — SVG operations depend on exactly this
-    toString() { return `${this.x},${this.y}` }
+    toString(sep = ',') { return `${this.x}${sep}${this.y}` }
 
     round = (places: number = 0) =>
         new CartPair(round(this.x, places), round(this.y, places))

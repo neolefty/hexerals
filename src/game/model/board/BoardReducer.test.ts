@@ -317,8 +317,8 @@ fit('notices captures', () => {
     brt.setCursor(Hex.RIGHT_UP)
     brt.queueMove(Player.Zero, Hex.RIGHT_UP)
     brt.doMoves()
-    expect(brt.board.getHexStatistics().get(Player.Zero)).toBe(4)
-    expect(brt.board.getPopStatistics().get(Player.Zero)).toBe(74)
+    expect(brt.board.getHexStatistics().get(Player.Zero, 0)).toBe(4)
+    expect(brt.board.getPopStatistics().get(Player.Zero, 0)).toBe(74)
     const captures2 = brt.state.captures
     expect(captures2).not.toBeUndefined()
     // the last two capture should be from the capital capture
@@ -363,7 +363,7 @@ fit ('advances game phases', () => {
     brt.queueMove(Player.Zero, Hex.LEFT_UP)
     brt.doAllMoves()
     expect(brt.moves.size).toBe(0)
-    expect(brt.board.getHexStatistics().get(Player.Zero)).toBe(4)
+    expect(brt.board.getHexStatistics().get(Player.Zero, 0)).toBe(4)
     expect(brt.board.getHexStatistics().get(Player.Two, 0)).toBe(0)
     expect(brt.board.getHexStatistics().get(Player.Three, 0)).toBe(0)
 })

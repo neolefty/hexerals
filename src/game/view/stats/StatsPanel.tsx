@@ -1,11 +1,12 @@
 import * as React from 'react'
 
-import {HistoryGraph, HistoryGraphProps} from './HistoryGraph'
+import {HistoryGraph} from './HistoryGraph'
 import {Map} from 'immutable'
 import {DriftColor} from '../../../color/DriftColor'
 import {Player} from '../../model/players/Players'
 import {CartPair} from '../../../common/CartPair'
 import {BoardState} from '../../model/board/BoardState'
+import {Faces} from './Faces'
 
 export interface StatsPanelProps {
     boardState: BoardState
@@ -39,6 +40,11 @@ export const StatsPanel = (props: StatsPanelProps) => (
             >
                 {`${props.boardState.turn > 0 ? Math.floor(props.boardState.turn / 2) : ''}`}
             </text>
+            <Faces
+                {...props}
+                faceText={(stat, player) => `${stat.pop.get(player, 0)}`}
+                superTitle={'pop'}
+            />
         </svg>
     </>
 )

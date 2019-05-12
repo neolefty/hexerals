@@ -18,7 +18,6 @@ import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger'
 import {LocalGameOptions} from './LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
-import {StatHistory} from '../stats/StatHistory'
 
 // the meta-game
 export const INITIAL_CYCLE_STATE: CycleState = {

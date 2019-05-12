@@ -54,6 +54,10 @@ export class PlayerManager {
         return this.playerIndexes.size
     }
 
+    isRobot(player: Player): boolean {
+        return this.playerRobots.has(player)
+    }
+
     setRobot(player: Player, robot: Robot | undefined): PlayerManager {
         return robot
             ? new PlayerManager(
