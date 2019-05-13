@@ -88,17 +88,24 @@ export class DriftColor {
     private _contrast: DriftColor | undefined = undefined
     // A color with the opposite hue and maximum saturation
     contrast(): DriftColor {
-        if (!this._contrast)
-            this._contrast = new DriftColor(
-                new CieColor([
+        if (!this._contrast) {
+            const hsl = this.saturation > 10  // if it's not too grey, pop up the saturation
+                ? [
                     this.cie.hsl[0] + 180,
                     DriftColor.MAX_SAT,
                     this.cie.hsl[2] > DriftColor.MID_LIGHT
-                        ? DriftColor.MIN_BRIGHT + 5 // allow more color
+                        ? DriftColor.MIN_BRIGHT + 5 /* allow more color*/
                         : DriftColor.MAX_BRIGHT,
-                ]),
-                1 - this.key
-            )
+                ]
+                : [  // if it's very close to grey, make it dark or light grey
+                    this.cie.hsl[0] + 180,
+                    0,
+                    this.cie.hsl[2] > DriftColor.MID_LIGHT
+                        ? DriftColor.MIN_BRIGHT - 5
+                        : DriftColor.MAX_BRIGHT + 5,
+                ]
+            this._contrast =  new DriftColor(new CieColor(hsl), 1 - this.key)
+        }
         return this._contrast
     }
 
