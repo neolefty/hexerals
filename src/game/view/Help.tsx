@@ -100,8 +100,7 @@ export class Help extends React.PureComponent<HelpOptions> {
                     <p>end game — esc</p>
                     <hr/>
                     <p>
-                        Inspired by
-                        <a
+                        Inspired by <a
                             target='_blank'
                             rel='noreferrer noopener'
                             href="http://generals.io/?from=hexpansion.io"
