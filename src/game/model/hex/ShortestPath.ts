@@ -27,6 +27,7 @@ export const floodShortestPath = (
         if (curRing.size === 0)
             throw Error(`origin ${origin.toString()} and destination ${
                 dest.toString()} are not connected`)
+        // eslint-disable-next-line no-loop-func
         curRing.forEach(curRingHex => {
             const curCost: HexNum = scratch.get(curRingHex) as HexNum // the cost to get here
             // to get to a neighbor, go here first; the trip will cost you to here + 1
@@ -153,6 +154,7 @@ export class HexPaths {
         let nextLength = 2  // the length of each of the next set of paths
         while (curEndpoints.size > 0) {
             const nextEndpoints = Map().asMutable() as Map<Hex, List<Hex>>
+            // eslint-disable-next-line no-loop-func
             curEndpoints.forEach((curDests: List<Hex>, curSource: Hex) => {
                 const nextStep: HexNum = Object.freeze({ h: curSource, n: nextLength })
                 curDests.forEach((dest: Hex) => {

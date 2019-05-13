@@ -39,7 +39,7 @@ export class CycleView
     }
 
     setHighFidelity(highFidelity: boolean) {
-        if (this.getHighFidelity() != highFidelity)
+        if (this.getHighFidelity() !== highFidelity)
             this.setState({
                 highFidelity: highFidelity
             })

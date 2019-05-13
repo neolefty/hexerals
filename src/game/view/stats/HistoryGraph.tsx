@@ -1,5 +1,5 @@
 import * as React from 'react'
-import {List, Map} from 'immutable'
+import {Map} from 'immutable'
 
 import {CartPair} from '../../../common/CartPair'
 import {BoardState} from '../../model/board/BoardState'

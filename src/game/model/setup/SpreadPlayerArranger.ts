@@ -61,6 +61,7 @@ export class SpreadPlayersArranger extends Arranger {
         ) {
             let nextStarts: Map<Hex, Tile> = Map<Hex, Tile>()
             let [maxOfMins, minOfMins] = [-Infinity, Infinity]
+            // eslint-disable-next-line no-loop-func
             curStarts.forEach((tile, hex) => {
                 // console.log(`     * ${tile.owner} at ${hex.toCartString()}`)
                 let [nextHex, minDist] = [hex, distancesToOthers(hex, tile.owner).min() as number]

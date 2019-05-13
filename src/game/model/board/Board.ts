@@ -158,7 +158,7 @@ export class Board {
         let total = initialValue
         const stats: Map<K, number> = Map<K, number>().withMutations(result =>
             this.explicitTiles.forEach((tile, hex) => {
-                if (tile.owner != Player.Nobody) {
+                if (tile.owner !== Player.Nobody) {
                     const k = keyer(tile, hex)
                     const curV = result.get(k, initialValue)
                     const thisV = extractor(tile, hex)

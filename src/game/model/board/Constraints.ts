@@ -127,22 +127,22 @@ export abstract class BoardConstraints {
         floodEdge.add(this.start())
 
         // Could do this recursively but for large boards it overflows the stack
-
         // Flood out from this.start(), one layer at a time
+        const floodNeighbors = (x: Hex) => {
+            result.add(x)
+            x.neighbors.forEach(neighbor => {
+                // discard any that are out of bounds or already included
+                // conversely: keep those that are in bounds and novel
+                if (this.inBounds(neighbor) && !result.contains(neighbor))
+                    floodEdge.add(neighbor)
+            })
+        }
         while (!floodEdge.isEmpty()) {
             // freeze the old edge
             const oldEdge = floodEdge.asImmutable()
             // start building a new edge
             floodEdge = Set<Hex>().asMutable()
-            oldEdge.forEach(x => {
-                result.add(x)
-                x.neighbors.map(neighbor => {
-                    // discard any that are out of bounds or already included
-                    // conversely: keep those that are in bounds and novel
-                    if (this.inBounds(neighbor) && !result.contains(neighbor))
-                        floodEdge.add(neighbor)
-                })
-            })
+            oldEdge.forEach(floodNeighbors)
         }
 
         return result.asImmutable()
