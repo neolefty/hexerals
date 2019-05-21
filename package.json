@@ -34,7 +34,7 @@
   },
   "scripts": {
     "watch": "npm-run-all --parallel start css test",
-    "start": "set PORT=3001 && react-scripts start",
+    "start": "react-scripts start",
     "css": "npm run build-css && node-sass-chokidar src/ -o src/ --watch --recursive",
     "test": "npm run build-css && react-scripts test",
     "build": "npm-run-all build-css build-react",
