@@ -38,7 +38,7 @@ it('specifies IQ', () => {
     )
 })
 
-fit('captures nearby', () => {
+it('captures nearby', () => {
     Range(0, 10).forEach(() => {
         const brt = new BoardReducerTester(3, 3)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(2))

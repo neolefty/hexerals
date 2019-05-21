@@ -125,7 +125,7 @@ it('color podge random tests', () => {
     })
 })
 
-fit('textures', () => {
+it('textures', () => {
     Range(0, 10).forEach((i: number) => {
         const orig = DriftColor.random()
         const texture10 = orig.texture(10)

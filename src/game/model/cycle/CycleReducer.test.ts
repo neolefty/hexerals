@@ -13,7 +13,7 @@ it('small maps generate warning', () => {
     })
 })
 
-it ('non-random arranger is corners', () => {
+it('non-random arranger is corners', () => {
     const crt = new CycleReducerTester()
     crt.useSpreadArranger(false)
     crt.openLocalGame()

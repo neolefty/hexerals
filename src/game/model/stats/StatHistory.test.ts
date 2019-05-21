@@ -9,7 +9,7 @@ import {BoardStat} from '../board/BoardStat'
 
 const EMPTY_BOARD_STAT = new BoardStat<string>(Map(), 0)
 
-fit('BoardStat', () => {
+it('BoardStat', () => {
     const a = EMPTY_BOARD_STAT.set('foo', 10).set('bar', 20)
     expect(a.total).toBe(30)
     const b = EMPTY_BOARD_STAT.set('foo', 15).set('baz', 5)

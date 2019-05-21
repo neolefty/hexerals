@@ -274,7 +274,7 @@ it('makes real moves', () => {
     // TODO test that multiple players' queued moves all work simultaneously
 })
 
-fit('notices captures', () => {
+it('notices captures', () => {
     const brt = new BoardReducerTester(3, 3, [
         new CornersPlayerArranger(49, Terrain.Capital)
     ])
@@ -341,7 +341,7 @@ fit('notices captures', () => {
     expect(brt.state.phase).toBe(GamePhase.Ended)
 })
 
-fit ('advances game phases', () => {
+it ('advances game phases', () => {
     const brt = new BoardReducerTester(3, 3, [
         new CornersPlayerArranger(20)
     ], pickNPlayers(4))
@@ -367,3 +367,4 @@ fit ('advances game phases', () => {
     expect(brt.board.getHexStatistics().get(Player.Two, 0)).toBe(0)
     expect(brt.board.getHexStatistics().get(Player.Three, 0)).toBe(0)
 })
+
