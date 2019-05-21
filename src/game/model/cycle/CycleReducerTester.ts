@@ -17,7 +17,7 @@ import {PlayerMove} from '../move/Move'
 import {Player} from '../players/Players'
 import {CycleState, cycleStateToString, LocalGameState} from './CycleState'
 import {changeLocalOptionAction, CycleReducer, openLocalGameAction} from './CycleReducer'
-import {LocalGameOptions} from './LocalGameOptions'
+import {LocalGameOptions} from '../board/LocalGameOptions'
 
 export class CycleReducerTester {
     readonly store: Store<CycleState>

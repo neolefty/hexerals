@@ -4,7 +4,7 @@ import {RectEdges} from './Constraints'
 import {PlayerMove} from '../move/Move'
 import {Player} from '../players/Players'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {Arranger} from '../setup/Arranger'
+import {TileArranger} from '../setup/TileArranger'
 import {Tile} from '../hex/Tile'
 import {Hex} from '../hex/Hex'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
@@ -16,6 +16,7 @@ import {Capture} from '../move/Capture';
 import {HexPaths} from '../hex/ShortestPath';
 import {Terrain} from '../hex/Terrain';
 import {BoardStat} from './BoardStat'
+import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from './LocalGameOptions'
 
 export class BoardAndMessages {
     constructor(
@@ -43,7 +44,7 @@ export type TileFilter = (tile: Tile) => boolean
 export type TileSideEffect = (hex: Hex, tile: Tile) => void
 
 export class Board {
-    static readonly DEFAULT_ARRANGERS: Arranger[] = [new RandomPlayerArranger()]
+    static readonly DEFAULT_ARRANGERS: TileArranger[] = [new RandomPlayerArranger()]
 
     static construct(
         constraints: BoardConstraints,
@@ -58,22 +59,39 @@ export class Board {
         )
     }
 
-    static constructSquare(
+    static constructDefaultSquare(
         size: number,
         players: List<Player>,
-        arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
-    ) {
-        return Board.constructRectangular(size, size * 2 - 1, players, arrangers)
+        arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
+        messages?: StatusMessage[],
+    ): Board {
+        return Board.constructDefaultRectangular(
+            size, size * 2 - 1, players, arrangers, messages,
+        )
+    }
+
+    static constructDefaultRectangular(
+        w: number,
+        h: number,
+        players: List<Player>,
+        arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
+        messages?: StatusMessage[],
+    ): Board {
+        return Board.constructRectangular({
+            ...DEFAULT_LOCAL_GAME_OPTIONS,
+            boardWidth: w,
+            boardHeight: h,
+        }, players, arrangers, messages)
     }
 
     static constructRectangular(
-        w: number,
-        h: number,
+        opts: LocalGameOptions,
         players: List<Player> = List(),
-        arrangers: Arranger[] = this.DEFAULT_ARRANGERS,
+        // TODO replace with LocalGameOptions.randomStart
+        arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
         messages?: StatusMessage[],
     ): Board {
-        const constraints = new RectangularConstraints(w, h)
+        const constraints = new RectangularConstraints(opts)
         let result = Board.construct(constraints, players)
         arrangers.forEach(arranger =>
             result = result.overlayTiles(
@@ -178,7 +196,7 @@ export class Board {
             this._hexStatistics = this.gatherStatistics<Player>(
                 0,
                 tile => tile.owner,
-                (tile, hex) => 1,
+                (/* tile, hex */) => 1,
             )
         return this._hexStatistics
     }
@@ -191,7 +209,7 @@ export class Board {
             this._popStatistics = this.gatherStatistics(
                 0,
                 tile => tile.owner,
-                (tile, hex) => tile.pop,
+                (tile/*, hex*/) => tile.pop,
             )
         return this._popStatistics
     }

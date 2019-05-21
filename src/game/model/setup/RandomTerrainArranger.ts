@@ -4,13 +4,13 @@ import {Tile} from '../hex/Tile';
 import {Board, TileFilter} from '../board/Board';
 import {Hex} from '../hex/Hex';
 import {connected} from '../hex/HexGraph';
-import {Arranger} from './Arranger';
+import {TileArranger} from './TileArranger';
 import {Terrain} from '../hex/Terrain';
 import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
 
 // replace empty terrain randomly and without blocking
-export class RandomTerrainArranger extends Arranger {
+export class RandomTerrainArranger extends TileArranger {
     constructor(
         // what fraction of empty terrain should be replaced?
         readonly fractionOfEmpty: number,

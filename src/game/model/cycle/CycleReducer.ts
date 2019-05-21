@@ -16,28 +16,13 @@ import {BasicRobot} from '../players/BasicRobot'
 import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger'
-import {LocalGameOptions} from './LocalGameOptions'
+import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from '../board/LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
 
 // the meta-game
 export const INITIAL_CYCLE_STATE: CycleState = {
     mode: CycleMode.NOT_IN_GAME,
-    localOptions: {
-        numRobots: 5,
-        boardWidth: 7,
-        boardHeight: 21,
-        difficulty: 2,
-        mountainPercent: 25,
-        tickMillis: 500,
-        startingPop: 0,
-        // booleans — non-zero is true
-        fog: 1,
-        capitals: 1,
-        statsVisible: 0, // 1,
-        randomStart: 1,
-        // meta — what options are visible
-        levelVisible: 0,
-    },
+    localOptions: DEFAULT_LOCAL_GAME_OPTIONS,
     localGame: undefined,
 }
 
@@ -108,8 +93,7 @@ const openLocalGameReducer =
         ? new SpreadPlayersArranger(capitalTerrain, opts.startingPop)
         : new CornersPlayerArranger(opts.startingPop, capitalTerrain)
     const newBoard = Board.constructRectangular(
-        opts.boardWidth,
-        opts.boardHeight,
+        opts,
         players,
         [
             arranger,

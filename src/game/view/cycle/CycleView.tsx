@@ -6,7 +6,7 @@ import {CycleState} from '../../model/cycle/CycleState'
 import {Layered} from '../../../common/Layered'
 import {LocalGamePreview} from './LocalGamePreview'
 import {LocalGameContainer} from './LocalGameContainer'
-import {LocalGameOptions} from '../../model/cycle/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 
 export interface CycleViewProps extends CycleState {
     displaySize: CartPair

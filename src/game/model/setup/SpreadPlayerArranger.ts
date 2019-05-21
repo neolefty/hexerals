@@ -1,4 +1,4 @@
-import {Arranger} from './Arranger';
+import {TileArranger} from './TileArranger';
 import {Terrain} from '../hex/Terrain';
 import {Board} from '../board/Board';
 import {StatusMessage} from '../../../common/StatusMessage';
@@ -20,7 +20,7 @@ export const FloodDM: DistanceMaker = (hexes: Set<Hex>) =>
 export const PathsDM: DistanceMaker = (hexes: Set<Hex>) =>
     new HexPaths(hexes)
 
-export class SpreadPlayersArranger extends Arranger {
+export class SpreadPlayersArranger extends TileArranger {
     constructor(
         readonly startingTerrain: Terrain = Terrain.Capital,
         readonly startingPop: number = 0,

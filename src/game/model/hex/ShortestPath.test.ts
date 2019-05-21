@@ -7,12 +7,12 @@ import {Tile} from './Tile'
 import {Terrain} from './Terrain'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {FloodDM, PathsDM, SpreadPlayersArranger} from '../setup/SpreadPlayerArranger';
-import {Arranger} from '../setup/Arranger';
+import {TileArranger} from '../setup/TileArranger';
 import {StatusMessage} from '../../../../common/StatusMessage';
 import {pickNPlayers} from '../players/Players';
 
 it ('finds a simple shortest path', () => {
-    const ten = Board.constructSquare(10, List())
+    const ten = Board.constructDefaultSquare(10, List())
     // edges.lowerRight is not the rightmost it's (8, 0)
     const [ ll, ul, lr, ur ] = [ ten.edges.lowerLeft, ten.edges.upperLeft, Hex.getCart(9, 1), ten.edges.upperRight ]
     expect(ll === Hex.ORIGIN).toBeTruthy()
@@ -46,7 +46,7 @@ it ('finds a simple shortest path', () => {
 })
 
 it ('finds a slightly more complex shortest path', () => {
-    let ten = Board.constructSquare(10, List())
+    let ten = Board.constructDefaultSquare(10, List())
     const setMountain = (hex: Hex) =>
         ten = ten.setTiles(ten.explicitTiles.set(hex, Tile.MOUNTAIN))
     Range(0, 8).forEach(index => {
@@ -81,7 +81,7 @@ it ('finds a slightly more complex shortest path', () => {
 })
 
 const timeArranging = (
-    name: string, board: Board, arranger: Arranger, log: boolean = false
+    name: string, board: Board, arranger: TileArranger, log: boolean = false
 ) => {
     const start = Date.now()
     const status = [] as StatusMessage[]
@@ -105,7 +105,7 @@ it ('compares performance of flood & global', () => {
         ? Range(15, 36, 5)
         : Range(10, 21, 5)
     range.forEach(side => {
-        const board = Board.constructSquare(
+        const board = Board.constructDefaultSquare(
             side, pickNPlayers(16),
             [ new RandomTerrainArranger(0.2) ],
         )
@@ -118,7 +118,7 @@ const r = (n: number, places: number = 2, shift: number = 0) =>
     Math.round(n * (10 ** shift) * (10 ** places)) / (10 ** places)
 
 const testPerf = (side: number, log: boolean = false) => {
-    let board = Board.constructSquare(side, List(), [
+    let board = Board.constructDefaultSquare(side, List(), [
         new RandomTerrainArranger(0.2)
     ])
     const hexes = board.hexesOccupiable.size

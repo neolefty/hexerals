@@ -5,6 +5,7 @@ import {Dispatch} from 'redux'
 
 import {GenericAction} from '../../../common/GenericAction'
 import { RectangularConstraints } from '../../model/board/Constraints'
+import {DEFAULT_LOCAL_GAME_OPTIONS} from '../../model/board/LocalGameOptions'
 
 export interface PerfState {
     history: List<PerfRecord>
@@ -61,7 +62,7 @@ const mapDispatchToPerfProps = (dispatch: Dispatch<PerfAction>) => ({
 
 export const runPerfTest = (wh: Wh) => {
     const start = new Date()
-    const constraints = new RectangularConstraints(wh.w, wh.h)
+    const constraints = new RectangularConstraints(wh.defaultLocalGameOptions)
     const n = constraints.all.size
     const elapsed = new Date().getTime() - start.getTime()
     return new PerfRecord(wh, elapsed, n)
@@ -119,6 +120,13 @@ class PerfRecord {
 class Wh {
     constructor(readonly w: number, readonly h: number) {}
     get area() { return this.w * this.h }
+    get defaultLocalGameOptions() {
+        return {
+            ...DEFAULT_LOCAL_GAME_OPTIONS,
+            boardWidth: this.w,
+            boardHeight: this.h,
+        }
+    }
 }
 
 const INITIAL_PERF_STATE = {

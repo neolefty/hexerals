@@ -15,7 +15,7 @@
   $float-height: 12vmin;
   $level0-height: 24vmin;
   $level1-height: 28vmin;
-  $level2-height: 13vmin;
+  $level2-height: 28vmin;
 
   .LevelButton {
     transition: all 400ms;
@@ -59,12 +59,12 @@
 
   &.Show2 {
     .Modal {
-      height: $float-height + $level0-height + $level1-height + $level2-height;
+      height: $float-height + $level0-height + $level2-height;
     }
     .Level1 {
-      height: $level1-height;
-      opacity: 1;
-      border-top: 2px solid #777;
+      transform: scaleY(0);
+      height: 0;
+      opacity: 0;
     }
     .Level2 {
       height: $level2-height;

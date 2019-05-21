@@ -46,7 +46,7 @@ export const isGameAction = (action: GenericAction): action is GameAction =>
 const INITIAL_PLAYERS = pickNPlayers(0)
 export const INITIAL_BOARD_STATE: BoardState = {
     ...BOARD_STATE_STARTER,
-    board: Board.constructSquare(2, INITIAL_PLAYERS),
+    board: Board.constructDefaultSquare(2, INITIAL_PLAYERS),
     players: PlayerManager.construct(INITIAL_PLAYERS),
 }
 

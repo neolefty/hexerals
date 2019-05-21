@@ -4,13 +4,13 @@ import * as assert from 'assert';
 import {Board} from '../board/Board';
 import {Hex} from '../hex/Hex';
 import {Tile} from '../hex/Tile';
-import {Arranger, MAP_TOO_SMALL} from './Arranger';
+import {TileArranger, TAG_MAP_TOO_SMALL} from './TileArranger';
 import {Player} from '../players/Players';
 import {Terrain} from '../hex/Terrain';
 import {StatusMessage} from '../../../common/StatusMessage';
 
 // arranges players on a board
-export class RandomPlayerArranger extends Arranger {
+export class RandomPlayerArranger extends TileArranger {
     constructor(
         readonly startingPop: number = 0,
         readonly startingTerrain: Terrain = Terrain.City,
@@ -41,7 +41,7 @@ export class RandomPlayerArranger extends Arranger {
             else {
                 if (status)
                     status.push(new StatusMessage(
-                        MAP_TOO_SMALL,
+                        TAG_MAP_TOO_SMALL,
                         `Could not place player ${player}`,
                         `map size ${board.hexesAll.size} / players ${
                             board.players.size
@@ -54,7 +54,7 @@ export class RandomPlayerArranger extends Arranger {
 }
 
 // place up to 4 players in lower left, upper right, upper left, and lower right
-export class CornersPlayerArranger extends Arranger {
+export class CornersPlayerArranger extends TileArranger {
     constructor(
         readonly startingPop: number = 0,
         readonly terrain: Terrain = Terrain.City,
@@ -78,7 +78,7 @@ export class CornersPlayerArranger extends Arranger {
             if (prevOwner !== Player.Nobody) {
                 if (status)
                     status.push(new StatusMessage(
-                        MAP_TOO_SMALL,
+                        TAG_MAP_TOO_SMALL,
                         `Could not place player ${player} in corner #${i}.`,
                         `Hex at ${hex.toString()} already occupied by ${prevOwner}`,
                     ))

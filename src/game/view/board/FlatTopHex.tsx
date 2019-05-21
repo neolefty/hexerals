@@ -46,6 +46,7 @@ class HexTouch {
     }
 }
 
+// TODO move touch listener up, to avoid binding to disappearing element
 // a hexagon centered at (x, y)
 export class FlatTopHex
     extends React.PureComponent<FlatTopHexProps>

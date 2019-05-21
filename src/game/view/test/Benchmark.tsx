@@ -13,6 +13,7 @@ import {BOARD_STUBS, BoardViewProps} from '../board/BoardViewBase'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {SpreadPlayersArranger} from '../../model/setup/SpreadPlayerArranger'
 import {YMountainArranger} from '../../model/setup/YMountainArranger'
+import {DEFAULT_LOCAL_GAME_OPTIONS} from '../../model/board/LocalGameOptions'
 
 const NUM_PLAYERS = 10
 const BOARD_WIDTH = 21
@@ -52,11 +53,12 @@ const newBoardState = (
     players: List<Player> = PLAYERS,
 ): BoardState => ({
     ...BOARD_STATE_STARTER,
-    board: Board.constructRectangular(
-        w, h, players, [
+    board: Board.constructDefaultRectangular(w, h,
+        players,
+        [
             new YMountainArranger(0, 2),
             new SpreadPlayersArranger(),
-        ]
+        ],
     ),
     players: assignRobots(),
 })

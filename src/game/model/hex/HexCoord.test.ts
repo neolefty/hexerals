@@ -44,7 +44,7 @@ const slow = false, reallySlow = false
 
 const timeRect = (w: number, h: number) => {
     const start = new Date()
-    const constraints = new RectangularConstraints(w, h)
+    const constraints = RectangularConstraints.constructDefault(w, h)
     const n = constraints.all.size
     expect(n).toBe(countHexes(w, h))
     if (slow || reallySlow) {

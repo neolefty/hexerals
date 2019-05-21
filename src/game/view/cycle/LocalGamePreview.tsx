@@ -13,7 +13,7 @@ import {Terrain} from '../../model/hex/Terrain'
 import {SpreadPlayersArranger} from '../../model/setup/SpreadPlayerArranger'
 import {BOARD_STUBS} from '../board/BoardViewBase'
 import {BoardAndStats} from '../board/BoardAndStats'
-import {LocalGameOptions} from '../../model/cycle/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
@@ -110,9 +110,7 @@ const getBoardState = (
         Object.freeze({
             ...BOARD_STATE_STARTER,
             players: PlayerManager.construct(List()),
-            board: Board.constructRectangular(
-                options.boardWidth, options.boardHeight
-            )
+            board: Board.constructRectangular(options)
         })
     )
 

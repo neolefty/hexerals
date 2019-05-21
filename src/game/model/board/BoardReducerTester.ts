@@ -17,8 +17,9 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {MovementQueue} from '../move/MovementQueue'
 import {PlayerMove} from '../move/Move'
 import {Robot} from '../players/Robot'
-import {Arranger} from '../setup/Arranger'
+import {TileArranger} from '../setup/TileArranger'
 import {GamePhase} from '../cycle/GamePhase'
+import {DEFAULT_LOCAL_GAME_OPTIONS} from './LocalGameOptions'
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
@@ -29,14 +30,15 @@ export class BoardReducerTester {
     constructor(
         width = BoardReducerTester.INITIAL_WIDTH,
         height = BoardReducerTester.INITIAL_HEIGHT,
-        arrangers: Arranger[] = [
+        arrangers: TileArranger[] = [
             new CornersPlayerArranger(BoardReducerTester.INITIAL_POP)
         ],
         players: List<Player> = pickNPlayers(2),
     ) {
         this.store = createStore(BoardReducer)
-        this.store.dispatch(newGameAction(Board.constructRectangular(
-            width, height, players, arrangers)))
+        this.store.dispatch(newGameAction(Board.constructDefaultRectangular(
+            width, height, players, arrangers,
+        )))
     }
 
     getRawTile = (coord: Hex | undefined): Tile | undefined => coord && this.explicitTiles.get(coord)

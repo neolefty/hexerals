@@ -1,6 +1,6 @@
 import {CycleReducerTester} from './CycleReducerTester';
 import {StatusMessage} from '../../../common/StatusMessage';
-import {MAP_TOO_SMALL} from '../setup/Arranger';
+import {TAG_MAP_TOO_SMALL} from '../setup/TileArranger';
 import {Player} from '../players/Players';
 
 it('small maps generate warning', () => {
@@ -9,7 +9,7 @@ it('small maps generate warning', () => {
         crt.useSpreadArranger(b)
         crt.openLocalGame(1, 1)
         expect(crt.messages.size).toBe(1)
-        expect(crt.messages.first(StatusMessage.BLANK).tag === MAP_TOO_SMALL)
+        expect(crt.messages.first(StatusMessage.BLANK).tag === TAG_MAP_TOO_SMALL)
     })
 })
 

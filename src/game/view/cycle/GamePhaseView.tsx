@@ -29,7 +29,7 @@ const singleHexBoard = (
     boardState: {
         ...props.boardState,
         cursors: Map(),
-        board: Board.constructSquare(
+        board: Board.constructDefaultSquare(
             1, List<Player>(props.boardState.curPlayer || Player.Zero)
         ).setTiles(Map<Hex, Tile>([[Hex.ORIGIN, tile]])),
         moves: new MovementQueue(),

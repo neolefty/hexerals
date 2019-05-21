@@ -1,6 +1,7 @@
 import {Hex} from '../hex/Hex'
 import {List, Range, Seq, Set} from 'immutable'
 import * as assert from 'assert';
+import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from './LocalGameOptions'
 
 export class RectEdges {
     readonly left: number
@@ -61,6 +62,9 @@ export abstract class BoardConstraints {
     static readonly LT = (x: number, y: number) => (x < y)
     // static readonly GTE = (x: number, y: number) => (x >= y)
     static readonly GT = (x: number, y: number) => (x > y)
+    
+    // noinspection JSUnusedGlobalSymbols
+    protected constructor(readonly opts: LocalGameOptions) {}
 
     // Override to have a constraints class start somewhere else.
     // Needs to be inBounds().
@@ -162,10 +166,26 @@ export abstract class BoardConstraints {
 //
 // Note that w should be an integer, and h can be divisible by 0.5
 export class RectangularConstraints extends BoardConstraints {
-    constructor(readonly w: number, readonly h: number) {
-        super()
-        assert.strictEqual(w, Math.round(w))
-        assert.strictEqual(h, Math.round(h))
+    static constructDefault(
+        w: number,
+        h: number,
+        opts: LocalGameOptions = DEFAULT_LOCAL_GAME_OPTIONS
+    ): RectangularConstraints {
+        return new RectangularConstraints({
+            ...opts,
+            boardWidth: w,
+            boardHeight: h,
+        })
+    }
+
+    readonly w: number
+    readonly h: number
+    constructor(opts: LocalGameOptions) {
+        super(opts)
+        assert.strictEqual(opts.boardWidth, Math.round(opts.boardWidth))
+        assert.strictEqual(opts.boardHeight, Math.round(opts.boardHeight))
+        this.w = opts.boardWidth
+        this.h = opts.boardHeight
     }
 
     inBounds(coord: Hex): boolean {

@@ -7,7 +7,7 @@ import {
 import {CartPair} from '../../../common/CartPair'
 import {AppState} from '../App'
 import {CycleView} from './CycleView'
-import {LocalGameOptions} from '../../model/cycle/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 
 export interface CycleContainerProps {
     displaySize: CartPair

@@ -3,9 +3,9 @@ import {Board} from '../board/Board';
 import {StatusMessage} from '../../../common/StatusMessage';
 import {Tile} from '../hex/Tile';
 import {Map} from 'immutable';
-import {Arranger} from './Arranger';
+import {TileArranger} from './TileArranger';
 
-export class YMountainArranger extends Arranger {
+export class YMountainArranger extends TileArranger {
     static readonly Y_DIRS: Hex[] = [
         Hex.LEFT_UP, Hex.DOWN, Hex.RIGHT_UP,
     ]

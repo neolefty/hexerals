@@ -9,7 +9,7 @@ import {CacheMap} from '../../../common/CacheMap'
 import {minMax, minRatio, roundToMap} from '../../../common/MathFunctions'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
-import {LocalGameOptions} from '../../model/cycle/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {countHexes, heightFromWidth, widthFromHeight} from '../board/HexConstants'
 import {statSizesAndStyles} from '../board/BoardAndStats'
 import './LocalGameOptionsView.css'
@@ -68,6 +68,7 @@ const LocalGameOptionsLimits =
         ['mountainPercent', [ 0, 50 ]],
         ['tickMillis', [ 1, 9999 ]],
         ['startingPop', [ 0, 999 ]],
+        ['roundLength', [ 1, 9999 ]],
     ])
 
 interface HexCounts {
@@ -245,32 +246,6 @@ export class LocalGameOptionsView
         const optionToggler = (optionName: LGOKey) =>
             () => this.toggleOption(optionName)
 
-/*
-        const dropdownNumber = (
-            label: string,
-            title: string,
-            choices: Map<string, number>,
-            value: number,
-            onChange?: (value: number) => void,
-            level: number = 0,
-            option?: string,
-        ) => (
-            <DropdownNumber
-                value={value}
-                choices={choices}
-                onChange={
-                    onChange ? onChange
-                        : option ? optionChanger(option)
-                        : (x: number) => console.log(`${label} = ${x}`)
-                }
-                label={label}
-                title={title}
-                onEnter={this.props.newGame}
-                blockTabbing={!this.isLevelVisible(level)}
-            />
-        )
-*/
-
         const numberInput = (
             label: string, option: LGOKey, title: string,
             level: number = 0, children?: JSX.Element | JSX.Element[],
@@ -288,6 +263,7 @@ export class LocalGameOptionsView
             />
         )
 
+        // TODO Replace with toggle button — grey when inactive
         const checkInput = (
             label: string, option: LGOKey, title: string, level: number = 0
         ) => (
@@ -380,8 +356,10 @@ export class LocalGameOptionsView
                         {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
                     </div>
                     <div className="Level2 Column">
-                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
                         {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
+                        {numberInput('Ticks per round', 'roundLength', 'How often population increases in regular hexes.', 2)}
+                        {checkInput('Synced Growth', 'syncedGrowth', 'Pop grows all at once?', 2)}
+                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
                     </div>
                     <div>
                         <button

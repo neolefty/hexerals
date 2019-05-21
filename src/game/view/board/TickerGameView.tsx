@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import {Ticker} from '../../../common/Ticker'
-import {LocalGameOptions} from '../../model/cycle/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {BoardViewProps} from './BoardViewBase'
 import {BoardAndStats} from './BoardAndStats'
 

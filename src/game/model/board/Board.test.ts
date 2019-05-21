@@ -35,7 +35,7 @@ export function printBoard(board: Board) {
 
 it('converts between hex and cartesian coords', () => {
     const w = 11, h = 9
-    const elevenByNine = Board.constructRectangular(
+    const elevenByNine = Board.constructDefaultRectangular(
         w, h, pickNPlayers(2), [new CornersPlayerArranger(1)])
     // h x w, but every other row (that is, h/2 rows) is short by 1
     expect(elevenByNine.constraints.all.size == w * h - Math.trunc(h/2))
@@ -57,7 +57,7 @@ it('converts between hex and cartesian coords', () => {
 })
 
 it('overlays', () => {
-    const five = Board.constructSquare(
+    const five = Board.constructDefaultSquare(
         5,
         pickNPlayers(4),
         [new CornersPlayerArranger(10)],
@@ -77,7 +77,7 @@ it('overlays', () => {
 })
 
 it('navigates around a board', () => {
-    const elevenByTen = Board.constructRectangular(
+    const elevenByTen = Board.constructDefaultRectangular(
         11, 10, pickNPlayers(2), [new CornersPlayerArranger(20)])
     expect(elevenByTen.inBounds(Hex.ORIGIN)).toBeTruthy()
     expect(elevenByTen.constraints.all.contains(Hex.ORIGIN)).toBeTruthy()
@@ -110,7 +110,7 @@ it('navigates around a board', () => {
 })
 
 it('validates moves', () => {
-    const threeBySeven = Board.constructRectangular(
+    const threeBySeven = Board.constructDefaultRectangular(
         3, 7, pickNPlayers(2), [new CornersPlayerArranger(20)])
     const messages: StatusMessage[] = []
     const options = threeBySeven.validationOptions(messages)
@@ -172,7 +172,7 @@ it('validates moves', () => {
 })
 
 it('steps population', () => {
-    const threeByThirteen = Board.constructRectangular(
+    const threeByThirteen = Board.constructDefaultRectangular(
         3, 13, pickNPlayers(2),
         [new CornersPlayerArranger(20)],
     )
@@ -212,12 +212,12 @@ it('steps population', () => {
 })
 
 it('captures capitals and checks stats', () => {
-    const start = Board.constructRectangular(
+    const start = Board.constructDefaultRectangular(
         3, 3, pickNPlayers(2),
         [new CornersPlayerArranger(20, Terrain.Capital)],
     )
-    expect(start.getHexStatistics().get(Player.Zero)).toBe(1)
-    expect(start.getPopStatistics().get(Player.Zero)).toBe(20)
+    expect(start.getHexStatistics().get(Player.Zero, -1)).toBe(1)
+    expect(start.getPopStatistics().get(Player.Zero, -1)).toBe(20)
     expect(start.getHexStatistics().size).toBe(2)
     expect(start.getTile(Hex.ORIGIN).terrain).toBe(Terrain.Capital)
     // move player one to lower right corner
@@ -239,6 +239,6 @@ it('captures capitals and checks stats', () => {
     expect(captured.getCartTile(2, 0)).toEqual(
         new Tile(Player.Zero, 9))
     expect(captured.getHexStatistics().get(Player.One, 0)).toBe(0)
-    expect(captured.getHexStatistics().get(Player.Zero)).toBe(4)
-    expect(captured.getPopStatistics().get(Player.Zero)).toBe(27)
+    expect(captured.getHexStatistics().get(Player.Zero, -1)).toBe(4)
+    expect(captured.getPopStatistics().get(Player.Zero, -1)).toBe(27)
 })

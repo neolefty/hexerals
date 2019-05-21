@@ -19,7 +19,7 @@ import {Terrain} from '../../model/hex/Terrain'
 
 it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})
-    const board = Board.constructSquare(
+    const board = Board.constructDefaultSquare(
         3, pickNPlayers(2), [new CornersPlayerArranger(5)]
     )
     const view = enzyme.render(
@@ -38,8 +38,11 @@ it('renders a board with no selection', () => {
     // - _ - _ *
     // *   -    -
     // 8o8o8 or =-=-=
-    const board = Board.constructRectangular(
-        5, 3, pickNPlayers(2), [new CornersPlayerArranger(3)])
+    const board = Board.constructDefaultRectangular(
+        5, 3, pickNPlayers(2), [
+            new CornersPlayerArranger(3)
+        ],
+    )
     // console.log(board.toString())
     const boardState: BoardState = {
         ...BOARD_STATE_STARTER,
@@ -93,7 +96,7 @@ it('renders a board with no selection', () => {
 
 it('renders a board with a selection', () => {
     // select lower-right corner
-    const board = Board.constructSquare(
+    const board = Board.constructDefaultSquare(
         3, pickNPlayers(2), [new CornersPlayerArranger(2)])
     const ur = board.edges.upperRight
     const bs: BoardState = {
@@ -117,7 +120,7 @@ it('renders a board with a selection', () => {
 })
 
 it('clicks a tile to select it', () => {
-    const board = Board.constructSquare(
+    const board = Board.constructDefaultSquare(
         3, pickNPlayers(2), [new CornersPlayerArranger(6)])
     const coord = board.constraints.extreme(c => - c.cartX - c.cartY)
     const tile = board.getTile(coord)

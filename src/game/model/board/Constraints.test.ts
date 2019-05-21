@@ -9,13 +9,13 @@ import {countHexes} from '../../view/board/HexConstants';
 
 it('counts hexes', () => {
     // all 4 permutations of even & odd
-    expect(Board.constructRectangular(10, 6, List()).hexesAll.size)
+    expect(Board.constructDefaultRectangular(10, 6, List()).hexesAll.size)
         .toBe(countHexes(10, 6))
-    expect(Board.constructRectangular(9, 6, List()).hexesAll.size)
+    expect(Board.constructDefaultRectangular(9, 6, List()).hexesAll.size)
         .toBe(countHexes(9, 6))
-    expect(Board.constructRectangular(6, 9, List()).hexesAll.size)
+    expect(Board.constructDefaultRectangular(6, 9, List()).hexesAll.size)
         .toBe(countHexes(6, 9))
-    expect(Board.constructRectangular(19, 21, List()).hexesAll.size)
+    expect(Board.constructDefaultRectangular(19, 21, List()).hexesAll.size)
         .toBe(countHexes(19, 21))
 })
 
@@ -23,7 +23,7 @@ it('checks rectangular board geometry', () => {
     const arr = [new CornersPlayerArranger()]
     const twoPlayers = pickNPlayers(2)
 
-    const nineByFour = Board.constructRectangular(9, 4, twoPlayers, arr)
+    const nineByFour = Board.constructDefaultRectangular(9, 4, twoPlayers, arr)
     // _ - _ - _ - _ - _  <-- upper-right is at cartesian (7, 3)
     // _ - _ - _ - _ - _
     expect(nineByFour.constraints.extreme(x => x.cartX).cartX).toBe(0)  // left 0
