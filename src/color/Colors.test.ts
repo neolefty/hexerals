@@ -3,6 +3,17 @@ import {CieColor} from "./CieColor"
 import {DriftColor} from "./DriftColor"
 import {List, Range} from "immutable"
 
+it('color equality', () => {
+    const a1 = new DriftColor(new CieColor([1, 2, 3]))
+    const a2 = new DriftColor(new CieColor([1, 2, 3]))
+    const b = new DriftColor(new CieColor([1, 2, 0]))
+    const c = { foo: 10 }
+    expect(a1.equals(a2)).toBeTruthy()
+    expect(a1.equals(b)).toBeFalsy()
+    expect(a1.equals(c)).toBeFalsy()
+    expect(a1.equals(undefined)).toBeFalsy()
+})
+
 it('color distance', () => {
     const c0 = new DriftColor(new CieColor([1, 2, 3]))
     const c1 = new DriftColor(new CieColor([2, 4, 6]))
@@ -39,6 +50,7 @@ it('color podge basics', () => {
     // ... should have no effect except on
     Range(0, 2).forEach(i =>
         Range(0, 3).forEach(j => {
+            expect(cp.driftColors.get(i)).toBeDefined()
             const orig = cp.driftColors.get(i) as DriftColor
             const disp = cpDispersed.driftColors.get(i)
             
