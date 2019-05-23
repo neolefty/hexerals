@@ -29,7 +29,7 @@ it('tracks stat history', () => {
     const stats = () => (crt.localBoard && crt.localBoard.stats) as StatHistory
     const phase = () => (crt.localBoard && crt.localBoard.phase) as GamePhase
 
-    expect(stats().values.size).toBe(0)
+    expect(stats().values.size).toBe(1)
     expect(stats().lastTurns.size).toBe(0)
     expect(phase()).toBe(GamePhase.BeforeStart)
 
@@ -42,29 +42,30 @@ it('tracks stat history', () => {
     crt.queueMove(crt.ul, Hex.RIGHT_DOWN, Player.Two) // get out of the way
     crt.doMoves()
     crt.tick() // turn 0 ends
+    expect(stats().last.turn).toBe(1)
     expect(phase()).toBe(GamePhase.Started)
-    expect(stats().values.size).toBe(1)
     expect(stats().last.hexes.get(Player.Zero, -1)).toBe(1)
     expect(stats().last.hexes.get(Player.Two, -1)).toBe(2)
-    expect(stats().last.pop.get(Player.Two, -1)).toBe(21)
+    expect(stats().last.pop.get(Player.Two, -1)).toBe(20)
 
     // 2. Zero captures Two
     crt.queueMove(crt.ll, Hex.UP, Player.Zero) // Zero captures Two
     crt.doMoves()
     crt.tick() // turn 1 ends
-    expect(stats().values.size).toBe(2)
+    expect(stats().last.turn).toBe(2)
+    expect(stats().values.size).toBe(3)
     expect(stats().last.hexes.get(Player.Two, -1)).toBe(-1)
     expect(stats().last.hexes.get(Player.Zero, -1)).toBe(3)
     expect(stats().last.pop.get(Player.Two, -1)).toBe(-1)
-    expect(stats().last.pop.get(Player.Zero, -1)).toBe(29)
+    expect(stats().last.pop.get(Player.Zero, -1)).toBe(31)
     expect(stats().lastTurns.size).toBe(1)
     expect(stats().lastTurns.get(Player.Two, -1)).toBe(1)
 
-    // Player Two peaked at 21 pop in 2 hexes
-    expect(stats().maxes.pop.get(Player.Two, -1)).toBe(21)
+    // Player Two peaked at 20 pop in 2 hexes
+    expect(stats().maxes.pop.get(Player.Two, -1)).toBe(20)
     expect(stats().maxes.hexes.get(Player.Two, -1)).toBe(2)
-    expect(stats().maxes.pop.get(Player.Zero, -1)).toBe(29)
-    expect(stats().maxes.pop.maxValue).toBe(29)
+    expect(stats().maxes.pop.get(Player.Zero, -1)).toBe(31)
+    expect(stats().maxes.pop.maxValue).toBe(31)
 
     // 3. Three captures One
     crt.queueMove(crt.ur, Hex.LEFT_DOWN, Player.One) // get out of the way
@@ -77,7 +78,7 @@ it('tracks stat history', () => {
     expect(stats().lastTurns.get(Player.One, -1)).toBe(2)
     crt.tick() // turn 3 ends
     crt.tick() // turn 4 ends
-    expect(stats().values.size).toBe(5)
+    expect(stats().values.size).toBe(6)
     expect(stats().lastTurns.size).toBe(2)
 
     // 4. Three captures One — Game Over!
@@ -86,7 +87,7 @@ it('tracks stat history', () => {
     crt.doMoves()
     crt.doMoves()
     crt.tick() // turn 5 ends
-    expect(stats().values.size).toBe(6)
+    expect(stats().values.size).toBe(7)
     expect(stats().lastTurns.size).toBe(3)
     expect(stats().lastTurns.get(Player.Three, -1)).toBe(5)
     expect(phase()).toBe(GamePhase.Ended)

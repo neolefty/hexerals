@@ -188,24 +188,19 @@ it('steps population', () => {
     const moved = threeByThirteen.applyMove(
         PlayerMove.constructDelta(Player.One, ur, Hex.DOWN)
     ).board
+    // after turn 0, city doesn't grow
     expect(moved.getTile(ur).pop).toBe(1)
     expect(moved.getTile(urd).pop).toBe(19)
     expect(moved.getTile(urd2).pop).toBe(0)
 
-    // after turn 1, no changes in population
+    // after turn 1, city grows
     const one = moved.stepPop(1)
-    expect(one.getTile(ur).pop).toBe(1)
+    expect(one.getTile(ur).pop).toBe(2)
     expect(one.getTile(urd).pop).toBe(19)
     expect(one.getTile(urd2).pop).toBe(0)
 
-    // after turn 2, city grows
-    const two = one.stepPop(2)
-    expect(two.getTile(ur).pop).toBe(2)
-    expect(two.getTile(urd).pop).toBe(19)
-    expect(two.getTile(urd2).pop).toBe(0)
-
     // after turn 50, both city and countryside grow
-    const fifty = two.stepPop(50)
+    const fifty = one.stepPop(49)
     expect(fifty.getTile(ur).pop).toBe(3)
     expect(fifty.getTile(urd).pop).toBe(20)
     expect(fifty.getTile(urd2).pop).toBe(0)

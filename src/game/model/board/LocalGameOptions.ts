@@ -3,7 +3,8 @@ export interface LocalGameOptions {
     // If we need a non-number, the reducer should be easy to modify.
     numRobots: number
     tickMillis: number  // how long is a turn? default 500
-    roundLength: number  // how many turns in a round? Default 50
+    roundTicks: number  // how many turns in a round? Default 50
+    cityTicks: number // how often does city pop grow? Default 2
     boardWidth: number
     boardHeight: number
     mountainPercent: number
@@ -31,14 +32,15 @@ export const DEFAULT_LOCAL_GAME_OPTIONS: LocalGameOptions = Object.freeze({
     difficulty: 2,
     mountainPercent: 25,
     tickMillis: 500,
-    roundLength: 50,
+    roundTicks: 50,
+    cityTicks: 2,
     startingPop: 0,
     // booleans — non-zero is true
     fog: 1,
     capitals: 1,
     syncedGrowth: 1,
     // meta
-    statsVisible: 0, // 1,
+    statsVisible: 1, // 0, // 1,
     levelVisible: 0,  // what options are visible
     randomStart: 1,  // used in testing
 })

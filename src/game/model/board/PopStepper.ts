@@ -1,26 +1,25 @@
 import {Board} from './Board';
 import {Terrain} from '../hex/Terrain';
-
-const COUNTRYSIDE_TURNS = 50
-const CITY_TURNS = 2
+import {LocalGameOptions} from './LocalGameOptions'
 
 export class PopStepper {
     constructor(
-        readonly cityTurns: number = CITY_TURNS,
-        readonly countrysideTurns: number = COUNTRYSIDE_TURNS,
+        readonly opts: LocalGameOptions,
     ) {}
 
+    // called before incrementing turn — anticipate next turn
     step(orig: Board, turn: number): Board {
         let result = orig.explicitTiles
         // TODO consider using a single loop
-        if (turn % this.cityTurns === 0)
+        // TODO for rolling increments, consider bucketing
+        if ((turn + 1) % this.opts.cityTicks === 0)
             result = result.withMutations(mut =>
                 result.forEach((tile, hex) => {
                     if (tile.growsFast && tile.isOwned)
                         mut.set(hex, tile.incrementPop())
                 })
             )
-        if (turn > 0 && turn % this.countrysideTurns === 0)
+        if ((turn + 1) % this.opts.roundTicks === 0)
             result = result.withMutations(mut =>
                 result.forEach((tile, hex) => {
                     if (tile.terrain === Terrain.Empty && tile.isOwned)

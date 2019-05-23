@@ -68,7 +68,7 @@ const LocalGameOptionsLimits =
         ['mountainPercent', [ 0, 50 ]],
         ['tickMillis', [ 1, 9999 ]],
         ['startingPop', [ 0, 999 ]],
-        ['roundLength', [ 1, 9999 ]],
+        ['roundTicks', [ 1, 9999 ]],
     ])
 
 interface HexCounts {
@@ -357,7 +357,7 @@ export class LocalGameOptionsView
                     </div>
                     <div className="Level2 Column">
                         {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
-                        {numberInput('Ticks per round', 'roundLength', 'How often population increases in regular hexes.', 2)}
+                        {numberInput('Ticks per round', 'roundTicks', 'How often population increases in regular hexes.', 2)}
                         {checkInput('Synced Growth', 'syncedGrowth', 'Pop grows all at once?', 2)}
                         {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
                     </div>

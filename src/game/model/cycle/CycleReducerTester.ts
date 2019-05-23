@@ -1,5 +1,5 @@
 import {createStore, Store} from 'redux'
-import {List} from 'immutable'
+import {List, Range} from 'immutable'
 
 import {StatusMessage} from '../../../common/StatusMessage'
 import {
@@ -61,7 +61,11 @@ export class CycleReducerTester {
 
     robotsDecide = () => { this.store.dispatch(robotsDecideAction()) }
     doMoves = () => { this.store.dispatch(doMovesAction()) }
-    tick = () => { this.store.dispatch(gameTickAction()) }
+    tick = (n: number = 1) => {
+        Range(0, n).forEach(
+            () => this.store.dispatch(gameTickAction())
+        )
+    }
 
     changeLocalOption = (name: keyof LocalGameOptions, n: number) =>
         this.store.dispatch(changeLocalOptionAction(name, n))

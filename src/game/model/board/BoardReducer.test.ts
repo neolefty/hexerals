@@ -281,6 +281,8 @@ it('notices captures', () => {
     expect(brt.state.phase).toBe(GamePhase.BeforeStart)
     brt.gameTick()
     expect(brt.state.phase).toBe(GamePhase.Started)
+    expect(brt.getTile(Hex.ORIGIN).pop).toBe(49)
+    brt.gameTick()
     expect(brt.getTile(Hex.ORIGIN).pop).toBe(50)
 
     // move player zero to center
@@ -341,7 +343,7 @@ it('notices captures', () => {
     expect(brt.state.phase).toBe(GamePhase.Ended)
 })
 
-it ('advances game phases', () => {
+it('advances game phases', () => {
     const brt = new BoardReducerTester(3, 3, [
         new CornersPlayerArranger(20)
     ], pickNPlayers(4))
@@ -367,4 +369,3 @@ it ('advances game phases', () => {
     expect(brt.board.getHexStatistics().get(Player.Two, 0)).toBe(0)
     expect(brt.board.getHexStatistics().get(Player.Three, 0)).toBe(0)
 })
-

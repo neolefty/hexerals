@@ -36,7 +36,7 @@ export class BoardRules {
         readonly constraints: BoardConstraints,
         readonly edges: RectEdges = new RectEdges(constraints),
         readonly validator: MoveValidator = new MoveValidator(constraints),
-        readonly stepper: PopStepper = new PopStepper(),
+        readonly stepper: PopStepper = new PopStepper(constraints.opts),
     ) {}
 }
 

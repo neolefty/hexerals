@@ -19,7 +19,6 @@ import {PlayerMove} from '../move/Move'
 import {Robot} from '../players/Robot'
 import {TileArranger} from '../setup/TileArranger'
 import {GamePhase} from '../cycle/GamePhase'
-import {DEFAULT_LOCAL_GAME_OPTIONS} from './LocalGameOptions'
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
