@@ -3,6 +3,8 @@ import {CieColor} from "./CieColor"
 import {DriftColor} from "./DriftColor"
 import {List, Range} from "immutable"
 
+// TODO test that mindist() of each color in a podge is similar, after convergence
+
 it('color equality', () => {
     const a1 = new DriftColor(new CieColor([1, 2, 3]))
     const a2 = new DriftColor(new CieColor([1, 2, 3]))
@@ -49,7 +51,7 @@ it('color podge basics', () => {
     expect(cpDispersed.driftColors.size).toEqual(2)
     // ... should have no effect except on
     Range(0, 2).forEach(i =>
-        Range(0, 3).forEach(j => {
+        Range(0, 3).forEach(() => {
             expect(cp.driftColors.get(i)).toBeDefined()
             const orig = cp.driftColors.get(i) as DriftColor
             const disp = cpDispersed.driftColors.get(i)
@@ -138,7 +140,7 @@ it('color podge random tests', () => {
 })
 
 it('textures', () => {
-    Range(0, 10).forEach((i: number) => {
+    Range(0, 10).forEach(() => {
         const orig = DriftColor.random()
         const texture10 = orig.texture(10)
         const darker5 = orig.darker(5)
@@ -159,5 +161,3 @@ it('textures', () => {
         expect(orig.darker(100).lightness).toBe(0)
     })
 })
-
-// TODO test that mindist() of each color in a podge is similar, after convergence
