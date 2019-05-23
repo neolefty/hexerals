@@ -40,7 +40,7 @@ export const DEFAULT_LOCAL_GAME_OPTIONS: LocalGameOptions = Object.freeze({
     capitals: 1,
     syncedGrowth: 1,
     // meta
-    statsVisible: 1, // 0, // 1,
+    statsVisible: 0, // 1,
     levelVisible: 0,  // what options are visible
     randomStart: 1,  // used in testing
 })
