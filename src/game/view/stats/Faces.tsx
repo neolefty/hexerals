@@ -5,6 +5,7 @@ import {DriftColor} from '../../../color/DriftColor'
 import {StatsPanelProps} from './StatsPanel'
 import {Player} from '../../model/players/Players'
 import {TurnStat} from '../../model/stats/TurnStat'
+import {PlayerFace} from './PlayerFace'
 
 // viewbox is -SIZE to SIZE — for example, -10,-10 to 10,10
 const SIZE = new CartPair(10, 10)
@@ -14,115 +15,6 @@ const MARGIN = 5
 
 // how much of the status panel do faces take up (0.5 would be half)
 const FACES_FRACTION = 0.9
-
-interface FaceProps extends FaceShapeProps, InscriptionProps {
-}
-
-interface FaceShapeProps {
-    color: DriftColor
-}
-
-interface InscriptionProps {
-    color: DriftColor
-    superTitle?: string
-    contents?: string
-    alt?: string
-    verticalShift?: number
-}
-
-const HumanFaceShape = (props: FaceShapeProps) => (
-    <ellipse
-        rx='6' ry='7'
-        stroke={props.color.texture().hexString}
-        strokeWidth='1'
-        fill={props.color.hexString}
-    />
-)
-
-const HumanGraveShape = (props: FaceShapeProps) => (
-    <>
-        <ellipse cy='-5' rx='5' ry='3' />
-        <rect x='-5' y='-5' width='10' height='10' stroke='none' />
-        <line x1='5' y1='-5' x2='5' y2='5' />
-        <line x1='-5' y1='-5' x2='-5' y2='5' />
-        <polygon
-            points='-8,9 -8,8 -6,5 6,5 8,8 8,9'
-            fill={props.color.texture().hexString}
-        />
-    </>
-)
-
-const RobotFaceShape = (props: FaceShapeProps) => (
-    <>
-        <rect x='-5' y='-4' width='10' height='12' rx='1' ry='1' />
-        <line y1='-6' y2='-4' />
-        <circle cy='-7' r='1' />
-    </>
-)
-
-const RobotGraveShape = (props: FaceShapeProps) =>
-    HumanGraveShape(props)
-
-interface PlayerFaceShapeProps extends FaceShapeProps {
-    alive: boolean
-    human: boolean
-}
-
-interface PlayerFaceProps extends PlayerFaceShapeProps, FaceProps {}
-
-const PlayerFaceShape = (props: PlayerFaceShapeProps) => {
-    return props.human
-        ? (props.alive
-            ? (<HumanFaceShape color={props.color}/>)
-            : (<HumanGraveShape color={props.color}/>)
-        )
-        : (props.alive
-            ? (<RobotFaceShape color={props.color}/>)
-            : (<RobotGraveShape color={props.color}/>)
-        )
-}
-
-const Inscription = (props: InscriptionProps) => (
-    <>
-        {
-            props.alt ? (<title>{props.alt}</title>) : undefined
-        }
-        {
-            props.contents ? (
-                <text
-                    y={(props.verticalShift || 0) + 5.5}
-                    fill={props.color.contrast().hexString}
-                    fontSize="5.5"
-                    textAnchor="middle"
-                    stroke="none"
-                >{props.contents}</text>
-            ) : undefined
-        }
-        {
-            props.superTitle ? (
-                <text
-                    y={props.verticalShift || 0}
-                    fill={props.color.contrast().hexString}
-                    fontSize="2.7"
-                    textAnchor="middle"
-                    stroke="none"
-                >{props.superTitle}</text>
-            ) : undefined
-        }
-    </>
-)
-
-const PlayerFace = (props: PlayerFaceProps) => (
-    <g
-        stroke={props.color.texture().hexString}
-        strokeWidth='1'
-        fill={props.color.hexString}
-        strokeLinecap='round'
-    >
-        <PlayerFaceShape {...props} />
-        <Inscription {...props} />
-    </g>
-)
 
 interface FacesProps extends StatsPanelProps {
     faceText?: (stat: TurnStat, player: Player) => string

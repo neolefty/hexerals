@@ -4,7 +4,7 @@ import {CycleMode} from '../../model/cycle/CycleState'
 import * as React from 'react'
 import {CycleState} from '../../model/cycle/CycleState'
 import {Layered} from '../../../common/Layered'
-import {LocalGamePreview} from './LocalGamePreview'
+import {LocalGamePreview} from './preview/LocalGamePreview'
 import {LocalGameContainer} from './LocalGameContainer'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 

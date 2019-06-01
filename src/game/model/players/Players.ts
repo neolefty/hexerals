@@ -50,8 +50,9 @@ export class PlayerManager {
         readonly playerRobots: Map<Player, Robot>,
     ) {}
 
-    get size() {
-        return this.playerIndexes.size
+    get size(): number {
+        // some kind of weird bug is causing this to be necessary ...
+        return this.playerIndexes ? this.playerIndexes.size : NaN
     }
 
     isRobot(player: Player): boolean {
@@ -75,6 +76,5 @@ export class PlayerManager {
             + (this.playerRobots.size > 0 ? ` — ${
                 JSON.stringify(this.playerRobots.toJSON())
             }` : '')
-
     }
 }
