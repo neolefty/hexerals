@@ -6,6 +6,7 @@ import {BoardViewProps} from './BoardViewBase';
 import {TileHexView} from './TileHexView';
 import {Player} from '../../model/players/Players';
 import {Set} from 'immutable';
+import {Terrain} from '../../model/hex/Terrain'
 
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
@@ -28,7 +29,13 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                     const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
                     const color: DriftColor = ownerColor
-                        || (tile.known ? DriftColor.GREY_60 : DriftColor.GREY_40)
+                        || (tile.known
+                            ? (tile.terrain === Terrain.Empty
+                                    ? DriftColor.GREY_80
+                                    : DriftColor.GREY_60
+                                )
+                            : DriftColor.GREY_40
+                        )
                     const text = !tile.known && !tile.isBlank() ? '?' : tile.pop !== 0 ? `${tile.pop}` : undefined
                     // undefined means let the TileHexView decide
                     const textColor = !tile.known ? color.texture(30) : undefined
