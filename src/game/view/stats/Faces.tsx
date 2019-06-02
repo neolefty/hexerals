@@ -63,7 +63,7 @@ export const Faces = (props: FacesProps) => {
                 const color = props.colors.get(player, DriftColor.GREY_60)
                 const isAlive = !demises.has(player)
                 const isHuman = !props.boardState.players.isRobot(player)
-                const superTitle = isAlive ? 'pop' : 'R.I.P.'
+                const superTitle = isAlive ? 'pop' : 'R I P'
                 const contents = demises.has(player)
                     ? `${Math.floor(demises.get(player, -1)/2)}`
                     : props.faceText && props.faceText(latest, player)
