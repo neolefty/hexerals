@@ -3,12 +3,12 @@ import * as ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {createStore} from 'redux'
 
-import {CartPair} from "../../common/CartPair"
+import {CartPair} from "../../../common/CartPair"
 import {
     CycleReducer,
     changeLocalOptionAction, openLocalGameAction,
-} from '../model/cycle/CycleReducer'
-import {CycleContainer} from './cycle/CycleContainer'
+} from '../../model/cycle/CycleReducer'
+import {CycleContainer} from '../cycle/CycleContainer'
 
 it('renders without crashing', () => {
     const store = createStore(CycleReducer)
