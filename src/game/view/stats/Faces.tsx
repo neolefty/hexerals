@@ -43,7 +43,10 @@ export const Faces = (props: FacesProps) => {
     const players = props.boardState.board.players
     const y = props.displaySize.isVertical ? props.displaySize.y - MARGIN : MARGIN
     const x = MARGIN
-    const d = props.displaySize.max * FACES_FRACTION / players.size
+    const d = Math.min(
+        props.displaySize.max * FACES_FRACTION / players.size,
+        props.displaySize.min * FACES_FRACTION,
+    )
     const dy = props.displaySize.isVertical ? -d : 0
     const dx = props.displaySize.isHorizontal ? d : 0
     const side = d - MARGIN
