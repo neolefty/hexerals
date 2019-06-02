@@ -4,9 +4,9 @@ import {List, Map} from 'immutable';
 import {MovementQueue} from '../../model/move/MovementQueue';
 import {DriftColor} from '../../../color/DriftColor';
 import {Player} from '../../model/players/Players';
-import {viewBoxHeight} from './HexesView';
+import {viewBoxHeight} from '../hex/HexesView';
 import {HexMove} from '../../model/move/Move';
-import {centerX, centerY} from './TileHexView';
+import {centerX, centerY} from '../hex/TileHexView';
 
 interface MoveQueueViewProps {
     moves: MovementQueue

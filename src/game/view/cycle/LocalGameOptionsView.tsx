@@ -10,7 +10,7 @@ import {minMax, minRatio, roundToMap} from '../../../common/MathFunctions'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
-import {countHexes, heightFromWidth, widthFromHeight} from '../board/HexConstants'
+import {countHexes, heightFromWidth, widthFromHeight} from '../hex/HexConstants'
 import {statSizesAndStyles} from '../board/BoardAndStats'
 import './LocalGameOptionsView.css'
 

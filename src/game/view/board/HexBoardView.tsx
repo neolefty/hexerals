@@ -3,10 +3,10 @@ import {Map} from 'immutable'
 
 import './Board.css'
 import {Player} from '../../model/players/Players'
-import {HexesView} from './HexesView';
+import {HexesView} from '../hex/HexesView';
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';
-import {hexPixelHeight, hexPixelWidth} from './HexConstants';
+import {hexPixelHeight, hexPixelWidth} from '../hex/HexConstants';
 import {DriftColor} from '../../../color/DriftColor';
 
 // space between bounding rect and hex viewbox

@@ -5,7 +5,7 @@ import * as assert from 'assert'
 import {StatusMessage} from '../../../common/StatusMessage';
 import {GenericAction} from '../../../common/GenericAction'
 import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics';
-import {countHexes} from '../../view/board/HexConstants'
+import {countHexes} from '../../view/hex/HexConstants'
 import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
 import {BOARD_STATE_STARTER, BoardState} from '../board/BoardState'

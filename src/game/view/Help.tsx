@@ -9,8 +9,8 @@ import {Player} from '../model/players/Players'
 import {Terrain} from '../model/hex/Terrain'
 import {HexMove} from '../model/move/Move'
 import {MoveView} from './board/MoveQueueView'
-import {TileHexView} from './board/TileHexView'
-import {hexPixelHeight, hexPixelWidth} from './board/HexConstants'
+import {TileHexView} from './hex/TileHexView'
+import {hexPixelHeight, hexPixelWidth} from './hex/HexConstants'
 
 import './Help.css'
 

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import {DriftColor} from '../../../color/DriftColor';
 import {Hex} from '../../model/hex/Hex';
-import {BoardViewProps} from './BoardViewBase';
+import {BoardViewProps} from '../board/BoardViewBase';
 import {TileHexView} from './TileHexView';
 import {Player} from '../../model/players/Players';
 import {Set} from 'immutable';

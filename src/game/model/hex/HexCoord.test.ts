@@ -1,7 +1,7 @@
 import {Range} from 'immutable';
 import {RectangularConstraints} from '../board/Constraints'
 import {Hex} from './Hex'
-import {countHexes} from '../../view/board/HexConstants';
+import {countHexes} from '../../view/hex/HexConstants';
 
 it('checks hex neighbors', () => {
     expect(Hex.ORIGIN.getRightDown() === Hex.RIGHT_DOWN).toBeTruthy()

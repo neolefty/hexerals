@@ -8,7 +8,7 @@ import {Terrain} from './Terrain'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {FloodDM, PathsDM, SpreadPlayersArranger} from '../setup/SpreadPlayerArranger';
 import {TileArranger} from '../setup/TileArranger';
-import {StatusMessage} from '../../../../common/StatusMessage';
+import {StatusMessage} from '../../../common/StatusMessage'
 import {pickNPlayers} from '../players/Players';
 
 it ('finds a simple shortest path', () => {
