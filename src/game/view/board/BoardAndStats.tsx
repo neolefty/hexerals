@@ -100,7 +100,7 @@ export const statSizesAndStyles = (
 export const BoardAndStats = (props: BoardAndStatsProps) => {
     const [state, setState] = useLocalStorageState('BoardAndStats.state', defaultState)
     const displayStuff = statSizesAndStyles(props.displaySize, props.statsVisible, state)
-    const vert = props.displaySize.isVertical
+    const screenVertical = props.displaySize.isVertical
     return (
         <div style={displayStuff.container.style}>
             <div style={displayStuff.board.style}>
@@ -114,10 +114,11 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
                     <div style={displayStuff.stats.style}>
                         <StatsPanel
                             boardState={props.boardState}
+                            flipped={screenVertical ? !state.statsDown : !state.statsRight}
                             onTogglePosition={() => {
                                 setState({
-                                    statsRight: vert ? state.statsRight : !state.statsRight,
-                                    statsDown: vert ? !state.statsDown : state.statsDown,
+                                    statsRight: screenVertical ? state.statsRight : !state.statsRight,
+                                    statsDown: screenVertical ? !state.statsDown : state.statsDown,
                                 })
                             }}
                             displaySize={displayStuff.stats.displaySize}

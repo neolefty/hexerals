@@ -13,8 +13,9 @@ const SIZE = new CartPair(10, 10)
 // space between faces
 const MARGIN = 5
 
-// how much of the status panel do faces take up (0.5 would be half)
-const FACES_FRACTION = 0.9
+// lengthwise, how much of the status panel do faces take up (0.5 would be half)
+const FACES_FRACTION_LENGTH = 0.9
+const FACES_FRACTION_WIDTH = 1
 
 interface FacesProps extends StatsPanelProps {
     faceText?: (stat: TurnStat, player: Player) => string
@@ -41,14 +42,18 @@ export const Faces = (props: FacesProps) => {
     }
 
     const players = props.boardState.board.players
-    const y = props.displaySize.isVertical ? props.displaySize.y - MARGIN : MARGIN
-    const x = MARGIN
     const d = Math.min(
-        props.displaySize.max * FACES_FRACTION / players.size,
-        props.displaySize.min * FACES_FRACTION,
+        props.displaySize.max * FACES_FRACTION_LENGTH / players.size,
+        props.displaySize.min * FACES_FRACTION_WIDTH,
     )
-    const dy = props.displaySize.isVertical ? -d : 0
+    const dy = props.displaySize.isVertical ? d : 0
     const dx = props.displaySize.isHorizontal ? d : 0
+    const y = props.displaySize.isVertical
+        ? 0 // vertical always start at the top
+        : props.flipped ? props.displaySize.y - d : 0 // horizontal start at the top unless flipped
+    const x = props.displaySize.isHorizontal
+        ? 0 // horizontal always start at the left
+        : props.flipped ? props.displaySize.x - d : 0 // vertical start at left unless flipped
     const side = d - MARGIN
     const viewBox = `${SIZE.scale(-1).toString(' ')} ${SIZE.scale(2).toString(' ')}`
 
@@ -67,7 +72,7 @@ export const Faces = (props: FacesProps) => {
                         key={player}
                         viewBox={viewBox}
                         x={x + dx * (index)}
-                        y={y + dy * (index + 1)}
+                        y={y + dy * (index)}
                         width={side}
                         height={side}
                     >

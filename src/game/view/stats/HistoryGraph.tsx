@@ -1,18 +1,12 @@
 import * as React from 'react'
-import {Map} from 'immutable'
 
-import {CartPair} from '../../../common/CartPair'
-import {BoardState} from '../../model/board/BoardState'
 import {TurnStat} from '../../model/stats/TurnStat'
 import {Player} from '../../model/players/Players'
-import {DriftColor} from '../../../color/DriftColor'
 import {BoardStat} from '../../model/board/BoardStat'
 import {StatsPoly} from './StatsPoly'
+import {StatsPanelProps} from './StatsPanel'
 
-export interface HistoryGraphProps {
-    boardState: BoardState
-    displaySize: CartPair
-    colors: Map<Player, DriftColor>
+export interface HistoryGraphProps extends StatsPanelProps {
     picker: StatPicker
     stacked: boolean
     area: boolean // if false, draw lines instead

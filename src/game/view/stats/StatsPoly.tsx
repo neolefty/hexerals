@@ -36,6 +36,10 @@ const zeroY = (pair: string) => {
 const MIN_Y_RANGE = 5
 const MIN_X_RANGE = 25
 
+// How much of the height should the graph fill?
+// (To leave a gap between the graph and the board, make it < 1.)
+const GRAPH_FILL_HEIGHT = 0.75
+
 export class StatsPoly {
     readonly history: StatHistory
     readonly players: List<Player>
@@ -81,8 +85,8 @@ export class StatsPoly {
             ? this.props.displaySize
             : this.props.displaySize.transpose
         this.scale = new CartPair(
-            this.graphSize.x / this.range.x,
-            this.graphSize.y / this.range.y
+            this.graphSize.x / (this.range.x - 1), // range is 0 to n-1
+            GRAPH_FILL_HEIGHT * this.graphSize.y / this.range.y
         )
     }
     // TODO maybe shift over to right edge and grow to left until it fills the whole X axis (instead of growing from left)?
@@ -124,8 +128,11 @@ export class StatsPoly {
 
     get polys(): React.ReactNode {
         const transform = this.props.displaySize.isHorizontal
-            ? `translate(0 ${this.props.displaySize.y}) scale(1 -1)`
-            : `rotate(90 0 0) scale(-1 1) translate(${-this.graphSize.x} ${-this.graphSize.y})`
+            ? `translate(0 ${this.props.flipped ? 0 : this.props.displaySize.y}) scale(1 ${this.props.flipped ? 1 : -1})`
+            // vertical graph flowing downward
+            : `rotate(90 0 0) scale(1 ${this.props.flipped ? -1 : 1}) translate(0 ${this.props.flipped ? 0 : -this.graphSize.y})`
+            // vertical graph flowing upward
+            // : `rotate(90 0 0) scale(-1 ${this.props.flipped ? -1 : 1}) translate(${-this.graphSize.x} ${this.props.flipped ? 0 : -this.graphSize.y})`
 
         return (
             <g transform={transform}>
