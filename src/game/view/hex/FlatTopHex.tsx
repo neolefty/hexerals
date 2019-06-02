@@ -1,190 +1,91 @@
 import * as React from 'react'
 
 import {TerrainView} from './TerrainView'
-import {Hex} from '../../model/hex/Hex'
-import {Terrain} from '../../model/hex/Terrain';
-import {CartPair} from '../../../common/CartPair';
-import {HEX_POINTS} from './HexConstants';
-import {HexViewProps} from './HexViewProps';
+import {Terrain} from '../../model/hex/Terrain'
+import {HEX_POINTS} from './HexConstants'
+import {HexViewProps} from './HexViewProps'
 
 export interface FlatTopHexProps extends HexViewProps {
     centerX: number
     centerY: number
 }
 
-// persist a touch event and connect it to a Hex
-class HexTouch {
-    readonly screen: CartPair
-    readonly client: CartPair
-    readonly page: CartPair
-    readonly id: number
-
-    // from attribute hex-id
-    readonly hex: Hex  // can be Hex.NONE
-
-    constructor(t: React.Touch) {
-        this.id = t.identifier
-        this.screen = new CartPair(t.screenX, t.screenY)
-        this.client = new CartPair(t.clientX, t.clientY)
-        this.page = new CartPair(t.pageX, t.pageY)
-        this.hex = this.getHexFromPoint()
-    }
-
-    private getHexFromPoint(): Hex {
-        const elements: Element[] = document.elementsFromPoint(this.client.x, this.client.y)
-        for (let elem of elements) {
-            // in the presence of malformed hex-id
-            const hexIdString: string | null = elem.getAttribute('hex-id')
-            if (hexIdString)
-                return Hex.getById(parseInt(hexIdString, 10))
-        }
-        return Hex.NONE;
-    }
-
-    toString(): string {
-        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round()} / client ${ this.client.round()} / page ${this.page.round()}`
-    }
-}
-
-// TODO move touch listener up, to avoid binding to disappearing element
 // a hexagon centered at (x, y)
-export class FlatTopHex
-    extends React.PureComponent<FlatTopHexProps>
-{
-    constructor(props: FlatTopHexProps) {
-        super(props)
-        this.logEvent = this.logEvent.bind(this)
-        this.onTouchStart = this.onTouchStart.bind(this)
-        this.onTouchMove = this.onTouchMove.bind(this)
-        this.onTouchEnd = this.onTouchEnd.bind(this)
+export const FlatTopHex = (props: FlatTopHexProps) => {
+    const hexIdAttribute = {
+        // Attribute of the top SVG element, for retrieval from Touch events
+        'hex-id': props.hex.id
     }
 
-    onTouchStart(e: React.TouchEvent) {
-        // this.logEvent(e)
-        if (this.props.onPlaceCursor) {
-            for (let i = 0; i < e.touches.length; ++i) {
-                const hexTouch = new HexTouch(e.touches[i])
-                // console.log(`  — set cursor ${hexTouch}`)
-                this.props.onPlaceCursor(hexTouch.id, hexTouch.hex, false)
-            }
-            if (e.cancelable)
-                e.preventDefault()
-        }
-    }
-
-    onTouchMove(e: React.TouchEvent) {
-        // this.logEvent(e)
-        if (this.props.onDrag) {
-            for (let i = 0; i < e.touches.length; ++i) {
-                const hexTouch = new HexTouch(e.touches[i])
-                // console.log(`  — ${hexTouch.toString()}`)
-                if (hexTouch.hex !== Hex.NONE)
-                    this.props.onDrag(hexTouch.id, hexTouch.hex)
-            }
-            if (e.cancelable)
-                e.preventDefault()
-        }
-    }
-
-    onTouchEnd(e: React.TouchEvent) {
-        // this.logEvent(e)
-        if (this.props.onClearCursor) {
-            for (let i = 0; i < e.changedTouches.length; ++i) {
-                const hexTouch = new HexTouch(e.changedTouches[i])
-                // console.log(`  — clearing cursor — ${hexTouch}`)
-                this.props.onClearCursor(hexTouch.id)
-            }
-            if (e.cancelable)
-                e.preventDefault()
-        }
-    }
-
-    logEvent(e: React.SyntheticEvent, prefix: string = '') {
-        // tslint:disable-next-line
-        console.log(
-            `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.hexString}`)
-    }
-
-    render(): React.ReactNode {
-        const hexIdAttribute = {
-            // Attribute of the top SVG element, for retrieval from Touch events
-            'hex-id': this.props.hex.id
-        }
-
-        const children: JSX.Element[] = [(
-            <polygon
-                {...hexIdAttribute}
-                key="bg"
-                points={HEX_POINTS}
-                style={
-                    this.props.color && {
-                        fill: this.props.color.hexString
-                    }
+    const children: JSX.Element[] = [(
+        <polygon
+            {...hexIdAttribute}
+            key="bg"
+            points={HEX_POINTS}
+            style={
+                props.color && {
+                    fill: props.color.hexString
                 }
-            />
-        )]
+            }
+        />
+    )]
 
-        if (this.props.selected)
-            children.push(
-                <polygon
-                    key="cursor"
-                    className="cursor"
-                    points={HEX_POINTS}
-                    style={{
-                        stroke: this.props.color.contrast().hexString,
-                    }}
-                />
-            )
-
+    if (props.selected)
         children.push(
             <polygon
-                key="hover"
-                className="hover"
+                key="cursor"
+                className="cursor"
                 points={HEX_POINTS}
                 style={{
-                    stroke: this.props.color.contrast().hexString,
+                    stroke: props.color.contrast().hexString,
                 }}
             />
         )
 
-        if (this.props.tile.terrain !== Terrain.Empty) children.push(
-            <TerrainView
-                key={this.props.hex.id}
-                tile={this.props.tile}
-                color={this.props.color}
-            />
-        )
+    children.push(
+        <polygon
+            key="hover"
+            className="hover"
+            points={HEX_POINTS}
+            style={{
+                stroke: props.color.contrast().hexString,
+            }}
+        />
+    )
 
-        if (Array.isArray(this.props.children))
-            children.push(...this.props.children as JSX.Element[])
-        else if (this.props.children)
-            children.push(this.props.children as JSX.Element)
+    if (props.tile.terrain !== Terrain.Empty) children.push(
+        <TerrainView
+            key={props.hex.id}
+            tile={props.tile}
+            color={props.color}
+        />
+    )
 
-        return (
-            <g
-                transform={`translate(${this.props.centerX} ${this.props.centerY})`}
-                className={`FlatTopHex ${this.props.tile.owner} tile${this.props.selected ? ' active' : ''}`}
+    if (Array.isArray(props.children))
+        children.push(...props.children as JSX.Element[])
+    else if (props.children)
+        children.push(props.children as JSX.Element)
 
-                onTouchStart={this.onTouchStart}
-                onTouchMove={this.onTouchMove}
-                onTouchCancel={this.onTouchEnd}
-                onTouchEnd={this.onTouchEnd}
+    return (
+        <g
+            transform={`translate(${props.centerX} ${props.centerY})`}
+            className={`FlatTopHex ${props.tile.owner} tile${props.selected ? ' active' : ''}`}
 
-                onMouseEnter={(e) => {
-                    // left mouse button
-                    if (this.props.onDrag && e.buttons === 1) {
-                        this.props.onDrag(0, this.props.hex)
-                        e.preventDefault()
-                    }
-                }}
-                onMouseDown={(e) => {
-                    if (this.props.onPlaceCursor) {
-                        this.props.onPlaceCursor(0, this.props.hex, true)
-                        e.preventDefault()
-                    }
-                }}
-            >
-                {children}
-            </g>
-        )    }
+            onMouseEnter={(e) => {
+                // left mouse button
+                if (props.onDrag && e.buttons === 1) {
+                    props.onDrag(0, props.hex)
+                    e.preventDefault()
+                }
+            }}
+            onMouseDown={(e) => {
+                if (props.onPlaceCursor) {
+                    props.onPlaceCursor(0, props.hex, true)
+                    e.preventDefault()
+                }
+            }}
+        >
+            {children}
+        </g>
+    )
 }

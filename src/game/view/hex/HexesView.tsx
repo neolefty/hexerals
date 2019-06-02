@@ -7,6 +7,7 @@ import {TileHexView} from './TileHexView';
 import {Player} from '../../model/players/Players';
 import {Set} from 'immutable';
 import {Terrain} from '../../model/hex/Terrain'
+import {HexTouch} from './HexTouch'
 
 export const viewBoxHeight = (boardHeight: number): number => (boardHeight + 1) * 26
 
@@ -15,6 +16,43 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
         super(props)
         this.onDrag = this.onDrag.bind(this)
         this.onClearCursor = this.onClearCursor.bind(this)
+        this.onTouchStart = this.onTouchStart.bind(this)
+        this.onTouchMove = this.onTouchMove.bind(this)
+        this.onTouchEnd = this.onTouchEnd.bind(this)
+    }
+
+    onTouchStart(e: React.TouchEvent) {
+        // this.logEvent(e)
+        for (let i = 0; i < e.touches.length; ++i) {
+            const hexTouch = new HexTouch(e.touches[i])
+            // console.log(`  — set cursor ${hexTouch}`)
+            this.props.onPlaceCursor(hexTouch.id, hexTouch.hex, false)
+        }
+        if (e.cancelable)
+            e.preventDefault()
+    }
+
+    onTouchMove(e: React.TouchEvent) {
+        // this.logEvent(e)
+        for (let i = 0; i < e.touches.length; ++i) {
+            const hexTouch = new HexTouch(e.touches[i])
+            // console.log(`  — ${hexTouch.toString()}`)
+            if (hexTouch.hex !== Hex.NONE)
+                this.onDrag(hexTouch.id, hexTouch.hex)
+        }
+        if (e.cancelable)
+            e.preventDefault()
+    }
+
+    onTouchEnd(e: React.TouchEvent) {
+        // this.logEvent(e)
+        for (let i = 0; i < e.changedTouches.length; ++i) {
+            const hexTouch = new HexTouch(e.changedTouches[i])
+            // console.log(`  — clearing cursor — ${hexTouch}`)
+            this.onClearCursor(hexTouch.id)
+        }
+        if (e.cancelable)
+            e.preventDefault()
     }
 
     render(): React.ReactNode {
@@ -23,7 +61,13 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
         const cursorSet = Set<Hex>(boardState.cursors.values())
         // TODO look into SVGFactory / SVGElement
         return (
-            <g id="hexMap"> {
+            <g
+                id="hexMap"
+                onTouchStart={this.onTouchStart}
+                onTouchMove={this.onTouchMove}
+                onTouchCancel={this.onTouchEnd}
+                onTouchEnd={this.onTouchEnd}
+            >{
                 boardState.board.constraints.allSorted.map(hex => {
                     const tile = boardState.board.getTile(hex)
                     const ownerColor: DriftColor | undefined
@@ -55,8 +99,7 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                         />
                     )
                 })
-            }
-            </g>
+            }</g>
         )
     }
 
@@ -72,4 +115,10 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
             this.props.onDrag(player, cursorIndex, source, dest)
         }
     }
+
+    // logEvent(e: React.SyntheticEvent, prefix: string = '') {
+    //     // tslint:disable-next-line
+    //     console.log(
+    //         `${prefix}@${this.props.hex} ${e.nativeEvent.type} — ${this.props.tile} ${this.props.color.hexString}`)
+    // }
 }
