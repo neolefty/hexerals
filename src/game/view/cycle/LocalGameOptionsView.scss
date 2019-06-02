@@ -13,9 +13,9 @@
 
   // specify height explicitly because auto doesn't animate
   $float-height: 12vmin;
-  $level0-height: 24vmin;
-  $level1-height: 28vmin;
-  $level2-height: 28vmin;
+  $level0-height: 30vmin;
+  $level1-height: 34vmin;
+  $level2-height: 34vmin;
 
   .LevelButton {
     transition: all 400ms;
@@ -73,10 +73,17 @@
     }
   }
 
-  .Label {
+  .LabelBefore {
     text-align: right;
-    margin-right: 0.5em;
-    margin-left: -0.5em;
+    margin-right: 0.6em;
+    margin-left: -0.4em;
+    width: 15vmin;
+  }
+
+  .LabelAfter {
+    text-align: left;
+    margin-right: -0.4em;
+    margin-left: 0.6em;
     width: 15vmin;
   }
 
@@ -104,7 +111,7 @@
   .InputRange {
     margin: 0.4em 0.3em;
     .input-range {
-      width: 33vmin;
+      width: 27vmin;
       display: inline-flex;
     }
     .input-range__label {

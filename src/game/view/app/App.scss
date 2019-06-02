@@ -20,7 +20,11 @@
   border-radius: 1em;
   transition: all 400ms;
   border: 0.7vmin solid rgba(90, 90, 90, 0.8);
-  width: 50vmin;
+  width: 63vmin;
+  .Row {
+    margin-top: 2.5vmin;
+    margin-bottom: 2.5vmin;
+  }
 }
 
 .App {

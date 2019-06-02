@@ -278,7 +278,9 @@ export class LocalGameOptionsView
         )
 
         function numberRangeFromMap<V>(
-            label: string, title: string, value: number,
+            labelBefore: string,
+            labelAfter: (value: number) => string,
+            title: string, value: number,
             choices: Map<V, number>,
             onChange: (n: number, highFidelity: boolean) => void,
         ) {
@@ -287,11 +289,12 @@ export class LocalGameOptionsView
                 min = Math.min(n, min)
                 max = Math.max(n, max)
             })
-            return numberRange(label, title, value, min, max, onChange)
+            return numberRange(labelBefore, labelAfter, title, value, min, max, onChange)
         }
 
         function numberRange<V>(
-            label: string, title: string, value: number,
+            labelBefore: string, labelAfter: (value: number) => string,
+            title: string, value: number,
             min: number, max: number,
             onChange: (n: number, highFidelity: boolean) => void,
         ) {
@@ -300,9 +303,7 @@ export class LocalGameOptionsView
                     className="InputRange Row"
                     title={title}
                 >
-                    <span className="Label">
-                        {label}
-                    </span>
+                    <span className="LabelBefore">{labelBefore}</span>
                     <InputRange
                         minValue={min}
                         maxValue={max}
@@ -315,6 +316,7 @@ export class LocalGameOptionsView
                             onChange(value as number, false)
                         }
                     />
+                    <span className="LabelAfter">{labelAfter(value)}</span>
                 </label>
             )
         }
@@ -330,19 +332,23 @@ export class LocalGameOptionsView
                     <div className="Level0 Column">
                         {numberRangeFromMap(
                             'Map',
+                            value => this.nearestBoardSize(value).toString(' x '),
                             'How big of a map?',
                             this.nHexesFromProps(),
                             this.getHexCounts().counts,
                             this.fitToShape,
                         )}
                         {numberRange(
-                            'Robots', 'How many AI opponents?',
+                            'Robots',
+                            value => `${value}`,
+                            'How many AI opponents?',
                             this.props.localOptions.numRobots,
                             0, MAX_PLAYERS - 1,
                             optionChanger('numRobots', true),
                         )}
                         {numberRange(
-                            difficultyNames[this.props.localOptions.difficulty],
+                            'Difficulty',
+                            value => difficultyNames[value],
                             'How smart should these robots be?',
                             this.props.localOptions.difficulty,
                             0, BasicRobot.MAX_IQ,
