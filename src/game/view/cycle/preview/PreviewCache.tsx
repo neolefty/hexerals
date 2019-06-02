@@ -7,6 +7,7 @@ import {RandomTerrainArranger} from '../../../model/setup/RandomTerrainArranger'
 import {SpreadPlayersArranger} from '../../../model/setup/SpreadPlayerArranger'
 import {Terrain} from '../../../model/hex/Terrain'
 import {CacheMap} from '../../../../common/CacheMap'
+import {BasicRobot} from '../../../model/players/BasicRobot'
 
 // options that change how the preview looks
 type CacheKey = {
@@ -50,6 +51,8 @@ const makeKey = (opts: LocalGameOptions): Record<CacheKey> => {
 }
 const bsCache = new CacheMap<{}, BoardState>(2000)
 
+const DUMMY_ROBOT = BasicRobot.bySkill(0)
+
 export const getPreviewBoard = (
     options: LocalGameOptions,
     highFidelity: boolean,
@@ -59,28 +62,27 @@ export const getPreviewBoard = (
     const keyBlank = keyNoPlayers.set('mountainPercent', 0)
 
     // cache low-fidelity of blank hexes (computes set of all tiles)
-    const blankState = bsCache.get(keyBlank, () =>
+    const blankBoardState = bsCache.get(keyBlank, () =>
         Object.freeze({
             ...BOARD_STATE_STARTER,
             players: PlayerManager.construct(List()),
             board: Board.constructRectangular(options)
         })
     )
-    console.log(`blank has ${blankState.players.size} players`)
 
     // while scrubbing board size, always show blank for consistency
     // (even if we have precomputed terrain + players)
     if (!highFidelity)
-        return blankState
+        return blankBoardState
 
     // cache with mountains (no players)
-    const boardNoPlayers = bsCache.get(keyNoPlayers, () =>
+    const mountainState = bsCache.get(keyNoPlayers, () =>
         Object.freeze({
-            ...blankState,
-            board: blankState.board.overlayTiles(  // reuse blank board
+            ...blankBoardState,
+            board: blankBoardState.board.overlayTiles(  // reuse blank board
                 new RandomTerrainArranger(
                     options.mountainPercent / 100
-                ).arrange(blankState.board)
+                ).arrange(blankBoardState.board)
             )
         })
     )
@@ -88,21 +90,26 @@ export const getPreviewBoard = (
     // then, keeping mountains the same, update players
     const result: BoardState = bsCache.get(key, () => {
         const players = pickNPlayers(options.numRobots + 1)
-        const board = boardNoPlayers.board.overlayTiles(
+        const boardWithPlayers = mountainState.board.withPlayers(players)
+        const boardWithCities = boardWithPlayers.overlayTiles(
             new SpreadPlayersArranger(
                 options.capitals ? Terrain.Capital : Terrain.City,
                 0,
                 // reuse shortest paths
-                () => boardNoPlayers.board.emptyHexPaths,
+                () => mountainState.board.emptyHexPaths,
                 2, 4, 6, 3,
-            ).arrange(boardNoPlayers.board.withPlayers(players))
+            ).arrange(boardWithPlayers)
         )
+        let pm = PlayerManager.construct(players)
+        players.forEach((p, i) => {
+            if (i !== 0)
+                pm = pm.setRobot(p, DUMMY_ROBOT)
+        })
         return Object.freeze({
-            ...boardNoPlayers,
-            board: board,
-            players: PlayerManager.construct(players)
+            ...mountainState,
+            board: boardWithCities,
+            players: pm,
         })
     })
-    console.log(`populated has ${result.players.size} players`)
     return result
 }
