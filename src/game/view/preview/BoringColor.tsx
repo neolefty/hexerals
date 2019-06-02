@@ -1,8 +1,8 @@
-import {DriftColor} from '../../../../color/DriftColor'
-import {CieColor} from '../../../../color/CieColor'
-import {BoardState} from '../../../model/board/BoardState'
+import {DriftColor} from '../../../color/DriftColor'
+import {CieColor} from '../../../color/CieColor'
+import {BoardState} from '../../model/board/BoardState'
 import {List, Map, Set} from 'immutable'
-import {Player} from '../../../model/players/Players'
+import {Player} from '../../model/players/Players'
 
 const [ MIN_BORING, MAX_BORING ] = [ 10, 30 ]
 const randomLightness = () =>

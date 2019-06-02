@@ -1,13 +1,13 @@
-import {LocalGameOptions} from '../../../model/board/LocalGameOptions'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {List, Record} from 'immutable'
-import {BOARD_STATE_STARTER, BoardState} from '../../../model/board/BoardState'
-import {pickNPlayers, PlayerManager} from '../../../model/players/Players'
-import {Board} from '../../../model/board/Board'
-import {RandomTerrainArranger} from '../../../model/setup/RandomTerrainArranger'
-import {SpreadPlayersArranger} from '../../../model/setup/SpreadPlayerArranger'
-import {Terrain} from '../../../model/hex/Terrain'
-import {CacheMap} from '../../../../common/CacheMap'
-import {BasicRobot} from '../../../model/players/BasicRobot'
+import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
+import {pickNPlayers, PlayerManager} from '../../model/players/Players'
+import {Board} from '../../model/board/Board'
+import {RandomTerrainArranger} from '../../model/setup/RandomTerrainArranger'
+import {SpreadPlayersArranger} from '../../model/setup/SpreadPlayerArranger'
+import {Terrain} from '../../model/hex/Terrain'
+import {CacheMap} from '../../../common/CacheMap'
+import {BasicRobot} from '../../model/players/BasicRobot'
 
 // options that change how the preview looks
 type CacheKey = {

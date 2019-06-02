@@ -1,9 +1,9 @@
 import * as React from 'react'
 
-import {CartPair} from '../../../../common/CartPair'
-import {BOARD_STUBS} from '../../board/BoardViewBase'
-import {BoardAndStats} from '../../board/BoardAndStats'
-import {LocalGameOptions} from '../../../model/board/LocalGameOptions'
+import {CartPair} from '../../../common/CartPair'
+import {BOARD_STUBS} from '../board/BoardViewBase'
+import {BoardAndStats} from '../board/BoardAndStats'
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {greyColors} from './BoringColor'
 import {getPreviewBoard} from './PreviewCache'
 

@@ -1,7 +1,7 @@
 import {connect} from 'react-redux'
 import {Dispatch} from 'redux'
 
-import {AppState} from '../game/view/App'
+import {AppState} from '../game/view/app/App'
 import {ColorsDiv} from './ColorsDiv'
 import {
     ColorsActions, ColorsState,

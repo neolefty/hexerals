@@ -5,7 +5,7 @@ import {
     CycleAction, changeLocalOptionAction, openLocalGameAction,
 } from '../../model/cycle/CycleReducer'
 import {CartPair} from '../../../common/CartPair'
-import {AppState} from '../App'
+import {AppState} from '../app/App'
 import {CycleView} from './CycleView'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 

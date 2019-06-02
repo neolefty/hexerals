@@ -1,16 +1,16 @@
 import * as React from 'react'
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 
-import {CartPair} from '../../common/CartPair'
-import {inDev} from '../../common/Analytics'
-import {ColorsContainer} from '../../color/ColorsContainer'
-import {ColorsState} from '../../color/ColorsReducer'
-import {CycleState} from '../model/cycle/CycleState'
-import {CycleContainer} from './cycle/CycleContainer'
-import {TestTracking} from './test/TestTracking'
+import {CartPair} from '../../../common/CartPair'
+import {inDev} from '../../../common/Analytics'
+import {ColorsContainer} from '../../../color/ColorsContainer'
+import {ColorsState} from '../../../color/ColorsReducer'
+import {CycleState} from '../../model/cycle/CycleState'
+import {CycleContainer} from '../cycle/CycleContainer'
+import {TestTracking} from '../test/TestTracking'
 import {Help} from './Help'
 import './App.css'
-import {isIOS} from '../../common/BrowserUtil'
+import {isIOS} from '../../../common/BrowserUtil'
 
 const MIN_WIDTH = 300
 const MIN_HEIGHT = 300
