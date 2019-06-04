@@ -4,7 +4,8 @@ import {BoardState} from '../../model/board/BoardState'
 import {List, Map, Set} from 'immutable'
 import {Player} from '../../model/players/Players'
 
-const [ MIN_BORING, MAX_BORING ] = [ 10, 30 ]
+const [ MIN_BORING, MAX_BORING ] = [ 5, 45 ]
+const MID_BORING = (MIN_BORING + MAX_BORING) * .5
 const randomLightness = () =>
     MIN_BORING + Math.random() * (MAX_BORING - MIN_BORING)
 
@@ -16,7 +17,9 @@ class BoringColor extends DriftColor {
     }
 
     contrast(): BoringColor {
-        return new BoringColor(MAX_BORING - this.lightness)
+        return new BoringColor(
+            this.lightness > MID_BORING ? MIN_BORING : MAX_BORING
+        )
     }
 
     texture(diff: number = 20): DriftColor {
@@ -37,7 +40,7 @@ export const greyColors = (bs: BoardState): Map<Player, DriftColor> => {
         ).set(
             // dark background
             Player.Nobody,
-            DriftColor.constructHSL(0, 0, 10)
+            DriftColor.constructHSL(0, 0, 20)
         )
         prevGreyPlayers = Set<Player>(prevGrey.keys())
     }
