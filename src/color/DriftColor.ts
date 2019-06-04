@@ -16,8 +16,11 @@ export class DriftColor {
 
     static readonly BLACK: DriftColor = new DriftColor(CieColor.BLACK);
     static readonly GREY_20: DriftColor = new DriftColor(CieColor.GREY_20);
+    static readonly GREY_30: DriftColor = new DriftColor(CieColor.GREY_30);
     static readonly GREY_40: DriftColor = new DriftColor(CieColor.GREY_40);
+    static readonly GREY_50: DriftColor = new DriftColor(CieColor.GREY_50);
     static readonly GREY_60: DriftColor = new DriftColor(CieColor.GREY_60);
+    static readonly GREY_70: DriftColor = new DriftColor(CieColor.GREY_70);
     static readonly GREY_80: DriftColor = new DriftColor(CieColor.GREY_80);
     static readonly WHITE: DriftColor = new DriftColor(CieColor.WHITE);
 
