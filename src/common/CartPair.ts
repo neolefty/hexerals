@@ -26,6 +26,7 @@ export class CartPair {
 
     get min() { return Math.min(this.x, this.y) }
     get max() { return Math.max(this.x, this.y) }
+    get product() { return this.x * this.y }
 
     // for destructuring calls e.g. [x,y] = dim.xy
     get xy() { return [this.x, this.y] }

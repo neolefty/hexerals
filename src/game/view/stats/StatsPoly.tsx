@@ -127,6 +127,7 @@ export class StatsPoly {
     }
 
     get polys(): React.ReactNode {
+        // Note — Transforms happen in reverse order
         const transform = this.props.displaySize.isHorizontal
             ? `translate(0 ${this.props.flipped ? 0 : this.props.displaySize.y}) scale(1 ${this.props.flipped ? 1 : -1})`
             // vertical graph flowing downward

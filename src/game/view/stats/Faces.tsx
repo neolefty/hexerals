@@ -6,6 +6,7 @@ import {StatsPanelProps} from './StatsPanel'
 import {Player} from '../../model/players/Players'
 import {TurnStat} from '../../model/stats/TurnStat'
 import {PlayerFace} from './PlayerFace'
+import {packSquares} from './PackSquares'
 
 // viewbox is -SIZE to SIZE — for example, -10,-10 to 10,10
 const SIZE = new CartPair(10, 10)
@@ -32,6 +33,15 @@ export const Faces = (props: FacesProps) => {
     const latest = stats.last
     const demises = stats.lastTurns
     const curTurn = latest.turn
+    const players = props.boardState.board.players
+    const ds = props.displaySize
+    const facesArea = ds.scaleXY(
+        ds.isHorizontal ? FACES_FRACTION_LENGTH : FACES_FRACTION_WIDTH,
+        ds.isVertical ? FACES_FRACTION_LENGTH : FACES_FRACTION_WIDTH,
+    )
+    const vert = facesArea.isVertical
+    const horiz = facesArea.isHorizontal
+    const grid = packSquares(players.size, facesArea.x / facesArea.y)
 
     const orderFaces = (a: Player, b: Player): number => {
         // if currently alive, rank is positive — simply pop
@@ -41,21 +51,33 @@ export const Faces = (props: FacesProps) => {
         return aRank - bRank
     }
 
-    const players = props.boardState.board.players
-    const d = Math.min(
-        props.displaySize.max * FACES_FRACTION_LENGTH / players.size,
-        props.displaySize.min * FACES_FRACTION_WIDTH,
-    )
-    const dy = props.displaySize.isVertical ? d : 0
-    const dx = props.displaySize.isHorizontal ? d : 0
-    const y = props.displaySize.isVertical
+    const d = Math.min(facesArea.x / grid.x, facesArea.y / grid.y)
+    const dx = horiz ? d : (props.flipped ? -d : d)
+    const dy = vert ? d : (props.flipped ? -d : d)
+    const nx = vert ? grid.x : Math.ceil(players.size / grid.y)
+    const ny = horiz ? grid.y : Math.ceil(players.size / grid.x)
+    const startY = vert
         ? 0 // vertical always start at the top
-        : props.flipped ? props.displaySize.y - d : 0 // horizontal start at the top unless flipped
-    const x = props.displaySize.isHorizontal
+        : props.flipped ? ds.y - d : 0 // horizontal start at the top unless flipped
+    const startX = horiz
         ? 0 // horizontal always start at the left
-        : props.flipped ? props.displaySize.x - d : 0 // vertical start at left unless flipped
+        : props.flipped // start on outside
+            ? ds.x - d // vertical flipped — start in right column
+            : 0 // vertical not flipped — start in left column
     const side = d - MARGIN
     const viewBox = `${SIZE.scale(-1).toString(' ')} ${SIZE.scale(2).toString(' ')}`
+    // push faces up to front of UI — highest one close to leading edge of graph
+
+
+
+
+    // WHere I was — figure out how to bump up to edge of graph
+    // could just check panel dimensions and add
+
+
+
+
+    const bump = grid.product - players.size
 
     return (
         <>{
@@ -67,12 +89,19 @@ export const Faces = (props: FacesProps) => {
                 const contents = demises.has(player)
                     ? `${Math.floor(demises.get(player, -1)/2)}`
                     : props.faceText && props.faceText(latest, player)
+                const bumped = index + bump
+                let x = vert ? bumped % grid.x : Math.floor(bumped / grid.y)
+                let y = vert ? Math.floor(bumped / grid.x) : bumped % grid.y
+                // if (vert && !props.flipped)
+                //     x = grid.x - x - 1
+                // if (horiz && !props.flipped)
+                //     y = grid.y - y - 1
                 return (
                     <svg
                         key={player}
                         viewBox={viewBox}
-                        x={x + dx * (index)}
-                        y={y + dy * (index)}
+                        x={startX + dx * x}
+                        y={startY + dy * y}
                         width={side}
                         height={side}
                     >
