@@ -75,10 +75,13 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                     const color: DriftColor = ownerColor
                         || (tile.known
                             ? (tile.terrain === Terrain.Empty
-                                    ? DriftColor.GREY_80
+                                    ? DriftColor.GREY_80 // highlight explored empties
                                     : DriftColor.GREY_60
                                 )
-                            : DriftColor.GREY_40
+                            : (tile.terrain === Terrain.Mountain
+                                    ? DriftColor.GREY_30 // mountains a clear border
+                                    : DriftColor.GREY_40
+                                )
                         )
                     const text = !tile.known && !tile.isBlank() ? '?' : tile.pop !== 0 ? `${tile.pop}` : undefined
                     // undefined means let the TileHexView decide
