@@ -54,8 +54,6 @@ export const Faces = (props: FacesProps) => {
     const d = Math.min(facesArea.x / grid.x, facesArea.y / grid.y)
     const dx = horiz ? d : (props.flipped ? -d : d)
     const dy = vert ? d : (props.flipped ? -d : d)
-    const nx = vert ? grid.x : Math.ceil(players.size / grid.y)
-    const ny = horiz ? grid.y : Math.ceil(players.size / grid.x)
     const startY = vert
         ? 0 // vertical always start at the top
         : props.flipped ? ds.y - d : 0 // horizontal start at the top unless flipped
@@ -67,16 +65,6 @@ export const Faces = (props: FacesProps) => {
     const side = d - MARGIN
     const viewBox = `${SIZE.scale(-1).toString(' ')} ${SIZE.scale(2).toString(' ')}`
     // push faces up to front of UI — highest one close to leading edge of graph
-
-
-
-
-    // WHere I was — figure out how to bump up to edge of graph
-    // could just check panel dimensions and add
-
-
-
-
     const bump = grid.product - players.size
 
     return (
