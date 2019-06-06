@@ -13,6 +13,7 @@ import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {countHexes, heightFromWidth, widthFromHeight} from '../hex/HexConstants'
 import {statSizesAndStyles} from '../board/BoardAndStats'
 import './LocalGameOptionsView.css'
+import {isPhone} from '../../../common/BrowserUtil'
 
 // export type LGOKey =
 //     'numRobots' | 'tickMillis' | 'boardWidth' | 'boardHeight'
@@ -32,9 +33,17 @@ import './LocalGameOptionsView.css'
 //     levelVisible = 'levelVisible',
 // }
 
-const MAX_MAP_SIZE = 375
 const MIN_MAP_SIZE = 50
 const DEFAULT_HEXES_PER_PLAYER = 'A few'
+
+// hexes can get too small, especially for touch
+// but this doesn't work very well because browsers report such a wide variety of resolutions
+const MIN_PIXELS_PER_HEX = 800
+
+// this seems like an over simplification, but I haven't found anything better.
+// note that tablets get the higher number
+const maxMapSize = (): number => isPhone() ? 250 : 400
+
 // const DEFAULT_DIFFICULTY = '2'
 
 // number of hexes per player
@@ -134,11 +143,15 @@ export class LocalGameOptionsView
                 {
                     let w = minWidth
                     let hexCount = 0;
-                    while (hexCount < MAX_MAP_SIZE) {
+                    while (hexCount < maxMapSize()) {
                         const h = this.heightFromWidth(w)
                         if (h >= minHeight) {
                             hexCount = countHexes(w, h)
-                            if (hexCount >= MIN_MAP_SIZE) {
+                            const pixelsPerHex = this.props.displaySize.product / hexCount
+                            if (
+                                hexCount >= MIN_MAP_SIZE
+                                && pixelsPerHex >= MIN_PIXELS_PER_HEX
+                            ) {
                                 result.set(new CartPair(w, h), hexCount)
                                 // console.log(`${w} x ${h} —> ${hexCount}`)
                             }
@@ -149,11 +162,15 @@ export class LocalGameOptionsView
                 {
                     let h = minHeight
                     let hexCount = 0;
-                    while (hexCount < MAX_MAP_SIZE) {
+                    while (hexCount < maxMapSize()) {
                         const w = this.widthFromHeight(h)
                         if (w >= minWidth) {
                             hexCount = countHexes(w, h)
-                            if (hexCount >= MIN_MAP_SIZE) {
+                            const pixelsPerHex = this.props.displaySize.product / hexCount
+                            if (
+                                hexCount >= MIN_MAP_SIZE
+                                && pixelsPerHex >= MIN_PIXELS_PER_HEX
+                            ) {
                                 result.set(new CartPair(w, h), hexCount)
                                 // console.log(`${w} x ${h} —> ${hexCount}`)
                             }
@@ -321,6 +338,8 @@ export class LocalGameOptionsView
             )
         }
 
+        const pixelsPer = Math.round(this.props.displaySize.product / this.nHexesFromProps())
+
         return (
             <div
                 className={`LocalGameOptionsView Column Show${
@@ -332,7 +351,8 @@ export class LocalGameOptionsView
                     <div className="Level0 Column">
                         {numberRangeFromMap(
                             'Map',
-                            value => this.nearestBoardSize(value).toString(' x '),
+                            value => `${this.nearestBoardSize(value).toString(' x ')} ${pixelsPer} ${this.nHexesFromProps()}`,
+                            // value => this.nearestBoardSize(value).toString(' x '),
                             'How big of a map?',
                             this.nHexesFromProps(),
                             this.getHexCounts().counts,
