@@ -338,7 +338,7 @@ export class LocalGameOptionsView
             )
         }
 
-        const pixelsPer = Math.round(this.props.displaySize.product / this.nHexesFromProps())
+        // const pixelsPer = Math.round(this.props.displaySize.product / this.nHexesFromProps())
 
         return (
             <div
@@ -351,7 +351,7 @@ export class LocalGameOptionsView
                     <div className="Level0 Column">
                         {numberRangeFromMap(
                             'Map',
-                            value => `${this.nearestBoardSize(value).toString(' x ')} ${pixelsPer} ${this.nHexesFromProps()}`,
+                            value => `${this.nearestBoardSize(value).toString(' x ')}`, // ${pixelsPer} ${this.nHexesFromProps()}`,
                             // value => this.nearestBoardSize(value).toString(' x '),
                             'How big of a map?',
                             this.nHexesFromProps(),
