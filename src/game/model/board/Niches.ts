@@ -34,4 +34,9 @@ export class Niches {
             hexesToString(this.bottoms)
         }`
     }
+
+    get ll(): Hex { return this.bottoms.first(Hex.NONE) }
+    get ul(): Hex { return this.tops.first(Hex.NONE) }
+    get ur(): Hex { return this.tops.last(Hex.NONE) }
+    get lr(): Hex { return this.bottoms.last(Hex.NONE) }
 }
