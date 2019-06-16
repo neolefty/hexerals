@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {Map} from 'immutable'
 
-import './Board.css'
+import './HexBoardView.css'
 import {Player} from '../../model/players/Players'
 import {HexesView} from '../hex/HexesView';
 import {MoveQueueView} from './MoveQueueView';

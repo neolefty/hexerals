@@ -1,4 +1,5 @@
 import {List, Map} from 'immutable'
+import {countHexes} from "../../view/hex/HexConstants"
 
 import {Board} from './Board'
 import {pickNPlayers, Player} from '../players/Players'
@@ -54,6 +55,16 @@ it('converts between hex and cartesian coords', () => {
     expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
     // expect(midHex === Hex.get(6, -2, -4)).toBeTruthy()
     expect(elevenByNine.getCartTile(6, 2) === Tile.MAYBE_EMPTY).toBeTruthy()
+})
+
+it ('top to bottom', () => {
+    const sixByEight = Board.constructDefaultRectangular(6, 8)
+    expect(sixByEight.hexesAll.size).toBe(countHexes(6, 8))
+    const rs = sixByEight.constraints.allReverseSorted
+    expect(rs.size).toBe(countHexes(6, 8))
+    // console.log(hexesToString(rs))
+    expect(rs.first() === Hex.getCart(5,7)).toBeTruthy()
+    expect(rs.last() === Hex.ORIGIN).toBeTruthy()
 })
 
 it('overlays', () => {

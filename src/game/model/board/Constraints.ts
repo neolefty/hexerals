@@ -111,15 +111,15 @@ export abstract class BoardConstraints {
     }
 
     // tslint:disable-next-line:member-ordering
-    private _allSorted?: List<Hex> = undefined
-    get allSorted(): List<Hex> {
-        if (this._allSorted === undefined) {
-            this._allSorted = List<Hex>(this.all).sort(
+    private _allReverseSorted?: List<Hex> = undefined
+    get allReverseSorted(): List<Hex> {
+        if (this._allReverseSorted === undefined) {
+            this._allReverseSorted = List<Hex>(this.all).sort(
                 (a: Hex, b: Hex) =>
-                    a.compareTo(b)
+                    b.compareTo(a)
             ) as List<Hex>
         }
-        return this._allSorted
+        return this._allReverseSorted
     }
 
     // Compile the set of all hexes that are in bounds and connected to this.start().

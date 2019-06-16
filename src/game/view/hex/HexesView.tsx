@@ -68,7 +68,7 @@ export class HexesView extends React.PureComponent<BoardViewProps> {
                 onTouchCancel={this.onTouchEnd}
                 onTouchEnd={this.onTouchEnd}
             >{
-                boardState.board.constraints.allSorted.map(hex => {
+                boardState.board.constraints.allReverseSorted.map(hex => {
                     const tile = boardState.board.getTile(hex)
                     const ownerColor: DriftColor | undefined
                         = this.props.colors && this.props.colors.get(tile.owner)
