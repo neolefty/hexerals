@@ -2,6 +2,7 @@ import * as React from 'react'
 import {Map} from 'immutable'
 
 import './HexBoardView.css'
+import {isIOS} from "../../../common/BrowserUtil"
 import {Player} from '../../model/players/Players'
 import {HexesView} from '../hex/HexesView';
 import {MoveQueueView} from './MoveQueueView';
@@ -18,6 +19,7 @@ const FLAG_CLEARANCE = 5
 
 export class HexBoardView extends BoardViewBase {
     private focusRef = React.createRef<HTMLDivElement>()
+    readonly needsFocus: boolean
 
     private shouldGrabFocus = () =>
         this.props.grabFocus === undefined
@@ -25,6 +27,8 @@ export class HexBoardView extends BoardViewBase {
 
     constructor(props: BoardViewProps) {
         super(props)
+        // Safari seems to work better without grabbing focus
+        this.needsFocus = !isIOS()
         // ensure there are enough colors for all the players
         if (
             !this.props.colors
@@ -33,8 +37,8 @@ export class HexBoardView extends BoardViewBase {
             this.props.onResetColors(this.props.boardState.players.size)
     }
 
-    componentDidMount() { this.focusDiv() }
-    componentDidUpdate() { this.focusDiv() }
+    componentDidMount() { if (this.needsFocus) this.focusDiv() }
+    componentDidUpdate() { if (this.needsFocus) this.focusDiv() }
 
     focusDiv() {
         if (this.shouldGrabFocus()) {

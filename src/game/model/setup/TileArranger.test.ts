@@ -9,7 +9,6 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {TAG_MAP_TOO_SMALL} from './TileArranger'
 import {RandomTerrainArranger} from './RandomTerrainArranger'
 import {CornersPlayerArranger, RandomPlayerArranger} from './PlayerArranger'
-import {DEFAULT_LOCAL_GAME_OPTIONS} from '../board/LocalGameOptions'
 
 it ('does not bisect the map with mountains', () => {
     Range(0, 10).forEach(() => {
