@@ -131,7 +131,7 @@ it('stops by cities', () => {
 })
 
 type RobotMaker = () => Robot
-const robotTrials = logWinLoss ? 40 : 16
+const robotTrials = logWinLoss ? 40 : 24
 const IQRobotMaker = (iq: number) => () =>
     BasicRobot.byIntelligence(iq)
 const SkillRobotMaker = (skill: number) => () =>

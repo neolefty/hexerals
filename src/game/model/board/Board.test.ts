@@ -23,7 +23,7 @@ export function printBoard(board: Board) {
                 else if (tile.owner === Player.One)
                     c = tile.pop === 0 ? '=' : (tile.pop === 1 ? 'c' : 'C')
                 else
-                    c = (tile.terrain == Terrain.Mountain) ? 'M' : '-'
+                    c = (tile.terrain === Terrain.Mountain) ? 'M' : '-'
             }
             line += c
         })
@@ -38,7 +38,7 @@ it('converts between hex and cartesian coords', () => {
     const elevenByNine = Board.constructDefaultRectangular(
         w, h, pickNPlayers(2), [new CornersPlayerArranger(1)])
     // h x w, but every other row (that is, h/2 rows) is short by 1
-    expect(elevenByNine.constraints.all.size == w * h - Math.trunc(h/2))
+    expect(elevenByNine.constraints.all.size === w * h - Math.trunc(h/2))
 
     const metaCartTile = (cx: number, cy: number) => (
         () => elevenByNine.getCartTile(cx, cy)

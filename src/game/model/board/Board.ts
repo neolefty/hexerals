@@ -61,7 +61,7 @@ export class Board {
 
     static constructDefaultSquare(
         size: number,
-        players: List<Player>,
+        players: List<Player> = List(),
         arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
         messages?: StatusMessage[],
     ): Board {
@@ -73,7 +73,7 @@ export class Board {
     static constructDefaultRectangular(
         w: number,
         h: number,
-        players: List<Player>,
+        players: List<Player> = List(),
         arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
         messages?: StatusMessage[],
     ): Board {
