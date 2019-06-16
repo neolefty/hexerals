@@ -81,3 +81,18 @@ it('checks trigonometry', () => {
     expect(Hex.DOWN.degrees).toBeCloseTo(270)
     expect(Hex.RIGHT_DOWN.degrees).toBeCloseTo(330)
 })
+
+it('sorts hexes', () => {
+    expect(Hex.ORIGIN.compareTo(Hex.ORIGIN)).toBe(0)
+
+    expect(Hex.ORIGIN.compareTo(Hex.UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.DOWN)).toBeGreaterThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.LEFT_UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.RIGHT_UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.LEFT_DOWN)).toBeGreaterThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.RIGHT_DOWN)).toBeGreaterThan(0)
+
+    expect(Hex.NONE.compareTo(Hex.NONE)).toBeNaN()
+    expect(Hex.NONE.compareTo(Hex.ORIGIN)).toBeNaN()
+
+})

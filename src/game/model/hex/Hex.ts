@@ -208,14 +208,18 @@ export class Hex implements ValueObject {
         this.z = -x - y
     }
 
+    // (y, x) lexicographically -- bottom to top then left to right
     compareTo(that: Hex): number {
-        const dy = that.cartY - this.cartY
-        return dy !== 0 ? dy : that.cartX - this.cartX
+        const dy = this.cartY - that.cartY
+        return dy !== 0 ? dy : this.cartX - that.cartX
     }
 
     equals(other: any): boolean { return other === this }
     hashCode(): number { return this.id; }
 }
+
+export const hexCompare = (a: Hex, b: Hex) =>
+    a.compareTo(b)
 
 export const hexesToString = (s: List<Hex> | undefined) => {
     if (!s)
