@@ -37,11 +37,11 @@ export class HexBoardView extends BoardViewBase {
             this.props.onResetColors(this.props.boardState.players.size)
     }
 
-    componentDidMount() { if (this.needsFocus) this.focusDiv() }
-    componentDidUpdate() { if (this.needsFocus) this.focusDiv() }
+    componentDidMount() { this.focusDiv() }
+    componentDidUpdate() { this.focusDiv() }
 
     focusDiv() {
-        if (this.shouldGrabFocus()) {
+        if (this.shouldGrabFocus() && this.needsFocus) {
             const node = this.focusRef.current
             if (node)
                 node.focus()
