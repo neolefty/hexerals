@@ -9,6 +9,7 @@ import {CartPair} from '../../../common/CartPair';
 
 export const HEX_RADIUS = 30
 export const HEX_HALF_HEIGHT = 26
+export const HEX_QUARTER_HEIGHT = 0.5 * HEX_HALF_HEIGHT
 // approx (sqrt 3) / 2
 export const HALF_HEIGHT_RATIO = HEX_HALF_HEIGHT / HEX_RADIUS
 export const HEX_MID = HEX_RADIUS * 0.5
