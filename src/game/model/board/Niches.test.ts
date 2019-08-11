@@ -4,7 +4,7 @@ import {Niches} from "./Niches"
 
 it('finds niches above and below a board', () => {
     const seven = Board.constructDefaultSquare(7)
-    const sevenNiches = new Niches(seven)
+    const sevenNiches = new Niches(seven.rules)
     // console.log(hexesToString(List<Hex>(seven.hexesAll).sort(hexCompare)))
     // console.log(sevenNiches.toString())
     expect(sevenNiches.tops.size).toBe(3)
@@ -18,7 +18,7 @@ it('finds niches above and below a board', () => {
     // _-_-_- looks like this
     // _-_-_-
     const six = Board.constructDefaultRectangular(6, 6)
-    const sixNiches = new Niches(six)
+    const sixNiches = new Niches(six.rules)
     // console.log(hexesToString(List<Hex>(six.hexesAll).sort(hexCompare)))
     // console.log(sixNiches.toString())
     expect(sixNiches.tops.size).toBe(3)

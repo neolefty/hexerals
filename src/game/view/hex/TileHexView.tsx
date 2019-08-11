@@ -39,10 +39,8 @@ const textPowers: number[] = Range(0, 15).map(i =>
 ).toArray()
 
 // note: hotspot (every hex), so stick with quick calculations
-export const textSize = (tile: Tile, text: String): number => {
+export const textSize = (text: String): number => {
     let result = HEX_HALF_HEIGHT
-    // large "?"
-    if (!tile.known) result *= 1.5
     result *= textPowers[text.length]
     return result
 }
@@ -60,8 +58,8 @@ export const TileHexView = (props: TileHexViewProps) => {
                 key="pop"
                 y={textY(props.tile, props.text)}
                 fill={(props.textColor || props.color.contrast()).hexString}
-                fontSize={textSize(props.tile, props.text)}
-                // TODO move this into a style sheet?
+                fontSize={textSize(props.text) * (props.tile.known ? 1 : 1.5) /* large "?" */ }
+                // TODO move these into a style sheet?
                 fontFamily="Sans-Serif"
                 textAnchor="middle"
             >

@@ -1,7 +1,8 @@
 import {List} from "immutable"
 
-import {Board} from "./Board"
+import {Board, BoardRules} from "./Board"
 import {Hex, hexesToString} from "../hex/Hex"
+import {BoardConstraints} from "./Constraints"
 
 // find half-hexes at the edges of boards (tops & bottoms) where we can add UI elements such as turn tickers and menu buttons.
 export class Niches {
@@ -11,18 +12,18 @@ export class Niches {
     readonly bottoms: List<Hex>
 
     constructor(
-        readonly board: Board
+        readonly rules: BoardRules
     ) {
         // hexes just below the top have a half-space above them
         this.tops = List<Hex>(
-            board.hexesAll.filter(
-                hex => hex.cartY === board.edges.top - 1
+            rules.constraints.all.filter(
+                hex => hex.cartY === rules.edges.top - 1
             ).map(hex => hex.getUp())
         ).sort()
         // hexes just above the bottom have a half-space below them
         this.bottoms = List<Hex>(
-            board.hexesAll.filter(
-                hex => hex.cartY === board.edges.bottom + 1
+            rules.constraints.all.filter(
+                hex => hex.cartY === rules.edges.bottom + 1
             ).map(hex => hex.getDown())
         ).sort()
     }

@@ -9,6 +9,7 @@ import {Tile} from '../hex/Tile'
 import {Hex} from '../hex/Hex'
 import {BoardConstraints, RectangularConstraints} from './Constraints'
 import {MoveValidator, MoveValidatorOptions} from '../move/MoveValidator';
+import {Niches} from "./Niches"
 import {PopStepper} from './PopStepper';
 import {RandomPlayerArranger} from '../setup/PlayerArranger';
 import * as assert from 'assert';
@@ -38,6 +39,13 @@ export class BoardRules {
         readonly validator: MoveValidator = new MoveValidator(constraints),
         readonly stepper: PopStepper = new PopStepper(constraints.opts),
     ) {}
+
+    private _niches?: Niches
+    get niches(): Niches {
+        if (!this._niches)
+            this._niches = new Niches(this)
+        return this._niches
+    }
 }
 
 export type TileFilter = (tile: Tile) => boolean
@@ -117,6 +125,12 @@ export class Board {
     get constraints(): BoardConstraints { return this.rules.constraints }
     get edges(): RectEdges { return this.rules.edges }
     get popStepper(): PopStepper { return this.rules.stepper }
+    get opts(): LocalGameOptions { return this.constraints.opts }
+    get niches(): Niches { return this.rules.niches }
+
+    perceivedTurn(turn: number): number {
+        return Math.floor(turn / this.opts.cityTicks)
+    }
 
     inBounds = (hex: Hex | undefined) =>
         !!(hex && this.constraints.inBounds(hex))

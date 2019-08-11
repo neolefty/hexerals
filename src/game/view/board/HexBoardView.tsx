@@ -3,11 +3,13 @@ import {Map} from 'immutable'
 
 import './HexBoardView.css'
 import {isIOS} from "../../../common/BrowserUtil"
+import {Hex} from "../../model/hex/Hex"
 import {Player} from '../../model/players/Players'
 import {HexesView} from '../hex/HexesView';
+import {NicheText} from "../hex/NicheView"
 import {MoveQueueView} from './MoveQueueView';
 import {BoardViewBase, BoardViewProps} from './BoardViewBase';
-import {hexPixelHeight, hexPixelWidth} from '../hex/HexConstants';
+import {hexPixelHeight, hexPixelWidth} from '../hex/HexConstants'
 import {DriftColor} from '../../../color/DriftColor';
 
 // space between bounding rect and hex viewbox
@@ -62,19 +64,21 @@ export class HexBoardView extends BoardViewBase {
         const scaleWidth = hexPixelWidth(coordsWidth)
         const scaleHeight = hexPixelHeight(coordsHeight)
 
+        const perceivedTurn = this.props.boardState.board.perceivedTurn(this.props.boardState.turn)
+
         // figure out whether height or width is constraining factor
         const boardAspectRatio = scaleHeight / scaleWidth
         const screenAspectRatio = innerH / innerW
-        let boardHeight, boardWidth
+        let svgHeight, svgWidth
 
         if (boardAspectRatio > screenAspectRatio) {
             // board taller than screen, so constrained by height
-            boardHeight = innerH
-            boardWidth = boardHeight / boardAspectRatio
+            svgHeight = innerH
+            svgWidth = svgHeight / boardAspectRatio
         } else {
             // constrained by width
-            boardWidth = innerW
-            boardHeight = boardWidth * boardAspectRatio
+            svgWidth = innerW
+            svgHeight = svgWidth * boardAspectRatio
         }
 
         return (
@@ -86,8 +90,8 @@ export class HexBoardView extends BoardViewBase {
             >
                 <svg
                     className="board"
-                    width={boardWidth}
-                    height={boardHeight}
+                    width={svgWidth}
+                    height={svgHeight}
                     viewBox={[
                         -INNER_BOARD_MARGIN,
                         -INNER_BOARD_MARGIN - FLAG_CLEARANCE,
@@ -100,8 +104,29 @@ export class HexBoardView extends BoardViewBase {
                         moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
                         players={this.props.boardState.board.players}
-                        boardHeight={this.props.boardState.board.edges.height}
+                        boardHeight={coordsHeight}
                     />
+                    {
+                        perceivedTurn <= 0 ? undefined : (
+                            <>
+                                <NicheText
+                                    hex={Hex.RIGHT_DOWN}
+                                    topHalf={true}
+                                    boardHeight={coordsHeight}
+                                    text={perceivedTurn}
+                                />
+                                <NicheText
+                                    hex={this.props.boardState.board.niches.ur}
+                                    topHalf={false}
+                                    boardHeight={coordsHeight}
+                                    text={perceivedTurn}
+                                />
+                            </>
+                        )
+                    }
+                    {
+                        // TODO Add a turn indicator in upper right too
+                    }
                 </svg>
             </div>
         )
