@@ -1,8 +1,7 @@
 import {List} from "immutable"
 
-import {Board, BoardRules} from "./Board"
+import {BoardRules} from "./Board"
 import {Hex, hexesToString} from "../hex/Hex"
-import {BoardConstraints} from "./Constraints"
 
 // find half-hexes at the edges of boards (tops & bottoms) where we can add UI elements such as turn tickers and menu buttons.
 export class Niches {
