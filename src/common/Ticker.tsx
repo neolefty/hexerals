@@ -10,7 +10,7 @@ export interface TickerProps {
 export class Ticker extends React.PureComponent<TickerProps> {
     private timer?: NodeJS.Timer;
 
-    componentWillMount(): void {
+    componentDidMount(): void {
         if (!this.timer)
             this.timer = global.setInterval(this.props.tick, this.props.tickMillis);
     }

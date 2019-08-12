@@ -5,7 +5,7 @@ import {Niches} from "../../model/board/Niches"
 import {Hex} from "../../model/hex/Hex"
 import {HEX_HALF_HEIGHT, HEX_QUARTER_HEIGHT, HEX_WIDTH} from "./HexConstants"
 import {viewBoxHeight} from "./HexesView"
-import {centerX, centerY, textSize, textY, tileTextY} from "./TileHexView"
+import {centerX, centerY, textSize, textY} from "./TileHexView"
 
 type HexMatcher = (hex: Hex) => React.ReactNode | undefined
 

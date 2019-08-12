@@ -20,7 +20,7 @@ export const centerY = (height: number, cartY: number): number =>
     height - (cartY + 1) * HEX_HALF_HEIGHT
 
 // note: hotspot (every hex), so stick with quick calculations
-export const tileTextY = (tile: Tile, text: String): number => {
+const tileTextY = (tile: Tile, text: String): number => {
     // position in body of capital or question mark in mountain
     let result = 0.5 * HEX_HALF_HEIGHT
     // center in known empty & house
