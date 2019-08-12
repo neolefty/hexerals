@@ -107,51 +107,22 @@ export class HexBoardView extends BoardViewBase {
                         boardHeight={coordsHeight}
                     />
                     {
-                        // perceivedTurn <= 0 ? undefined : (
+                        perceivedTurn <= 0 ? undefined : (
                             <>
-                                <NicheText
-                                    hex={board.niches.lr}
-                                    topHalf={true}
-                                    boardHeight={coordsHeight}
-                                    text={`lr ${perceivedTurn}`}
-                                />
                                 <NicheText
                                     hex={board.niches.ll}
                                     topHalf={true}
                                     boardHeight={coordsHeight}
-                                    text={`ll ${perceivedTurn}`}
+                                    text={perceivedTurn}
                                 />
                                 <NicheText
                                     hex={board.niches.ur}
                                     topHalf={false}
                                     boardHeight={coordsHeight}
-                                    text={`ur ${perceivedTurn}`}
-                                />
-                                <NicheText
-                                    hex={board.niches.ul}
-                                    topHalf={false}
-                                    boardHeight={coordsHeight}
-                                    text={`ul ${perceivedTurn}`}
+                                    text={perceivedTurn}
                                 />
                             </>
-                        // )
-                    }
-                    {
-                        <>{
-                            board.niches.tops.map((hex, index) => (
-                                <NicheText text={index} hex={hex} topHalf={false} boardHeight={coordsHeight} fill="red" />
-                            ))
-                        }</>
-                    }
-                    {
-                        <>{
-                            board.niches.bottoms.map((hex, index) => (
-                                <NicheText text={index} hex={hex} topHalf={true} boardHeight={coordsHeight} fill="blue "/>
-                            ))
-                        }</>
-                    }
-                    {
-                        <NicheText text="ur" hex={board.edges.upperRight} topHalf={false} boardHeight={coordsHeight} />
+                        )
                     }
                 </svg>
             </div>

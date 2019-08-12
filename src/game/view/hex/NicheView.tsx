@@ -1,10 +1,11 @@
 import * as React from "react"
+import {Board} from "../../model/board/Board"
 
 import {Niches} from "../../model/board/Niches"
 import {Hex} from "../../model/hex/Hex"
 import {HEX_HALF_HEIGHT, HEX_QUARTER_HEIGHT, HEX_WIDTH} from "./HexConstants"
 import {viewBoxHeight} from "./HexesView"
-import {centerX, centerY, textSize} from "./TileHexView"
+import {centerX, centerY, textSize, textY, tileTextY} from "./TileHexView"
 
 type HexMatcher = (hex: Hex) => React.ReactNode | undefined
 
@@ -73,10 +74,36 @@ export const NicheText = (props: NicheTextProps) => {
             <text
                 textAnchor="middle"
                 fill={props.fill || "#aaa"}
-                y="10" fontSize={textSize(s)}
+                y={textY(s)}
+                fontSize={textSize(s)}
             >
                 {s}
             </text>
         </NicheView>
+    )
+}
+
+export const NicheDebugView = (props: {board: Board}) => {
+    const niches = props.board.niches
+    const edges = props.board.edges
+    const h = edges.height
+    return (
+        <>
+            {
+                niches.tops.map((hex, index) => (
+                    <NicheText text={index} hex={hex} topHalf={false} boardHeight={h} fill="red" />
+                ))
+            }
+            {
+                niches.bottoms.map((hex, index) => (
+                    <NicheText text={index} hex={hex} topHalf={true} boardHeight={h} fill="blue " />
+                ))
+            }
+            <NicheText text="board ur" hex={edges.upperRight} topHalf={true} boardHeight={h} />
+            <NicheText hex={niches.ur} topHalf={false} boardHeight={h} text="ur niche" />
+            <NicheText hex={niches.ul} topHalf={false} boardHeight={h} text="ul niche" />
+            <NicheText hex={niches.ll} topHalf={true} boardHeight={h} text="ll niche" />
+            <NicheText hex={niches.lr} topHalf={true} boardHeight={h} text="lr niche" />
+        </>
     )
 }

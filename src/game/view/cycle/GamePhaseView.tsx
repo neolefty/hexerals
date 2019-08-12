@@ -5,6 +5,7 @@ import {
     AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent,
 } from '../../../common/Analytics'
 import {CartPair} from '../../../common/CartPair'
+import {DEFAULT_LOCAL_GAME_OPTIONS} from "../../model/board/LocalGameOptions"
 import {Tile} from '../../model/hex/Tile'
 import {Hex} from '../../model/hex/Hex'
 import {Player} from '../../model/players/Players'
@@ -29,8 +30,13 @@ const singleHexBoard = (
     boardState: {
         ...props.boardState,
         cursors: Map(),
-        board: Board.constructDefaultSquare(
-            1, List<Player>(props.boardState.curPlayer || Player.Zero)
+        board: Board.constructRectangular(
+            {
+                ...DEFAULT_LOCAL_GAME_OPTIONS,
+                cityTicks: Infinity, // never advance turns
+                boardHeight: 1,
+                boardWidth: 1,
+            }, List<Player>(props.boardState.curPlayer || Player.Zero)
         ).setTiles(Map<Hex, Tile>([[Hex.ORIGIN, tile]])),
         moves: new MovementQueue(),
     }

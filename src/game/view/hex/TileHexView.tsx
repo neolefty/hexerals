@@ -20,7 +20,7 @@ export const centerY = (height: number, cartY: number): number =>
     height - (cartY + 1) * HEX_HALF_HEIGHT
 
 // note: hotspot (every hex), so stick with quick calculations
-export const textY = (tile: Tile, text: String): number => {
+export const tileTextY = (tile: Tile, text: String): number => {
     // position in body of capital or question mark in mountain
     let result = 0.5 * HEX_HALF_HEIGHT
     // center in known empty & house
@@ -31,15 +31,22 @@ export const textY = (tile: Tile, text: String): number => {
     return result
 }
 
-// haha, recalculating this for every hex was slow
+export const textY = (text: String): number =>
+    0.35 * HEX_HALF_HEIGHT
+        // longer text is small, so shift it up to compensate
+        - 0.03 * HEX_HALF_HEIGHT * (text.length - 1)
+
 const textPowers: number[] = Range(0, 15).map(i =>
     i > 1
         ? 0.9 ** (i - 1)
         : 1
 ).toArray()
 
+const tileTextSize = (tile: Tile, text: string) =>
+    textSize(text) * (tile.known ? 1 : 1.5) // large "?"
+
 // note: hotspot (every hex), so stick with quick calculations
-export const textSize = (text: String): number => {
+export const textSize = (text: string): number => {
     let result = HEX_HALF_HEIGHT
     result *= textPowers[text.length]
     return result
@@ -56,9 +63,9 @@ export const TileHexView = (props: TileHexViewProps) => {
         children.push(
             <text
                 key="pop"
-                y={textY(props.tile, props.text)}
+                y={tileTextY(props.tile, props.text)}
                 fill={(props.textColor || props.color.contrast()).hexString}
-                fontSize={textSize(props.text) * (props.tile.known ? 1 : 1.5) /* large "?" */ }
+                fontSize={tileTextSize(props.tile, props.text)}
                 // TODO move these into a style sheet?
                 fontFamily="Sans-Serif"
                 textAnchor="middle"
