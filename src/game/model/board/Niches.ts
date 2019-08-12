@@ -18,13 +18,13 @@ export class Niches {
             rules.constraints.all.filter(
                 hex => hex.cartY === rules.edges.top - 1
             ).map(hex => hex.getUp())
-        ).sort()
+        ).sort((a, b) => a.compareTo(b))
         // hexes just above the bottom have a half-space below them
         this.bottoms = List<Hex>(
             rules.constraints.all.filter(
                 hex => hex.cartY === rules.edges.bottom + 1
             ).map(hex => hex.getDown())
-        ).sort()
+        ).sort((a, b) => a.compareTo(b))
     }
 
     toString() {
