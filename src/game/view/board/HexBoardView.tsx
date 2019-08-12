@@ -3,7 +3,6 @@ import {Map} from 'immutable'
 
 import './HexBoardView.css'
 import {isIOS} from "../../../common/BrowserUtil"
-import {Hex} from "../../model/hex/Hex"
 import {Player} from '../../model/players/Players'
 import {HexesView} from '../hex/HexesView';
 import {NicheText} from "../hex/NicheView"
@@ -54,8 +53,10 @@ export class HexBoardView extends BoardViewBase {
         // calculate board size
         const innerW = this.props.displaySize.x - 2 * OUTER_BOARD_MARGIN
         const innerH = this.props.displaySize.y - 2 * OUTER_BOARD_MARGIN
-        const coordsWidth = this.props.boardState.board.edges.width
-        const coordsHeight = this.props.boardState.board.edges.height
+        const board = this.props.boardState.board
+        const perceivedTurn = board.perceivedTurn(this.props.boardState.turn)
+        const coordsWidth = board.edges.width
+        const coordsHeight = board.edges.height
 
         // integer approximation of hexes -- half of sqrt 3 ~= 13 / 15
         // coords inside viewport -- hex radius is 15, hex half-height is 13
@@ -64,7 +65,6 @@ export class HexBoardView extends BoardViewBase {
         const scaleWidth = hexPixelWidth(coordsWidth)
         const scaleHeight = hexPixelHeight(coordsHeight)
 
-        const perceivedTurn = this.props.boardState.board.perceivedTurn(this.props.boardState.turn)
 
         // figure out whether height or width is constraining factor
         const boardAspectRatio = scaleHeight / scaleWidth
@@ -103,29 +103,55 @@ export class HexBoardView extends BoardViewBase {
                     <MoveQueueView
                         moves={this.props.boardState.moves}
                         colors={this.props.colors as Map<Player, DriftColor>}
-                        players={this.props.boardState.board.players}
+                        players={board.players}
                         boardHeight={coordsHeight}
                     />
                     {
-                        perceivedTurn <= 0 ? undefined : (
+                        // perceivedTurn <= 0 ? undefined : (
                             <>
                                 <NicheText
-                                    hex={Hex.RIGHT_DOWN}
+                                    hex={board.niches.lr}
                                     topHalf={true}
                                     boardHeight={coordsHeight}
-                                    text={perceivedTurn}
+                                    text={`lr ${perceivedTurn}`}
                                 />
                                 <NicheText
-                                    hex={this.props.boardState.board.niches.ur}
+                                    hex={board.niches.ll}
+                                    topHalf={true}
+                                    boardHeight={coordsHeight}
+                                    text={`ll ${perceivedTurn}`}
+                                />
+                                <NicheText
+                                    hex={board.niches.ur}
                                     topHalf={false}
                                     boardHeight={coordsHeight}
-                                    text={perceivedTurn}
+                                    text={`ur ${perceivedTurn}`}
+                                />
+                                <NicheText
+                                    hex={board.niches.ul}
+                                    topHalf={false}
+                                    boardHeight={coordsHeight}
+                                    text={`ul ${perceivedTurn}`}
                                 />
                             </>
-                        )
+                        // )
                     }
                     {
-                        // TODO Add a turn indicator in upper right too
+                        <>{
+                            board.niches.tops.map((hex, index) => (
+                                <NicheText text={index} hex={hex} topHalf={false} boardHeight={coordsHeight} fill="red" />
+                            ))
+                        }</>
+                    }
+                    {
+                        <>{
+                            board.niches.bottoms.map((hex, index) => (
+                                <NicheText text={index} hex={hex} topHalf={true} boardHeight={coordsHeight} fill="blue "/>
+                            ))
+                        }</>
+                    }
+                    {
+                        <NicheText text="ur" hex={board.edges.upperRight} topHalf={false} boardHeight={coordsHeight} />
                     }
                 </svg>
             </div>
