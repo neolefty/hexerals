@@ -1,0 +1,16 @@
+g.niche {
+  text.hideExceptHover {
+    visibility: hidden;
+  }
+  text.hideOnHover {
+    visibility: visible;
+  }
+}
+g.niche:hover {
+  text.hideExceptHover {
+    visibility: visible;
+  }
+  text.hideOnHover {
+    visibility: hidden;
+  }
+}

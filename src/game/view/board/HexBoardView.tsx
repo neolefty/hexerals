@@ -4,12 +4,12 @@ import {Map} from 'immutable'
 import './HexBoardView.css'
 import {isIOS} from "../../../common/BrowserUtil"
 import {Player} from '../../model/players/Players'
-import {HexesView} from '../hex/HexesView';
-import {NicheText} from "../hex/NicheView"
-import {MoveQueueView} from './MoveQueueView';
-import {BoardViewBase, BoardViewProps} from './BoardViewBase';
+import {HexesView} from '../hex/HexesView'
+import {MoveQueueView} from './MoveQueueView'
+import {BoardViewBase, BoardViewProps} from './BoardViewBase'
 import {hexPixelHeight, hexPixelWidth} from '../hex/HexConstants'
-import {DriftColor} from '../../../color/DriftColor';
+import {DriftColor} from '../../../color/DriftColor'
+import {TurnNiches} from './TurnNiches'
 
 // space between bounding rect and hex viewbox
 const OUTER_BOARD_MARGIN = 1
@@ -54,7 +54,6 @@ export class HexBoardView extends BoardViewBase {
         const innerW = this.props.displaySize.x - 2 * OUTER_BOARD_MARGIN
         const innerH = this.props.displaySize.y - 2 * OUTER_BOARD_MARGIN
         const board = this.props.boardState.board
-        const perceivedTurn = board.perceivedTurn(this.props.boardState.turn)
         const coordsWidth = board.edges.width
         const coordsHeight = board.edges.height
 
@@ -64,7 +63,6 @@ export class HexBoardView extends BoardViewBase {
 
         const scaleWidth = hexPixelWidth(coordsWidth)
         const scaleHeight = hexPixelHeight(coordsHeight)
-
 
         // figure out whether height or width is constraining factor
         const boardAspectRatio = scaleHeight / scaleWidth
@@ -106,24 +104,7 @@ export class HexBoardView extends BoardViewBase {
                         players={board.players}
                         boardHeight={coordsHeight}
                     />
-                    {
-                        perceivedTurn <= 0 ? undefined : (
-                            <>
-                                <NicheText
-                                    hex={board.niches.ll}
-                                    topHalf={true}
-                                    boardHeight={coordsHeight}
-                                    text={perceivedTurn}
-                                />
-                                <NicheText
-                                    hex={board.niches.ur}
-                                    topHalf={false}
-                                    boardHeight={coordsHeight}
-                                    text={perceivedTurn}
-                                />
-                            </>
-                        )
-                    }
+                    <TurnNiches {...this.props} />
                 </svg>
             </div>
         )
