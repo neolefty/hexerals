@@ -1,43 +1,16 @@
 import * as React from "react"
-import {Board} from "../../model/board/Board"
 
-import {Niches} from "../../model/board/Niches"
+import './NicheView.css'
 import {Hex} from "../../model/hex/Hex"
 import {HEX_HALF_HEIGHT, HEX_QUARTER_HEIGHT, HEX_WIDTH} from "./HexConstants"
 import {viewBoxHeight} from "./HexesView"
 import {centerX, centerY, textSize, textY} from "./TileHexView"
 
-type HexMatcher = (hex: Hex) => React.ReactNode | undefined
-
-interface NichesViewProps {
-    matcher: HexMatcher
-    niches: Niches
-    boardHeight: number
-}
-
-export const NichesView = (props: NichesViewProps) => (
-    <>
-        {
-            props.niches.tops.map(hex => (
-                <NicheView hex={hex} topHalf={false} boardHeight={props.boardHeight}>
-                    { props.matcher(hex) }
-                </NicheView>
-            ))
-        }
-        {
-            props.niches.bottoms.map(hex => (
-                <NicheView hex={hex} topHalf={true} boardHeight={props.boardHeight}>
-                    { props.matcher(hex) }
-                </NicheView>
-            ))
-        }
-    </>
-)
-
 interface NichePropsBase {
     hex: Hex
     topHalf: boolean
     boardHeight: number
+    title?: string
 }
 
 interface NicheViewProps extends NichePropsBase {
@@ -58,7 +31,11 @@ export const NicheView = (props: NicheViewProps) =>
         transform={translateHalfHex(props.hex, viewBoxHeight(props.boardHeight), props.topHalf)}
         width={HEX_WIDTH}
         height={HEX_HALF_HEIGHT}
+        style={{cursor: 'default'}}
+        className='niche'
     >
+        {props.title ? <title>{props.title}</title> : undefined}
+        {props.title ? <desc>{props.title}</desc> : undefined}
         {props.children}
     </g>
 
@@ -76,34 +53,21 @@ export const NicheText = (props: NicheTextProps) => {
                 fill={props.fill || "#aaa"}
                 y={textY(s)}
                 fontSize={textSize(s)}
+                className='hideOnHover'
             >
                 {s}
             </text>
+            {props.title ?
+                <text
+                    textAnchor="middle"
+                    fill={props.fill || "#aaa"}
+                    y={textY(props.title)}
+                    fontSize={textSize(props.title)}
+                    className='hideExceptHover'
+                >
+                    {props.title}
+                </text>
+                : undefined}
         </NicheView>
-    )
-}
-
-export const NicheDebugView = (props: {board: Board}) => {
-    const niches = props.board.niches
-    const edges = props.board.edges
-    const h = edges.height
-    return (
-        <>
-            {
-                niches.tops.map((hex, index) => (
-                    <NicheText text={index} hex={hex} topHalf={false} boardHeight={h} fill="red" />
-                ))
-            }
-            {
-                niches.bottoms.map((hex, index) => (
-                    <NicheText text={index} hex={hex} topHalf={true} boardHeight={h} fill="blue " />
-                ))
-            }
-            <NicheText text="board ur" hex={edges.upperRight} topHalf={true} boardHeight={h} />
-            <NicheText hex={niches.ur} topHalf={false} boardHeight={h} text="ur niche" />
-            <NicheText hex={niches.ul} topHalf={false} boardHeight={h} text="ul niche" />
-            <NicheText hex={niches.ll} topHalf={true} boardHeight={h} text="ll niche" />
-            <NicheText hex={niches.lr} topHalf={true} boardHeight={h} text="lr niche" />
-        </>
     )
 }
