@@ -16,7 +16,7 @@ interface BoardAndStatsState {  // state for BoardAndStats
     statsDown: boolean  // is the stats pane on bottom if vertical?
 }
 
-const defaultState: BoardAndStatsState = {
+const defaultPrefs: BoardAndStatsState = {
     statsRight: true,
     statsDown: true,
 }
@@ -35,7 +35,7 @@ export interface BoardAndStatsDisplayStuff {
 }
 
 export const statSizesAndStyles = (
-    displaySize: CartPair, statsVisible: boolean, state: BoardAndStatsState = defaultState,
+    displaySize: CartPair, statsVisible: boolean, state: BoardAndStatsState = defaultPrefs,
 ): BoardAndStatsDisplayStuff => {
     const containerStyle: React.CSSProperties = {
         display: 'flex',
@@ -98,8 +98,8 @@ export const statSizesAndStyles = (
 }
 
 export const BoardAndStats = (props: BoardAndStatsProps) => {
-    const [state, setState] = useLocalStorageState('BoardAndStats.state', defaultState)
-    const displayStuff = statSizesAndStyles(props.displaySize, props.statsVisible, state)
+    const [prefs, setPrefs] = useLocalStorageState('BoardAndStats.state', defaultPrefs)
+    const displayStuff = statSizesAndStyles(props.displaySize, props.statsVisible, prefs)
     const screenVertical = props.displaySize.isVertical
     return (
         <div style={displayStuff.container.style}>
@@ -114,11 +114,11 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
                     <div style={displayStuff.stats.style}>
                         <StatsPanel
                             boardState={props.boardState}
-                            flipped={screenVertical ? !state.statsDown : !state.statsRight}
+                            flipped={screenVertical ? !prefs.statsDown : !prefs.statsRight}
                             onTogglePosition={() => {
-                                setState({
-                                    statsRight: screenVertical ? state.statsRight : !state.statsRight,
-                                    statsDown: screenVertical ? !state.statsDown : state.statsDown,
+                                setPrefs({
+                                    statsRight: screenVertical ? prefs.statsRight : !prefs.statsRight,
+                                    statsDown: screenVertical ? !prefs.statsDown : prefs.statsDown,
                                 })
                             }}
                             displaySize={displayStuff.stats.displaySize}
