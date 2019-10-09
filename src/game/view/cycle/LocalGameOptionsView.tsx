@@ -315,6 +315,7 @@ export class LocalGameOptionsView
             min: number, max: number,
             onChange: (n: number, highFidelity: boolean) => void,
         ) {
+            // console.log(`${labelBefore} ${value} — ${labelAfter(value)} — ${min} - ${max}`)
             return (
                 <label
                     className="InputRange Row"

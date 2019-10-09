@@ -109,7 +109,7 @@ const mapDispatchToBoardViewProps = (
     onRestartGame: () => {
         logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
         dispatch(openLocalGameAction())
-    }
+    },
 })
 
 export const LocalGameContainer = connect(

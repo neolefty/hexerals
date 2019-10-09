@@ -16,7 +16,12 @@ import {BasicRobot} from '../players/BasicRobot'
 import {SpreadPlayersArranger} from '../setup/SpreadPlayerArranger'
 import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger'
-import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from '../board/LocalGameOptions'
+import {
+    DEFAULT_LOCAL_GAME_OPTIONS,
+    LocalGameOptions,
+    restoreLocalGameOptions,
+    saveLocalGameOptions
+} from '../board/LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
 
 // the meta-game
@@ -30,9 +35,20 @@ export type CycleAction = GameAction
     | OpenLocalGame | CloseLocalGame
     | ChangeLocalOption
 
+const restoreState = (): CycleState => {
+    return {
+        ...INITIAL_CYCLE_STATE,
+        localOptions: {
+            ...DEFAULT_LOCAL_GAME_OPTIONS,
+            ...restoreLocalGameOptions(),
+        }
+    }
+}
+
 export const CycleReducer = (
-    state: CycleState = INITIAL_CYCLE_STATE, action: GenericAction,
+    maybeState: CycleState | undefined, action: GenericAction,
 ): CycleState => {
+    const state = maybeState || restoreState()
     if (!isCycleAction(action))
         return state
     else {
@@ -41,8 +57,11 @@ export const CycleReducer = (
             return openLocalGameReducer(state, action)
         else if (isCloseLocalGame(action))
             return closeLocalGameReducer(state, action)
-        else if (isChangeLocalOption(action))
-            return changeLocalOptionReducer(state, action)
+        else if (isChangeLocalOption(action)) {
+            const result = changeLocalOptionReducer(state, action)
+            saveLocalGameOptions(result.localOptions)
+            return result
+        }
         else { // must be a GameAction, by process of elimination
             const localGame = state.localGame
             if (localGame === undefined) {
