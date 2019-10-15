@@ -9,6 +9,7 @@ export interface SizeStyle {
 // Cartesian Pair (x, y)
 export class CartPair {
     static readonly ORIGIN = new CartPair(0, 0)
+    static readonly NAN = new CartPair(NaN, NaN)
 
     constructor(readonly x: number, readonly y: number) {}
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 import {Map} from 'immutable'
 
 import {CartPair} from '../../../common/CartPair'
-import {useLocalStorageState} from '../../../common/MoreHooks'
+import {useLocalStorageState} from '../../../common/HookLocalStorage'
 import {StatsPanel} from '../stats/StatsPanel'
 import {BoardViewProps} from './BoardViewBase'
 import {HexBoardView} from './HexBoardView'

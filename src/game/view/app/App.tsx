@@ -1,21 +1,18 @@
-import * as React from 'react'
+import * as React from "react"
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
-
-import {CartPair} from '../../../common/CartPair'
-import {inDev} from '../../../common/Analytics'
 import {ColorsContainer} from '../../../color/ColorsContainer'
 import {ColorsState} from '../../../color/ColorsReducer'
+import {inDev} from '../../../common/Analytics'
+import {isIOS} from '../../../common/BrowserUtil'
+
+import {CartPair} from '../../../common/CartPair'
+import {useWindowSize} from "../../../common/HookWindowSize"
 import {CycleState} from '../../model/cycle/CycleState'
 import {CycleContainer} from '../cycle/CycleContainer'
 import {TestTracking} from '../test/TestTracking'
-import {Help} from './Help'
 import './App.css'
-import {isIOS} from '../../../common/BrowserUtil'
+import {Help} from './Help'
 
-const MIN_WIDTH = 300
-const MIN_HEIGHT = 300
-
-export interface AppProps {}
 
 export interface AppState {
     colors: ColorsState
@@ -26,36 +23,16 @@ export interface AppState {
     displaySize: CartPair
 }
 
-export interface AppProps {
-}
+const MIN_WIDTH = 300
+const MIN_HEIGHT = 300
 
-class App extends React.Component<AppProps, AppState> {
-    private dimensionListener = this.updateDimensions.bind(this)
+const App = () => {
+    const rawWinSize = useWindowSize()
+    const viewSize = new CartPair(
+        Math.max(rawWinSize.x, MIN_WIDTH) - (isIOS() ? 48 : 0), // avoid forward & back gesture areas in iOS
+        Math.max(window.innerHeight * 0.96 - 30, MIN_HEIGHT)
+    )
 
-    updateDimensions() {
-        let dim = new CartPair(
-            Math.max(window.innerWidth, MIN_WIDTH),
-            Math.max(window.innerHeight * 0.96, MIN_HEIGHT)
-        )
-        if (isIOS())
-            dim = dim.plusX(-48) // avoid forward & back gesture areas in iOS
-        this.setState({
-            ...this.state,
-            displaySize: dim,
-        })
-    }
-
-    componentDidMount(): void {
-        window.addEventListener('resize', this.dimensionListener)
-        this.updateDimensions()
-    }
-
-    componentWillUnmount(): void {
-        window.removeEventListener('resize', this.dimensionListener)
-    }
-
-    render() {
-        const displaySize = this.getDisplaySize().plusXY(0, -30)
         return (
             <div className="App">
                 <Tabs>
@@ -68,13 +45,13 @@ class App extends React.Component<AppProps, AppState> {
                         }
                     </TabList>
                     <TabPanel>
-                        <CycleContainer displaySize={displaySize}/>
+                        <CycleContainer displaySize={viewSize}/>
                     </TabPanel>
                     <TabPanel>
-                        <Help displaySize={displaySize}/>
+                        <Help displaySize={viewSize}/>
                     </TabPanel>
                     <TabPanel>
-                        <ColorsContainer displaySize={displaySize}/>
+                        <ColorsContainer displaySize={viewSize}/>
                     </TabPanel>
                     {
                         inDev() ? (
@@ -86,13 +63,6 @@ class App extends React.Component<AppProps, AppState> {
                 </Tabs>
             </div>
         )
-    }
-
-    private getDisplaySize() {
-        return (this.state && this.state.displaySize)
-            ? this.state.displaySize
-            : new CartPair(MIN_WIDTH, MIN_HEIGHT)
-    }
 }
 
 export default App
