@@ -1,88 +1,62 @@
-import {CartPair} from '../../../common/CartPair'
-import {LocalGameOptionsView} from './LocalGameOptionsView'
-import {CycleMode} from '../../model/cycle/CycleState'
-import * as React from 'react'
-import {CycleState} from '../../model/cycle/CycleState'
+import * as React from "react"
+import {useState} from "react"
+import {AssertNever} from "../../../common/AssertNever"
 import {Layered} from '../../../common/Layered'
+import {useDisplaySize} from "../../../common/ViewSizeContext"
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
+import {CycleMode, CycleState} from '../../model/cycle/CycleState'
 import {LocalGamePreview} from '../preview/LocalGamePreview'
 import {LocalGameContainer} from './LocalGameContainer'
-import {LocalGameOptions} from '../../model/board/LocalGameOptions'
+import {LocalGameOptionsView} from './LocalGameOptionsView'
 
 export interface CycleViewProps extends CycleState {
-    displaySize: CartPair
-
     onOpenLocalGame: () => void
     onChangeLocalOption: (
         name: keyof LocalGameOptions, n: number
     ) => void
 }
 
-interface CycleViewState {
+export const CycleView = (props: CycleViewProps) => {
+    const displaySize = useDisplaySize()
     // Render a detailed preview (true, slow) or a rough one (false, fast)?
-    highFidelity: boolean
-}
+    const [ highFidelity, setHighFidelity ] = useState<boolean>(true)
 
-export class CycleView
-    extends React.Component<CycleViewProps, CycleViewState>
-{
-    constructor(props: CycleViewProps) {
-        super(props)
-        this.getHighFidelity = this.getHighFidelity.bind(this)
-        this.setHighFidelity = this.setHighFidelity.bind(this)
-        this.changeLocalOption = this.changeLocalOption.bind(this)
-    }
-
-    getHighFidelity(): boolean {
-        return this.state
-            ? this.state.highFidelity
-            : true // default true
-    }
-
-    setHighFidelity(highFidelity: boolean) {
-        if (this.getHighFidelity() !== highFidelity)
-            this.setState({
-                highFidelity: highFidelity
-            })
-    }
-
-    changeLocalOption(
+    const changeLocalOption = (
         name: keyof LocalGameOptions, n: number, highFidelity: boolean
-    ) {
-        this.setHighFidelity(highFidelity)
-        this.props.onChangeLocalOption(name, n)
+    ) => {
+        setHighFidelity(highFidelity)
+        props.onChangeLocalOption(name, n)
     }
 
-    render(): React.ReactNode {
-        switch (this.props.mode) {
-            case CycleMode.IN_LOCAL_GAME:
-                if (this.props.localGame)
-                    return (
-                        <LocalGameContainer
-                            displaySize={this.props.displaySize}
-                        />
-                    )
-                else
-                    return (
-                        <code>Error: localGame.board is undefined</code>
-                    )
-            case CycleMode.NOT_IN_GAME:
+    switch (props.mode) {
+        case CycleMode.IN_LOCAL_GAME:
+            if (props.localGame)
                 return (
-                    <Layered>
-                        <LocalGamePreview
-                            localOptions={this.props.localOptions}
-                            displaySize={this.props.displaySize}
-                            highFidelity={this.getHighFidelity()}
-                        />
-                        <LocalGameOptionsView
-                            localOptions={this.props.localOptions}
-                            displaySize={this.props.displaySize}
-                            newGame={this.props.onOpenLocalGame}
-                            changeLocalOption={this.changeLocalOption}
-                        />
-                    </Layered>
+                    <LocalGameContainer
+                        displaySize={displaySize}
+                    />
                 )
-            default:
-                return <p>Unknown mode: <code>{this.props.mode}</code></p>
-        }
+            else
+                return (
+                    <code>Error: localGame.board is undefined</code>
+                )
+        case CycleMode.NOT_IN_GAME:
+            return (
+                <Layered>
+                    <LocalGamePreview
+                        localOptions={props.localOptions}
+                        displaySize={displaySize}
+                        highFidelity={highFidelity}
+                    />
+                    <LocalGameOptionsView
+                        localOptions={props.localOptions}
+                        displaySize={displaySize}
+                        newGame={props.onOpenLocalGame}
+                        changeLocalOption={changeLocalOption}
+                    />
+                </Layered>
+            )
+        default:
+            return AssertNever(props.mode)
     }
 }

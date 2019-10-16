@@ -13,11 +13,7 @@ export interface CycleContainerProps {
     displaySize: CartPair
 }
 
-const mapStateToCycleViewProps =
-    (state: AppState, ownProps: CycleContainerProps) => ({
-        displaySize: ownProps.displaySize,
-        ...state.cycle,
-    })
+const mapStateToCycleViewProps = (state: AppState) => state.cycle
 
 const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleAction>) => ({
     onOpenLocalGame: () => dispatch(openLocalGameAction()),

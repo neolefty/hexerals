@@ -1,11 +1,11 @@
-import {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import {CartPair} from "./CartPair"
 
 const getWindowSize = () =>
     new CartPair(window.innerWidth, window.innerHeight)
 
-export const useWindowSize = (): CartPair => {
-    const [size, setSize] = useState(CartPair.ORIGIN)
+export const useWindowSize = (defaultSize: CartPair): CartPair => {
+    const [size, setSize] = useState(defaultSize)
 
     const dimensionListener = () =>
         setSize(getWindowSize())
@@ -19,3 +19,4 @@ export const useWindowSize = (): CartPair => {
 
     return size
 }
+
