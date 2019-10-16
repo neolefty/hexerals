@@ -5,18 +5,16 @@ const getWindowSize = () =>
     new CartPair(window.innerWidth, window.innerHeight)
 
 export const useWindowSize = (): CartPair => {
-    const [size, setSize] = useState(CartPair.NAN)
+    const [size, setSize] = useState(CartPair.ORIGIN)
 
-    const dimensionListener = () => {
+    const dimensionListener = () =>
         setSize(getWindowSize())
-    }
 
     useEffect(() => {
         dimensionListener() // initial value
         window.addEventListener('resize', dimensionListener)
-        return () => {
+        return () =>
             window.removeEventListener('resize', dimensionListener)
-        }
     }, [])
 
     return size
