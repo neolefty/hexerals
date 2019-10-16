@@ -51,7 +51,7 @@ export const restoreLocalGameOptions = (): Partial<LocalGameOptions> => {
     const saved = localStorage.getItem(STORE_KEY)
     if (saved) {
         try {
-            console.log(JSON.parse(saved))
+            // console.log(JSON.parse(saved))
             return JSON.parse(saved)
         } catch(e) {
             console.error(e)
