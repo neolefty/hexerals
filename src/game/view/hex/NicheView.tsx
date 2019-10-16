@@ -25,6 +25,7 @@ const translateHalfHex = (hex: Hex, height: number, isTop: boolean) =>
         + (isTop ? -HEX_QUARTER_HEIGHT : HEX_QUARTER_HEIGHT)
     })`
 
+// TODO figure out why <title> and <desc> aren't working here
 export const NicheView = (props: NicheViewProps) =>
     <g
         key={props.hex.id}
