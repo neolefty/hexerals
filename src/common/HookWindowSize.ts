@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import {useEffect, useState} from "react"
 import {CartPair} from "./CartPair"
 
 const getWindowSize = () =>
@@ -19,4 +19,3 @@ export const useWindowSize = (defaultSize: CartPair): CartPair => {
 
     return size
 }
-

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Ticker} from '../../../common/Ticker'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
-import {BoardViewProps} from './BoardViewBase'
+import {BoardViewProps} from './BoardViewProps'
 import {BoardAndStats} from './BoardAndStats'
 
 export interface TickerGameViewProps extends BoardViewProps {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import {BoardViewProps} from './BoardViewBase'
+import {BoardViewProps} from './BoardViewProps'
 import {PlayerFog} from '../../model/board/Fog';
 import {Map} from 'immutable';
 import {Player} from '../../model/players/Players';

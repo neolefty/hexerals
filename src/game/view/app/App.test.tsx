@@ -1,25 +1,33 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
-import {createStore} from 'redux'
+import {combineReducers, createStore} from 'redux'
+import {ColorsReducer} from "../../../color/ColorsReducer"
 
 import {CartPair} from "../../../common/CartPair"
-import {
-    CycleReducer,
-    changeLocalOptionAction, openLocalGameAction,
-} from '../../model/cycle/CycleReducer'
+import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
+import {changeLocalOptionAction, CycleReducer, openLocalGameAction,} from '../../model/cycle/CycleReducer'
 import {CycleContainer} from '../cycle/CycleContainer'
 
 it('renders without crashing', () => {
-    const store = createStore(CycleReducer)
+    const store = createStore(
+        combineReducers({
+            colors: ColorsReducer,
+            cycle: CycleReducer,
+        }),
+        // {
+        //     cycle: INITIAL_CYCLE_STATE,
+        // },
+    )
     const div = document.createElement('div')
+    const size = {size: new CartPair(1200, 700) }
 
     // render it without a game
     ReactDOM.render(
         <Provider store={store}>
-            <CycleContainer
-                displaySize={new CartPair(100, 100)}
-            />
+            <DisplaySizeProvider {...size}>
+                <CycleContainer/>
+            </DisplaySizeProvider>
         </Provider>,
         div)
 
@@ -28,9 +36,9 @@ it('renders without crashing', () => {
     store.dispatch(openLocalGameAction())
     ReactDOM.render(
         <Provider store={store}>
-            <CycleContainer
-                displaySize={new CartPair(100, 100)}
-            />
+            <DisplaySizeProvider {...size}>
+                <CycleContainer/>
+            </DisplaySizeProvider>
         </Provider>,
         div)
 })

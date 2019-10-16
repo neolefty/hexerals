@@ -1,16 +1,13 @@
 import * as React from 'react'
-
-import {CartPair} from '../../../common/CartPair'
-import {BOARD_STUBS} from '../board/BoardViewBase'
-import {BoardAndStats} from '../board/BoardAndStats'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
+import {BoardAndStats} from '../board/BoardAndStats'
+import {BOARD_STUBS} from '../board/BoardViewProps'
 import {greyColors} from './BoringColor'
 import {getPreviewBoard} from './PreviewCache'
 
 export interface LocalGamePreviewProps {
     localOptions: LocalGameOptions
     highFidelity: boolean
-    displaySize: CartPair
 }
 
 export const LocalGamePreview = (props: LocalGamePreviewProps) => {
@@ -18,7 +15,6 @@ export const LocalGamePreview = (props: LocalGamePreviewProps) => {
     return (
         <BoardAndStats
             {...BOARD_STUBS}
-            displaySize={props.displaySize}
             colors={greyColors(boardState)}
             boardState={boardState}
             grabFocus={false}

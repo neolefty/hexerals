@@ -4,7 +4,6 @@ import {ColorsContainer} from '../../../color/ColorsContainer'
 import {ColorsState} from '../../../color/ColorsReducer'
 import {inDev} from '../../../common/Analytics'
 import {isIOS} from '../../../common/BrowserUtil'
-
 import {CartPair} from '../../../common/CartPair'
 import {useWindowSize} from "../../../common/HookWindowSize"
 import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
@@ -14,14 +13,9 @@ import {TestTracking} from '../test/TestTracking'
 import './App.css'
 import {Help} from './Help'
 
-
 export interface AppState {
     colors: ColorsState
     cycle: CycleState
-
-    // displaySize is only needed here so that setState in updateDimensions()
-    // will trigger rendering of children
-    displaySize: CartPair
 }
 
 const MIN_WIDTH = 300

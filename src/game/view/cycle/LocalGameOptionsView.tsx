@@ -1,19 +1,20 @@
-import * as React from 'react'
 import {List, Map} from 'immutable'
+import * as React from 'react'
 import InputRange, {Range as MinMax} from 'react-input-range'
 import 'react-input-range/lib/css/index.css'
+import {isPhone} from '../../../common/BrowserUtil'
+import {CacheMap} from '../../../common/CacheMap'
 
 import {CartPair} from '../../../common/CartPair'
 import {CheckInput, NumberInput} from '../../../common/Inputs'
-import {CacheMap} from '../../../common/CacheMap'
-import {minMax, minRatio, roundToMap} from '../../../common/MathFunctions'
+import {minRatio, roundToMap} from '../../../common/MathFunctions'
+import {useDisplaySize} from "../../../common/ViewSizeContext"
+import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
-import {LocalGameOptions} from '../../model/board/LocalGameOptions'
-import {countHexes, heightFromWidth, widthFromHeight} from '../hex/HexConstants'
 import {statSizesAndStyles} from '../board/BoardAndStats'
+import {countHexes, heightFromWidth, widthFromHeight} from '../hex/HexConstants'
 import './LocalGameOptionsView.css'
-import {isPhone} from '../../../common/BrowserUtil'
 
 // export type LGOKey =
 //     'numRobots' | 'tickMillis' | 'boardWidth' | 'boardHeight'
@@ -34,7 +35,7 @@ import {isPhone} from '../../../common/BrowserUtil'
 // }
 
 const MIN_MAP_SIZE = 50
-const DEFAULT_HEXES_PER_PLAYER = 'A few'
+// const DEFAULT_HEXES_PER_PLAYER = 'A few'
 
 // hexes can get too small, especially for touch
 // but this doesn't work very well because browsers report such a wide variety of resolutions
@@ -47,15 +48,15 @@ const maxMapSize = (): number => isPhone() ? 250 : 400
 // const DEFAULT_DIFFICULTY = '2'
 
 // number of hexes per player
-const playerDensities = Map<string, number>([
-    ['Tons', 6],
-    ['Lots', 12],
-    ['Many', 24],
-    [DEFAULT_HEXES_PER_PLAYER, 48],
-    ['Not many', 96],
-    ['Very few', 192],
-    ['None', Infinity],
-])
+// const playerDensities = Map<string, number>([
+//     ['Tons', 6],
+//     ['Lots', 12],
+//     ['Many', 24],
+//     [DEFAULT_HEXES_PER_PLAYER, 48],
+//     ['Not many', 96],
+//     ['Very few', 192],
+//     ['None', Infinity],
+// ])
 
 const difficultyNames = Object.freeze([
     'Easy',
@@ -89,7 +90,6 @@ const hexCountsCache = new CacheMap<CartPair, HexCounts>(20)
 
 export interface LGOVProps {
     localOptions: LocalGameOptions
-    displaySize: CartPair
 
     changeLocalOption: (
         name: keyof LocalGameOptions, n: number, highFidelity: boolean
@@ -97,57 +97,57 @@ export interface LGOVProps {
     newGame: () => void
 }
 
-export class LocalGameOptionsView
-    extends React.PureComponent<LGOVProps>
-{
-    private boardDisplaySize: CartPair = CartPair.ORIGIN
-    private isOption = (optionName: LGOKey): boolean =>
-        this.props.localOptions[optionName] > 0
-    private toggleOption = (optionName: LGOKey) =>
-        this.props.changeLocalOption(
+export const LocalGameOptionsView = (props: LGOVProps) => {
+    const displaySize = useDisplaySize()
+    const boardDisplaySize = statSizesAndStyles(
+        displaySize, props.localOptions.statsVisible !== 0
+    ).board.displaySize
+
+    const isOption = (optionName: LGOKey): boolean => props.localOptions[optionName] > 0
+    const isLevelVisible = (level: number) => props.localOptions.levelVisible >= level
+
+    const toggleOption = (optionName: LGOKey) =>
+        props.changeLocalOption(
             optionName,
-            this.isOption(optionName) ? 0 : 1,
+            isOption(optionName) ? 0 : 1,
             true,
         )
 
-    isLevelVisible = (level: number) =>
-        this.props.localOptions.levelVisible >= level
-
-    toggleAdvanced = () =>
-        this.props.changeLocalOption(
+    const toggleAdvanced = () =>
+        props.changeLocalOption(
             'levelVisible',
-            (this.props.localOptions.levelVisible + 1) % 3, // 0, 1, 2
+            (props.localOptions.levelVisible + 1) % 3, // 0, 1, 2
             true,
         )
 
     // How many hexes fit, proportionately?
-    widthFromHeight = (hexHeight: number): number =>
-        widthFromHeight(this.boardDisplaySize, hexHeight)
-    heightFromWidth = (hexWidth: number): number =>
-        heightFromWidth(this.boardDisplaySize, hexWidth)
+    const wFromH = (hexHeight: number): number =>
+        widthFromHeight(boardDisplaySize, hexHeight)
+    const hFromW = (hexWidth: number): number =>
+        heightFromWidth(boardDisplaySize, hexWidth)
 
-    getHexCounts = (): HexCounts =>
+    const getHexCounts = (): HexCounts =>
         hexCountsCache.get(
-            this.boardDisplaySize,
-            () => this.computeHexCounts()
+            boardDisplaySize,
+            () => computeHexCounts()
         )
 
-    getOptionLimits = (key: LGOKey): [ number, number ] =>
+    const getOptionLimits = (key: LGOKey): [ number, number ] =>
         LocalGameOptionsLimits.get(key) as [ number, number ]
 
-    computeHexCounts = (): HexCounts => {
+    const computeHexCounts = (): HexCounts => {
         const map = Map<CartPair, number>().withMutations(
             result => {
-                const minWidth = this.getOptionLimits('boardWidth')[0]
-                const minHeight = this.getOptionLimits('boardHeight')[0]
+                const minWidth = getOptionLimits('boardWidth')[0]
+                const minHeight = getOptionLimits('boardHeight')[0]
                 {
                     let w = minWidth
                     let hexCount = 0;
                     while (hexCount < maxMapSize()) {
-                        const h = this.heightFromWidth(w)
+                        const h = hFromW(w)
                         if (h >= minHeight) {
                             hexCount = countHexes(w, h)
-                            const pixelsPerHex = this.props.displaySize.product / hexCount
+                            const pixelsPerHex = displaySize.product / hexCount
                             if (
                                 hexCount >= MIN_MAP_SIZE
                                 && pixelsPerHex >= MIN_PIXELS_PER_HEX
@@ -163,10 +163,10 @@ export class LocalGameOptionsView
                     let h = minHeight
                     let hexCount = 0;
                     while (hexCount < maxMapSize()) {
-                        const w = this.widthFromHeight(h)
+                        const w = wFromH(h)
                         if (w >= minWidth) {
                             hexCount = countHexes(w, h)
-                            const pixelsPerHex = this.props.displaySize.product / hexCount
+                            const pixelsPerHex = displaySize.product / hexCount
                             if (
                                 hexCount >= MIN_MAP_SIZE
                                 && pixelsPerHex >= MIN_PIXELS_PER_HEX
@@ -186,229 +186,219 @@ export class LocalGameOptionsView
         return { dimensions: list, counts: map }
     }
 
-    nPlayers = (nHexes: number, hexesPerPlayer: number): number =>
-        hexesPerPlayer === Infinity ? 1
-            : minMax(
-                // always at least one opponent unless "None" is selected
-                nHexes / hexesPerPlayer, 2, MAX_PLAYERS
-            )
+    const nHexesFromProps = (): number =>
+        countHexes(props.localOptions.boardWidth, props.localOptions.boardHeight)
 
-    nHexesFromProps = (): number =>
-        countHexes(
-            this.props.localOptions.boardWidth,
-            this.props.localOptions.boardHeight)
-
+    // const nPlayers = (nHexes: number, hexesPerPlayer: number): number =>
+    //     hexesPerPlayer === Infinity ? 1
+    //         : minMax(
+    //             // always at least one opponent unless "None" is selected
+    //             nHexes / hexesPerPlayer, 2, MAX_PLAYERS
+    //         )
+    //
     // map of player density name ("Lots", "Very Few", etc) to total number of players
-    playerCountMap = (): Map<string, number> =>
-        playerDensities.mapEntries(([label, density]) =>
-            [label, this.nPlayers(this.nHexesFromProps(), density)]
-        )
-
+    // const playerCountMap = (): Map<string, number> =>
+    //     playerDensities.mapEntries(([label, density]) =>
+    //         [label, nPlayers(nHexesFromProps(), density)]
+    //     )
+    //
     // What robot density gives us the number of robots closest to the one requested in props?
-    closestPlayerDensity = (): number =>
-        playerDensities.get(
-            roundToMap(
-                this.props.localOptions.numRobots + 1,
-                this.playerCountMap(),
-                DEFAULT_HEXES_PER_PLAYER,
-            )[0]
-        ) as number
+    // const closestPlayerDensity = (): number =>
+    //     playerDensities.get(
+    //         roundToMap(
+    //             props.localOptions.numRobots + 1,
+    //             playerCountMap(),
+    //             DEFAULT_HEXES_PER_PLAYER,
+    //         )[0]
+    //     ) as number
 
-    setBoardSize = (wh: CartPair, highFidelity: boolean) => {
+    const setBoardSize = (wh: CartPair, highFidelity: boolean) => {
         // order not preserved — if 1st is low fidelity, it may overwrite 2nd
-        this.props.changeLocalOption('boardWidth', wh.x, highFidelity)
-        this.props.changeLocalOption('boardHeight', wh.y, highFidelity)
+        props.changeLocalOption('boardWidth', wh.x, highFidelity)
+        props.changeLocalOption('boardHeight', wh.y, highFidelity)
     }
 
-    nearestBoardSize(hexCount: number): CartPair {
-        return roundToMap(
+    const nearestBoardSize = (hexCount: number): CartPair =>
+        roundToMap(
             hexCount,
-            this.getHexCounts().counts,
+            getHexCounts().counts,
             new CartPair(10, 10)
         )[0]
-    }
 
     // Are the current hex proportions a close enough fit to the window?
     // margin of 0 means must be exact match; .1 means within 10%, etc.
-    shapeMatches(margin: number = 0.2): boolean {
-        const wh = this.nearestBoardSize(this.nHexesFromProps())
+    const shapeMatches = (margin: number = 0.2): boolean => {
+        const wh = nearestBoardSize(nHexesFromProps())
         // Divide margin by 2 - margin is extra forgiving because it's kinda operating on geometric mean instead of what you'd expect, since x and y are proportional to square root of number of hexes.
         const ratio = (1 - margin / 2)
-        const xRatio = minRatio(wh.x, this.props.localOptions.boardWidth)
-        const yRatio = minRatio(wh.y, this.props.localOptions.boardHeight)
+        const xRatio = minRatio(wh.x, props.localOptions.boardWidth)
+        const yRatio = minRatio(wh.y, props.localOptions.boardHeight)
         return (
             xRatio >= ratio && yRatio >= ratio
         )
     }
 
-    fitToShape = (hexCount: number, highFidelity: boolean) => {
+    const fitToShape = (hexCount: number, highFidelity: boolean) => {
         // console.log(`set board size to ${hexCount} hexes — ${highFidelity ? 'high' : 'low'} fidelity`)
-        this.setBoardSize(
-            this.nearestBoardSize(hexCount), highFidelity
+        setBoardSize(nearestBoardSize(hexCount), highFidelity)
+    }
+
+    // TODO move this up to parent, to avoid mutating state in render() ...
+    if (!shapeMatches())
+        fitToShape(nHexesFromProps(), true)
+
+    const optionChanger = (
+        name: keyof LocalGameOptions, forceHighFi = false
+    ) => (n: number, highFidelity: boolean = true) =>
+        props.changeLocalOption(name, n, highFidelity || forceHighFi)
+    const optionToggler = (optionName: LGOKey) =>
+        () => toggleOption(optionName)
+
+    const numberInput = (
+        label: string, option: LGOKey, title: string,
+        level: number = 0, children?: JSX.Element | JSX.Element[],
+    ) => (
+        <NumberInput
+            label={label}
+            value={props.localOptions[option]}
+            title={title}
+            min={getOptionLimits(option)[0]}
+            max={getOptionLimits(option)[1]}
+            onChange={optionChanger(option)}
+            onEnter={props.newGame}
+            blockTabbing={!isLevelVisible(level)}
+            children={children}
+        />
+    )
+
+    // TODO Replace with toggle button — grey when inactive
+    const checkInput = (
+        label: string, option: LGOKey, title: string, level: number = 0
+    ) => (
+        <CheckInput
+            label={label}
+            value={isOption(option)}
+            title={title}
+            onToggle={optionToggler(option)}
+            onEnter={props.newGame}
+            blockTabbing={!isLevelVisible(level)}
+        />
+    )
+
+    function numberRangeFromMap<V>(
+        labelBefore: string,
+        labelAfter: (value: number) => string,
+        title: string, value: number,
+        choices: Map<V, number>,
+        onChange: (n: number, highFidelity: boolean) => void,
+    ) {
+        let [ min, max ] = [ Infinity, -Infinity ]
+        choices.forEach(n => {
+            min = Math.min(n, min)
+            max = Math.max(n, max)
+        })
+        return numberRange(labelBefore, labelAfter, title, value, min, max, onChange)
+    }
+
+    function numberRange<V>(
+        labelBefore: string, labelAfter: (value: number) => string,
+        title: string, value: number,
+        min: number, max: number,
+        onChange: (n: number, highFidelity: boolean) => void,
+    ) {
+        // console.log(`${labelBefore} ${value} — ${labelAfter(value)} — ${min} - ${max}`)
+        return (
+            <label
+                className="InputRange Row"
+                title={title}
+            >
+                <span className="LabelBefore">{labelBefore}</span>
+                <InputRange
+                    minValue={min}
+                    maxValue={max}
+                    value={value}
+                    formatLabel={() => ''}
+                    onChangeComplete={(value: number | MinMax) =>
+                        onChange(value as number, true)
+                    }
+                    onChange={(value: number | MinMax) =>
+                        onChange(value as number, false)
+                    }
+                />
+                <span className="LabelAfter">{labelAfter(value)}</span>
+            </label>
         )
     }
 
-    render(): React.ReactNode {
-        this.boardDisplaySize = statSizesAndStyles(
-            this.props.displaySize, this.props.localOptions.statsVisible !== 0
-        ).board.displaySize
-        // TODO move this up to parent, to avoid mutating state in render() ...
-        if (!this.shapeMatches())
-            this.fitToShape(this.nHexesFromProps(), true)
-
-        const optionChanger = (
-            name: keyof LocalGameOptions, forceHighFi = false
-        ) => (n: number, highFidelity: boolean = true) =>
-            this.props.changeLocalOption(name, n, highFidelity || forceHighFi)
-        const optionToggler = (optionName: LGOKey) =>
-            () => this.toggleOption(optionName)
-
-        const numberInput = (
-            label: string, option: LGOKey, title: string,
-            level: number = 0, children?: JSX.Element | JSX.Element[],
-        ) => (
-            <NumberInput
-                label={label}
-                value={this.props.localOptions[option]}
-                title={title}
-                min={this.getOptionLimits(option)[0]}
-                max={this.getOptionLimits(option)[1]}
-                onChange={optionChanger(option)}
-                onEnter={this.props.newGame}
-                blockTabbing={!this.isLevelVisible(level)}
-                children={children}
-            />
-        )
-
-        // TODO Replace with toggle button — grey when inactive
-        const checkInput = (
-            label: string, option: LGOKey, title: string, level: number = 0
-        ) => (
-            <CheckInput
-                label={label}
-                value={this.isOption(option)}
-                title={title}
-                onToggle={optionToggler(option)}
-                onEnter={this.props.newGame}
-                blockTabbing={!this.isLevelVisible(level)}
-            />
-        )
-
-        function numberRangeFromMap<V>(
-            labelBefore: string,
-            labelAfter: (value: number) => string,
-            title: string, value: number,
-            choices: Map<V, number>,
-            onChange: (n: number, highFidelity: boolean) => void,
-        ) {
-            let [ min, max ] = [ Infinity, -Infinity ]
-            choices.forEach(n => {
-                min = Math.min(n, min)
-                max = Math.max(n, max)
-            })
-            return numberRange(labelBefore, labelAfter, title, value, min, max, onChange)
-        }
-
-        function numberRange<V>(
-            labelBefore: string, labelAfter: (value: number) => string,
-            title: string, value: number,
-            min: number, max: number,
-            onChange: (n: number, highFidelity: boolean) => void,
-        ) {
-            // console.log(`${labelBefore} ${value} — ${labelAfter(value)} — ${min} - ${max}`)
-            return (
-                <label
-                    className="InputRange Row"
-                    title={title}
-                >
-                    <span className="LabelBefore">{labelBefore}</span>
-                    <InputRange
-                        minValue={min}
-                        maxValue={max}
-                        value={value}
-                        formatLabel={() => ''}
-                        onChangeComplete={(value: number | MinMax) =>
-                            onChange(value as number, true)
-                        }
-                        onChange={(value: number | MinMax) =>
-                            onChange(value as number, false)
-                        }
-                    />
-                    <span className="LabelAfter">{labelAfter(value)}</span>
-                </label>
-            )
-        }
-
-        // const pixelsPer = Math.round(this.props.displaySize.product / this.nHexesFromProps())
-        const showSize = this.nearestBoardSize(this.nHexesFromProps()).scaleXY(1, 0.5).round()
-        return (
-            <div
-                className={`LocalGameOptionsView Column Show${
-                    this.props.localOptions.levelVisible
-                }`}
-                style={this.props.displaySize.sizeStyle}
-            >
-                <div className="Modal Column">
-                    <div className="Level0 Column">
-                        {numberRangeFromMap(
-                            'Map',
-                            value => `${showSize.toString(' x ')}`, // ${pixelsPer} ${this.nHexesFromProps()}`,
-                            // value => this.nearestBoardSize(value).toString(' x '),
-                            'How big of a map?',
-                            this.nHexesFromProps(),
-                            this.getHexCounts().counts,
-                            this.fitToShape,
-                        )}
-                        {numberRange(
-                            'Robots',
-                            value => `${value}`,
-                            'How many AI opponents?',
-                            this.props.localOptions.numRobots,
-                            0, MAX_PLAYERS - 1,
-                            optionChanger('numRobots', true),
-                        )}
-                        {numberRange(
-                            'Difficulty',
-                            value => difficultyNames[value],
-                            'How smart should these robots be?',
-                            this.props.localOptions.difficulty,
-                            0, BasicRobot.MAX_IQ,
-                            optionChanger('difficulty', true),
-                        )}
-                    </div>
-                    <div className="Level1 Column">
-                        {numberInput('Mountains', 'mountainPercent', 'Percent of the map covered by mountains', 1)}
-                        {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
-                        {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
-                        {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
-                    </div>
-                    <div className="Level2 Column">
-                        {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
-                        {numberInput('Ticks per round', 'roundTicks', 'How often population increases in regular hexes.', 2)}
-                        {checkInput('Synced Growth', 'syncedGrowth', 'Pop grows all at once?', 2)}
-                        {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
-                    </div>
-                    <div>
-                        <button
-                            onClick={this.props.newGame}
-                            className='start'
-                        >
-                            Start
-                        </button>
-                        <button
-                            className="LevelButton"
-                            onClick={this.toggleAdvanced}
-                            title={[
-                                'More Options',
-                                'Even More Options',
-                                'Hide Options',
-                            ][this.props.localOptions.levelVisible]}
-                        >
-                            {['...', '...', '...'][this.props.localOptions.levelVisible]}
-                        </button>
-                    </div>
+    // const pixelsPer = Math.round(this.props.displaySize.product / this.nHexesFromProps())
+    const showSize = nearestBoardSize(nHexesFromProps()).scaleXY(1, 0.5).round()
+    return (
+        <div
+            className={`LocalGameOptionsView Column Show${
+                props.localOptions.levelVisible
+            }`}
+            style={displaySize.sizeStyle}
+        >
+            <div className="Modal Column">
+                <div className="Level0 Column">
+                    {numberRangeFromMap(
+                        'Map',
+                        value => `${showSize.toString(' x ')}`, // ${pixelsPer} ${this.nHexesFromProps()}`,
+                        // value => this.nearestBoardSize(value).toString(' x '),
+                        'How big of a map?',
+                        nHexesFromProps(),
+                        getHexCounts().counts,
+                        fitToShape,
+                    )}
+                    {numberRange(
+                        'Robots',
+                        value => `${value}`,
+                        'How many AI opponents?',
+                        props.localOptions.numRobots,
+                        0, MAX_PLAYERS - 1,
+                        optionChanger('numRobots', true),
+                    )}
+                    {numberRange(
+                        'Difficulty',
+                        value => difficultyNames[value],
+                        'How smart should these robots be?',
+                        props.localOptions.difficulty,
+                        0, BasicRobot.MAX_IQ,
+                        optionChanger('difficulty', true),
+                    )}
+                </div>
+                <div className="Level1 Column">
+                    {numberInput('Mountains', 'mountainPercent', 'Percent of the map covered by mountains', 1)}
+                    {numberInput('Tick', 'tickMillis', 'Milliseconds between turns', 1)}
+                    {checkInput('Fog', 'fog', 'Hide the areas you don\'t control.', 1)}
+                    {checkInput('Capitals', 'capitals', 'Kill a player when you capture their home.', 1)}
+                </div>
+                <div className="Level2 Column">
+                    {numberInput('Starting Population', 'startingPop', 'Population of your initial tile.', 2)}
+                    {numberInput('Ticks per round', 'roundTicks', 'How often population increases in regular hexes.', 2)}
+                    {checkInput('Synced Growth', 'syncedGrowth', 'Pop grows all at once?', 2)}
+                    {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
+                </div>
+                <div>
+                    <button
+                        onClick={props.newGame}
+                        className='start'
+                    >
+                        Start
+                    </button>
+                    <button
+                        className="LevelButton"
+                        onClick={toggleAdvanced}
+                        title={[
+                            'More Options',
+                            'Even More Options',
+                            'Hide Options',
+                        ][props.localOptions.levelVisible]}
+                    >
+                        {['...', '...', '...'][props.localOptions.levelVisible]}
+                    </button>
                 </div>
             </div>
-        )
-    }
+        </div>
+    )
 }

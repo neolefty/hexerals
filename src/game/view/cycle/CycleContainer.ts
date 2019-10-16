@@ -5,17 +5,18 @@ import {
     CycleAction, changeLocalOptionAction, openLocalGameAction,
 } from '../../model/cycle/CycleReducer'
 import {CartPair} from '../../../common/CartPair'
+import {CycleState} from "../../model/cycle/CycleState"
 import {AppState} from '../app/App'
-import {CycleView} from './CycleView'
+import {CycleView, CycleViewActions} from './CycleView'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 
 export interface CycleContainerProps {
     displaySize: CartPair
 }
 
-const mapStateToCycleViewProps = (state: AppState) => state.cycle
+const mapStateToCycleViewProps = (state: AppState): CycleState => state.cycle
 
-const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleAction>) => ({
+const mapDispatchToCycleViewProps = (dispatch: Dispatch<CycleAction>): CycleViewActions => ({
     onOpenLocalGame: () => dispatch(openLocalGameAction()),
     onChangeLocalOption: (name: keyof LocalGameOptions, n: number) =>
         dispatch(changeLocalOptionAction(name, n)),

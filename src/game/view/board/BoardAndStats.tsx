@@ -3,8 +3,9 @@ import {Map} from 'immutable'
 
 import {CartPair} from '../../../common/CartPair'
 import {useLocalStorageState} from '../../../common/HookLocalStorage'
+import {DisplaySizeProvider, useDisplaySize} from "../../../common/ViewSizeContext"
 import {StatsPanel} from '../stats/StatsPanel'
-import {BoardViewProps} from './BoardViewBase'
+import {BoardViewProps} from './BoardViewProps'
 import {HexBoardView} from './HexBoardView'
 
 export interface BoardAndStatsProps extends BoardViewProps {
@@ -99,15 +100,15 @@ export const statSizesAndStyles = (
 
 export const BoardAndStats = (props: BoardAndStatsProps) => {
     const [prefs, setPrefs] = useLocalStorageState('BoardAndStats.state', defaultPrefs)
-    const displayStuff = statSizesAndStyles(props.displaySize, props.statsVisible, prefs)
-    const screenVertical = props.displaySize.isVertical
+    const displaySize = useDisplaySize()
+    const displayStuff = statSizesAndStyles(displaySize, props.statsVisible, prefs)
+    const screenVertical = displaySize.isVertical
     return (
         <div style={displayStuff.container.style}>
             <div style={displayStuff.board.style}>
-                <HexBoardView
-                    {...props}
-                    displaySize={displayStuff.board.displaySize}
-                />
+                <DisplaySizeProvider size={displayStuff.board.displaySize}>
+                    <HexBoardView {...props} />
+                </DisplaySizeProvider>
             </div>
             {
                 props.statsVisible ? (

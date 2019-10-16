@@ -1,21 +1,21 @@
-import * as React from 'react'
-import {Map, Set} from 'immutable'
-import Adapter from 'enzyme-adapter-react-16'
 import * as enzyme from 'enzyme'
 import {mount, shallow} from 'enzyme'
+import Adapter from 'enzyme-adapter-react-16'
+import {List, Map, Set} from 'immutable'
+import * as React from 'react'
+import {CartPair} from "../../../common/CartPair"
+import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
 
 import {Board} from '../../model/board/Board'
-import {Hex} from '../../model/hex/Hex'
-import {CartPair} from "../../../common/CartPair"
-import {BoardViewBase, BOARD_STUBS} from "./BoardViewBase"
-import {BoardState, BOARD_STATE_STARTER} from '../../model/board/BoardState'
-import {
-    pickNPlayers, Player, PlayerManager
-} from '../../model/players/Players'
-import {Tile} from '../../model/hex/Tile'
-import {CornersPlayerArranger} from '../../model/setup/PlayerArranger'
 import {BoardReducerTester} from '../../model/board/BoardReducerTester'
+import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
+import {Hex} from '../../model/hex/Hex'
 import {Terrain} from '../../model/hex/Terrain'
+import {Tile} from '../../model/hex/Tile'
+import {pickNPlayers, Player, PlayerManager} from '../../model/players/Players'
+import {CornersPlayerArranger} from '../../model/setup/PlayerArranger'
+import {BoardKeyboardController} from "./BoardKeyboardController"
+import {BOARD_STUBS, BoardViewProps} from "./BoardViewProps"
 
 it('renders a tile', () => {
     enzyme.configure({adapter: new Adapter()})
@@ -74,10 +74,11 @@ it('renders a board with no selection', () => {
     // )
 
     const view = mount(
-        <OldGridView {...BOARD_STUBS}
-            boardState={boardState}
-            displaySize={new CartPair(1000, 1000)}
-        />
+        <DisplaySizeProvider size={new CartPair(1000, 1000)}>
+            <OldGridView {...BOARD_STUBS}
+                boardState={boardState}
+            />
+        </DisplaySizeProvider>
     )
     // console.log(view.html())
     // console.log(view.children().toString())
@@ -87,6 +88,7 @@ it('renders a board with no selection', () => {
     expect(tiles.first().text()).toEqual('0')
     let text = ''
     tiles.forEach(tile => text += tile.text())
+    // eslint-disable-next-line no-useless-concat
     expect(text).toEqual(('003'+'00'+'300'))
     // expect(tiles.first().next().next().text()).toEqual('3')
     // expect(tiles[2].attribs['title'].substr(0, String(Player.One).length)).toEqual(String(Player.One))
@@ -107,11 +109,12 @@ it('renders a board with a selection', () => {
         curPlayer: Player.One,
     }
     const view = enzyme.render(
-        <OldGridView
-            {...BOARD_STUBS}
-            boardState={bs}
-            displaySize={new CartPair(1000, 1000)}
-        />
+        <DisplaySizeProvider size={new CartPair(1000, 1000)}>
+            <OldGridView
+                {...BOARD_STUBS}
+                boardState={bs}
+            />
+        </DisplaySizeProvider>
     )
     const active = view.find('.active')
     expect(active.length).toEqual(1)  // only one selected
@@ -177,42 +180,41 @@ export const OldGridTileView = (props: OldGridTileProps) => (
     </span>
 )
 
-export class OldGridView extends BoardViewBase {
-    render(): React.ReactNode {
-        const bs: BoardState = this.props.boardState
-        const cursorSet: Set<Hex> = Set<Hex>(this.props.boardState.cursors.values())
-        return (
-            <div
-                className="board"
-                tabIndex={0}
-                onKeyDown={this.keyboardController.onKeyDown}
-            >
-                {
-                    bs.board.edges.yRange().reverse().map((cy: number) => (
-                        <div key={cy}>
-                            {
-                                bs.board.edges.xRange().filter( // remove nonexistent
-                                    cx => (cx !== undefined) && (cx + cy) % 2 === 0
-                                ).map( // turn cartesian into hex
-                                    (cx: number) => Hex.getCart(cx, cy)
-                                ).filter( // only in-bounds
-                                    coord => bs.board.inBounds(coord)
-                                ).map(
-                                    (coord: Hex) => (
-                                        <OldGridTileView
-                                            tile={bs.board.getTile(coord)}
-                                            key={coord.id}
-                                            selected={cursorSet.contains(coord)}
-                                            onSelect={() => this.props.onPlaceCursor(0, coord, true)}
-                                            coord={coord}
-                                        />
-                                    )
+const OldGridView = (props: BoardViewProps) => {
+    const bs: BoardState = props.boardState
+    const cursorSet: Set<Hex> = Set<Hex>(props.boardState.cursors.values())
+    const keyboardController = new BoardKeyboardController(props)
+    return (
+        <div
+            className="board"
+            tabIndex={0}
+            onKeyDown={keyboardController.onKeyDown}
+        >
+            {
+                bs.board.edges.yRange().reverse().map((cy: number) => (
+                    <div key={cy}>
+                        {
+                            bs.board.edges.xRange().filter( // remove nonexistent
+                                cx => (cx !== undefined) && (cx + cy) % 2 === 0
+                            ).map( // turn cartesian into hex
+                                (cx: number) => Hex.getCart(cx, cy)
+                            ).filter( // only in-bounds
+                                coord => bs.board.inBounds(coord)
+                            ).map(
+                                (coord: Hex) => (
+                                    <OldGridTileView
+                                        tile={bs.board.getTile(coord)}
+                                        key={coord.id}
+                                        selected={cursorSet.contains(coord)}
+                                        onSelect={() => props.onPlaceCursor(0, coord, true)}
+                                        coord={coord}
+                                    />
                                 )
-                            }
-                        </div>
-                    ))
-                }
-            </div>
-        )
-    }
+                            )
+                        }
+                    </div>
+                ))
+            }
+        </div>
+    )
 }

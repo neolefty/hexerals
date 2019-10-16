@@ -1,4 +1,4 @@
-import {BoardViewProps} from './BoardViewBase'
+import {BoardViewProps} from './BoardViewProps'
 import {NicheText} from '../hex/NicheView'
 import * as React from 'react'
 

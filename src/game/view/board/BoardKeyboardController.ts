@@ -1,9 +1,9 @@
-import {List, Map} from 'immutable';
-import * as React from 'react';
+import {List, Map} from 'immutable'
+import * as React from 'react'
 
-import {Hex} from '../../model/hex/Hex';
-import {PlayerMove} from '../../model/move/Move';
-import {BoardViewBase} from './BoardViewBase';
+import {Hex} from '../../model/hex/Hex'
+import {PlayerMove} from '../../model/move/Move'
+import {BoardViewProps} from './BoardViewProps'
 
 const KEY_CONTROLS: Map<string, Hex> = Map({
     'ArrowLeft': Hex.LEFT_DOWN,
@@ -21,38 +21,36 @@ const KEY_CONTROLS: Map<string, Hex> = Map({
 })
 
 export class BoardKeyboardController {
-    constructor(private view: BoardViewBase) {
-        this.onKeyDown = this.onKeyDown.bind(this)
-    }
+    constructor(readonly props: BoardViewProps) {}
 
-    onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
-        const bs = this.view.props.boardState
+    onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+        const bs = this.props.boardState
         const cursor = bs.cursors.get(0, Hex.NONE)
         if (cursor !== Hex.NONE && bs.curPlayer) {
             const delta = KEY_CONTROLS.get(e.key, Hex.NONE)
             if (delta !== Hex.NONE) {
                 const move = PlayerMove.constructDelta(bs.curPlayer, cursor, delta)
                 if (bs.board.canBeOccupied(move.dest))
-                    this.view.props.onQueueMoves(List([move]))
+                    this.props.onQueueMoves(List([move]))
                 const newCursor = cursor.plus(delta)
-                this.view.props.onPlaceCursor(0, newCursor, true)
+                this.props.onPlaceCursor(0, newCursor, true)
                 e.preventDefault()
                 return
             }
         }
 
         if (e.key === 'Escape') {
-            this.view.props.onEndGame()
+            this.props.onEndGame()
             e.preventDefault()
             return
         }
 
         if (e.key === 'z' && bs.curPlayer) {
-            this.view.props.onCancelMoves(bs.curPlayer, -1, 1)
+            this.props.onCancelMoves(bs.curPlayer, -1, 1)
             e.preventDefault()
         }
         if (e.key === 'x' && bs.curPlayer) {
-            this.view.props.onCancelMoves(bs.curPlayer, -1, -1)
+            this.props.onCancelMoves(bs.curPlayer, -1, -1)
             e.preventDefault()
         }
     }

@@ -1,16 +1,12 @@
-import {BoardState} from '../../model/board/BoardState'
-import {CartPair} from '../../../common/CartPair'
 import {List, Map} from 'immutable'
-import {Player} from '../../model/players/Players'
 import {DriftColor} from '../../../color/DriftColor'
-import {PlayerMove} from '../../model/move/Move'
+import {BoardState} from '../../model/board/BoardState'
 import {Hex} from '../../model/hex/Hex'
-import * as React from 'react'
-import {BoardKeyboardController} from './BoardKeyboardController'
+import {PlayerMove} from '../../model/move/Move'
+import {Player} from '../../model/players/Players'
 
 export interface BoardViewProps extends BoardViewActions {
     boardState: BoardState
-    displaySize: CartPair
     colors?: Map<Player, DriftColor>
     grabFocus?: boolean
 }
@@ -29,15 +25,6 @@ export interface BoardViewActions {
     onEndGame: () => void
     onRestartGame: () => void
     onResetColors: (n: number) => void
-}
-
-export class BoardViewBase extends React.PureComponent<BoardViewProps> {
-    protected readonly keyboardController: BoardKeyboardController
-
-    constructor(props: BoardViewProps) {
-        super(props)
-        this.keyboardController = new BoardKeyboardController(this)
-    }
 }
 
 export const BOARD_STUBS: BoardViewActions = ({

@@ -47,9 +47,7 @@ const playerColorsCache = new CacheMap<ColorPodge, Map<Player, DriftColor>>(5)
 export const cachedPlayerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
     playerColorsCache.get(colors, () => playerColors(colors))
 
-const mapStateToTickerBoardViewProps = (
-    state: AppState, ownProps: LocalBoardProps
-) => {
+const mapStateToTickerBoardViewProps = (state: AppState) => {
     // assert localGame is not undefined
     const game = state.cycle.localGame as LocalGameState
     const options = state.cycle.localOptions
@@ -59,7 +57,6 @@ const mapStateToTickerBoardViewProps = (
 
     return ({
         boardState: board,
-        displaySize: ownProps.displaySize,
         localOptions: options,
         // colors: playerColors(state.colors.colors),
         colors: cachedPlayerColors(state.colors.colors),

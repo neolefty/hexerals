@@ -1,19 +1,19 @@
-import * as React from 'react'
 import {List} from 'immutable'
-
-import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
-import {HexBoardView} from '../board/HexBoardView'
+import * as React from 'react'
 import {ColorPodge} from '../../../color/ColorPodge'
 import {CartPair} from '../../../common/CartPair'
-import {playerColors} from '../cycle/LocalGameContainer'
-import './Benchmark.css'
+import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
 import {Board} from '../../model/board/Board'
-import {pickNPlayers, Player, PlayerManager} from '../../model/players/Players'
-import {BOARD_STUBS, BoardViewProps} from '../board/BoardViewBase'
+
+import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
 import {BasicRobot} from '../../model/players/BasicRobot'
+import {pickNPlayers, Player, PlayerManager} from '../../model/players/Players'
 import {SpreadPlayersArranger} from '../../model/setup/SpreadPlayerArranger'
 import {YMountainArranger} from '../../model/setup/YMountainArranger'
-import {DEFAULT_LOCAL_GAME_OPTIONS} from '../../model/board/LocalGameOptions'
+import {BOARD_STUBS, BoardViewProps} from '../board/BoardViewProps'
+import {HexBoardView} from '../board/HexBoardView'
+import {playerColors} from '../cycle/LocalGameContainer'
+import './Benchmark.css'
 
 const NUM_PLAYERS = 10
 const BOARD_WIDTH = 21
@@ -66,11 +66,7 @@ const newBoardState = (
 // the parts of BoardViewProps that don't change — everything except boardState: BoardState
 const staticBoardViewProps: BoardViewProps = {
     ...BOARD_STUBS,
-
-    // static parts that don't change
-    displaySize: new CartPair(1000, 700),
     colors: playerColors(ColorPodge.construct(NUM_PLAYERS)),
-
     // this gets replaced Run is clicked
     boardState: newBoardState(1, 1)
 }
@@ -101,24 +97,26 @@ export class Benchmark
 
     render(): React.ReactNode {
         return (
-            <div
-                className="Row"
-                style={{height: this.props.displaySize.y}}
-            >{
-                this.state && this.state.curGame
-                    ? (
-                        <HexBoardView
-                            {...staticBoardViewProps}
-                            boardState={this.state.curGame}
-                        />
-                    )
-                    : (
-                        <button onClick={this.startGame}>
-                            Run
-                        </button>
-                    )
-            }
-            </div>
+            <DisplaySizeProvider size={new CartPair(1000, 700)}>
+                <div
+                    className="Row"
+                    style={{height: this.props.displaySize.y}}
+                >{
+                    this.state && this.state.curGame
+                        ? (
+                            <HexBoardView
+                                {...staticBoardViewProps}
+                                boardState={this.state.curGame}
+                            />
+                        )
+                        : (
+                            <button onClick={this.startGame}>
+                                Run
+                            </button>
+                        )
+                }
+                </div>
+            </DisplaySizeProvider>
         )
     }
 }
