@@ -5,7 +5,7 @@ import {shuffle} from "../../../common/Shuffle"
 import {Board} from '../board/Board'
 import {BoardState} from '../board/BoardState'
 import {Hex} from '../hex/Hex'
-import {growsFast} from "../hex/Terrain"
+import {growsFast, Terrain} from "../hex/Terrain"
 import {Tile} from '../hex/Tile'
 import {HexMove, PlayerMove} from '../move/Move'
 import {Player} from './Players'
@@ -30,7 +30,7 @@ const append = <T>(a?: List<T>, b?: List<T>): List<T> | undefined => {
 }
 
 export class BasicRobot implements Robot {
-    static readonly MAX_IQ = 5
+    static readonly MAX_IQ = 6
 
     // doesn't always move all the way until blocked
     static readonly SKILL_STOP_PARTWAY = 0
@@ -42,6 +42,14 @@ export class BasicRobot implements Robot {
     static readonly SKILL_STOP_BY_CITIES = 3
     // tends to concentrate pop
     static readonly SKILL_CONSOLIDATE = 4
+
+    // leaves pop in capital to protect them
+    static readonly SKILL_GARRISON = 5
+    // bias (away from 1 -- 0 would mean never move) towards leaving pop in capital
+    static readonly GARRISON_FACTOR = 0.3
+
+    // TODO actively defend capital by attacking armies next to it -- either from capital or from nearby
+
     // tends to take empty squares
     // static readonly SKILL_SPREAD = 5
     // tends to take opponents' squares
@@ -89,6 +97,8 @@ export class BasicRobot implements Robot {
         return this.skills[BasicRobot.SKILL_STOP_BY_CITIES] }
     get consolidates(): boolean {
         return this.skills[BasicRobot.SKILL_CONSOLIDATE] }
+    get garrisons(): boolean {
+        return this.skills[BasicRobot.SKILL_GARRISON] }
     // get spreads(): boolean {
     //     return this.skills[BasicRobot.SKILL_SPREAD] }
 /*
@@ -183,26 +193,27 @@ export class BasicRobot implements Robot {
         }
 
         if (shouldQueue && this.consolidates) {
-            // keep track of what size we're moving
-            // TODO keep track of last N largest moves, and ignore anything smaller?
-            let smallSize = 2
-            let moves = List<HexMove>().withMutations(moves => {
+            // pairs of [ pop, move ] — ignore smaller moves
+            let smallSize = 2 // can't move if pop is 1
+            let moves = List<[number, HexMove]>().withMutations(moves => {
                 bs.board.filterOwnedTiles(
                     ([hex, tile]) => tile.owner === player && tile.pop > 1
                 ).forEach(([bigHex, bigTile]) => {
                     bs.board.forNeighborsOccupiable(
                         bigHex, (smallHex, smallTile) => {
+                            // value protecting cities
+                            const moveValue = smallTile.pop * (growsFast(bigTile.terrain) ? 2 : 1)
                             if (
                                 // only move if it's a "big move"
-                                smallTile.pop >= smallSize
+                                moveValue >= smallSize
                                 // and either protect cities or consolidate onto larger tiles
                                 && (growsFast(bigTile.terrain) || bigTile.pop >= smallTile.pop)
                             ) {
-                                if (smallTile.pop > smallSize * 1.7) { // if we've found a move that's much bigger than the rest
+                                if (smallTile.pop > smallSize * 1.5) { // if we've found a move that's much bigger than the rest
+                                    // console.log(`small size ${smallSize} ——> ${smallTile.pop}`)
                                     smallSize = smallTile.pop
-                                    moves.clear()
                                 }
-                                moves.push(new HexMove(smallHex, bigHex.minus(smallHex)))
+                                moves.push([moveValue, new HexMove(smallHex, bigHex.minus(smallHex))])
                             }
                         }
                     )
@@ -210,11 +221,12 @@ export class BasicRobot implements Robot {
             })
 
             moves = shuffle(moves)
+            moves = moves.sort(([a/*, am*/], [b/*, bm*/]) => b - a)
             const n = this.maxConsolidations(bs, player)
             if (moves.size > n)
                 moves = moves.slice(0, n)
-            result.makeMoves = append(result.makeMoves, moves)
-            // go ahead and queue in a random direction, too
+            result.makeMoves = append(result.makeMoves, moves.map(([pop, move]) => move))
+            // note: leave shouldQueue = true — go ahead and queue in a random direction, too
         }
 
         // queue moves in a random direction if appropriate
@@ -226,14 +238,17 @@ export class BasicRobot implements Robot {
                 player,
                 (source: Hex, dests: List<Hex>) => {
                     const sourceTile = bs.board.getTile(source)
+                    let weightedSourcePop = sourceTile.pop
+                    if (sourceTile.terrain === Terrain.Capital && this.garrisons)
+                        weightedSourcePop *= BasicRobot.GARRISON_FACTOR
                     // I think this is a shortcut to giving each move a fair weight
                     const takeIt: boolean =
-                        (Math.random() * (totalPop + sourceTile.pop)) > totalPop
+                        (Math.random() * (totalPop + weightedSourcePop)) > totalPop
                     if (takeIt) {
                         const dest = dests.get(Math.floor(Math.random() * dests.size)) as Hex
                         chosenMove = new HexMove(source, dest.minus(source))
                     }
-                    totalPop += sourceTile.pop
+                    totalPop += weightedSourcePop
                 }
             )
             if (chosenMove !== NONE_MOVE) {
