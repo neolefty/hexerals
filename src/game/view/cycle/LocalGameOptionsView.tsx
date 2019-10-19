@@ -62,6 +62,7 @@ const difficultyNames = Object.freeze([
     'Easy',
     'Basic',
     'Medium',
+    'Medium',
     'Tough',
     'Hard',
 ])

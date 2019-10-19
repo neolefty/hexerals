@@ -1,4 +1,4 @@
-import {List, Map, Set} from 'immutable'
+import {List, Map, Seq, Set} from 'immutable'
 
 import {RectEdges} from './Constraints'
 import {PlayerMove} from '../move/Move'
@@ -49,6 +49,7 @@ export class BoardRules {
 }
 
 export type TileFilter = (tile: Tile) => boolean
+export type HexTileFilter = (entry: [Hex, Tile]) => boolean
 export type TileSideEffect = (hex: Hex, tile: Tile) => void
 
 export class Board {
@@ -161,6 +162,10 @@ export class Board {
             )
         return this._hexPaths
     }
+
+    // filter tiles that have an owner
+    filterOwnedTiles = (filter: HexTileFilter): Seq.Indexed<[Hex, Tile]> =>
+        this.explicitTiles.entrySeq().filter(filter)
 
     // noinspection PointlessBooleanExpressionJS
     filterTiles = (filter: TileFilter): Set<Hex> =>

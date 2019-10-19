@@ -1,14 +1,15 @@
-import {List} from 'immutable';
-
-import {GameDecision, Robot} from './Robot';
-import {HexMove, PlayerMove} from '../move/Move';
-import {BoardState} from '../board/BoardState';
-import {Player} from './Players';
-import {Hex} from '../hex/Hex';
-import {Tile} from '../hex/Tile';
-import {Board} from '../board/Board';
-import * as assert from 'assert';
-import {Comma} from '../../../common/Comma';
+import * as assert from 'assert'
+import {List} from 'immutable'
+import {Comma} from '../../../common/Comma'
+import {shuffle} from "../../../common/Shuffle"
+import {Board} from '../board/Board'
+import {BoardState} from '../board/BoardState'
+import {Hex} from '../hex/Hex'
+import {growsFast} from "../hex/Terrain"
+import {Tile} from '../hex/Tile'
+import {HexMove, PlayerMove} from '../move/Move'
+import {Player} from './Players'
+import {GameDecision, Robot} from './Robot'
 
 // improvements
 // * defend capital
@@ -18,17 +19,33 @@ import {Comma} from '../../../common/Comma';
 
 const NONE_MOVE = new HexMove(Hex.NONE, Hex.NONE)
 
+const append = <T>(a?: List<T>, b?: List<T>): List<T> | undefined => {
+    if (a) {
+        if (b) return a.concat(b)
+        else return a
+    } else {
+        if (b) return b
+        else return undefined
+    }
+}
+
 export class BasicRobot implements Robot {
-    static readonly MAX_IQ = 4
+    static readonly MAX_IQ = 5
 
     // doesn't always move all the way until blocked
     static readonly SKILL_STOP_PARTWAY = 0
     // avoids making losing moves
     static readonly SKILL_WASTE_NOT = 1
     // grabs cities if it can
-    static readonly SKILL_CAPTURE_NEARBY = 2
+    static readonly SKILL_CAPTURE_CITY = 2
     // stops if it's next to an opposing city
     static readonly SKILL_STOP_BY_CITIES = 3
+    // tends to concentrate pop
+    static readonly SKILL_CONSOLIDATE = 4
+    // tends to take empty squares
+    // static readonly SKILL_SPREAD = 5
+    // tends to take opponents' squares
+    // static readonly SKILL_CAPTURE = 6
 /*
     // captures enemy tiles
     static readonly SKILL_LIKES_CAPTURE = 4
@@ -37,7 +54,7 @@ export class BasicRobot implements Robot {
 */
 
     static readonly SKILL_NAMES = [
-        'stops partway', 'wastes not', 'captures nearby', 'stops by cities',
+        'stops partway', 'wastes not', 'captures nearby', 'stops by cities', 'consolidates',
     ]
 
     // assign N random skills
@@ -67,9 +84,13 @@ export class BasicRobot implements Robot {
     get wastesNot(): boolean {
         return this.skills[BasicRobot.SKILL_WASTE_NOT] }
     get capturesNearby(): boolean {
-        return this.skills[BasicRobot.SKILL_CAPTURE_NEARBY] }
+        return this.skills[BasicRobot.SKILL_CAPTURE_CITY] }
     get stopsByCities(): boolean {
         return this.skills[BasicRobot.SKILL_STOP_BY_CITIES] }
+    get consolidates(): boolean {
+        return this.skills[BasicRobot.SKILL_CONSOLIDATE] }
+    // get spreads(): boolean {
+    //     return this.skills[BasicRobot.SKILL_SPREAD] }
 /*
     get likesCapture(): boolean {
         return this.skills[BasicRobot.SKILL_LIKES_CAPTURE] }
@@ -85,6 +106,15 @@ export class BasicRobot implements Robot {
 
     get isWatchingNextMove() {
         return this.stopsByCities || this.wastesNot
+    }
+
+    maxConsolidations(bs: BoardState, player: Player): number {
+        return Math.min(4, // at least 4
+            Math.max( // and at most ...
+                bs.board.constraints.opts.roundTicks / 4, // quarter the number of ticks between blank increases
+                Math.min(bs.board.edges.width, bs.board.edges.height) / 2 // or half the shortest dimension
+            )
+        )
     }
 
     decide(
@@ -139,14 +169,52 @@ export class BasicRobot implements Robot {
                             && neighborTile.growsFast
                             && neighborTile.pop <= myTile.pop - 1
                         ) {
-                            result.makeMoves = List([
-                                new HexMove(myHex, neighborHex.minus(myHex))
-                            ])
+                            result.makeMoves = append(
+                                result.makeMoves,
+                                List([
+                                    new HexMove(myHex, neighborHex.minus(myHex))
+                                ])
+                            )
                             shouldQueue = false
                         }
                     }
                 )
             })
+        }
+
+        if (shouldQueue && this.consolidates) {
+            // keep track of what size we're moving
+            // TODO keep track of last N largest moves, and ignore anything smaller?
+            let smallSize = 2
+            let moves = List<HexMove>().withMutations(moves => {
+                bs.board.filterOwnedTiles(
+                    ([hex, tile]) => tile.owner === player && tile.pop > 1
+                ).forEach(([bigHex, bigTile]) => {
+                    bs.board.forNeighborsOccupiable(
+                        bigHex, (smallHex, smallTile) => {
+                            if (
+                                // only move if it's a "big move"
+                                smallTile.pop >= smallSize
+                                // and either protect cities or consolidate onto larger tiles
+                                && (growsFast(bigTile.terrain) || bigTile.pop >= smallTile.pop)
+                            ) {
+                                if (smallTile.pop > smallSize * 1.7) { // if we've found a move that's much bigger than the rest
+                                    smallSize = smallTile.pop
+                                    moves.clear()
+                                }
+                                moves.push(new HexMove(smallHex, bigHex.minus(smallHex)))
+                            }
+                        }
+                    )
+                })
+            })
+
+            moves = shuffle(moves)
+            const n = this.maxConsolidations(bs, player)
+            if (moves.size > n)
+                moves = moves.slice(0, n)
+            result.makeMoves = append(result.makeMoves, moves)
+            // go ahead and queue in a random direction, too
         }
 
         // queue moves in a random direction if appropriate
@@ -186,7 +254,7 @@ export class BasicRobot implements Robot {
                     moves = moves.slice(0, moves.size - movesToDrop) as List<HexMove>
                     assert.ok(moves.size >= 1)
                 }
-                result.makeMoves = moves
+                result.makeMoves = append(result.makeMoves, moves)
             }
         }
 

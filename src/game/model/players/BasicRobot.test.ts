@@ -108,7 +108,7 @@ it('stops by cities', () => {
     Range(0, n).forEach(() => {
         const brt = new BoardReducerTester(3, 9)
         let skills: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
-        skills[BasicRobot.SKILL_CAPTURE_NEARBY] = true
+        skills[BasicRobot.SKILL_CAPTURE_CITY] = true
         skills[BasicRobot.SKILL_STOP_BY_CITIES] = true
         brt.setRobot(Player.Zero, new BasicRobot(skills))
         brt.setTile(Hex.RIGHT_UP.plus(Hex.UP), Tile.CITY)
@@ -157,7 +157,7 @@ const doesABeatB = (
         brt.doMoves()
         brt.gameTick()
         // every 10 turns check for a winner
-        if (brt.state.turn % 10 == 0 && brt.isGameOver)
+        if (brt.state.turn % 10 === 0 && brt.isGameOver)
             break
     }
     // noinspection UnnecessaryLocalVariableJS
@@ -194,7 +194,7 @@ it('IQ 1 not lose too much', () => {
         if (logWinLoss)
             // tslint:disable-next-line
             console.log(`Skill #${skillIndex}: ${wins}/${robotTrials} = ${wins/robotTrials} (${smart().toString()})`)
-        expect(wins).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.4 : 0.35))  // weak!
+        expect(wins).toBeGreaterThanOrEqual(robotTrials * (logWinLoss ? 0.4 : 0.33))  // weak!
     })
 })
 

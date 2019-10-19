@@ -25,3 +25,7 @@ declare module "immutable" {
         ): /*this*/Iterable<number, T>;
     }
 }
+
+declare module "immutable-shuffle" {
+
+}
