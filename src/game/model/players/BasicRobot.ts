@@ -30,7 +30,7 @@ const append = <T>(a?: List<T>, b?: List<T>): List<T> | undefined => {
 }
 
 export class BasicRobot implements Robot {
-    static readonly MAX_IQ = 6
+    static readonly MAX_IQ = 7
 
     // doesn't always move all the way until blocked
     static readonly SKILL_STOP_PARTWAY = 0
@@ -48,6 +48,7 @@ export class BasicRobot implements Robot {
     // bias (away from 1 -- 0 would mean never move) towards leaving pop in capital
     static readonly GARRISON_FACTOR = 0.3
 
+    static readonly SKILL_ACTIVE_DEFENSE = 6
     // TODO actively defend capital by attacking armies next to it -- either from capital or from nearby
 
     // tends to take empty squares
@@ -99,6 +100,8 @@ export class BasicRobot implements Robot {
         return this.skills[BasicRobot.SKILL_CONSOLIDATE] }
     get garrisons(): boolean {
         return this.skills[BasicRobot.SKILL_GARRISON] }
+    get activelyDefends(): boolean {
+        return this.skills[BasicRobot.SKILL_ACTIVE_DEFENSE] }
     // get spreads(): boolean {
     //     return this.skills[BasicRobot.SKILL_SPREAD] }
 /*
@@ -134,12 +137,36 @@ export class BasicRobot implements Robot {
 
         // queue moves? If there aren't any queued currently ...
         let shouldQueue: boolean = !curMoves || curMoves.size === 0
+        let respondingToThreat: boolean = false
 
-        // TODO abstract these skills
-        // TODO fuzzy robot that likes or dislikes moves
+        // protect the capital
+        if (this.activelyDefends) {
+            // 1. find the worst threat to a capital
+            let threatHex = Hex.NONE
+            let threatTile = Tile.EMPTY
+            bs.board.capitals.filter((tile) => tile.owner === player).forEach((tile, hex) => {
+                bs.board.forNeighborsOccupiable(hex, ((neighborHex, neighborTile) => {
+                    if (neighborTile.owner !== player && neighborTile.pop > threatTile.pop) {
+                        threatHex = neighborHex
+                        threatTile = neighborTile
+                    }
+                }))
+            })
+            if (threatHex !== Hex.NONE) {
+                // 2. attack that spot
+                const defenseMoves = this.attackFromNeighbors(bs.board, threatHex, player)
+                if (defenseMoves.size > 0) {
+                    respondingToThreat = true
+                    if (curMoves)
+                        result.cancelMoves = curMoves.size
+                    result.makeMoves = defenseMoves
+                    shouldQueue = false
+                }
+            }
+        }
 
         // cancel moves?
-        if (this.isWatchingNextMove && curMoves && curMoves.size > 0) {
+        if (!respondingToThreat && this.isWatchingNextMove && curMoves && curMoves.size > 0) {
             const nextMove = curMoves.get(0) as PlayerMove
             const source = bs.board.getTile(nextMove.source)
             const dest = bs.board.getTile(nextMove.dest)
@@ -274,6 +301,35 @@ export class BasicRobot implements Robot {
         }
 
         return result
+    }
+
+    // have player attack a target from its neighbors, minimizing effort & risk
+    attackFromNeighbors = (board: Board, target: Hex, player: Player): List<HexMove> => {
+        let notCapMoves = List<HexMove>() // attacks from non-capitals
+        let capMoves = List<HexMove>() // attacks from capitals
+        // find all hexes that player can use to attack the target
+        board.forNeighborsOccupiable(target, (neighborHex, neighborTile) => {
+            if (neighborTile.owner === player && neighborTile.pop > 1) {
+                const move = HexMove.constructDest(neighborHex, target)
+                if (neighborTile.terrain === Terrain.Capital)
+                    capMoves = capMoves.push(move)
+                else
+                    notCapMoves = notCapMoves.push(move)
+            }
+        })
+        // sorted from largest to smallest non-capitals ...
+        notCapMoves = notCapMoves.sort((a, b) => board.getTile(a.source).pop - board.getTile(b.source).pop)
+        // ... and then capitals (to try to avoid moving them)
+        let allMoves: List<HexMove> = notCapMoves.concat(capMoves)
+
+        // how many of those moves does it take to capture?
+        let remainPop = board.getTile(target).pop
+        let i = 0
+        while (remainPop > -1 && i < allMoves.size) { // attack until defeated
+            remainPop -= board.getTile(allMoves.get(i, HexMove.NO_MOVE).source).pop - 1
+            ++i
+        }
+        return allMoves.slice(0, i)
     }
 
     forEachSetOfStarts = (

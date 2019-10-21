@@ -163,6 +163,15 @@ export class Board {
         return this._hexPaths
     }
 
+    private _capitals?: Map<Hex, Tile>
+    get capitals(): Map<Hex, Tile> {
+        if (!this._capitals)
+            this._capitals = Map(this.filterOwnedTiles(([hex, tile]) =>
+                tile.terrain === Terrain.Capital)
+            )
+        return this._capitals
+    }
+
     // filter tiles that have an owner
     filterOwnedTiles = (filter: HexTileFilter): Seq.Indexed<[Hex, Tile]> =>
         this.explicitTiles.entrySeq().filter(filter)

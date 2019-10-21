@@ -3,6 +3,8 @@ import {Player} from '../players/Players';
 import {hash, ValueObject} from 'immutable';
 
 export class HexMove implements ValueObject {
+    static readonly NO_MOVE = new HexMove(Hex.NONE, Hex.ORIGIN)
+
     static constructDest(source: Hex, dest: Hex) {
         return new HexMove(source, dest.minus(source))
     }

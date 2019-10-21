@@ -1,14 +1,14 @@
-import {List, Map} from 'immutable'
-import {countHexes} from "../../view/hex/HexConstants"
-
-import {Board} from './Board'
-import {pickNPlayers, Player} from '../players/Players'
+import {List, Map, Range} from 'immutable'
 import {StatusMessage} from '../../../common/StatusMessage'
-import {PlayerMove} from '../move/Move'
-import {CornersPlayerArranger} from '../setup/PlayerArranger'
-import {Tile} from '../hex/Tile'
+import {countHexes} from "../../view/hex/HexConstants"
 import {Hex} from '../hex/Hex'
 import {Terrain} from '../hex/Terrain'
+import {Tile} from '../hex/Tile'
+import {PlayerMove} from '../move/Move'
+import {pickNPlayers, Player} from '../players/Players'
+import {CornersPlayerArranger, RandomPlayerArranger} from '../setup/PlayerArranger'
+
+import {Board} from './Board'
 
 // noinspection JSUnusedGlobalSymbols
 export function printBoard(board: Board) {
@@ -85,6 +85,15 @@ it('overlays', () => {
     const after = five.overlayTiles(overlay)
     expect(after.getTile(Hex.ORIGIN) === emptyFive).toBeTruthy()
     expect(after.getTile(Hex.RIGHT_UP) === cityThree).toBeTruthy()
+})
+
+it('gets capitals', () => {
+    Range(2, 10).forEach(playerCount => {
+        const ten = Board.constructDefaultSquare(10, pickNPlayers(playerCount), [
+            new RandomPlayerArranger(0, Terrain.Capital)
+        ])
+        expect(ten.capitals.size).toEqual(playerCount)
+    })
 })
 
 it('navigates around a board', () => {

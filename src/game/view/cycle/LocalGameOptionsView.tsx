@@ -60,6 +60,7 @@ const maxMapSize = (): number => isPhone() ? 250 : 400
 
 const difficultyNames = Object.freeze([
     'Easy',
+    'Easy',
     'Basic',
     'Basic',
     'Medium',
