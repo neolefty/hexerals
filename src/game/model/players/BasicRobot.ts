@@ -165,6 +165,8 @@ export class BasicRobot implements Robot {
             }
         }
 
+        // TODO stop going back into the same city over and over (pattern is queue a move out of a city, it only makes it one hex away and is stopped by something, and then goes back, to reinforce the city
+
         // cancel moves?
         if (!respondingToThreat && this.isWatchingNextMove && curMoves && curMoves.size > 0) {
             const nextMove = curMoves.get(0) as PlayerMove
