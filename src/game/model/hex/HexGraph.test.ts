@@ -8,7 +8,8 @@ const randomWalk = (n: number, start: Hex): Set<Hex> => {
     while (result.size < n) {
         result = result.add(here)
         here = here.neighbors.get(
-            Math.floor(Math.random() * here.neighbors.size)
+            Math.floor(Math.random() * here.neighbors.size),
+            Hex.NONE,
         )
     }
     return result
@@ -20,7 +21,7 @@ it ('floods', () => {
     const far = Hex.getCart(n * 4, 0)
     const byO = randomWalk(n, o)
     const byFar = randomWalk(n, far)
-    const both = byO.union(byFar)
+    const both = byO.union<Hex>(byFar)
 
     expect(byO.size).toEqual(n)
     expect(byO.equals(flood(o, byO).flooded)).toBeTruthy()
@@ -40,8 +41,8 @@ it ('finds disconnected sets', () => {
     const byO = randomWalk(n, o)
     const byFar = randomWalk(n, far)
     const byBeyond = randomWalk(n, beyond)
-    const oAndFar = byO.union(byFar)
-    const all = oAndFar.union(byBeyond)
+    const oAndFar = byO.union<Hex>(byFar)
+    const all = oAndFar.union<Hex>(byBeyond)
 
     expect(oAndFar.size).toEqual(n * 2)
     expect(all.size).toEqual(n * 3)

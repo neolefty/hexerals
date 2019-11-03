@@ -32,21 +32,25 @@ it ('regular js objects not good cache keys', () => {
     // console.log('---- regular js types ----')
     const x = { a: 1, b: 2 }
     const y = { a: 1, b: 2 }
+    const nan = [ { a: NaN, b: NaN }, NaN ]
+    // noinspection DuplicatedCode
     const m = Map<{}, number>([[x, 0]])
     expect(m.has(x)).toBeTruthy()
     expect(m.has(y)).toBeFalsy()
     expect(m.size).toBe(1)
-    expect(m.entrySeq().first()[0]).toBe(x)
+    expect(m.entrySeq().first(nan)[0]).toBe(x)
 })
 
 it ('neither are frozen js objects', () => {
     const x = Object.freeze({ a: 1, b: 2 })
     const y = Object.freeze({ a: 1, b: 2 })
+    const nan = [ Object.freeze({ a: 1, b: 2 }), NaN ]
+    // noinspection DuplicatedCode
     const m = Map<{}, number>([[x, 0]])
     expect(m.has(x)).toBeTruthy()
     expect(m.has(y)).toBeFalsy()
     expect(m.size).toBe(1)
-    expect(m.entrySeq().first()[0]).toBe(x)
+    expect(m.entrySeq().first(nan)[0]).toBe(x)
 })
 
 it ('but immutable.js Records are', () => {
@@ -55,11 +59,12 @@ it ('but immutable.js Records are', () => {
     const x = ABRecord()
     const y = ABRecord()
     const z = ABRecord({ b: 3 })
+    const nan = [ ABRecord({ a: NaN, b: NaN }), NaN ]
     const m = Map<Record<AB>, number>([[x, 0]])
     expect(m.has(x)).toBeTruthy()
     expect(m.has(y)).toBeTruthy()
     expect(m.has(z)).toBeFalsy()
     expect(m.size).toBe(1)
-    expect(m.entrySeq().first()[0]).toBe(x)
-    expect(m.entrySeq().first()[0]).toEqual(y)
+    expect(m.entrySeq().first(nan)[0]).toBe(x)
+    expect(m.entrySeq().first(nan)[0]).toEqual(y)
 })
