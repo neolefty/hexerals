@@ -1,36 +1,38 @@
 {
-  "name": "hexpansion",
+  "name": "@neolefty/hexerals",
   "version": "0.1.0",
+  "author": "Bill Baker <neolefty@gmail.com> (http://github.com/neolefty)",
   "private": true,
   "homepage": "https://hexpansion.io/",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.15.1",
     "hsluv": "^0.0.3",
     "immutable": "^4.0.0-rc.12",
-    "react": "^16.10.2",
+    "react": "^16.12.0",
     "react-device-detect": "^1.9.10",
-    "react-dom": "^16.10.2",
+    "react-dom": "^16.12.0",
     "react-dropdown": "^1.6.4",
     "react-input-range": "^1.3.0",
-    "react-redux": "^7.1.1",
+    "react-redux": "^7.1.3",
     "react-tabs": "^3.0.0",
-    "react-test-renderer": "^16.10.2",
+    "react-test-renderer": "^16.12.0",
     "redux": "^4.0.4"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
     "@types/enzyme-adapter-react-16": "^1.0.5",
-    "@types/jest": "^24.0.19",
-    "@types/node": "^12.11.1",
-    "@types/react": "^16.9.9",
-    "@types/react-dom": "^16.9.2",
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.14",
+    "@types/react": "^16.9.13",
+    "@types/react-dom": "^16.9.4",
     "@types/react-redux": "^7.1.5",
     "@types/react-tabs": "^2.3.1",
     "@types/react-test-renderer": "^16.9.1",
-    "node-sass-chokidar": "^1.3.5",
+    "node-sass-chokidar": "^1.4.0",
     "react-scripts": "3.2.0",
-    "typescript": "^3.6.4",
+    "typescript": "^3.7.2",
     "yarn-run-all": "^3.1.1"
   },
   "scripts": {
@@ -43,7 +45,9 @@
     "build-css": "node-sass-chokidar src/ -o src/",
     "serve": "ln -fs . build/hexerals && serve -s build -o",
     "build-serve": "npm-run-all build serve",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "compile": "tsc --noEmit false --outDir pack --declaration --isolatedModules false",
+    "verbose": "tsc --noEmit false --outDir pack --declaration --isolatedModules false --extendedDiagnostics"
   },
   "eslintConfig": {
     "extends": "react-app"
