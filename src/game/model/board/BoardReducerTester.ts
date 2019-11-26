@@ -81,15 +81,15 @@ export class BoardReducerTester {
             this.queueMove(this.state.curPlayer, Hex.UP, alsoCursor)
     }
 
-    setCursor = (coord: Hex) => this.store.dispatch(placeCursorAction(coord))
-    doMoves = () => this.store.dispatch(doMovesAction())
+    setCursor = (coord: Hex) => { this.store.dispatch(placeCursorAction(coord)) }
+    doMoves = () => { this.store.dispatch(doMovesAction()) }
     doAllMoves = () => {
         while (this.moves.size > 0)
             this.doMoves()
     }
-    gameTick = () => this.store.dispatch(gameTickAction())
-    queueRobots = () => this.store.dispatch(robotsDecideAction())
-    setCurPlayer = (player: Player) => this.store.dispatch(setCurPlayerAction(player))
+    gameTick = () => { this.store.dispatch(gameTickAction()) }
+    queueRobots = () => { this.store.dispatch(robotsDecideAction()) }
+    setCurPlayer = (player: Player) => { this.store.dispatch(setCurPlayerAction(player)) }
 
     cancelMoves = (
         player: Player | undefined = undefined,
@@ -105,8 +105,9 @@ export class BoardReducerTester {
             throw Error('current player is undefined')
     }
 
-    setRobot = (player: Player, robot: Robot) =>
+    setRobot = (player: Player, robot: Robot) => {
         this.store.dispatch(setRobotAction(player, robot))
+    }
 
     popTotal = (player: Player) => {
         let result = 0

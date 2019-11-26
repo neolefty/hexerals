@@ -67,14 +67,17 @@ export class CycleReducerTester {
         )
     }
 
-    changeLocalOption = (name: keyof LocalGameOptions, n: number) =>
+    changeLocalOption = (name: keyof LocalGameOptions, n: number) => {
         this.store.dispatch(changeLocalOptionAction(name, n))
+    }
 
     // true by default
-    useSpreadArranger = (spread: boolean = true) =>
+    useSpreadArranger = (spread: boolean = true) => {
         this.changeLocalOption('randomStart', spread ? 1 : 0)
-    useCornersArranger = (corners: boolean = true) =>
+    }
+    useCornersArranger = (corners: boolean = true) => {
         this.useSpreadArranger(!corners)
+    }
 
     openLocalGame = (
         width = BoardReducerTester.INITIAL_WIDTH,
