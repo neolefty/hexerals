@@ -46,8 +46,8 @@
     "serve": "ln -fs . build/hexerals && serve -s build -o",
     "build-serve": "npm-run-all build serve",
     "eject": "react-scripts eject",
-    "compile": "tsc --noEmit false --outDir pack --declaration --isolatedModules false",
-    "verbose": "tsc --noEmit false --outDir pack --declaration --isolatedModules false --extendedDiagnostics"
+    "compile": "tsc -p package-tsconfig.json",
+    "compile-verbose": "tsc -p package-tsconfig.json --extendedDiagnostics"
   },
   "eslintConfig": {
     "extends": "react-app"
