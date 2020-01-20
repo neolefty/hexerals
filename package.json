@@ -1,10 +1,15 @@
 {
   "name": "@neolefty/hexerals",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Bill Baker <neolefty@gmail.com> (http://github.com/neolefty)",
-  "private": true,
+  "private": false,
   "homepage": "https://hexpansion.io/",
+  "repository": {
+    "type": "npm/npm",
+    "url": "https://npmjs.com/@neolefty/hexerals"
+  },
   "license": "GPL-3.0-or-later",
+  "files": [ "/lib" ],
   "dependencies": {
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
@@ -46,8 +51,10 @@
     "serve": "ln -fs . build/hexerals && serve -s build -o",
     "build-serve": "npm-run-all build serve",
     "eject": "react-scripts eject",
-    "compile": "tsc -p package-tsconfig.json",
-    "compile-verbose": "tsc -p package-tsconfig.json --extendedDiagnostics"
+    "compile": "tsc -p tsconfig-publish.json",
+    "compile-verbose": "tsc -p package-tsconfig.json --extendedDiagnostics",
+    "clean": "rm -rf lib",
+    "prepare": "yarn clean && yarn compile"
   },
   "eslintConfig": {
     "extends": "react-app"

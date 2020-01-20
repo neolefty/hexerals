@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -11,15 +11,17 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "isolatedModules": false,
     "declaration": true,
-    "outDir": "pack",
     "noEmit": false,
-    "jsx": "preserve"
+    "outDir": "lib",
+    "jsx": "react",
+    "sourceMap": true
   },
   "include": [
     "src"
