@@ -43,4 +43,4 @@ it('renders without crashing', () => {
         div)
 })
 
-// TODO test whole redux integration with connect (see App.tsx) & GUI events (see HexBoardView.test.tsx)
+// TODO test whole redux integration with connect (see Main.tsx) & GUI events (see HexBoardView.test.tsx)

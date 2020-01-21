@@ -22,7 +22,7 @@ import {Player, PLAYERS} from '../../model/players/Players'
 import {PlayerMove} from '../../model/move/Move'
 import {LocalGameState} from '../../model/cycle/CycleState'
 import {closeLocalGameAction, openLocalGameAction} from '../../model/cycle/CycleReducer'
-import {AppState} from '../app/App'
+import {AppState} from "../app/App"
 import {LocalGameView} from './LocalGameView'
 import {GenericAction} from '../../../common/GenericAction'
 

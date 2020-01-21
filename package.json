@@ -1,19 +1,21 @@
 {
   "name": "@neolefty/hexerals",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "author": "Bill Baker <neolefty@gmail.com> (http://github.com/neolefty)",
   "private": false,
   "homepage": "https://hexpansion.io/",
   "repository": {
-    "type": "npm/npm",
-    "url": "https://npmjs.com/@neolefty/hexerals"
+    "type": "git",
+    "url": "https://github.com/neolefty/hexerals.git"
   },
   "license": "GPL-3.0-or-later",
-  "files": [ "/lib" ],
+  "files": [
+    "/lib"
+  ],
   "dependencies": {
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "hsluv": "^0.0.3",
+    "hsluv": "^0.1.0",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.12.0",
     "react-device-detect": "^1.11.14",
@@ -28,16 +30,17 @@
   "devDependencies": {
     "@types/enzyme": "^3.10.4",
     "@types/enzyme-adapter-react-16": "^1.0.5",
-    "@types/jest": "^24.0.25",
-    "@types/node": "^13.1.4",
+    "@types/jest": "^24.9.0",
+    "@types/node": "^13.1.8",
     "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.4",
-    "@types/react-redux": "^7.1.5",
+    "@types/react-dom": "^16.9.5",
+    "@types/react-redux": "^7.1.6",
     "@types/react-tabs": "^2.3.1",
     "@types/react-test-renderer": "^16.9.1",
+    "copyfiles": "^2.2.0",
     "node-sass-chokidar": "^1.4.0",
     "react-scripts": "3.3.0",
-    "typescript": "^3.7.4",
+    "typescript": "^3.7.5",
     "yarn-run-all": "^3.1.1"
   },
   "scripts": {
@@ -54,7 +57,8 @@
     "compile": "tsc -p tsconfig-publish.json",
     "compile-verbose": "tsc -p package-tsconfig.json --extendedDiagnostics",
     "clean": "rm -rf lib",
-    "prepare": "yarn clean && yarn compile"
+    "copy-css": "npm run build-css && copyup \"src/**/*.css\" lib",
+    "prepare": "yarn clean && yarn copy-css && yarn compile"
   },
   "eslintConfig": {
     "extends": "react-app"

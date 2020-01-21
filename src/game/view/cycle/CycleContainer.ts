@@ -6,7 +6,7 @@ import {
 } from '../../model/cycle/CycleReducer'
 import {CartPair} from '../../../common/CartPair'
 import {CycleState} from "../../model/cycle/CycleState"
-import {AppState} from '../app/App'
+import {AppState} from "../app/App"
 import {CycleView, CycleViewActions} from './CycleView'
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 
