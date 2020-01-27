@@ -108,6 +108,7 @@ export class Help extends React.PureComponent<HelpOptions> {
                             generals.io
                         </a>
                     </p>
+                    <p><a href="https://forms.gle/Dpnqm4J5XLWH6fp79">Contact Us</a></p>
                 </div>
                 <div className="Column">
                     <svg
