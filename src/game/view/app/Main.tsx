@@ -26,7 +26,7 @@ export const Main = () => {
                     <Help displaySize={viewSize}/>
                 </TabPanel>
                 <TabPanel>
-                    <ColorsContainer displaySize={viewSize}/>
+                    <ColorsContainer/>
                 </TabPanel>
                 { inDev() &&
                     <TabPanel>

@@ -1,5 +1,5 @@
-import {Reducer} from 'redux'
 import {Set, List} from 'immutable'
+import {Reducer} from "react"
 
 import {StatusMessage} from '../../../common/StatusMessage'
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
@@ -50,7 +50,7 @@ export const INITIAL_BOARD_STATE: BoardState = {
     players: PlayerManager.construct(INITIAL_PLAYERS),
 }
 
-export const BoardReducer: Reducer<BoardState, GameAction> = (
+export const BoardReducer: Reducer<BoardState, GenericAction> = (
     state: BoardState = INITIAL_BOARD_STATE, action: GenericAction,
 ): BoardState => {
     if (isGameAction(action)) {

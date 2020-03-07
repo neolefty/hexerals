@@ -60,7 +60,7 @@ it('queues multiple moves at once', () => {
     ])
     // console.log('Moves:')
     // moves.forEach((move, idx) => console.log(`${idx}: ${move.toString()}`))
-    brt.store.dispatch(queueMovesAction(moves))
+    brt.dispatch(queueMovesAction(moves))
     // console.log('Messages:')
     // st.messages.forEach((msg, idx) => console.log(`${idx}: ${msg.toString()}`))
     expect(brt.moves.size).toBe(4)

@@ -1,10 +1,9 @@
-import { List } from 'immutable'
-import * as React from 'react'
-import {connect} from 'react-redux'
-import {Dispatch} from 'redux'
+import {List} from 'immutable'
+import * as React from "react"
+import {Dispatch, useReducer} from "react"
 
 import {GenericAction} from '../../../common/GenericAction'
-import { RectangularConstraints } from '../../model/board/Constraints'
+import {RectangularConstraints} from '../../model/board/Constraints'
 import {DEFAULT_LOCAL_GAME_OPTIONS} from '../../model/board/LocalGameOptions'
 
 export interface PerfState {
@@ -13,7 +12,7 @@ export interface PerfState {
 }
 
 export function PerfReducer(
-    state: PerfState = INITIAL_PERF_STATE, action: PerfAction
+    state: PerfState, action: PerfAction
 ): PerfState {
     // if (isQueuePerfTest(action)) {
     //     console.log(`Queue perf test ${action.xy}`)
@@ -84,11 +83,15 @@ const PerfTest = (props: PerfProps) => (
     </div>
 )
 
-export const PerfContainer = connect(
-    mapStateToPerfProps, mapDispatchToPerfProps
-)(
-    PerfTest
-)
+export const PerfContainer = () => {
+    const [ state, dispatch ] = useReducer(PerfReducer, INITIAL_PERF_STATE)
+    return (
+        <PerfTest
+            {...mapStateToPerfProps(state)}
+            {...mapDispatchToPerfProps(dispatch)}
+        />
+    )
+}
 
 const WhInput = (props: WhInputProps) => (
     <div>

@@ -31,9 +31,13 @@ export const INITIAL_CYCLE_STATE: CycleState = {
     localGame: undefined,
 }
 
+export type CycleDispatch = (action: CycleAction) => void
+
 export type CycleAction = GameAction
     | OpenLocalGame | CloseLocalGame
     | ChangeLocalOption
+
+export const initialCycleState = (): CycleState => restoreState()
 
 const restoreState = (): CycleState => {
     return {
@@ -46,9 +50,8 @@ const restoreState = (): CycleState => {
 }
 
 export const CycleReducer = (
-    maybeState: CycleState | undefined, action: GenericAction,
+    state: CycleState, action: GenericAction,
 ): CycleState => {
-    const state = maybeState || restoreState()
     if (!isCycleAction(action))
         return state
     else {

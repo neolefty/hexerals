@@ -1,46 +1,29 @@
-import * as React from 'react'
-import * as ReactDOM from 'react-dom'
-import {Provider} from 'react-redux'
-import {combineReducers, createStore} from 'redux'
-import {ColorsReducer} from "../../../color/ColorsReducer"
-
-import {CartPair} from "../../../common/CartPair"
-import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
-import {changeLocalOptionAction, CycleReducer, openLocalGameAction,} from '../../model/cycle/CycleReducer'
-import {CycleContainer} from '../cycle/CycleContainer'
+import * as React from "react"
+import TestRenderer from 'react-test-renderer'
+import {Mini} from "./Mini"
 
 it('renders without crashing', () => {
-    const store = createStore(
-        combineReducers({
-            colors: ColorsReducer,
-            cycle: CycleReducer,
-        }),
-        // {
-        //     cycle: INITIAL_CYCLE_STATE,
-        // },
+    const blank = TestRenderer.create(
+        <Mini/>
     )
-    const div = document.createElement('div')
-    const size = {size: new CartPair(1200, 700) }
+    console.log(blank.toJSON())
 
-    // render it without a game
-    ReactDOM.render(
-        <Provider store={store}>
-            <DisplaySizeProvider {...size}>
-                <CycleContainer/>
-            </DisplaySizeProvider>
-        </Provider>,
-        div)
-
-    // render it with a game
-    store.dispatch(changeLocalOptionAction('mountainPercent', 0))
-    store.dispatch(openLocalGameAction())
-    ReactDOM.render(
-        <Provider store={store}>
-            <DisplaySizeProvider {...size}>
-                <CycleContainer/>
-            </DisplaySizeProvider>
-        </Provider>,
-        div)
+    // const div = document.createElement('div')
+    //
+    // const render = (init?: Init) =>
+    //     ReactDOM.render(Mini({init}), div)
+    //
+    // // render it without a game
+    // render()
+    //
+    // // render it with a game
+    // render(state => {
+    //     let result = state
+    //     result = MainReducer(result, changeLocalOptionAction('mountainPercent', 0))
+    //     result = MainReducer(result, openLocalGameAction())
+    //     return result
+    // })
+    // // expect(hoistedState?.cycle.localGame?.boardState.board.capitals.size).toBe(2)
 })
 
 // TODO test whole redux integration with connect (see Main.tsx) & GUI events (see HexBoardView.test.tsx)

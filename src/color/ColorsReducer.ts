@@ -6,6 +6,9 @@ const DRIFT = 5
 
 const INITIAL_COLOR_PODGE = ColorPodge.construct(6, true)
 
+export const initialColorState = (): ColorsState =>
+    ({colors: INITIAL_COLOR_PODGE})
+
 export interface ColorsState {
     colors: ColorPodge
 }
@@ -20,6 +23,8 @@ export interface ColorsProps {
     displaySize: CartPair
     tick: number
 }
+
+export type ColorsDispatch = (action: ColorsAction) => void
 
 export type ColorsAction = AddColor | RemoveColor | Diverge | SetColors
 
@@ -64,9 +69,7 @@ export const setColorsAction = (colors: ColorPodge): SetColors => ({
 })
 
 export function ColorsReducer(
-    state: ColorsState = {
-        colors: INITIAL_COLOR_PODGE,
-    },
+    state: ColorsState,
     action: GenericAction,
 ): ColorsState {
     if (isAddColor(action)) state = {

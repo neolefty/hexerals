@@ -1,34 +1,28 @@
 import {List, Map} from 'immutable'
-import {connect} from 'react-redux'
-import {Dispatch} from 'redux'
-
-import {CartPair} from '../../../common/CartPair'
-import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
-import {CacheMap} from '../../../common/CacheMap'
-import {DriftColor} from '../../../color/DriftColor'
+import React from "react"
 import {ColorPodge} from '../../../color/ColorPodge'
 import {setColorsAction} from '../../../color/ColorsReducer'
-import {Hex} from '../../model/hex/Hex'
+import {DriftColor} from '../../../color/DriftColor'
+import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
+import {CacheMap} from '../../../common/CacheMap'
+import {MainDispatch} from "../../../main/MainReducer"
+import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
 import {
-    queueMovesAction,
-    placeCursorAction,
-    doMovesAction,
     cancelMovesAction,
-    gameTickAction,
-    robotsDecideAction,
+    doMovesAction,
     dragAction,
+    gameTickAction,
+    placeCursorAction,
+    queueMovesAction,
+    robotsDecideAction,
 } from '../../model/board/BoardReducer'
-import {Player, PLAYERS} from '../../model/players/Players'
-import {PlayerMove} from '../../model/move/Move'
-import {LocalGameState} from '../../model/cycle/CycleState'
 import {closeLocalGameAction, openLocalGameAction} from '../../model/cycle/CycleReducer'
+import {LocalGameState} from '../../model/cycle/CycleState'
+import {Hex} from '../../model/hex/Hex'
+import {PlayerMove} from '../../model/move/Move'
+import {Player, PLAYERS} from '../../model/players/Players'
 import {AppState} from "../app/App"
 import {LocalGameView} from './LocalGameView'
-import {GenericAction} from '../../../common/GenericAction'
-
-export interface LocalBoardProps {
-    displaySize: CartPair
-}
 
 export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
     Map<Player, DriftColor>().withMutations(result =>
@@ -65,7 +59,7 @@ const mapStateToTickerBoardViewProps = (state: AppState) => {
 }
 
 const mapDispatchToBoardViewProps = (
-    dispatch: Dispatch<GenericAction>
+    dispatch: MainDispatch
 ) => ({
     onQueueMoves: (moves: List<PlayerMove>) => dispatch(
         queueMovesAction(moves)
@@ -109,8 +103,13 @@ const mapDispatchToBoardViewProps = (
     },
 })
 
-export const LocalGameContainer = connect(
-    mapStateToTickerBoardViewProps, mapDispatchToBoardViewProps
-)(
-    LocalGameView
-)
+export const LocalGameContainer = () => {
+    const dispatch = useMainDispatch()
+    const state = useMainState()
+    return (
+        <LocalGameView
+            {...mapStateToTickerBoardViewProps(state)}
+            {...mapDispatchToBoardViewProps(dispatch)}
+        />
+    )
+}

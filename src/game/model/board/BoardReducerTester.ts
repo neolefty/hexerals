@@ -1,12 +1,12 @@
 import {List, Map} from 'immutable'
-import {createStore, Store} from 'redux'
+import {GenericAction} from "../../../common/GenericAction"
 
 import {BoardState, boardStateToString} from './BoardState'
 import {
     BoardReducer,
     cancelMovesAction, doMovesAction, newGameAction, placeCursorAction,
     queueMovesAction, robotsDecideAction, setCurPlayerAction,
-    setRobotAction, gameTickAction,
+    setRobotAction, gameTickAction, INITIAL_BOARD_STATE,
 } from './BoardReducer'
 import {Board} from './Board'
 import {pickNPlayers, Player} from '../players/Players'
@@ -24,7 +24,7 @@ export class BoardReducerTester {
     static readonly INITIAL_POP = 50
     static readonly INITIAL_WIDTH = 11
     static readonly INITIAL_HEIGHT = 13
-    readonly store: Store<BoardState>
+    state: BoardState
 
     constructor(
         width = BoardReducerTester.INITIAL_WIDTH,
@@ -34,10 +34,14 @@ export class BoardReducerTester {
         ],
         players: List<Player> = pickNPlayers(2),
     ) {
-        this.store = createStore(BoardReducer)
-        this.store.dispatch(newGameAction(Board.constructDefaultRectangular(
+        this.state = INITIAL_BOARD_STATE
+        this.dispatch(newGameAction(Board.constructDefaultRectangular(
             width, height, players, arrangers,
         )))
+    }
+
+    dispatch(action: GenericAction) {
+        this.state = BoardReducer(this.state, action)
     }
 
     getRawTile = (coord: Hex | undefined): Tile | undefined => coord && this.explicitTiles.get(coord)
@@ -45,7 +49,6 @@ export class BoardReducerTester {
     setTile = (hex: Hex, tile: Tile) =>
         this.state.board = this.board.setTiles(this.explicitTiles.set(hex, tile))
 
-    get state(): BoardState { return this.store.getState() }
     get board(): Board { return this.state.board }
     get phase(): GamePhase { return this.state.phase }
     get explicitTiles(): Map<Hex, Tile> { return this.board.explicitTiles }
@@ -62,7 +65,7 @@ export class BoardReducerTester {
     get lr() { return this.state.board.edges.lowerRight }
 
     queueMove = (player: Player, delta: Hex, alsoCursor = true) => {
-        this.store.dispatch(
+        this.dispatch(
             queueMovesAction(
                 List([PlayerMove.constructDelta(player, this.firstCursor, delta)])
             )
@@ -81,15 +84,15 @@ export class BoardReducerTester {
             this.queueMove(this.state.curPlayer, Hex.UP, alsoCursor)
     }
 
-    setCursor = (coord: Hex) => { this.store.dispatch(placeCursorAction(coord)) }
-    doMoves = () => { this.store.dispatch(doMovesAction()) }
+    setCursor = (coord: Hex) => { this.dispatch(placeCursorAction(coord)) }
+    doMoves = () => { this.dispatch(doMovesAction()) }
     doAllMoves = () => {
         while (this.moves.size > 0)
             this.doMoves()
     }
-    gameTick = () => { this.store.dispatch(gameTickAction()) }
-    queueRobots = () => { this.store.dispatch(robotsDecideAction()) }
-    setCurPlayer = (player: Player) => { this.store.dispatch(setCurPlayerAction(player)) }
+    gameTick = () => { this.dispatch(gameTickAction()) }
+    queueRobots = () => { this.dispatch(robotsDecideAction()) }
+    setCurPlayer = (player: Player) => { this.dispatch(setCurPlayerAction(player)) }
 
     cancelMoves = (
         player: Player | undefined = undefined,
@@ -98,7 +101,7 @@ export class BoardReducerTester {
     ) => {
         const actualPlayer = player || this.state.curPlayer
         if (actualPlayer)
-            this.store.dispatch(
+            this.dispatch(
                 cancelMovesAction(
                     actualPlayer, cursorIndex, count))
         else
@@ -106,7 +109,7 @@ export class BoardReducerTester {
     }
 
     setRobot = (player: Player, robot: Robot) => {
-        this.store.dispatch(setRobotAction(player, robot))
+        this.dispatch(setRobotAction(player, robot))
     }
 
     popTotal = (player: Player) => {
