@@ -26,14 +26,14 @@ export type ColorsAction = AddColor | RemoveColor | Diverge | SetColors
 const DIVERGE = 'DIVERGE'
 type DIVERGE = typeof DIVERGE
 interface Diverge extends GenericAction { type: DIVERGE }
-const isDiverge = (action: ColorsAction): action is Diverge =>
+const isDiverge = (action: GenericAction): action is Diverge =>
     action.type === DIVERGE
 export const divergeAction = (): Diverge  => ({ type: DIVERGE })
 
 const ADD_COLOR = 'ADD_COLOR'
 type ADD_COLOR = typeof ADD_COLOR
 interface AddColor extends GenericAction { type: ADD_COLOR }
-const isAddColor = (action: ColorsAction): action is AddColor =>
+const isAddColor = (action: GenericAction): action is AddColor =>
     action.type === ADD_COLOR
 export const addColorAction = (): AddColor => ({ type: ADD_COLOR })
 
@@ -43,7 +43,7 @@ interface RemoveColor extends GenericAction {
     type: REMOVE_COLOR
     x: number
 }
-const isRemoveColor = (action: ColorsAction): action is RemoveColor =>
+const isRemoveColor = (action: GenericAction): action is RemoveColor =>
     action.type === REMOVE_COLOR
 export const removeColorAction = (x: number): RemoveColor => ({
     type: REMOVE_COLOR,
@@ -56,7 +56,7 @@ interface SetColors extends GenericAction {
     type: SET_COLORS
     colors: ColorPodge
 }
-const isSetColors = (action: ColorsAction): action is SetColors =>
+const isSetColors = (action: GenericAction): action is SetColors =>
     action.type === SET_COLORS
 export const setColorsAction = (colors: ColorPodge): SetColors => ({
     type: SET_COLORS,
@@ -67,7 +67,7 @@ export function ColorsReducer(
     state: ColorsState = {
         colors: INITIAL_COLOR_PODGE,
     },
-    action: ColorsAction,
+    action: GenericAction,
 ): ColorsState {
     if (isAddColor(action)) state = {
         ...state,
