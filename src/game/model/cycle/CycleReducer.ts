@@ -10,6 +10,7 @@ import {Board} from '../board/Board'
 import {GameAction, BoardReducer, isGameAction} from '../board/BoardReducer'
 import {BOARD_STATE_STARTER, BoardState} from '../board/BoardState'
 import {PlayerFogs} from '../board/Fog'
+import {restoreLocalGameOptions, saveLocalGameOptions} from "../board/peristLocalGameOptions"
 import {Terrain} from '../hex/Terrain'
 import {pickNPlayers, Player, PlayerManager} from '../players/Players'
 import {BasicRobot} from '../players/BasicRobot'
@@ -18,9 +19,7 @@ import {RandomTerrainArranger} from '../setup/RandomTerrainArranger'
 import {CornersPlayerArranger} from '../setup/PlayerArranger'
 import {
     DEFAULT_LOCAL_GAME_OPTIONS,
-    LocalGameOptions,
-    restoreLocalGameOptions,
-    saveLocalGameOptions
+    LocalGameOptions
 } from '../board/LocalGameOptions'
 import {CycleState, CycleMode} from './CycleState'
 

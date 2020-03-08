@@ -1,3 +1,7 @@
+import {Map} from "immutable"
+import {isPhone} from "../../../common/BrowserUtil"
+import {BasicRobot} from "../players/BasicRobot"
+
 export interface LocalGameOptions {
     // All numbers because our reducer assumes it.
     // If we need a non-number, the reducer should be easy to modify.
@@ -45,23 +49,52 @@ export const DEFAULT_LOCAL_GAME_OPTIONS: LocalGameOptions = Object.freeze({
     randomStart: 1,  // used in testing
 })
 
-const STORE_KEY = "localGameOptions"
+export const MIN_MAP_SIZE = 50
+// const DEFAULT_HEXES_PER_PLAYER = 'A few'
 
-export const restoreLocalGameOptions = (): Partial<LocalGameOptions> => {
-    const saved = localStorage.getItem(STORE_KEY)
-    if (saved) {
-        try {
-            // console.log(JSON.parse(saved))
-            return JSON.parse(saved)
-        } catch(e) {
-            console.error(e)
-            console.log('clearing local game option storage due to parse error')
-            localStorage.removeItem(STORE_KEY)
-        }
-    }
-    return {}
-}
+// hexes can get too small, especially for touch
+// but this doesn't work very well because browsers report such a wide variety of resolutions
+export const MIN_PIXELS_PER_HEX = 800
 
-export const saveLocalGameOptions = (opts: Partial<LocalGameOptions>) => {
-    localStorage.setItem(STORE_KEY, JSON.stringify(opts))
-}
+// this seems like an over simplification, but I haven't found anything better.
+// note that tablets get the higher number
+export const maxMapSize = (): number => isPhone() ? 250 : 400
+
+// const DEFAULT_DIFFICULTY = '2'
+
+// number of hexes per player
+// const playerDensities = Map<string, number>([
+//     ['Tons', 6],
+//     ['Lots', 12],
+//     ['Many', 24],
+//     [DEFAULT_HEXES_PER_PLAYER, 48],
+//     ['Not many', 96],
+//     ['Very few', 192],
+//     ['None', Infinity],
+// ])
+
+export const LGO_DIFFICULTY_NAMES = Object.freeze([
+    'Easy',
+    'Easy',
+    'Basic',
+    'Basic',
+    'Medium',
+    'Medium',
+    'Tough',
+    'Hard',
+])
+
+// "Index types" — typescriptlang.org/docs/handbook/advanced-types.html
+export type LGOKey = keyof LocalGameOptions
+
+export const LGO_LIMITS =
+    Map<LGOKey, [number, number]>([
+        ['numRobots', [ 0, 15 ]],
+        ['difficulty', [ 0, BasicRobot.MAX_IQ ]],
+        ['boardWidth', [ 1, 45 ]],
+        ['boardHeight', [ 2, 21 ]],
+        ['mountainPercent', [ 0, 50 ]],
+        ['tickMillis', [ 1, 9999 ]],
+        ['startingPop', [ 0, 999 ]],
+        ['roundTicks', [ 1, 9999 ]],
+    ])
