@@ -32,15 +32,15 @@ export const isColorsAction = (action: GenericAction): action is ColorsAction =>
     action.type.startsWith('colors ')
 
 const DIVERGE = 'colors diverge'
-interface Diverge extends GenericAction { type: typeof DIVERGE }
+interface Diverge { type: typeof DIVERGE }
 export const divergeAction = (): Diverge  => ({ type: DIVERGE })
 
 const ADD_COLOR = 'colors add color'
-interface AddColor extends GenericAction { type: typeof ADD_COLOR }
+interface AddColor { type: typeof ADD_COLOR }
 export const addColorAction = (): AddColor => ({ type: ADD_COLOR })
 
 const REMOVE_COLOR = 'colors remove color'
-interface RemoveColor extends GenericAction {
+interface RemoveColor {
     type: typeof REMOVE_COLOR
     x: number
 }
@@ -50,7 +50,7 @@ export const removeColorAction = (x: number): RemoveColor => ({
 })
 
 const SET_COLORS = 'colors set'
-interface SetColors extends GenericAction {
+interface SetColors {
     type: typeof SET_COLORS
     colors: ColorPodge
 }

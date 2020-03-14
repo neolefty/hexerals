@@ -19,13 +19,13 @@ import {Board} from './Board'
 
 export type GameAction
     = NewGame | QueueMoves | PlaceCursor | SetCurPlayer
-        | DoMoves | CancelMoves | Drag | GameTick
+        | ApplyMoves | CancelMoves | Drag | GameTick
         | RobotsDecide | SetRobot
 
 const NEW_GAME = 'NEW_GAME'
 const GAME_TICK = 'GAME_TICK'
 const QUEUE_MOVES = 'QUEUE_MOVES'
-const DO_MOVES = 'DO_MOVES'
+const APPLY_MOVES = 'DO_MOVES'
 const CANCEL_MOVES = 'CANCEL_MOVES'
 const PLACE_CURSOR = 'PLACE_CURSOR'
 const DRAG = 'DRAG'
@@ -35,7 +35,7 @@ const ROBOTS_DECIDE = 'ROBOTS_DECIDE'
 
 const ACTION_TYPES = Set<string>([
     NEW_GAME, GAME_TICK,
-    QUEUE_MOVES, DO_MOVES, CANCEL_MOVES, PLACE_CURSOR, DRAG,
+    QUEUE_MOVES, APPLY_MOVES, CANCEL_MOVES, PLACE_CURSOR, DRAG,
     SET_CUR_PLAYER, SET_ROBOT, ROBOTS_DECIDE,
 ])
 
@@ -50,41 +50,37 @@ export const INITIAL_BOARD_STATE: BoardState = {
     players: PlayerManager.construct(INITIAL_PLAYERS),
 }
 
-export const BoardReducer: Reducer<BoardState, GenericAction> = (
-    state: BoardState = INITIAL_BOARD_STATE, action: GenericAction,
+export const BoardReducer: Reducer<BoardState, GameAction> = (
+    state: BoardState = INITIAL_BOARD_STATE, action: GameAction,
 ): BoardState => {
-    if (isGameAction(action)) {
-        if (isQueueMove(action))  // most common first
-            state = queueMovesReducer(state, action)
-        else if (isPlaceCursor(action))
-            state = placeCursorReducer(state, action)
-        else if (isDoMoves(action))
-            state = doMovesReducer(state)
-        else if (isDrag(action))
-            state = dragReducer(state, action)
-        else if (isGameTick(action))
-            state = gameTickReducer(state)
-        else if (isCancelMoves(action))
-            state = cancelMoveReducer(state, action)
-        else if (isNewGame(action))
-            state = newGameReducer(state, action)
-        else if (isSetCurPlayer(action))
-            state = setCurPlayerReducer(state, action)
-        else if (isSetRobot(action))
-            state = setRobotReducer(state, action)
-        else if (isRobotsDecide(action))
-            state = robotsDecideReducer(state)
+    switch(action.type) {
+        case QUEUE_MOVES:  // most common first
+            return queueMovesReducer(state, action)
+        case PLACE_CURSOR:
+            return placeCursorReducer(state, action)
+        case APPLY_MOVES:
+            return applyMovesReducer(state)
+        case DRAG:
+            return dragReducer(state, action)
+        case GAME_TICK:
+            return GameTickReducer(state)
+        case CANCEL_MOVES:
+            return cancelMoveReducer(state, action)
+        case NEW_GAME:
+            return newGameReducer(state, action)
+        case SET_CUR_PLAYER:
+            return setCurPlayerReducer(state, action)
+        case SET_ROBOT:
+            return setRobotReducer(state, action)
+        case ROBOTS_DECIDE:
+            return robotsDecideReducer(state)
     }
-    return state
 }
 
-type NEW_GAME = typeof NEW_GAME
-interface NewGame extends GenericAction {
-    type: NEW_GAME
+interface NewGame {
+    type: typeof NEW_GAME
     board: Board
 }
-export const isNewGame = (action: GenericAction): action is NewGame =>
-    action.type === NEW_GAME
 export const newGameAction = (board: Board): NewGame =>
     ({ type: NEW_GAME, board })
 const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
@@ -94,13 +90,10 @@ const newGameReducer = (state: BoardState, action: NewGame): BoardState => ({
 })
 
 // update to the player's movement queue
-type QUEUE_MOVES = typeof QUEUE_MOVES
-interface QueueMoves extends GenericAction {
-    type: QUEUE_MOVES
+interface QueueMoves {
+    type: typeof QUEUE_MOVES
     moves: List<PlayerMove>
 }
-const isQueueMove = (action: GenericAction): action is QueueMoves =>
-    action.type === QUEUE_MOVES
 export const queueMovesAction = (moves: List<PlayerMove>): QueueMoves =>
     ({ type: QUEUE_MOVES, moves: moves })
 const queueMovesReducer = (
@@ -142,12 +135,9 @@ const queueMovesReducer = (
 }
 
 // advance one step in the queue of moves for each player
-type DO_MOVES = typeof DO_MOVES
-interface DoMoves extends GenericAction { type: DO_MOVES }
-const isDoMoves = (action: GenericAction): action is DoMoves =>
-    action.type === DO_MOVES
-export const doMovesAction = (): DoMoves => ({ type: DO_MOVES })
-const doMovesReducer = (state: BoardState): BoardState => {
+interface ApplyMoves { type: typeof APPLY_MOVES }
+export const doApplyMoves = (): ApplyMoves => ({ type: APPLY_MOVES })
+const applyMovesReducer = (state: BoardState): BoardState => {
     // TODO rotate startPlayerIndex
     const movesAndQ = state.moves.popEach(
         (move: PlayerMove) => state.board.validate(move))
@@ -166,11 +156,9 @@ const doMovesReducer = (state: BoardState): BoardState => {
         return state
 }
 
-type GAME_TICK = 'GAME_TICK'
-interface GameTick extends GenericAction {type: GAME_TICK}
-const isGameTick = (action: GenericAction): action is GameTick => action.type === GAME_TICK
-export const gameTickAction = (): GameTick => ({ type: GAME_TICK })
-const gameTickReducer = (state: BoardState): BoardState => {
+interface GameTick {type: typeof GAME_TICK}
+export const doGameTick = (): GameTick => ({ type: GAME_TICK })
+const GameTickReducer = (state: BoardState): BoardState => {
 
     // 1. advance pop
     const result: BoardState = {
@@ -200,16 +188,13 @@ const gameTickReducer = (state: BoardState): BoardState => {
     return Object.freeze(result)
 }
 
-type DRAG = typeof DRAG
-interface Drag extends GenericAction {
-    type: DRAG,
+interface Drag {
+    type: typeof DRAG,
     player: Player,
     cursorIndex: number,
     source: Hex,
     dest: Hex,
 }
-const isDrag = (action: GenericAction): action is Drag =>
-    action.type === DRAG
 export const dragAction = (
     player: Player, cursorIndex: number, source: Hex, dest: Hex
 ): Drag => ({
@@ -281,15 +266,12 @@ const dragReducer = (
 }
 
 // forget the last move in the queue
-type CANCEL_MOVES = typeof CANCEL_MOVES
-interface CancelMoves extends GenericAction {
-    type: CANCEL_MOVES,
+interface CancelMoves {
+    type: typeof CANCEL_MOVES,
     player: Player,
     cursorIndex: number,
     count: number,
 }
-const isCancelMoves = (action: GenericAction): action is CancelMoves =>
-    action.type === CANCEL_MOVES
 export const cancelMovesAction = (
     player: Player, cursorIndex: number, count: number,
 ): CancelMoves => ({
@@ -329,15 +311,12 @@ const cancelMoveReducer = (
         return state
 }
 
-type PLACE_CURSOR = typeof PLACE_CURSOR
-interface PlaceCursor extends GenericAction {
-    type: PLACE_CURSOR
+interface PlaceCursor {
+    type: typeof PLACE_CURSOR
     index: number
     position: Hex
     clearOthers: boolean
 }
-const isPlaceCursor = (action: GenericAction): action is PlaceCursor =>
-    action.type === PLACE_CURSOR
 export const placeCursorAction = (
     position: Hex, index: number = 0, clearOthers: boolean = false,
 ): PlaceCursor =>
@@ -368,13 +347,10 @@ const placeCursorReducer = (
         })
 }
 
-type SET_CUR_PLAYER = typeof SET_CUR_PLAYER
-interface SetCurPlayer extends GenericAction {
-    type: SET_CUR_PLAYER
+interface SetCurPlayer {
+    type: typeof SET_CUR_PLAYER
     player: Player
 }
-const isSetCurPlayer = (action: GenericAction): action is SetCurPlayer =>
-    action.type === SET_CUR_PLAYER
 export const setCurPlayerAction = (player: Player): SetCurPlayer =>
     ({ type: SET_CUR_PLAYER, player })
 const setCurPlayerReducer = (state: BoardState, action: SetCurPlayer): BoardState => ({
@@ -382,14 +358,11 @@ const setCurPlayerReducer = (state: BoardState, action: SetCurPlayer): BoardStat
     curPlayer: action.player,
 })
 
-type SET_ROBOT = typeof SET_ROBOT
-interface SetRobot extends GenericAction {
-    type: SET_ROBOT
+interface SetRobot {
+    type: typeof SET_ROBOT
     player: Player
     robot: Robot | undefined
 }
-const isSetRobot = (action: GenericAction): action is SetRobot =>
-    action.type === SET_ROBOT
 export const setRobotAction = (player: Player, robot: Robot | undefined): SetRobot =>
     ({ type: SET_ROBOT, player, robot })
 const setRobotReducer = (state: BoardState, action: SetRobot): BoardState => ({
@@ -398,10 +371,7 @@ const setRobotReducer = (state: BoardState, action: SetRobot): BoardState => ({
 })
 
 // let robots make decisions
-type ROBOTS_DECIDE = typeof ROBOTS_DECIDE
-interface RobotsDecide extends GenericAction { type: ROBOTS_DECIDE }
-const isRobotsDecide = (action: GenericAction): action is RobotsDecide =>
-    action.type === ROBOTS_DECIDE
+interface RobotsDecide { type: typeof ROBOTS_DECIDE }
 export const robotsDecideAction = (): RobotsDecide => ({ type: ROBOTS_DECIDE })
 const robotsDecideReducer = (state: BoardState): BoardState => {
     let result = state

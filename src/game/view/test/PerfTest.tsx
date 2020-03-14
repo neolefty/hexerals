@@ -38,9 +38,9 @@ type CHANGE_WH = typeof CHANGE_WH
 function isChangeWh(action: PerfAction): action is ChangeWh {
     return action.type === CHANGE_WH }
 
-interface RunPerfTest extends GenericAction { type: RUN_PERF_TEST; wh: Wh }
-interface ChangeWh extends GenericAction { type: CHANGE_WH; wh: Wh }
-interface QueuePerfTest extends GenericAction { type: QUEUE_PERF_TEST; wh: Wh }
+interface RunPerfTest { type: RUN_PERF_TEST; wh: Wh }
+interface ChangeWh { type: CHANGE_WH; wh: Wh }
+interface QueuePerfTest { type: QUEUE_PERF_TEST; wh: Wh }
 type PerfAction = RunPerfTest | ChangeWh | QueuePerfTest
 
 function changeWhAction(wh: Wh): ChangeWh { return {type: CHANGE_WH, wh: wh} }

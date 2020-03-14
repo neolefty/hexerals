@@ -9,9 +9,9 @@ import {MainDispatch} from "../../../main/MainReducer"
 import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
 import {
     cancelMovesAction,
-    doMovesAction,
+    doApplyMoves,
     dragAction,
-    gameTickAction,
+    doGameTick,
     placeCursorAction,
     queueMovesAction,
     robotsDecideAction,
@@ -85,8 +85,8 @@ const mapDispatchToBoardViewProps = (
 
     onStep: () => {
         dispatch(robotsDecideAction())
-        dispatch(doMovesAction())
-        dispatch(gameTickAction())
+        dispatch(doApplyMoves())
+        dispatch(doGameTick())
     },
 
     onResetColors: (n: number) => dispatch(

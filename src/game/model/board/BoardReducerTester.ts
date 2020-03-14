@@ -1,24 +1,31 @@
 import {List, Map} from 'immutable'
-import {GenericAction} from "../../../common/GenericAction"
-
-import {BoardState, boardStateToString} from './BoardState'
-import {
-    BoardReducer,
-    cancelMovesAction, doMovesAction, newGameAction, placeCursorAction,
-    queueMovesAction, robotsDecideAction, setCurPlayerAction,
-    setRobotAction, gameTickAction, INITIAL_BOARD_STATE,
-} from './BoardReducer'
-import {Board} from './Board'
-import {pickNPlayers, Player} from '../players/Players'
-import {CornersPlayerArranger} from '../setup/PlayerArranger'
+import {StatusMessage} from '../../../common/StatusMessage'
+import {GamePhase} from '../cycle/GamePhase'
 import {Hex} from '../hex/Hex'
 import {Tile} from '../hex/Tile'
-import {StatusMessage} from '../../../common/StatusMessage'
-import {MovementQueue} from '../move/MovementQueue'
 import {PlayerMove} from '../move/Move'
+import {MovementQueue} from '../move/MovementQueue'
+import {pickNPlayers, Player} from '../players/Players'
 import {Robot} from '../players/Robot'
+import {CornersPlayerArranger} from '../setup/PlayerArranger'
 import {TileArranger} from '../setup/TileArranger'
-import {GamePhase} from '../cycle/GamePhase'
+import {Board} from './Board'
+import {
+    BoardReducer,
+    cancelMovesAction,
+    doApplyMoves,
+    doGameTick,
+    GameAction,
+    INITIAL_BOARD_STATE,
+    newGameAction,
+    placeCursorAction,
+    queueMovesAction,
+    robotsDecideAction,
+    setCurPlayerAction,
+    setRobotAction,
+} from './BoardReducer'
+
+import {BoardState, boardStateToString} from './BoardState'
 
 export class BoardReducerTester {
     static readonly INITIAL_POP = 50
@@ -40,7 +47,7 @@ export class BoardReducerTester {
         )))
     }
 
-    dispatch(action: GenericAction) {
+    dispatch(action: GameAction) {
         this.state = BoardReducer(this.state, action)
     }
 
@@ -85,12 +92,12 @@ export class BoardReducerTester {
     }
 
     setCursor = (coord: Hex) => { this.dispatch(placeCursorAction(coord)) }
-    doMoves = () => { this.dispatch(doMovesAction()) }
+    doMoves = () => { this.dispatch(doApplyMoves()) }
     doAllMoves = () => {
         while (this.moves.size > 0)
             this.doMoves()
     }
-    gameTick = () => { this.dispatch(gameTickAction()) }
+    gameTick = () => { this.dispatch(doGameTick()) }
     queueRobots = () => { this.dispatch(robotsDecideAction()) }
     setCurPlayer = (player: Player) => { this.dispatch(setCurPlayerAction(player)) }
 
@@ -129,12 +136,12 @@ export class BoardReducerTester {
         try {
             this.board.explicitTiles.forEach(tile => {
                 if (tile && tile.canBeOccupied && tile.owner !== contender)
-                    throw 'different'
+                    throw new Error('different')
             })
             return true
         }
         catch(e) {
-            if (e === 'different') return false
+            if (e.message === 'different') return false
             else throw e
         }
     }

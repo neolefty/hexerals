@@ -2,8 +2,8 @@ import {List, Range} from 'immutable'
 
 import {StatusMessage} from '../../../common/StatusMessage'
 import {
-    doMovesAction,
-    gameTickAction,
+    doApplyMoves,
+    doGameTick,
     placeCursorAction,
     queueMovesAction,
     robotsDecideAction
@@ -63,10 +63,10 @@ export class CycleReducerTester {
     }
 
     robotsDecide = () => { this.dispatch(robotsDecideAction()) }
-    doMoves = () => { this.dispatch(doMovesAction()) }
+    doMoves = () => { this.dispatch(doApplyMoves()) }
     tick = (n: number = 1) => {
         Range(0, n).forEach(
-            () => this.dispatch(gameTickAction())
+            () => this.dispatch(doGameTick())
         )
     }
 
