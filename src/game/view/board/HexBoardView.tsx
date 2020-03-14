@@ -92,7 +92,8 @@ export const HexBoardView = (props: BoardViewProps) => {
                     scaleHeight + INNER_BOARD_MARGIN + FLAG_CLEARANCE,
                 ].join(',')}
             >
-                <HexesView{...props}/>
+                {/*<HexesView{...props}/>*/}
+                <HexesView {...props}/>
                 <MoveQueueView
                     moves={props.boardState.moves}
                     colors={props.colors as Map<Player, DriftColor>}
