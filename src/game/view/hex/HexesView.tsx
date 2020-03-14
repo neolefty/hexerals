@@ -24,22 +24,23 @@ export const HexesView = (props: BoardViewProps) => {
         }
     }
 
+    const onPlaceCursor = props.onPlaceCursor
     const onClearCursor = useCallback((cursorIndex: number) => {
-        props.onPlaceCursor(cursorIndex, Hex.NONE, false)
-    }, [props.onPlaceCursor])
+        onPlaceCursor(cursorIndex, Hex.NONE, false)
+    }, [onPlaceCursor])
 
     const onTouchStart = useCallback((e: React.TouchEvent) => {
         // this.logEvent(e)
         for (let i = 0; i < e.touches.length; ++i) {
             const hexTouch = new HexTouch(e.touches[i])
             // console.log(`  — set cursor ${hexTouch}`)
-            props.onPlaceCursor(hexTouch.id, hexTouch.hex, false)
+            onPlaceCursor(hexTouch.id, hexTouch.hex, false)
         }
         if (e.cancelable)
             e.preventDefault()
-    }, [props.onPlaceCursor])
+    }, [onPlaceCursor])
 
-    const onTouchMove = useCallback((e: React.TouchEvent) => {
+    const onTouchMove = (e: React.TouchEvent) => {
         // this.logEvent(e)
         for (let i = 0; i < e.touches.length; ++i) {
             const hexTouch = new HexTouch(e.touches[i])
@@ -49,7 +50,7 @@ export const HexesView = (props: BoardViewProps) => {
         }
         if (e.cancelable)
             e.preventDefault()
-    }, [onDrag])
+    }
 
     const onTouchEnd = useCallback((e: React.TouchEvent) => {
         // this.logEvent(e)
@@ -103,7 +104,7 @@ export const HexesView = (props: BoardViewProps) => {
                         selected={cursorSet.contains(hex)}
                         viewBoxHeight={h}
                         onClearCursor={onClearCursor}
-                        onPlaceCursor={props.onPlaceCursor}
+                        onPlaceCursor={onPlaceCursor}
                         onDrag={onDrag}
                     />
                 )

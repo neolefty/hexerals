@@ -89,7 +89,7 @@ export const CycleReducer = (
     }
 }
 
-const isCycleAction = (action: GenericAction): action is CycleAction =>
+export const isCycleAction = (action: GenericAction): action is CycleAction =>
     isGameAction(action)
     || isOpenLocalGame(action) || isCloseLocalGame(action)
     || isChangeLocalOption(action)
