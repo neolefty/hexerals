@@ -11,10 +11,8 @@ const DEFAULT_STATE: MainState = {
     cycle: INITIAL_CYCLE_STATE,
     colors: initialColorState(),
 }
-export type Init = (state: MainState) => MainState
-
 interface MiniProps {
-    init?: Init
+    init?: (state: MainState) => MainState
 }
 
 export const Mini = (props: MiniProps) => {
