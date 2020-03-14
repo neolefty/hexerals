@@ -1,25 +1,35 @@
 import {Map} from "immutable"
-import {CycleState, LocalGameState} from "../cycle/CycleState"
+import {CycleState} from "../cycle/CycleState"
+
+const FIRST_TUTORIAL_ID = 'start'
+
 
 export interface TutorialState {
-    stepIndex?: number
-    // map of step index to that step's game
-    games: Map<number, CycleState>
+    curStep: string
+    // map of tutorial chapter to that chapter's game
+    steps: Map<string, TutorialStepState>
+}
+
+export interface TutorialStepState {
+    game: CycleState
+    message?: string
 }
 
 const INITIAL_TUTORIAL_STATE: TutorialState = {
-    stepIndex: undefined,
-    games: Map()
+    curStep: FIRST_TUTORIAL_ID,
+    steps: Map()
 }
 
 export interface TutorialStep {
-    welcome: string
-    triggers: GameTrigger[]
-    congrats: string
+    id: string
+    title: string
+    triggers: TutorialTrigger[]
+    initialState: TutorialStepState
 }
 
-export interface GameTrigger {
-    detector: (game: LocalGameState) => boolean
-    beforeMessage: string
-    afterMessage: string
+interface TutorialTriggerResult {
+    nextTutorialStep?: string
+    message?: string
 }
+
+export type TutorialTrigger = (game: CycleState) => TutorialTriggerResult | undefined

@@ -1,56 +1,78 @@
 import produce from "immer"
 import {GenericAction} from "../../../common/GenericAction"
 import {CycleAction, CycleReducer} from "../cycle/CycleReducer"
-import {CycleState} from "../cycle/CycleState"
-import {TutorialState} from "./TutorialState"
+import {TutorialState, TutorialStepState} from "./TutorialState"
 
-export type TutorialAction = TutorialStepAction | TutorialGameAction | TutorialStartGameAction
+export type TutorialAction = TutorialSetStepAction | TutorialGameAction | TutorialStartGameAction | TutorialMessageAction
 
-export const isTutorialAction = (action: GenericAction): action is TutorialStepAction =>
+export const isTutorialAction = (action: GenericAction): action is TutorialSetStepAction =>
     action.type.startsWith('tutorial ')
 
-const TUTORIAL_STEP = 'tutorial step'
-export const doTutorialStep = () => ({type: TUTORIAL_STEP})
-interface TutorialStepAction {
-    type: typeof TUTORIAL_STEP
-    stepIndex?: number
+const TUTORIAL_START_STEP = 'tutorial start step'
+interface TutorialStartGameAction {
+    type: typeof TUTORIAL_START_STEP
+    stepId: string
+    initialState: TutorialStepState
+}
+
+const TUTORIAL_SET_STEP = 'tutorial step'
+export const doTutorialSetStep = () => ({type: TUTORIAL_SET_STEP})
+interface TutorialSetStepAction {
+    type: typeof TUTORIAL_SET_STEP
+    stepId: string
 }
 
 const TUTORIAL_GAME = 'tutorial game'
 interface TutorialGameAction {
     type: typeof TUTORIAL_GAME
-    // which step of the tutorial?
-    stepIndex: number
+    stepId: string
     cycleAction: CycleAction
 }
 
-const TUTORIAL_START_GAME = 'tutorial start game'
-interface TutorialStartGameAction {
-    type: typeof TUTORIAL_START_GAME
-    stepIndex: number
-    initialState: CycleState
+const TUTORIAL_MESSAGE = 'tutorial message'
+interface TutorialMessageAction {
+    type: typeof TUTORIAL_MESSAGE
+    stepId: string
+    message: string
 }
 
 export const TutorialReducer = produce((
     draft: TutorialState, action: TutorialAction
 ): TutorialState => {
     switch(action.type) {
-        case TUTORIAL_STEP:
-            draft.stepIndex = action.stepIndex
+        case TUTORIAL_START_STEP:
+            draft.steps = draft.steps.set(action.stepId, action.initialState)
+            return draft
+        case TUTORIAL_SET_STEP:
+            if (!draft.steps.has(action.stepId))
+                console.error(`Step ${action.stepId} hasn't been started`, action)
+            else
+                draft.curStep = action.stepId
             return draft
         case TUTORIAL_GAME:
-            const cycle = draft.games.get(action.stepIndex)
-            if (cycle === undefined)
-                console.error(`Step #${action.stepIndex} uninitialized.`, action)
+        case TUTORIAL_MESSAGE:
+            const stepState = draft.steps.get(action.stepId)
+            if (stepState === undefined)
+                console.error(`Step #${action.stepId} uninitialized.`, action)
             else {
-                draft.games = draft.games.set(
-                    action.stepIndex,
-                    CycleReducer(cycle, action)
+                draft.steps = draft.steps.set(
+                    action.stepId,
+                    TutorialStepReducer(stepState, action)
                 )
             }
             return draft
-        case TUTORIAL_START_GAME:
-            draft.games = draft.games.set(action.stepIndex, action.initialState)
+    }
+})
+
+export const TutorialStepReducer = produce((
+    draft: TutorialStepState, action: TutorialMessageAction | TutorialGameAction
+): TutorialStepState => {
+    switch(action.type) {
+        case TUTORIAL_MESSAGE:
+            draft.message = action.message
+            return draft
+        case TUTORIAL_GAME:
+            draft.game = CycleReducer(draft.game, action.cycleAction)
             return draft
     }
 })
