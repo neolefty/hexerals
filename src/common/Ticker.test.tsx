@@ -36,13 +36,14 @@ it('creates a timer', async () => {
         n += 1
     })
     const wrapper = enzyme.mount(ticker)
-    await sleep(25)
+    await sleep(35)
+    // I know this seem excessively lax, but the test environment can be pretty resource-constrained
     expect(n).toBeGreaterThanOrEqual(2)
     wrapper.unmount()
     const m = n
     await sleep(25)
     expect(m).toBe(n)
-    expect(n).toBeLessThan(4)
+    expect(n).toBeLessThan(7)
 
     // sleep(25).then(() => {
     //     expect(n).toBeGreaterThanOrEqual(2)
