@@ -4,7 +4,7 @@ import {List, Range} from 'immutable';
 import {PlayerMove} from '../move/Move';
 import {pickNPlayers, Player} from '../players/Players';
 import {Hex} from '../hex/Hex';
-import {queueMovesAction} from './BoardReducer';
+import {doQueueMoves} from './BoardReducer';
 import {Terrain} from '../hex/Terrain';
 import {Tile} from '../hex/Tile';
 import {StatusMessage} from '../../../common/StatusMessage'
@@ -60,7 +60,7 @@ it('queues multiple moves at once', () => {
     ])
     // console.log('Moves:')
     // moves.forEach((move, idx) => console.log(`${idx}: ${move.toString()}`))
-    brt.dispatch(queueMovesAction(moves))
+    brt.dispatch(doQueueMoves(moves))
     // console.log('Messages:')
     // st.messages.forEach((msg, idx) => console.log(`${idx}: ${msg.toString()}`))
     expect(brt.moves.size).toBe(4)

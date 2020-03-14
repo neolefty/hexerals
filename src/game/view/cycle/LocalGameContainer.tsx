@@ -8,13 +8,13 @@ import {CacheMap} from '../../../common/CacheMap'
 import {MainDispatch} from "../../../main/MainReducer"
 import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
 import {
-    cancelMovesAction,
+    doCancelMoves,
     doApplyMoves,
-    dragAction,
+    doGameDrag,
     doGameTick,
-    placeCursorAction,
-    queueMovesAction,
-    robotsDecideAction,
+    doPlaceCursor,
+    doQueueMoves,
+    doRobotsDecide,
 } from '../../model/board/BoardReducer'
 import {doCloseLocalGame, doOpenLocalGame} from "../../model/cycle/CycleAction"
 import {LocalGameState} from '../../model/cycle/CycleState'
@@ -62,29 +62,29 @@ const mapDispatchToBoardViewProps = (
     dispatch: MainDispatch
 ) => ({
     onQueueMoves: (moves: List<PlayerMove>) => dispatch(
-        queueMovesAction(moves)
+        doQueueMoves(moves)
     ),
 
     onDrag: (
         player: Player, cursorIndex: number, source: Hex, dest: Hex
     ) => dispatch(
-        dragAction(player, cursorIndex, source, dest)
+        doGameDrag(player, cursorIndex, source, dest)
     ),
 
     onCancelMoves: (
         player: Player, cursorIndex: number, count: number
     ) => dispatch(
-        cancelMovesAction(player, cursorIndex, count)
+        doCancelMoves(player, cursorIndex, count)
     ),
 
     onPlaceCursor: (
         index: number, position: Hex, clearOthers: boolean
     ) => dispatch(
-        placeCursorAction(position, index, clearOthers)
+        doPlaceCursor(position, index, clearOthers)
     ),
 
     onStep: () => {
-        dispatch(robotsDecideAction())
+        dispatch(doRobotsDecide())
         dispatch(doApplyMoves())
         dispatch(doGameTick())
     },

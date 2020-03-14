@@ -12,17 +12,17 @@ import {TileArranger} from '../setup/TileArranger'
 import {Board} from './Board'
 import {
     BoardReducer,
-    cancelMovesAction,
+    doCancelMoves,
     doApplyMoves,
     doGameTick,
     GameAction,
     INITIAL_BOARD_STATE,
-    newGameAction,
-    placeCursorAction,
-    queueMovesAction,
-    robotsDecideAction,
-    setCurPlayerAction,
-    setRobotAction,
+    doNewGame,
+    doPlaceCursor,
+    doQueueMoves,
+    doRobotsDecide,
+    doSetCurPlayer,
+    doSetRobot,
 } from './BoardReducer'
 
 import {BoardState, boardStateToString} from './BoardState'
@@ -42,7 +42,7 @@ export class BoardReducerTester {
         players: List<Player> = pickNPlayers(2),
     ) {
         this.state = INITIAL_BOARD_STATE
-        this.dispatch(newGameAction(Board.constructDefaultRectangular(
+        this.dispatch(doNewGame(Board.constructDefaultRectangular(
             width, height, players, arrangers,
         )))
     }
@@ -73,7 +73,7 @@ export class BoardReducerTester {
 
     queueMove = (player: Player, delta: Hex, alsoCursor = true) => {
         this.dispatch(
-            queueMovesAction(
+            doQueueMoves(
                 List([PlayerMove.constructDelta(player, this.firstCursor, delta)])
             )
         )
@@ -91,15 +91,15 @@ export class BoardReducerTester {
             this.queueMove(this.state.curPlayer, Hex.UP, alsoCursor)
     }
 
-    setCursor = (coord: Hex) => { this.dispatch(placeCursorAction(coord)) }
+    setCursor = (coord: Hex) => { this.dispatch(doPlaceCursor(coord)) }
     doMoves = () => { this.dispatch(doApplyMoves()) }
     doAllMoves = () => {
         while (this.moves.size > 0)
             this.doMoves()
     }
     gameTick = () => { this.dispatch(doGameTick()) }
-    queueRobots = () => { this.dispatch(robotsDecideAction()) }
-    setCurPlayer = (player: Player) => { this.dispatch(setCurPlayerAction(player)) }
+    queueRobots = () => { this.dispatch(doRobotsDecide()) }
+    setCurPlayer = (player: Player) => { this.dispatch(doSetCurPlayer(player)) }
 
     cancelMoves = (
         player: Player | undefined = undefined,
@@ -109,14 +109,14 @@ export class BoardReducerTester {
         const actualPlayer = player || this.state.curPlayer
         if (actualPlayer)
             this.dispatch(
-                cancelMovesAction(
+                doCancelMoves(
                     actualPlayer, cursorIndex, count))
         else
             throw Error('current player is undefined')
     }
 
     setRobot = (player: Player, robot: Robot) => {
-        this.dispatch(setRobotAction(player, robot))
+        this.dispatch(doSetRobot(player, robot))
     }
 
     popTotal = (player: Player) => {

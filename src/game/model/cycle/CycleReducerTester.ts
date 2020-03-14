@@ -4,9 +4,9 @@ import {StatusMessage} from '../../../common/StatusMessage'
 import {
     doApplyMoves,
     doGameTick,
-    placeCursorAction,
-    queueMovesAction,
-    robotsDecideAction
+    doPlaceCursor,
+    doQueueMoves,
+    doRobotsDecide
 } from '../board/BoardReducer'
 import {BoardReducerTester} from '../board/BoardReducerTester'
 import {BoardState} from '../board/BoardState'
@@ -56,13 +56,13 @@ export class CycleReducerTester {
         delta: Hex = Hex.UP,
         player: Player = Player.Zero,
     ) => {
-        this.dispatch(placeCursorAction(from))
-        this.dispatch(queueMovesAction(List([
+        this.dispatch(doPlaceCursor(from))
+        this.dispatch(doQueueMoves(List([
             PlayerMove.constructDelta(player, from, delta)
         ])))
     }
 
-    robotsDecide = () => { this.dispatch(robotsDecideAction()) }
+    robotsDecide = () => { this.dispatch(doRobotsDecide()) }
     doMoves = () => { this.dispatch(doApplyMoves()) }
     tick = (n: number = 1) => {
         Range(0, n).forEach(

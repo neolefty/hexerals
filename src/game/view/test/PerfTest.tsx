@@ -1,8 +1,6 @@
 import {List} from 'immutable'
 import * as React from "react"
 import {Dispatch, useReducer} from "react"
-
-import {GenericAction} from '../../../common/GenericAction'
 import {RectangularConstraints} from '../../model/board/Constraints'
 import {DEFAULT_LOCAL_GAME_OPTIONS} from '../../model/board/LocalGameOptions'
 
@@ -14,33 +12,25 @@ export interface PerfState {
 export function PerfReducer(
     state: PerfState, action: PerfAction
 ): PerfState {
-    // if (isQueuePerfTest(action)) {
-    //     console.log(`Queue perf test ${action.xy}`)
-    // }
-    if (isRunPerfTest(action))
-        return { ...state, history: state.history.push(runPerfTest(action.wh)) }
-    else if (isChangeWh(action))
-        return { ...state, inputs: action.wh }
-    else
-        return state
+    switch(action.type) {
+        case RUN_PERF_TEST:
+            return { ...state, history: state.history.push(runPerfTest(action.wh)) }
+        case CHANGE_WH:
+            return { ...state, inputs: action.wh }
+        case QUEUE_PERF_TEST:
+            console.log(`Queue perf test ${action.wh}`)
+            return state
+    }
+
 }
 
-const QUEUE_PERF_TEST = 'QUEUE_PERF_TEST'
-type QUEUE_PERF_TEST = typeof QUEUE_PERF_TEST
-// function isQueuePerfTest(action: PerfAction): action is QueuePerfTest {
-//     return action.type === QUEUE_PERF_TEST }
-const RUN_PERF_TEST = 'RUN_PERF_TEST'
-type RUN_PERF_TEST = typeof RUN_PERF_TEST
-function isRunPerfTest(action: PerfAction): action is RunPerfTest {
-    return action.type === RUN_PERF_TEST }
-const CHANGE_WH = 'CHANGE_WH'
-type CHANGE_WH = typeof CHANGE_WH
-function isChangeWh(action: PerfAction): action is ChangeWh {
-    return action.type === CHANGE_WH }
+const QUEUE_PERF_TEST = 'perftest queue'
+const RUN_PERF_TEST = 'perftest run'
+const CHANGE_WH = 'perftest change wh'
 
-interface RunPerfTest { type: RUN_PERF_TEST; wh: Wh }
-interface ChangeWh { type: CHANGE_WH; wh: Wh }
-interface QueuePerfTest { type: QUEUE_PERF_TEST; wh: Wh }
+interface RunPerfTest { type: typeof RUN_PERF_TEST; wh: Wh }
+interface ChangeWh { type: typeof CHANGE_WH; wh: Wh }
+interface QueuePerfTest { type: typeof QUEUE_PERF_TEST; wh: Wh }
 type PerfAction = RunPerfTest | ChangeWh | QueuePerfTest
 
 function changeWhAction(wh: Wh): ChangeWh { return {type: CHANGE_WH, wh: wh} }
