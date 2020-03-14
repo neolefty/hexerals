@@ -1,13 +1,14 @@
 import React from "react"
 import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
-import {changeLocalOptionAction, CycleDispatch, openLocalGameAction,} from '../../model/cycle/CycleReducer'
+import {doChangeLocalOption, doOpenLocalGame} from "../../model/cycle/CycleAction"
+import {CycleDispatch, } from '../../model/cycle/CycleReducer'
 import {CycleView, CycleViewActions} from './CycleView'
 
 const mapDispatchToCycleViewProps = (dispatch: CycleDispatch): CycleViewActions => ({
-    onOpenLocalGame: () => dispatch(openLocalGameAction()),
+    onOpenLocalGame: () => dispatch(doOpenLocalGame()),
     onChangeLocalOption: (name: keyof LocalGameOptions, n: number) =>
-        dispatch(changeLocalOptionAction(name, n)),
+        dispatch(doChangeLocalOption(name, n)),
 })
 
 export const CycleContainer = () => {

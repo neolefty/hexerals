@@ -4,11 +4,11 @@ import {CartPair} from "../../../common/CartPair"
 import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
 import {MainReducer, MainState} from "../../../main/MainReducer"
 import {WithMainDispatch, WithMainState} from "../../../main/MainStateContext"
-import {INITIAL_CYCLE_STATE} from "../../model/cycle/CycleReducer"
+import {DEFAULT_CYCLE_STATE} from "../../model/cycle/CycleState"
 import {CycleContainer} from "../cycle/CycleContainer"
 
 const DEFAULT_STATE: MainState = {
-    cycle: INITIAL_CYCLE_STATE,
+    cycle: DEFAULT_CYCLE_STATE,
     colors: initialColorState(),
 }
 interface MiniProps {

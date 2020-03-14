@@ -1,5 +1,4 @@
 import {List, Range} from 'immutable'
-import {GenericAction} from "../../../common/GenericAction"
 
 import {StatusMessage} from '../../../common/StatusMessage'
 import {
@@ -11,22 +10,23 @@ import {
 } from '../board/BoardReducer'
 import {BoardReducerTester} from '../board/BoardReducerTester'
 import {BoardState} from '../board/BoardState'
+import {LocalGameOptions} from '../board/LocalGameOptions'
 import {Hex} from '../hex/Hex'
 import {Tile} from '../hex/Tile'
 import {PlayerMove} from '../move/Move'
 import {Player} from '../players/Players'
-import {CycleState, cycleStateToString, LocalGameState} from './CycleState'
-import {changeLocalOptionAction, CycleReducer, INITIAL_CYCLE_STATE, openLocalGameAction} from './CycleReducer'
-import {LocalGameOptions} from '../board/LocalGameOptions'
+import {CycleAction, doChangeLocalOption, doOpenLocalGame} from "./CycleAction"
+import {CycleReducer} from './CycleReducer'
+import {CycleState, cycleStateToString, DEFAULT_CYCLE_STATE, LocalGameState} from './CycleState'
 
 export class CycleReducerTester {
     state: CycleState
     constructor() {
-        this.state = INITIAL_CYCLE_STATE
+        this.state = DEFAULT_CYCLE_STATE
         this.changeLocalOption('startingPop', 20)
     }
 
-    dispatch(action: GenericAction) {
+    dispatch(action: CycleAction) {
         this.state = CycleReducer(this.state, action)
     }
 
@@ -71,7 +71,7 @@ export class CycleReducerTester {
     }
 
     changeLocalOption = (name: keyof LocalGameOptions, n: number) => {
-        this.dispatch(changeLocalOptionAction(name, n))
+        this.dispatch(doChangeLocalOption(name, n))
     }
 
     // true by default
@@ -94,7 +94,7 @@ export class CycleReducerTester {
         this.changeLocalOption('numRobots', numRobots)
         this.changeLocalOption('difficulty', difficulty)
         this.changeLocalOption('mountainPercent', mountainPercent)
-        this.dispatch(openLocalGameAction())
+        this.dispatch(doOpenLocalGame())
     }
 
     toString = () => cycleStateToString(this.state)

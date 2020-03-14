@@ -16,7 +16,7 @@ import {
     queueMovesAction,
     robotsDecideAction,
 } from '../../model/board/BoardReducer'
-import {closeLocalGameAction, openLocalGameAction} from '../../model/cycle/CycleReducer'
+import {doCloseLocalGame, doOpenLocalGame} from "../../model/cycle/CycleAction"
 import {LocalGameState} from '../../model/cycle/CycleState'
 import {Hex} from '../../model/hex/Hex'
 import {PlayerMove} from '../../model/move/Move'
@@ -94,12 +94,12 @@ const mapDispatchToBoardViewProps = (
     ),
 
     onEndGame: () => {
-        dispatch(closeLocalGameAction())
+        dispatch(doCloseLocalGame())
     },
 
     onRestartGame: () => {
         logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
-        dispatch(openLocalGameAction())
+        dispatch(doOpenLocalGame())
     },
 })
 

@@ -1,6 +1,7 @@
 import produce from "immer"
 import {GenericAction} from "../../../common/GenericAction"
-import {CycleAction, CycleReducer} from "../cycle/CycleReducer"
+import {CycleAction} from "../cycle/CycleAction"
+import {CycleReducer} from "../cycle/CycleReducer"
 import {TutorialState, TutorialStepState} from "./TutorialState"
 
 export type TutorialAction = TutorialSetStepAction | TutorialGameAction | TutorialStartGameAction | TutorialMessageAction

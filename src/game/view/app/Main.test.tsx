@@ -4,7 +4,8 @@ import {initialColorState} from "../../../color/ColorsReducer"
 import {MainReducer, MainState} from "../../../main/MainReducer"
 import {BoardState} from "../../model/board/BoardState"
 import {DEFAULT_LOCAL_GAME_OPTIONS} from "../../model/board/LocalGameOptions"
-import {changeLocalOptionAction, INITIAL_CYCLE_STATE, openLocalGameAction} from "../../model/cycle/CycleReducer"
+import {doChangeLocalOption, doOpenLocalGame} from "../../model/cycle/CycleAction"
+import {DEFAULT_CYCLE_STATE} from "../../model/cycle/CycleState"
 import {HexBoardView} from "../board/HexBoardView"
 import {countHexes} from "../hex/HexConstants"
 import {Mini} from "./Mini"
@@ -78,7 +79,7 @@ it('renders without crashing', () => {
     expect(foundDimensionLabel).toBeTruthy()
 
     let startedState: MainState = {
-        cycle: INITIAL_CYCLE_STATE,
+        cycle: DEFAULT_CYCLE_STATE,
         colors: initialColorState(),
     }
     let started: ReactTestRenderer | undefined = undefined
@@ -87,8 +88,8 @@ it('renders without crashing', () => {
             <Mini init={
                 state => {
                     let result = state
-                    result = MainReducer(result, changeLocalOptionAction('mountainPercent', 0))
-                    result = MainReducer(result, openLocalGameAction())
+                    result = MainReducer(result, doChangeLocalOption('mountainPercent', 0))
+                    result = MainReducer(result, doOpenLocalGame())
                     startedState = result
                     return result
                 }
@@ -100,7 +101,7 @@ it('renders without crashing', () => {
     // console.log(startedRenderer.toJSON())
 
     expect(startedState.cycle.localGame?.boardState.board.capitals.size)
-        .toBe(INITIAL_CYCLE_STATE.localOptions.numRobots + 1)
+        .toBe(DEFAULT_CYCLE_STATE.localOptions.numRobots + 1)
 
     const gs = startedRenderer.root.findAllByType('g')
     expect(gs.length).toBeGreaterThan(blanksHexes.length)
@@ -125,8 +126,8 @@ it('renders without crashing', () => {
     // // render it with a game
     // render(state => {
     //     let result = state
-    //     result = MainReducer(result, changeLocalOptionAction('mountainPercent', 0))
-    //     result = MainReducer(result, openLocalGameAction())
+    //     result = MainReducer(result, doChangeLocalOption('mountainPercent', 0))
+    //     result = MainReducer(result, doOpenLocalGame())
     //     return result
     // })
     // // expect(hoistedState?.cycle.localGame?.boardState.board.capitals.size).toBe(2)

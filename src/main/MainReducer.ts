@@ -1,7 +1,8 @@
 import {ColorsAction, ColorsReducer, ColorsState, initialColorState, isColorsAction} from "../color/ColorsReducer"
 import {AssertNever} from "../common/AssertNever"
-import {CycleAction, CycleReducer, initialCycleState, isCycleAction} from "../game/model/cycle/CycleReducer"
-import {CycleState} from "../game/model/cycle/CycleState"
+import {CycleAction, isCycleAction} from "../game/model/cycle/CycleAction"
+import {CycleReducer} from "../game/model/cycle/CycleReducer"
+import {CycleState, initialCycleState} from "../game/model/cycle/CycleState"
 
 export interface MainState {
     colors: ColorsState
