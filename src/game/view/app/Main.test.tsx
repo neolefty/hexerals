@@ -30,6 +30,9 @@ it('renders without crashing', () => {
         blank = TestRenderer.create(<Mini/>)
     })
     expect(blank).toBeDefined()
+    // TestRenderer.act(() => {
+    //     blank?.update(<Mini/>)
+    // })
     const blankRenderer = blank as unknown as ReactTestRenderer
     // console.log(blankRenderer.toJSON())
     const hasSubstring = (s: any, sub: string) => (typeof s === 'string' && s.indexOf(sub) >= 0)
@@ -50,22 +53,29 @@ it('renders without crashing', () => {
     //         console.log(g.props.className, '|', g.props.transform)
     // })
 
+    // blanksHexes.forEach(hex => console.log(`${hex.props.className.split(' ')[0]} — ${hex.props['transform']}`))
+    const blankN = blanksHexes.length
+
     const labels = blankRenderer.root.findAll(n => n.props.className === 'LabelAfter')
     let foundDimensionLabel = false
     labels.forEach(label => {
-        const s = `${label}`
-        if (s.indexOf(' x ') > 0) {
-            foundDimensionLabel = true
-            const words = s.split(' ')
-            expect(words.length).toBe(3)
-            const w = Number.parseInt(words[0])
-            const h = Number.parseInt(words[2])
-            const n = countHexes(w, h)
-            expect(n).toEqual(blanksHexes.length)
-            expect(n).toBeGreaterThan(50)
-            expect(n).toBeLessThan(100)
-        }
+        label.children.forEach(child => {
+            const s = `${child}`
+            if (s.indexOf(' x ') > 0) {
+                foundDimensionLabel = true
+                const words = s.split(' ')
+                expect(words.length).toBe(3)
+                const w = Number.parseInt(words[0])
+                const h = Number.parseInt(words[2]) * 2
+                const nEven = countHexes(w, h)
+                const nOdd = countHexes(w, h-1)
+                expect(nEven === blankN || nOdd === blankN).toBeTruthy()
+                expect(nEven).toBeGreaterThan(50)
+                expect(nEven).toBeLessThan(100)
+            }
+        })
     })
+    expect(foundDimensionLabel).toBeTruthy()
 
     let startedState: MainState = {
         cycle: INITIAL_CYCLE_STATE,
