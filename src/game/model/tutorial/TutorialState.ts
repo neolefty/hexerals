@@ -3,6 +3,7 @@ import {CycleState, LocalGameState} from "../cycle/CycleState"
 
 export interface TutorialState {
     stepIndex?: number
+    // map of step index to that step's game
     games: Map<number, CycleState>
 }
 
