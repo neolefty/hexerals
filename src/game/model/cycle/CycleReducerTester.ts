@@ -7,8 +7,8 @@ import {
     doPlaceCursor,
     doQueueMoves,
     doRobotsDecide
-} from '../board/BoardReducer'
-import {BoardReducerTester} from '../board/BoardReducerTester'
+} from '../board/BoardStateReducer'
+import {BoardStateReducerTester} from '../board/BoardStateReducerTester'
 import {BoardState} from '../board/BoardState'
 import {LocalGameOptions} from '../board/LocalGameOptions'
 import {Hex} from '../hex/Hex'
@@ -83,8 +83,8 @@ export class CycleReducerTester {
     }
 
     openLocalGame = (
-        width = BoardReducerTester.INITIAL_WIDTH,
-        height = BoardReducerTester.INITIAL_HEIGHT,
+        width = BoardStateReducerTester.INITIAL_WIDTH,
+        height = BoardStateReducerTester.INITIAL_HEIGHT,
         numRobots = 1,
         difficulty = 0,
         mountainPercent = 0,

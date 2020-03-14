@@ -1,4 +1,4 @@
-import {BoardReducerTester} from '../board/BoardReducerTester'
+import {BoardStateReducerTester} from '../board/BoardStateReducerTester'
 import {BasicRobot} from './BasicRobot'
 import {pickNPlayers, Player} from './Players'
 import {List, Range} from 'immutable'
@@ -13,7 +13,7 @@ import {PlayerMove} from '../move/Move'
 const logWinLoss = false
 
 it('makes moves', () => {
-    const brt = new BoardReducerTester(10, 19)
+    const brt = new BoardStateReducerTester(10, 19)
     const stupid = BasicRobot.byIntelligence(0)
     brt.setRobot(Player.Zero, stupid)
     brt.setRobot(Player.One, stupid)
@@ -40,7 +40,7 @@ it('specifies IQ', () => {
 
 it('captures nearby', () => {
     Range(0, 10).forEach(() => {
-        const brt = new BoardReducerTester(3, 3)
+        const brt = new BoardStateReducerTester(3, 3)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
         brt.setCursor(brt.ur)
         brt.queueMove(Player.One, Hex.DOWN)
@@ -59,7 +59,7 @@ it('captures nearby', () => {
 
 it('wastes not', () => {
     Range(0, 20).forEach(() => {
-        const brt = new BoardReducerTester(3, 3)
+        const brt = new BoardStateReducerTester(3, 3)
         expect(brt.board.hexesAll.size).toBe(5)
         brt.setRobot(Player.Zero, BasicRobot.bySkill(
             BasicRobot.SKILL_WASTE_NOT))
@@ -72,7 +72,7 @@ it('wastes not', () => {
         expect(brt.getTile(brt.ur).pop === 20)
     })
 
-    const brt = new BoardReducerTester(1, 7)
+    const brt = new BoardStateReducerTester(1, 7)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
         BasicRobot.SKILL_WASTE_NOT))
     expect(brt.ur === Hex.getCart(0, 6)).toBeTruthy()
@@ -95,7 +95,7 @@ it('wastes not', () => {
 })
 
 it('wastes not, even on a small board', () => {
-    const brt = new BoardReducerTester(1, 3)
+    const brt = new BoardStateReducerTester(1, 3)
     brt.setRobot(Player.Zero, BasicRobot.bySkill(
         BasicRobot.SKILL_WASTE_NOT))
     brt.queueRobots()
@@ -106,7 +106,7 @@ it('wastes not, even on a small board', () => {
 it('stops by cities', () => {
     const n = 5
     Range(0, n).forEach(() => {
-        const brt = new BoardReducerTester(3, 9)
+        const brt = new BoardStateReducerTester(3, 9)
         let skills: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
         skills[BasicRobot.SKILL_CAPTURE_CITY] = true
         skills[BasicRobot.SKILL_STOP_BY_CITIES] = true
@@ -142,7 +142,7 @@ const iqMax = IQRobotMaker(BasicRobot.MAX_IQ)
 const doesABeatB = (
     first: RobotMaker, second: RobotMaker, turnLimit: number
 ): boolean => {
-    const brt = new BoardReducerTester(
+    const brt = new BoardStateReducerTester(
         13, 13, [
             new RandomTerrainArranger(0.3),
             new SpreadPlayersArranger(),

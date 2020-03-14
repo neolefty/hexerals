@@ -11,11 +11,11 @@ import {CornersPlayerArranger} from '../setup/PlayerArranger'
 import {TileArranger} from '../setup/TileArranger'
 import {Board} from './Board'
 import {
-    BoardReducer,
+    BoardStateReducer,
     doCancelMoves,
     doApplyMoves,
     doGameTick,
-    GameAction,
+    BoardStateAction,
     INITIAL_BOARD_STATE,
     doNewGame,
     doPlaceCursor,
@@ -23,21 +23,21 @@ import {
     doRobotsDecide,
     doSetCurPlayer,
     doSetRobot,
-} from './BoardReducer'
+} from './BoardStateReducer'
 
 import {BoardState, boardStateToString} from './BoardState'
 
-export class BoardReducerTester {
+export class BoardStateReducerTester {
     static readonly INITIAL_POP = 50
     static readonly INITIAL_WIDTH = 11
     static readonly INITIAL_HEIGHT = 13
     state: BoardState
 
     constructor(
-        width = BoardReducerTester.INITIAL_WIDTH,
-        height = BoardReducerTester.INITIAL_HEIGHT,
+        width = BoardStateReducerTester.INITIAL_WIDTH,
+        height = BoardStateReducerTester.INITIAL_HEIGHT,
         arrangers: TileArranger[] = [
-            new CornersPlayerArranger(BoardReducerTester.INITIAL_POP)
+            new CornersPlayerArranger(BoardStateReducerTester.INITIAL_POP)
         ],
         players: List<Player> = pickNPlayers(2),
     ) {
@@ -47,8 +47,8 @@ export class BoardReducerTester {
         )))
     }
 
-    dispatch(action: GameAction) {
-        this.state = BoardReducer(this.state, action)
+    dispatch(action: BoardStateAction) {
+        this.state = BoardStateReducer(this.state, action)
     }
 
     getRawTile = (coord: Hex | undefined): Tile | undefined => coord && this.explicitTiles.get(coord)

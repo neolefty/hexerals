@@ -16,24 +16,24 @@ import {analyticsLabel, BOARD_STATE_STARTER, BoardState, DEFAULT_CURSORS} from '
 // derived from https://github.com/Microsoft/TypeScript-React-Starter#typescript-react-starter
 // TODO: try https://www.npmjs.com/package/redux-actions
 
-export type GameAction
+export type BoardStateAction
     = NewGameAction | QueueMoves | PlaceCursorAction | SetCurPlayerAction
         | ApplyMovesAction | CancelMovesAction | GameDragAction | GameTickAction
         | RobotsDecideAction | SetRobotAction
 
-const NEW_GAME = 'game new'
-const GAME_TICK = 'game tick'
-const QUEUE_MOVES = 'game queue moves'
-const APPLY_MOVES = 'game apply moves'
-const CANCEL_MOVES = 'game cancel moves'
-const PLACE_CURSOR = 'game place cursor'
-const GAME_DRAG = 'game drag'
-const SET_CUR_PLAYER = 'game set cur player'
-const SET_ROBOT = 'game set robot'
-const ROBOTS_DECIDE = 'game robots decide'
+const NEW_GAME = 'boardstate new'
+const GAME_TICK = 'boardstate tick'
+const QUEUE_MOVES = 'boardstate queue moves'
+const APPLY_MOVES = 'boardstate apply moves'
+const CANCEL_MOVES = 'boardstate cancel moves'
+const PLACE_CURSOR = 'boardstate place cursor'
+const GAME_DRAG = 'boardstate drag'
+const SET_CUR_PLAYER = 'boardstate set cur player'
+const SET_ROBOT = 'boardstate set robot'
+const ROBOTS_DECIDE = 'boardstate robots decide'
 
-export const isGameAction = (action: GenericAction): action is GameAction =>
-    action.type.startsWith('game ')
+export const isGameAction = (action: GenericAction): action is BoardStateAction =>
+    action.type.startsWith('boardstate ')
 
 // should never actually see this -- we just need a default for reducers
 const INITIAL_PLAYERS = pickNPlayers(0)
@@ -43,8 +43,8 @@ export const INITIAL_BOARD_STATE: BoardState = {
     players: PlayerManager.construct(INITIAL_PLAYERS),
 }
 
-export const BoardReducer: Reducer<BoardState, GameAction> = (
-    state: BoardState = INITIAL_BOARD_STATE, action: GameAction,
+export const BoardStateReducer: Reducer<BoardState, BoardStateAction> = (
+    state: BoardState = INITIAL_BOARD_STATE, action: BoardStateAction,
 ): BoardState => {
     switch(action.type) {
         case QUEUE_MOVES:  // most common first

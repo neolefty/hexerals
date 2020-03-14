@@ -1,6 +1,6 @@
 import * as assert from "assert"
 import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics'
-import {BoardReducer} from '../board/BoardReducer'
+import {BoardStateReducer} from '../board/BoardStateReducer'
 import {saveLocalGameOptions} from "../board/peristLocalGameOptions"
 import {
     CHANGE_LOCAL_OPTION,
@@ -27,7 +27,7 @@ export const CycleReducer = (
         saveLocalGameOptions(result.localOptions)
         return result
     }
-    else { // must be a GameAction, by process of elimination
+    else { // must be a BoardStateAction, by process of elimination
         const localGame = state.localGame
         if (localGame === undefined) {
             console.error(action)
@@ -35,7 +35,7 @@ export const CycleReducer = (
         }
         else {
             const localBoard = localGame.boardState
-            const newLocalBoard = BoardReducer(localBoard, action)
+            const newLocalBoard = BoardStateReducer(localBoard, action)
             if (newLocalBoard === localBoard)
                 return state
             else {

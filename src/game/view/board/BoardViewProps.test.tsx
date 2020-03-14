@@ -7,7 +7,7 @@ import {CartPair} from "../../../common/CartPair"
 import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
 
 import {Board} from '../../model/board/Board'
-import {BoardReducerTester} from '../../model/board/BoardReducerTester'
+import {BoardStateReducerTester} from '../../model/board/BoardStateReducerTester'
 import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
 import {Hex} from '../../model/hex/Hex'
 import {Terrain} from '../../model/hex/Terrain'
@@ -149,12 +149,12 @@ it('clicks a tile to select it', () => {
 })
 
 it('creates game via react-redux', () => {
-    const brt = new BoardReducerTester()
+    const brt = new BoardStateReducerTester()
     expect(brt.board.explicitTiles.size).toEqual(2)
     expect(brt.messages.size).toEqual(0)
     const lowLeft = Hex.ORIGIN
     expect(brt.getTile(lowLeft)).toEqual(
-        new Tile(Player.Zero, BoardReducerTester.INITIAL_POP, Terrain.City)
+        new Tile(Player.Zero, BoardStateReducerTester.INITIAL_POP, Terrain.City)
     )
 })
 

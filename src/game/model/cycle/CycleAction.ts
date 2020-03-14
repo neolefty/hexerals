@@ -1,8 +1,8 @@
 import {GenericAction} from "../../../common/GenericAction"
-import {GameAction, isGameAction} from "../board/BoardReducer"
+import {BoardStateAction, isGameAction} from "../board/BoardStateReducer"
 import {LocalGameOptions} from "../board/LocalGameOptions"
 
-export type CycleAction = GameAction
+export type CycleAction = BoardStateAction
     | OpenLocalGameAction | CloseLocalGameAction | ChangeLocalOptionAction
 
 export const isCycleAction = (action: GenericAction): action is CycleAction =>

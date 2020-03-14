@@ -1,10 +1,10 @@
-import {BoardReducerTester} from './BoardReducerTester';
+import {BoardStateReducerTester} from './BoardStateReducerTester';
 import {QueueAndMoves} from '../move/MovementQueue';
 import {List, Range} from 'immutable';
 import {PlayerMove} from '../move/Move';
 import {pickNPlayers, Player} from '../players/Players';
 import {Hex} from '../hex/Hex';
-import {doQueueMoves} from './BoardReducer';
+import {doQueueMoves} from './BoardStateReducer';
 import {Terrain} from '../hex/Terrain';
 import {Tile} from '../hex/Tile';
 import {StatusMessage} from '../../../common/StatusMessage'
@@ -19,7 +19,7 @@ it('ensures things are not mutable', () => {
     expect(testList.asMutable() === testList).toBeFalsy()
     expect(testList.asMutable().asImmutable() === testList).toBeFalsy()
 
-    const brt = new BoardReducerTester()
+    const brt = new BoardStateReducerTester()
     brt.setCurPlayer(Player.Zero)
     brt.setCursor(brt.ll)
     brt.queueMoveUp()
@@ -49,7 +49,7 @@ it('ensures things are not mutable', () => {
 })
 
 it('queues multiple moves at once', () => {
-    const brt = new BoardReducerTester()
+    const brt = new BoardStateReducerTester()
     const moves: List<PlayerMove> = List([
         PlayerMove.constructDelta(Player.Zero, brt.ll, Hex.UP),
         PlayerMove.constructDelta(Player.One, brt.ur, Hex.DOWN),
@@ -70,7 +70,7 @@ it('queues multiple moves at once', () => {
 })
 
 it('blocks illegal moves', () => {
-    const brt = new BoardReducerTester()
+    const brt = new BoardStateReducerTester()
     expect(brt.firstCursor === Hex.NONE).toBeTruthy()
     expect(brt.cursorRawTile).toBeUndefined()
 
@@ -109,7 +109,7 @@ it('blocks illegal moves', () => {
 // })
 
 it('cancels moves', () => {
-    const brt = new BoardReducerTester(6, 41)
+    const brt = new BoardStateReducerTester(6, 41)
     const boardBefore = brt.state.board
 
     brt.setCurPlayer(Player.One)
@@ -171,7 +171,7 @@ it('cancels moves', () => {
 })
 
 it('makes real moves', () => {
-    const brt = new BoardReducerTester()
+    const brt = new BoardStateReducerTester()
 
     // place cursors at upper right
     const boardBefore = brt.board
@@ -211,7 +211,7 @@ it('makes real moves', () => {
     expect(boardBefore !== boardAfter1).toBeTruthy()  // board updated
     expect(brt.firstCursor === brt.ur.getDown()).toBeTruthy()
     expect(brt.cursorRawTile).toEqual(
-        new Tile(Player.One, BoardReducerTester.INITIAL_POP - 1)
+        new Tile(Player.One, BoardStateReducerTester.INITIAL_POP - 1)
     )
 
     // can't move more than 1 space at a time (can't jump)
@@ -255,7 +255,7 @@ it('makes real moves', () => {
     expect(downFromUR(0)).toEqual(human1.setTerrain(Terrain.City))
     expect(downFromUR(1)).toEqual(human1)
     expect(downFromUR(2)).toEqual(
-        new Tile(Player.One, BoardReducerTester.INITIAL_POP-2)
+        new Tile(Player.One, BoardStateReducerTester.INITIAL_POP-2)
     )
     expect(downFromUR(3)).toEqual(new Tile(Player.Nobody, 0, Terrain.Empty, false))
     expect(downFromUR(3) === Tile.MAYBE_EMPTY).toBeTruthy()
@@ -275,7 +275,7 @@ it('makes real moves', () => {
 })
 
 it('notices captures', () => {
-    const brt = new BoardReducerTester(3, 3, [
+    const brt = new BoardStateReducerTester(3, 3, [
         new CornersPlayerArranger(49, Terrain.Capital)
     ])
     expect(brt.state.phase).toBe(GamePhase.BeforeStart)
@@ -344,7 +344,7 @@ it('notices captures', () => {
 })
 
 it('advances game phases', () => {
-    const brt = new BoardReducerTester(3, 3, [
+    const brt = new BoardStateReducerTester(3, 3, [
         new CornersPlayerArranger(20)
     ], pickNPlayers(4))
     expect(brt.phase).toBe(GamePhase.BeforeStart)

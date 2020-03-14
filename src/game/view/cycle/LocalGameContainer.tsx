@@ -15,7 +15,7 @@ import {
     doPlaceCursor,
     doQueueMoves,
     doRobotsDecide,
-} from '../../model/board/BoardReducer'
+} from '../../model/board/BoardStateReducer'
 import {doCloseLocalGame, doOpenLocalGame} from "../../model/cycle/CycleAction"
 import {LocalGameState} from '../../model/cycle/CycleState'
 import {Hex} from '../../model/hex/Hex'

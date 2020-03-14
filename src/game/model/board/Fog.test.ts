@@ -1,4 +1,4 @@
-import {BoardReducerTester} from './BoardReducerTester';
+import {BoardStateReducerTester} from './BoardStateReducerTester';
 import {PlayerFog} from './Fog';
 import {Player} from '../players/Players';
 import {Hex} from '../hex/Hex';
@@ -7,7 +7,7 @@ import {Terrain} from '../hex/Terrain';
 import * as assert from 'assert';
 
 it('fogs the board for a player', () => {
-    const brt = new BoardReducerTester(5, 9)
+    const brt = new BoardStateReducerTester(5, 9)
     const fog = new PlayerFog(Player.Zero, true)
     const fogged = fog.fog(brt.state).board
     expect(fogged.getTile(Hex.ORIGIN).known).toBeTruthy()
