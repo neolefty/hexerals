@@ -69,6 +69,7 @@ export const TileHexView = (props: TileHexViewProps) => {
                 // TODO move these into a style sheet?
                 fontFamily="Sans-Serif"
                 textAnchor="middle"
+                style={{userSelect: 'none'}}
             >
                 {props.text}
             </text>
