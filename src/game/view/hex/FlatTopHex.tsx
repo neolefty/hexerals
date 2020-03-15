@@ -1,9 +1,9 @@
 import * as React from 'react'
-
-import {TerrainView} from './TerrainView'
 import {Terrain} from '../../model/hex/Terrain'
+import './FlatTopHex.css'
 import {HEX_POINTS} from './HexConstants'
 import {HexViewProps} from './HexViewProps'
+import {TerrainView} from './TerrainView'
 
 export interface FlatTopHexProps extends HexViewProps {
     centerX: number

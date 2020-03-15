@@ -1,7 +1,7 @@
 import * as React from 'react'
-
 import {DriftColor} from '../../../color/DriftColor'
-import {PlayerFaceShapeProps, FaceShapeProps, PlayerFaceShape} from './PlayerFaceShape'
+import './PlayerFace.css'
+import {FaceShapeProps, PlayerFaceShape, PlayerFaceShapeProps} from './PlayerFaceShape'
 
 interface FaceProps extends FaceShapeProps, InscriptionProps {
 }
@@ -53,6 +53,7 @@ export const PlayerFace = (props: PlayerFaceProps) => (
         strokeWidth='1'
         fill={props.color.hexString}
         strokeLinecap='round'
+        className='PlayerFace'
     >
         <PlayerFaceShape {...props} />
         <Inscription {...props} />

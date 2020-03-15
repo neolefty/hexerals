@@ -127,6 +127,7 @@ export class Board {
     get edges(): RectEdges { return this.rules.edges }
     get popStepper(): PopStepper { return this.rules.stepper }
     get opts(): LocalGameOptions { return this.constraints.opts }
+    // half-hexes at top & bottom
     get niches(): Niches { return this.rules.niches }
 
     perceivedTurn(turn: number): number {

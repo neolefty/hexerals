@@ -1,35 +1,44 @@
-import {Map} from "immutable"
+import {List, Map} from "immutable"
 import {CycleState} from "../cycle/CycleState"
+import {Hex} from "../hex/Hex"
+import {FIRST_TUTORIAL_ID, LessonId} from "./Lessons"
 
-const FIRST_TUTORIAL_ID = 'start'
-
-
+// The tutorial is made up of a web of interconnected lessons
 export interface TutorialState {
-    curStep: string
+    curLesson: LessonId
     // map of tutorial chapter to that chapter's game
-    steps: Map<string, TutorialStepState>
-}
-
-export interface TutorialStepState {
-    game: CycleState
-    message?: string
+    lessons: Map<string, LessonState>
 }
 
 const INITIAL_TUTORIAL_STATE: TutorialState = {
-    curStep: FIRST_TUTORIAL_ID,
-    steps: Map()
+    curLesson: FIRST_TUTORIAL_ID,
+    lessons: Map()
 }
 
-export interface TutorialStep {
-    id: string
+export interface LessonState {
+    message: string
+    game: CycleState
+    highlights?: List<Hex>
+}
+
+export interface TutorialLesson {
+    id: LessonId
     title: string
-    triggers: TutorialTrigger[]
-    initialState: TutorialStepState
+    // A lesson has multiple steps or hints to move you along
+    triggers: LessonTrigger[]
+    initialState: () => LessonState
 }
 
-interface TutorialTriggerResult {
-    nextTutorialStep?: string
-    message?: string
+interface LessonTriggerResult {
+    // some triggers unlock more lessons
+    nextLessonId?: LessonId
+    // what you just did
+    congrats: string
+    // what you should do next
+    next: string
 }
 
-export type TutorialTrigger = (game: CycleState) => TutorialTriggerResult | undefined
+export type LessonTrigger = (
+    game: CycleState,
+    lastTriggerTurn?: number,
+) => LessonTriggerResult | undefined | false
