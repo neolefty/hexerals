@@ -31,7 +31,7 @@ export const HexBoardView = (props: BoardViewProps) => {
 
     // ensure there are enough colors for all the players
     if (!props.colors || props.colors.size !== props.boardState.players.size)
-        props.onResetColors(props.boardState.players.size)
+        setTimeout(() => props.onResetColors(props.boardState.players.size))
 
     const focusDiv = () => {
         if (shouldGrabFocus() && needsFocus) {
