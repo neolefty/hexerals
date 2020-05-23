@@ -3,7 +3,7 @@ import {GenericAction} from "../../../common/GenericAction"
 import {CycleAction} from "../cycle/CycleAction"
 import {CycleReducer} from "../cycle/CycleReducer"
 import {LessonId} from "./Lessons"
-import {TutorialState, LessonState} from "./TutorialState"
+import {LessonState, TutorialState} from "./TutorialState"
 
 export type TutorialAction = TutorialSetStepAction | TutorialGameAction | TutorialStartGameAction | TutorialMessageAction
 
@@ -39,7 +39,7 @@ interface TutorialMessageAction {
 }
 
 export const TutorialReducer = produce((
-    draft: TutorialState, action: TutorialAction
+    draft: TutorialState, action: TutorialAction,
 ): TutorialState => {
     switch(action.type) {
         case TUTORIAL_START_STEP:
@@ -67,7 +67,7 @@ export const TutorialReducer = produce((
 })
 
 export const TutorialStepReducer = produce((
-    draft: LessonState, action: TutorialMessageAction | TutorialGameAction
+    draft: LessonState, action: TutorialMessageAction | TutorialGameAction,
 ): LessonState => {
     switch(action.type) {
         case TUTORIAL_MESSAGE:

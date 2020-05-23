@@ -2,7 +2,7 @@ import {List, Map, Set, Range} from 'immutable'
 import {Hex} from './Hex';
 import * as assert from 'assert';
 
-interface HexNum {
+export interface HexNum {
     h: Hex
     n: number
 }
