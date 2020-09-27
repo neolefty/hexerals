@@ -37,4 +37,3 @@ export function roundToMap<K>(
         closest = defaultValue
     return [ closest, valueClosest ]
 }
-

@@ -5,7 +5,7 @@ import {minRatio, roundToMap} from "../../../common/MathFunctions"
 import {LGO_LIMITS, LGOKey, maxMapSize, MIN_MAP_SIZE, MIN_PIXELS_PER_HEX} from "../../model/board/LocalGameOptions"
 import {ChangePreviewOption} from "../cycle/LocalGameOptionsView"
 import {countHexes, heightFromWidth, widthFromHeight} from "../hex/HexConstants"
-import {statSizesAndStyles} from "../board/BoardAndStats"
+import {statSizesAndStyles} from "./BoardAndStats"
 
 export interface HexCounts {
     dimensions: List<CartPair>
@@ -14,7 +14,7 @@ export interface HexCounts {
 
 const hexCountsCache = new CacheMap<CartPair, HexCounts>(20)
 
-export const boardHexCounts = (displaySize: CartPair, statsVisible: boolean): HexCounts => {
+export const boardViewUtils = (displaySize: CartPair, statsVisible: boolean): HexCounts => {
     const boardDisplaySize = statSizesAndStyles(
         displaySize, statsVisible
     ).board.displaySize
@@ -89,7 +89,7 @@ const computeHexCounts = (statsVisible: boolean, boardDisplaySize: CartPair): He
 export const nearestBoardSize = (displaySize: CartPair, hexCount: number, statsVisible: boolean): CartPair =>
     roundToMap(
         hexCount,
-        boardHexCounts(displaySize, statsVisible).counts,
+        boardViewUtils(displaySize, statsVisible).counts,
         new CartPair(10, 10)
     )[0]
 

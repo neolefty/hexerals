@@ -9,12 +9,12 @@ import {LGO_DIFFICULTY_NAMES, LGOKey, LocalGameOptions} from '../../model/board/
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
 import {
-    boardHexCounts,
+    boardViewUtils,
     fitToDisplay,
     getOptionLimits,
     nearestBoardSize,
     shapeNeedsToChange
-} from "../fitToDisplay.ts/boardHexCounts"
+} from "../board/BoardViewUtils"
 import {countHexes} from '../hex/HexConstants'
 import './LocalGameOptionsView.css'
 import {MakeInputRange} from "./MakeInputRange"
@@ -134,7 +134,7 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
                         // value => this.nearestBoardSize(value).toString(' x '),
                         'How big of a map?',
                         nHexes,
-                        boardHexCounts(displaySize, statsVisible).counts,
+                        boardViewUtils(displaySize, statsVisible).counts,
                         fitHexes,
                     )}
                     {MakeInputRange(

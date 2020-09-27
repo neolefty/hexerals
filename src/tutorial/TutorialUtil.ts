@@ -1,13 +1,13 @@
 import {List} from "immutable"
-import {BoardState} from "../board/BoardState"
-import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from "../board/LocalGameOptions"
-import {doOpenLocalGame} from "../cycle/CycleAction"
-import {CycleReducer} from "../cycle/CycleReducer"
-import {CycleMode, CycleState, DEFAULT_CYCLE_STATE} from "../cycle/CycleState"
-import {Hex} from "../hex/Hex"
-import {Terrain} from "../hex/Terrain"
-import {Tile} from "../hex/Tile"
-import {Player} from "../players/Players"
+import {BoardState} from "../game/model/board/BoardState"
+import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from "../game/model/board/LocalGameOptions"
+import {doOpenLocalGame} from "../game/model/cycle/CycleAction"
+import {CycleReducer} from "../game/model/cycle/CycleReducer"
+import {CycleMode, CycleState, DEFAULT_CYCLE_STATE} from "../game/model/cycle/CycleState"
+import {Hex} from "../game/model/hex/Hex"
+import {Terrain} from "../game/model/hex/Terrain"
+import {Tile} from "../game/model/hex/Tile"
+import {Player} from "../game/model/players/Players"
 
 export const initCycle = (options?: Partial<LocalGameOptions>): CycleState => {
     const fullOptions = {...DEFAULT_TUTORIAL_OPTIONS, ...options}

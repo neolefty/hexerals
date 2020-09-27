@@ -1,7 +1,7 @@
 import produce from "immer"
-import {GenericAction} from "../../../common/GenericAction"
-import {CycleAction} from "../cycle/CycleAction"
-import {CycleReducer} from "../cycle/CycleReducer"
+import {GenericAction} from "../common/GenericAction"
+import {CycleAction} from "../game/model/cycle/CycleAction"
+import {CycleReducer} from "../game/model/cycle/CycleReducer"
 import {LessonId} from "./Lessons"
 import {LessonState, TutorialState} from "./TutorialState"
 

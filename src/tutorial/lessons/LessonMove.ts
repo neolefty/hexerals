@@ -1,4 +1,4 @@
-import {Player} from "../../players/Players"
+import {Player} from "../../game/model/players/Players"
 import {TutorialLesson} from "../TutorialState"
 import {cursorTiles, hasCapital, initCycle, tilesOwnedBy} from "../TutorialUtil"
 

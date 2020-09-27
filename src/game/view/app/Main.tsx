@@ -3,6 +3,7 @@ import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 import {ColorsContainer} from '../../../color/ColorsContainer'
 import {inDev} from '../../../common/Analytics'
 import {useDisplaySize} from "../../../common/ViewSizeContext"
+import {TutorialContainer} from "../../../tutorial/TutorialContainer"
 import {CycleContainer} from '../cycle/CycleContainer'
 import {TestTracking} from '../test/TestTracking'
 import {Help} from './Help'
@@ -18,6 +19,7 @@ export const Main = () => {
                     <Tab>Controls</Tab>
                     <Tab>Colors</Tab>
                     { inDev() && <Tab>Track</Tab> }
+                    { inDev() && <Tab>Tutorial</Tab> }
                 </TabList>
                 <TabPanel>
                     <CycleContainer/>
@@ -33,7 +35,13 @@ export const Main = () => {
                         <TestTracking/>
                     </TabPanel>
                 }
+                { inDev() &&
+                    <TabPanel>
+                        <TutorialContainer/>
+                    </TabPanel>
+                }
             </Tabs>
         </div>
     )
 }
+

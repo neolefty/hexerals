@@ -1,6 +1,6 @@
 import {List, Map} from "immutable"
-import {CycleState} from "../cycle/CycleState"
-import {Hex} from "../hex/Hex"
+import {CycleState} from "../game/model/cycle/CycleState"
+import {Hex} from "../game/model/hex/Hex"
 import {FIRST_TUTORIAL_ID, LessonId} from "./Lessons"
 
 // The tutorial is made up of a web of interconnected lessons
