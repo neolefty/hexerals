@@ -3,20 +3,17 @@ import {BoardState} from "../game/model/board/BoardState"
 import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from "../game/model/board/LocalGameOptions"
 import {doOpenLocalGame} from "../game/model/cycle/CycleAction"
 import {CycleReducer} from "../game/model/cycle/CycleReducer"
-import {CycleMode, CycleState, DEFAULT_CYCLE_STATE} from "../game/model/cycle/CycleState"
+import {CycleState, IN_LOCAL_GAME} from "../game/model/cycle/CycleState"
 import {Hex} from "../game/model/hex/Hex"
 import {Terrain} from "../game/model/hex/Terrain"
 import {Tile} from "../game/model/hex/Tile"
 import {Player} from "../game/model/players/Players"
 
 export const initCycle = (options?: Partial<LocalGameOptions>): CycleState => {
-    const fullOptions = {...DEFAULT_TUTORIAL_OPTIONS, ...options}
-    let result: CycleState = {
-        localOptions: fullOptions,
-        mode: CycleMode.IN_LOCAL_GAME,
-    }
-    result = CycleReducer(DEFAULT_CYCLE_STATE, doOpenLocalGame())
-    return result
+    return CycleReducer({
+        localOptions: {...DEFAULT_TUTORIAL_OPTIONS, ...options},
+        mode: IN_LOCAL_GAME,
+    }, doOpenLocalGame())
 }
 
 export const DEFAULT_TUTORIAL_OPTIONS = {

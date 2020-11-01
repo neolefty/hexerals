@@ -11,12 +11,10 @@ import {pickNPlayers, Player, PlayerManager} from "../players/Players"
 import {CornersPlayerArranger} from "../setup/PlayerArranger"
 import {RandomTerrainArranger} from "../setup/RandomTerrainArranger"
 import {SpreadPlayersArranger} from "../setup/SpreadPlayerArranger"
-import {OpenLocalGameAction} from "./CycleAction"
 // noinspection JSUnusedLocalSymbols
-import {CycleMode, CycleState} from "./CycleState"
+import {CycleState, IN_LOCAL_GAME} from "./CycleState"
 
-export const OpenLocalGameReducer =
-    (state: CycleState, action: OpenLocalGameAction): CycleState => {
+export const OpenLocalGameReducer = (state: CycleState): CycleState => {
         const opts = state.localOptions
         const players = pickNPlayers(opts.numRobots + 1)
         const mountainFrequency = opts.mountainPercent / 100
@@ -43,7 +41,7 @@ export const OpenLocalGameReducer =
                     BasicRobot.byIntelligence(opts.difficulty)
                 )
         })
-        // TODO log local game options better — can we send general tags?
+        // TODO log local game options better — can we send general tags?
         logAnalyticsEvent(
             AnalyticsAction.start, AnalyticsCategory.local, undefined, undefined, {
                 robots: opts.numRobots,
@@ -65,7 +63,7 @@ export const OpenLocalGameReducer =
 
         return Object.freeze({
             ...state,
-            mode: CycleMode.IN_LOCAL_GAME,
+            mode: IN_LOCAL_GAME,
             localGame: Object.freeze({
                 fogs: new PlayerFogs(true),
                 boardState: Object.freeze(boardState)

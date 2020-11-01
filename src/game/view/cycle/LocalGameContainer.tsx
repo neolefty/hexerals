@@ -1,15 +1,18 @@
 import {List, Map} from 'immutable'
-import React from "react"
+import React, {useCallback} from "react"
+import {useHistory} from "react-router-dom"
 import {ColorPodge} from '../../../color/ColorPodge'
 import {setColorsAction} from '../../../color/ColorsReducer'
 import {DriftColor} from '../../../color/DriftColor'
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
 import {CacheMap} from '../../../common/CacheMap'
+import {AppState} from "../../../main/App"
+import {ROUTE_LOCAL_OPTIONS} from "../../../main/Main"
 import {MainDispatch} from "../../../main/MainReducer"
 import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
 import {
-    doCancelMoves,
     doApplyMoves,
+    doCancelMoves,
     doGameDrag,
     doGameTick,
     doPlaceCursor,
@@ -21,7 +24,6 @@ import {LocalGameState} from '../../model/cycle/CycleState'
 import {Hex} from '../../model/hex/Hex'
 import {PlayerMove} from '../../model/move/Move'
 import {Player, PLAYERS} from '../../model/players/Players'
-import {AppState} from "../app/App"
 import {LocalGameView} from './LocalGameView'
 
 export const playerColors = (colors: ColorPodge): Map<Player, DriftColor> =>
@@ -59,44 +61,29 @@ const mapStateToTickerBoardViewProps = (state: AppState) => {
 }
 
 const mapDispatchToBoardViewProps = (
-    dispatch: MainDispatch
+    dispatch: MainDispatch,
+    navTo: (path: string) => void
 ) => ({
-    onQueueMoves: (moves: List<PlayerMove>) => dispatch(
-        doQueueMoves(moves)
-    ),
-
+    onQueueMoves: (moves: List<PlayerMove>) => dispatch(doQueueMoves(moves)),
     onDrag: (
         player: Player, cursorIndex: number, source: Hex, dest: Hex
-    ) => dispatch(
-        doGameDrag(player, cursorIndex, source, dest)
-    ),
-
+    ) => dispatch(doGameDrag(player, cursorIndex, source, dest)),
     onCancelMoves: (
         player: Player, cursorIndex: number, count: number
-    ) => dispatch(
-        doCancelMoves(player, cursorIndex, count)
-    ),
-
+    ) => dispatch(doCancelMoves(player, cursorIndex, count)),
     onPlaceCursor: (
         index: number, position: Hex, clearOthers: boolean
-    ) => dispatch(
-        doPlaceCursor(position, index, clearOthers)
-    ),
-
+    ) => dispatch(doPlaceCursor(position, index, clearOthers)),
     onStep: () => {
         dispatch(doRobotsDecide())
         dispatch(doApplyMoves())
         dispatch(doGameTick())
     },
-
-    onResetColors: (n: number) => dispatch(
-        setColorsAction(ColorPodge.construct(n))
-    ),
-
+    onResetColors: (n: number) => dispatch(setColorsAction(ColorPodge.construct(n))),
     onEndGame: () => {
         dispatch(doCloseLocalGame())
+        navTo(ROUTE_LOCAL_OPTIONS)
     },
-
     onRestartGame: () => {
         logAnalyticsEvent(AnalyticsAction.again, AnalyticsCategory.local)
         dispatch(doOpenLocalGame())
@@ -106,10 +93,12 @@ const mapDispatchToBoardViewProps = (
 export const LocalGameContainer = () => {
     const dispatch = useMainDispatch()
     const state = useMainState()
+    const history = useHistory()
+    const navTo = useCallback((path: string) => history.push(path), [history])
     return (
         <LocalGameView
             {...mapStateToTickerBoardViewProps(state)}
-            {...mapDispatchToBoardViewProps(dispatch)}
+            {...mapDispatchToBoardViewProps(dispatch, navTo)}
         />
     )
 }

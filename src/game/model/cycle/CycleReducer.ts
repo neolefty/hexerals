@@ -10,7 +10,7 @@ import {
     CycleAction,
     OPEN_LOCAL_GAME
 } from "./CycleAction"
-import {CycleMode, CycleState} from './CycleState'
+import {CycleState, NOT_IN_GAME} from './CycleState'
 import {OpenLocalGameReducer} from "./OpenLocalGameReducer"
 
 export type CycleDispatch = (action: CycleAction) => void
@@ -19,7 +19,7 @@ export const CycleReducer = (
     state: CycleState, action: CycleAction,
 ): CycleState => {
     if (action.type === OPEN_LOCAL_GAME)
-        return OpenLocalGameReducer(state, action)
+        return OpenLocalGameReducer(state)
     else if (action.type === CLOSE_LOCAL_GAME)
         return CloseLocalGameReducer(state, action)
     else if (action.type === CHANGE_LOCAL_OPTION) {
@@ -60,7 +60,7 @@ const CloseLocalGameReducer =
         )
         return {
             ...state,
-            mode: CycleMode.NOT_IN_GAME,
+            mode: NOT_IN_GAME,
             localGame: undefined,
         }
     }

@@ -1,13 +1,13 @@
 import * as React from "react"
 import TestRenderer, {ReactTestRenderer} from 'react-test-renderer'
-import {initialColorState} from "../../../color/ColorsReducer"
-import {MainReducer, MainState} from "../../../main/MainReducer"
-import {BoardState} from "../../model/board/BoardState"
-import {DEFAULT_LOCAL_GAME_OPTIONS} from "../../model/board/LocalGameOptions"
-import {doChangeLocalOption, doOpenLocalGame} from "../../model/cycle/CycleAction"
-import {DEFAULT_CYCLE_STATE} from "../../model/cycle/CycleState"
-import {HexBoardView} from "../board/HexBoardView"
-import {countHexes} from "../hex/HexConstants"
+import {initialColorState} from "../color/ColorsReducer"
+import {BoardState} from "../game/model/board/BoardState"
+import {DEFAULT_LOCAL_GAME_OPTIONS} from "../game/model/board/LocalGameOptions"
+import {doChangeLocalOption, doOpenLocalGame} from "../game/model/cycle/CycleAction"
+import {DEFAULT_CYCLE_STATE} from "../game/model/cycle/CycleState"
+import {HexBoardView} from "../game/view/board/HexBoardView"
+import {countHexes} from "../game/view/hex/HexConstants"
+import {MainReducer, MainState} from "./MainReducer"
 import {Mini} from "./Mini"
 
 interface InactiveBoardViewProps {

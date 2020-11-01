@@ -3,15 +3,15 @@ import {PlayerFogs} from '../board/Fog'
 import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from '../board/LocalGameOptions'
 import {restoreLocalGameOptions} from "../board/peristLocalGameOptions"
 
-export enum CycleMode {
-    IN_LOCAL_GAME = 'in local game',
-    NOT_IN_GAME = 'not in game',
-}
+export const NOT_IN_GAME = 'not in game'
+export const IN_LOCAL_GAME = 'in local game'
+
+export type CycleMode = typeof IN_LOCAL_GAME | typeof NOT_IN_GAME
 
 export interface CycleState {
-    mode: CycleMode;
-    localOptions: LocalGameOptions;
-    localGame?: LocalGameState;
+    mode: CycleMode
+    localOptions: LocalGameOptions
+    localGame?: LocalGameState
 }
 
 export interface LocalGameState {
@@ -23,7 +23,7 @@ export const initialCycleState = (): CycleState => restoreCycleState()
 
 // the meta-game
 export const DEFAULT_CYCLE_STATE: CycleState = {
-    mode: CycleMode.NOT_IN_GAME,
+    mode: NOT_IN_GAME,
     localOptions: DEFAULT_LOCAL_GAME_OPTIONS,
     localGame: undefined,
 }

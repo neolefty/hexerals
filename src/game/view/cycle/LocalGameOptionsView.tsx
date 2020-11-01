@@ -1,10 +1,13 @@
+import clsx from "clsx"
 import {Map} from 'immutable'
 import * as React from "react"
 import {useEffect, useMemo} from "react"
 import 'react-input-range/lib/css/index.css'
 import {CartPair} from "../../../common/CartPair"
 import {CheckInput, NumberInput} from '../../../common/Inputs'
+import {NavButton} from "../../../common/NavButton"
 import {useDisplaySize} from "../../../common/ViewSizeContext"
+import {ROUTE_TUTORIAL} from "../../../main/Main"
 import {LGO_DIFFICULTY_NAMES, LGOKey, LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
@@ -25,15 +28,16 @@ export type ChangePreviewOption = (
 
 export interface LGOVProps {
     localOptions: LocalGameOptions
-    changeLocalOption: ChangePreviewOption
-    newGame: () => void
+    onChangeLocalOption: ChangePreviewOption
+    onNewGame: () => void
+    onResume?: () => void
 }
 
 export const LocalGameOptionsView = (props: LGOVProps) => {
     const displaySize = useDisplaySize()
     const nHexes = countHexes(props.localOptions.boardWidth, props.localOptions.boardHeight)
     const statsVisible = props.localOptions.statsVisible !== 0
-    const changeOption = props.changeLocalOption
+    const changeOption = props.onChangeLocalOption
     const boardSize = useMemo<CartPair>(
         () => new CartPair(props.localOptions.boardWidth, props.localOptions.boardHeight),
         [props.localOptions.boardWidth, props.localOptions.boardHeight],
@@ -47,14 +51,14 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
     const isOption = (optionName: LGOKey): boolean => props.localOptions[optionName] > 0
     const isLevelVisible = (level: number) => props.localOptions.levelVisible >= level
     const toggleOption = (optionName: LGOKey) =>
-        props.changeLocalOption(
+        props.onChangeLocalOption(
             optionName,
             isOption(optionName) ? 0 : 1,
             true,
         )
 
     const toggleAdvanced = () =>
-        props.changeLocalOption(
+        props.onChangeLocalOption(
             'levelVisible',
             (props.localOptions.levelVisible + 1) % 3, // 0, 1, 2
             true,
@@ -63,7 +67,7 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
     const optionChanger = (
         name: keyof LocalGameOptions, forceHighFi = false
     ) => (n: number, highFidelity: boolean = true) =>
-        props.changeLocalOption(name, n, highFidelity || forceHighFi)
+        props.onChangeLocalOption(name, n, highFidelity || forceHighFi)
     const optionToggler = (optionName: LGOKey) =>
         () => toggleOption(optionName)
 
@@ -78,7 +82,7 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
             min={getOptionLimits(option)[0]}
             max={getOptionLimits(option)[1]}
             onChange={optionChanger(option)}
-            onEnter={props.newGame}
+            onEnter={props.onNewGame}
             blockTabbing={!isLevelVisible(level)}
             children={children}
         />
@@ -93,7 +97,7 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
             value={isOption(option)}
             title={title}
             onToggle={optionToggler(option)}
-            onEnter={props.newGame}
+            onEnter={props.onNewGame}
             blockTabbing={!isLevelVisible(level)}
         />
     )
@@ -117,16 +121,14 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
     const nearestBoardWh = nearestBoardSize(displaySize, nHexes, statsVisible)
     const showSize = nearestBoardWh.scaleXY(1, 0.5).round()
     const fitHexes = (n: number, hf: boolean) => fitToDisplay(
-        displaySize, n, hf, statsVisible, props.changeLocalOption
+        displaySize, n, hf, statsVisible, props.onChangeLocalOption
     )
     return (
         <div
-            className={`LocalGameOptionsView Column Show${
-                props.localOptions.levelVisible
-            }`}
+            className={clsx('LocalGameOptionsView', 'Column', `Show${props.localOptions.levelVisible}`)}
             style={displaySize.sizeStyle}
         >
-            <div className="Modal Column">
+            <div className={clsx('Modal', 'Column', props.onResume && 'Wide')}>
                 <div className="Level0 Column">
                     {numberRangeFromMap(
                         'Map',
@@ -167,12 +169,11 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
                     {checkInput('Stats', 'statsVisible', 'Show the stats panel.', 2)}
                 </div>
                 <div>
-                    <button
-                        onClick={props.newGame}
-                        className='start'
-                    >
-                        Start
-                    </button>
+                    <NavButton to={`/${ROUTE_TUTORIAL}`}>?</NavButton>
+                    <button onClick={props.onNewGame} className='start'>Start</button>
+                    {props.onResume &&
+                        <button onClick={props.onResume} className='start'>Resume</button>
+                    }
                     <button
                         className="LevelButton"
                         onClick={toggleAdvanced}

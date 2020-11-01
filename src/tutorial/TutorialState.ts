@@ -10,7 +10,7 @@ export interface TutorialState {
     lessons: Map<string, LessonState>
 }
 
-const INITIAL_TUTORIAL_STATE: TutorialState = {
+export const INITIAL_TUTORIAL_STATE: TutorialState = {
     curLesson: FIRST_TUTORIAL_ID,
     lessons: Map()
 }
