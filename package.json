@@ -16,7 +16,7 @@
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.4",
     "hsluv": "^0.1.0",
-    "immer": "^7.0.9",
+    "immer": "^8.0.1",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.13.1",
     "react-device-detect": "^1.13.1",
