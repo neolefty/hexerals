@@ -4,7 +4,7 @@ import Adapter from 'enzyme-adapter-react-16'
 import {List, Map, Set} from 'immutable'
 import * as React from 'react'
 import {CartPair} from "../../../common/CartPair"
-import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
+import {ProvideDisplaySize} from "../../../common/ViewSizeContext"
 
 import {Board} from '../../model/board/Board'
 import {BoardStateReducerTester} from '../../model/board/BoardStateReducerTester'
@@ -74,11 +74,11 @@ it('renders a board with no selection', () => {
     // )
 
     const view = mount(
-        <DisplaySizeProvider size={new CartPair(1000, 1000)}>
+        <ProvideDisplaySize size={new CartPair(1000, 1000)}>
             <OldGridView {...BOARD_STUBS}
                 boardState={boardState}
             />
-        </DisplaySizeProvider>
+        </ProvideDisplaySize>
     )
     // console.log(view.html())
     // console.log(view.children().toString())
@@ -109,12 +109,12 @@ it('renders a board with a selection', () => {
         curPlayer: Player.One,
     }
     const view = enzyme.render(
-        <DisplaySizeProvider size={new CartPair(1000, 1000)}>
+        <ProvideDisplaySize size={new CartPair(1000, 1000)}>
             <OldGridView
                 {...BOARD_STUBS}
                 boardState={bs}
             />
-        </DisplaySizeProvider>
+        </ProvideDisplaySize>
     )
     const active = view.find('.active')
     expect(active.length).toEqual(1)  // only one selected

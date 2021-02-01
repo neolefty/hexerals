@@ -10,7 +10,7 @@ interface DisplaySizeProviderProps extends HasChildren {
     size: CartPair
 }
 
-export const DisplaySizeProvider = (props: DisplaySizeProviderProps) =>
+export const ProvideDisplaySize = (props: DisplaySizeProviderProps) =>
     <DisplaySizeContext.Provider value={props.size}>
         {props.children}
     </DisplaySizeContext.Provider>

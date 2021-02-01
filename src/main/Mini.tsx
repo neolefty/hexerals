@@ -1,11 +1,11 @@
 import {default as React, useReducer} from "react"
 import {initialColorState} from "../color/ColorsReducer"
 import {CartPair} from "../common/CartPair"
-import {DisplaySizeProvider} from "../common/ViewSizeContext"
+import {ProvideDisplaySize} from "../common/ViewSizeContext"
 import {DEFAULT_CYCLE_STATE} from "../game/model/cycle/CycleState"
 import {CycleView} from "../game/view/cycle/CycleView"
 import {MainReducer, MainState} from "./MainReducer"
-import {WithMainDispatch, WithMainState} from "./MainStateContext"
+import {ProvideMainDispatch, ProvideMainState} from "./MainStateContext"
 
 const DEFAULT_STATE: MainState = {
     cycle: DEFAULT_CYCLE_STATE,
@@ -20,12 +20,12 @@ export const Mini = (props: MiniProps) => {
     const newState = props.init ? props.init(state) : state
     const size = {size: new CartPair(1200, 700)}
     return (
-        <WithMainDispatch dispatch={dispatch}>
-            <WithMainState state={newState}>
-                <DisplaySizeProvider {...size}>
+        <ProvideMainDispatch dispatch={dispatch}>
+            <ProvideMainState state={newState}>
+                <ProvideDisplaySize {...size}>
                     <CycleView/>
-                </DisplaySizeProvider>
-            </WithMainState>
-        </WithMainDispatch>
+                </ProvideDisplaySize>
+            </ProvideMainState>
+        </ProvideMainDispatch>
     )
 }

@@ -4,12 +4,12 @@ import {initialMainState, MainDispatch, MainState} from "./MainReducer"
 
 export const MainStateContext: Context<MainState> = React.createContext(initialMainState())
 
-export interface WithMainStateProps {
+export interface ProvideMainStateProps {
     state: MainState
     children?: ReactNode
 }
 
-export const WithMainState = (props: WithMainStateProps) =>
+export const ProvideMainState = (props: ProvideMainStateProps) =>
     <MainStateContext.Provider value={Object.freeze(props.state)}>
         {props.children}
     </MainStateContext.Provider>
@@ -22,12 +22,12 @@ export const DISPATCH_UNIMPLEMENTED_WARN: MainDispatch = (action: GenericAction)
 
 export const MainDispatchContext: Context<MainDispatch> = React.createContext(DISPATCH_UNIMPLEMENTED_WARN)
 
-export interface WithMainDispatchProps {
+export interface ProvideMainDispatchProps {
     dispatch: MainDispatch
     children?: ReactNode
 }
 
-export const WithMainDispatch = (props: WithMainDispatchProps) =>
+export const ProvideMainDispatch = (props: ProvideMainDispatchProps) =>
     <MainDispatchContext.Provider value={props.dispatch}>
         {props.children}
     </MainDispatchContext.Provider>

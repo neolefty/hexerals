@@ -2,7 +2,7 @@ import {List, Map} from 'immutable'
 import * as React from 'react'
 
 import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent,} from '../../../common/Analytics'
-import {DisplaySizeProvider, useDisplaySize} from "../../../common/ViewSizeContext"
+import {ProvideDisplaySize, useDisplaySize} from "../../../common/ViewSizeContext"
 import {Board} from '../../model/board/Board'
 import {DEFAULT_LOCAL_GAME_OPTIONS} from "../../model/board/LocalGameOptions"
 import {Hex} from '../../model/hex/Hex'
@@ -42,14 +42,14 @@ export const Victory = (props: BoardViewProps) => {
             <div className='Modal'>
                 <div className='Column'>
                     <div className='Row'>
-                        <DisplaySizeProvider size={displaySize.scale(1/3)}>
+                        <ProvideDisplaySize size={displaySize.scale(1/3)}>
                             <HexBoardView {
                                 ...singleHexBoard(
                                     props,
                                     new Tile(Player.Zero, 0, Terrain.Capital)
                                 )
                             }/>
-                        </DisplaySizeProvider>
+                        </ProvideDisplaySize>
                     </div>
                     <div className='Row'>
                         <strong>Victory!</strong>
@@ -80,14 +80,14 @@ export const Defeat = (props: BoardViewProps) => {
             <div className='Modal'>
                 <div className='Column'>
                     <div className='Row'>
-                        <DisplaySizeProvider size={displaySize.scale(1/3)}>
+                        <ProvideDisplaySize size={displaySize.scale(1/3)}>
                             <HexBoardView {
                                 ...singleHexBoard(
                                     props,
                                     new Tile(Player.Zero, 0, Terrain.Mountain)
                                 )
                             }/>
-                        </DisplaySizeProvider>
+                        </ProvideDisplaySize>
                     </div>
                     <div className='Row'>
                         <strong>defeat.</strong>

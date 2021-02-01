@@ -4,7 +4,7 @@ import {useMemo} from "react"
 
 import {CartPair} from '../../../common/CartPair'
 import {useLocalStorageState} from '../../../common/HookLocalStorage'
-import {DisplaySizeProvider, useDisplaySize} from "../../../common/ViewSizeContext"
+import {ProvideDisplaySize, useDisplaySize} from "../../../common/ViewSizeContext"
 import {HamburgerMenu} from "../../../main/HamburgerMenu"
 import {ROUTE_MENU} from "../../../main/Main"
 import {StatsPanel} from '../stats/StatsPanel'
@@ -133,9 +133,9 @@ export const BoardAndStats = (props: BoardAndStatsProps) => {
     return (
         <div style={displayStuff.container.style}>
             <div style={displayStuff.board.style}>
-                <DisplaySizeProvider size={displayStuff.board.displaySize}>
+                <ProvideDisplaySize size={displayStuff.board.displaySize}>
                     <HexBoardView {...props} />
-                </DisplaySizeProvider>
+                </ProvideDisplaySize>
             </div>
             {
                 props.statsVisible ? (

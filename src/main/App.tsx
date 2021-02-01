@@ -3,11 +3,11 @@ import {ColorsState} from "../color/ColorsReducer"
 import {isIOS} from "../common/BrowserUtil"
 import {CartPair} from "../common/CartPair"
 import {useWindowSize} from "../common/HookWindowSize"
-import {DisplaySizeProvider} from "../common/ViewSizeContext"
+import {ProvideDisplaySize} from "../common/ViewSizeContext"
 import {CycleState} from "../game/model/cycle/CycleState"
 import {Main} from "./Main"
 import {initialMainState, MainReducer} from "./MainReducer"
-import {WithMainDispatch, WithMainState} from "./MainStateContext"
+import {ProvideMainDispatch, ProvideMainState} from "./MainStateContext"
 
 const MIN_WIDTH = 300
 const MIN_HEIGHT = 300
@@ -30,12 +30,12 @@ export const App = () => {
     , [rawWinSize])
 
     return (
-        <DisplaySizeProvider size={viewSize}>
-            <WithMainDispatch dispatch={dispatch}>
-                <WithMainState state={state}>
+        <ProvideDisplaySize size={viewSize}>
+            <ProvideMainDispatch dispatch={dispatch}>
+                <ProvideMainState state={state}>
                     <Main/>
-                </WithMainState>
-            </WithMainDispatch>
-        </DisplaySizeProvider>
+                </ProvideMainState>
+            </ProvideMainDispatch>
+        </ProvideDisplaySize>
     )
 }

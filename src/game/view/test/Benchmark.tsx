@@ -2,7 +2,7 @@ import {List} from 'immutable'
 import * as React from 'react'
 import {ColorPodge} from '../../../color/ColorPodge'
 import {CartPair} from '../../../common/CartPair'
-import {DisplaySizeProvider} from "../../../common/ViewSizeContext"
+import {ProvideDisplaySize} from "../../../common/ViewSizeContext"
 import {Board} from '../../model/board/Board'
 
 import {BOARD_STATE_STARTER, BoardState} from '../../model/board/BoardState'
@@ -97,7 +97,7 @@ export class Benchmark
 
     render(): React.ReactNode {
         return (
-            <DisplaySizeProvider size={new CartPair(1000, 700)}>
+            <ProvideDisplaySize size={new CartPair(1000, 700)}>
                 <div
                     className="Row"
                     style={{height: this.props.displaySize.y}}
@@ -116,7 +116,7 @@ export class Benchmark
                         )
                 }
                 </div>
-            </DisplaySizeProvider>
+            </ProvideDisplaySize>
         )
     }
 }
