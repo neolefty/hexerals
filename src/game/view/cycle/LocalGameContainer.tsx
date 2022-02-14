@@ -95,6 +95,7 @@ export const LocalGameContainer = () => {
     const state = useMainState()
     const history = useHistory()
     const navTo = useCallback((path: string) => history.push(path), [history])
+    // TODO Memoize these mapping functions
     return (
         <LocalGameView
             {...mapStateToTickerBoardViewProps(state)}

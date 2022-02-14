@@ -8,3 +8,6 @@ export const FIRST_TUTORIAL_ID = 'move'
 export type LessonId = 'move' | 'drag'
 
 export const Lessons: List<TutorialLesson> = List([LessonMove, LessonDrag])
+
+export const useLesson = (lessonId: LessonId) =>
+    Lessons.find(lesson => lesson.id === lessonId)

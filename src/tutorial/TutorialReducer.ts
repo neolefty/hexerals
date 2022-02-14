@@ -1,5 +1,4 @@
 import produce from "immer"
-import {GenericAction} from "../common/GenericAction"
 import {CycleAction} from "../game/model/cycle/CycleAction"
 import {CycleReducer} from "../game/model/cycle/CycleReducer"
 import {LessonId} from "./Lessons"
@@ -7,10 +6,9 @@ import {LessonState, TutorialState} from "./TutorialState"
 
 export type TutorialAction = TutorialSetStepAction | TutorialGameAction | TutorialStartGameAction | TutorialMessageAction
 
-export const isTutorialAction = (action: GenericAction): action is TutorialSetStepAction =>
-    action.type.startsWith('tutorial ')
-
 const TUTORIAL_START_STEP = 'tutorial start step'
+export const doTutorialStartStep = (lessonId: LessonId, initialState: LessonState): TutorialStartGameAction =>
+    ({type: TUTORIAL_START_STEP, lessonId, initialState})
 interface TutorialStartGameAction {
     type: typeof TUTORIAL_START_STEP
     lessonId: LessonId
@@ -18,13 +16,16 @@ interface TutorialStartGameAction {
 }
 
 const TUTORIAL_SET_STEP = 'tutorial step'
-export const doTutorialSetStep = () => ({type: TUTORIAL_SET_STEP})
+export const doTutorialSetStep = (lessonId: LessonId): TutorialSetStepAction =>
+    ({type: TUTORIAL_SET_STEP, lessonId})
 interface TutorialSetStepAction {
     type: typeof TUTORIAL_SET_STEP
     lessonId: LessonId
 }
 
 const TUTORIAL_GAME = 'tutorial game'
+export const doTutorialGame = (lessonId: LessonId, cycleAction: CycleAction): TutorialGameAction =>
+    ({type: TUTORIAL_GAME, lessonId, cycleAction})
 interface TutorialGameAction {
     type: typeof TUTORIAL_GAME
     lessonId: LessonId
@@ -32,6 +33,8 @@ interface TutorialGameAction {
 }
 
 const TUTORIAL_MESSAGE = 'tutorial message'
+export const doTutorialMessage = (lessonId: LessonId, message: string): TutorialMessageAction =>
+    ({type: TUTORIAL_MESSAGE, lessonId, message})
 interface TutorialMessageAction {
     type: typeof TUTORIAL_MESSAGE
     lessonId: LessonId
@@ -49,7 +52,7 @@ export const TutorialReducer = produce((
             if (!draft.lessons.has(action.lessonId))
                 console.error(`Step ${action.lessonId} hasn't been started`, action)
             else
-                draft.curLesson = action.lessonId
+                draft.curLessonId = action.lessonId
             return draft
         case TUTORIAL_GAME:
         case TUTORIAL_MESSAGE:

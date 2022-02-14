@@ -6,11 +6,11 @@ export const useDisplaySize = (): CartPair => useContext(DisplaySizeContext)
 
 const DisplaySizeContext: Context<CartPair> = React.createContext(CartPair.ORIGIN)
 
-interface DisplaySizeProviderProps extends HasChildren {
+interface ProvideDisplaySizeProps extends HasChildren {
     size: CartPair
 }
 
-export const ProvideDisplaySize = (props: DisplaySizeProviderProps) =>
+export const ProvideDisplaySize = (props: ProvideDisplaySizeProps) =>
     <DisplaySizeContext.Provider value={props.size}>
         {props.children}
     </DisplaySizeContext.Provider>

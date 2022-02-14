@@ -5,13 +5,13 @@ import {FIRST_TUTORIAL_ID, LessonId} from "./Lessons"
 
 // The tutorial is made up of a web of interconnected lessons
 export interface TutorialState {
-    curLesson: LessonId
+    curLessonId: LessonId
     // map of tutorial chapter to that chapter's game
     lessons: Map<string, LessonState>
 }
 
 export const INITIAL_TUTORIAL_STATE: TutorialState = {
-    curLesson: FIRST_TUTORIAL_ID,
+    curLessonId: FIRST_TUTORIAL_ID,
     lessons: Map()
 }
 
