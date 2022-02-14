@@ -1,6 +1,6 @@
 import {List, Map} from 'immutable'
 import React, {useCallback} from "react"
-import {useHistory} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import {ColorPodge} from '../../../color/ColorPodge'
 import {setColorsAction} from '../../../color/ColorsReducer'
 import {DriftColor} from '../../../color/DriftColor'
@@ -93,8 +93,8 @@ const mapDispatchToBoardViewProps = (
 export const LocalGameContainer = () => {
     const dispatch = useMainDispatch()
     const state = useMainState()
-    const history = useHistory()
-    const navTo = useCallback((path: string) => history.push(path), [history])
+    const navigate = useNavigate()
+    const navTo = useCallback((path: string) => navigate(path), [navigate])
     // TODO Memoize these mapping functions
     return (
         <LocalGameView

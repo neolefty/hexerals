@@ -1,4 +1,5 @@
 import {List, Map, Set} from 'immutable';
+import {devAssert} from "../../../common/Environment"
 
 import {Tile} from '../hex/Tile';
 import {Board, TileFilter} from '../board/Board';
@@ -6,7 +7,6 @@ import {Hex} from '../hex/Hex';
 import {connected} from '../hex/HexGraph';
 import {TileArranger} from './TileArranger';
 import {Terrain} from '../hex/Terrain';
-import * as assert from 'assert';
 import {StatusMessage} from '../../../common/StatusMessage';
 
 // replace empty terrain randomly and without blocking
@@ -22,8 +22,8 @@ export class RandomTerrainArranger extends TileArranger {
         readonly bisectionFilter: TileFilter = tile => tile.canBeOccupied,
     ) {
         super()
-        assert.ok(fractionOfEmpty >= 0)
-        assert.ok(fractionOfEmpty <= 1)
+        devAssert(fractionOfEmpty >= 0)
+        devAssert(fractionOfEmpty <= 1)
     }
 
     arrange(
@@ -69,8 +69,7 @@ export class RandomTerrainArranger extends TileArranger {
                 }
             }
             if (!ranOutOfSpace)
-                assert.strictEqual(remainingCandidates.size,
-                    beforeEmpty - numReplacements - bisectionsAvoided)
+                devAssert(remainingCandidates.size === beforeEmpty - numReplacements - bisectionsAvoided)
         })
     }
 }

@@ -1,5 +1,5 @@
-import * as assert from "assert"
 import {AnalyticsAction, AnalyticsCategory, AnalyticsLabel, logAnalyticsEvent} from '../../../common/Analytics'
+import {devAssert} from "../../../common/Environment"
 import {BoardStateReducer} from '../board/BoardStateReducer'
 import {saveLocalGameOptions} from "../board/peristLocalGameOptions"
 import {
@@ -72,8 +72,8 @@ export const ChangeLocalOptionReducer = (
         return state
 
     const result = {...state.localOptions}
-    assert.ok(result.hasOwnProperty(action.name))
-    assert.strictEqual(typeof result[action.name], 'number')
+    devAssert(result.hasOwnProperty(action.name))
+    devAssert(typeof result[action.name] === 'number')
     result[action.name] = action.n
     return {
         ...state,

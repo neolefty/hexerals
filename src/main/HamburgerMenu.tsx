@@ -1,6 +1,6 @@
 import {useCallback} from "react"
 import * as React from "react"
-import {useHistory} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import {CartPair} from "../common/CartPair"
 
 interface HamburgerMenuProps {
@@ -10,8 +10,8 @@ interface HamburgerMenuProps {
 }
 
 export const HamburgerMenu = (props: HamburgerMenuProps) => {
-    const history = useHistory()
-    const handleClick = useCallback(() => history.push(props.to), [history, props.to])
+    const navigate = useNavigate()
+    const handleClick = useCallback(() => navigate(props.to), [navigate, props.to])
     return (
         <div style={props.style} onClick={handleClick}>
             <svg></svg>

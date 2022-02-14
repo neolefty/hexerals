@@ -1,5 +1,6 @@
 import {List, Map} from 'immutable'
 import {StatusMessage} from '../../../common/StatusMessage'
+import {unknownToError} from "../../../common/unknownToError"
 import {GamePhase} from '../cycle/GamePhase'
 import {Hex} from '../hex/Hex'
 import {Tile} from '../hex/Tile'
@@ -140,7 +141,8 @@ export class BoardStateReducerTester {
             })
             return true
         }
-        catch(e) {
+        catch(u) {
+            const e = unknownToError(u)
             if (e.message === 'different') return false
             else throw e
         }

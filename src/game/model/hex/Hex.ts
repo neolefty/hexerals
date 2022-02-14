@@ -1,5 +1,5 @@
 import {List, Map, ValueObject} from 'immutable'
-import * as assert from 'assert';
+import {devAssert} from "../../../common/Environment"
 
 // Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
 // "Cube coordinates" for a description, see:
@@ -45,7 +45,7 @@ export class Hex implements ValueObject {
         const total = x + y + z
         if (isNaN(total)) return Hex.NONE
         else {
-            assert.strictEqual(total, 0)
+            devAssert(total === 0)
             // TODO eliminate memory leak of accumulated cache
             // (tried WeakMap but couldn't get it to work -- see git log)
             let yCache = Hex.xyCache.get(x)
@@ -82,7 +82,7 @@ export class Hex implements ValueObject {
     // The origin's lower-left neighbor at (-1, 0, 1) has a cartesian coord (-1, 1).
     // In other words, (x + y) must be even.
     static getCart(cx: number, cy: number): Hex {
-        assert.strictEqual((cx + cy) % 2, 0)
+        devAssert((cx + cy) % 2 === 0)
         return Hex.get(cx, (cy - cx) / 2, -(cy + cx) / 2)
     }
 

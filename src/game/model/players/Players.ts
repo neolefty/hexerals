@@ -1,6 +1,6 @@
 import {List, Map, Range} from 'immutable'
+import {devAssert} from "../../../common/Environment"
 import {Robot} from './Robot'
-import * as assert from 'assert'
 
 export enum Player {
     Nobody = 'Nobody',
@@ -27,7 +27,7 @@ export const pickNPlayers = (n: number): List<Player> => {
     return result.withMutations(m => {
         Range(0, Math.min(n, PLAYERS.size)).forEach(i => {
             const player = PLAYERS.get(i) as Player
-            assert.ok(player !== undefined)
+            devAssert(player !== undefined)
             m.push(player)
         })
     })

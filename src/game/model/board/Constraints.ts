@@ -1,6 +1,6 @@
+import {devAssert} from "../../../common/Environment"
 import {Hex} from '../hex/Hex'
 import {List, Range, Seq, Set} from 'immutable'
-import * as assert from 'assert';
 import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from './LocalGameOptions'
 
 export class RectEdges {
@@ -127,7 +127,7 @@ export abstract class BoardConstraints {
         const result = Set<Hex>().asMutable()
 
         let floodEdge = Set<Hex>().asMutable()
-        assert.ok(this.inBounds(this.start()))
+        devAssert(this.inBounds(this.start()))
         floodEdge.add(this.start())
 
         // Could do this recursively but for large boards it overflows the stack
@@ -182,8 +182,8 @@ export class RectangularConstraints extends BoardConstraints {
     readonly h: number
     constructor(opts: LocalGameOptions) {
         super(opts)
-        assert.strictEqual(opts.boardWidth, Math.round(opts.boardWidth))
-        assert.strictEqual(opts.boardHeight, Math.round(opts.boardHeight))
+        devAssert(opts.boardWidth === Math.round(opts.boardWidth))
+        devAssert(opts.boardHeight === Math.round(opts.boardHeight))
         this.w = opts.boardWidth
         this.h = opts.boardHeight
     }

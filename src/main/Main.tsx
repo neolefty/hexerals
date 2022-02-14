@@ -1,8 +1,8 @@
 import * as React from "react"
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom"
+import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
 import {ColorsContainer} from "../color/ColorsContainer"
-import {inDev} from "../common/Analytics"
+import {inDev} from "../common/Environment"
 import {useDisplaySize} from "../common/ViewSizeContext"
 import {CycleView, LocalGameOptionsPage} from "../game/view/cycle/CycleView"
 import {TestTracking} from "../game/view/test/TestTracking"
@@ -58,30 +58,16 @@ export const ROUTE_LOCAL_OPTIONS = ''
 export const Main = () => {
     const viewSize = useDisplaySize()
     return (
-        <Router>
-            <Switch>
-                <Route path={`/${ROUTE_ABOUT}`}>
-                    <Help displaySize={viewSize}/>
-                </Route>
-                <Route path={`/${ROUTE_TRACK}`}>
-                    <TestTracking/>
-                </Route>
-                <Route path={`/${ROUTE_TUTORIAL}`}>
-                    <TutorialContainer/>
-                </Route>
-                <Route path={`/${ROUTE_COLORS}`}>
-                    <ColorsContainer/>
-                </Route>
-                <Route path={`/${ROUTE_MENU}`}>
-                    <MainMenu/>
-                </Route>
-                <Route path={`/${ROUTE_LOCAL_GAME}`}>
-                    <CycleView/>
-                </Route>
-                <Route path={`/${ROUTE_LOCAL_OPTIONS}`}>
-                    <LocalGameOptionsPage/>
-                </Route>
-            </Switch>
-        </Router>
+        <BrowserRouter>
+            <Routes>
+                <Route path={`/${ROUTE_ABOUT}`} element={<Help displaySize={viewSize}/>}/>
+                <Route path={`/${ROUTE_TRACK}`} element={<TestTracking/>}/>
+                <Route path={`/${ROUTE_TUTORIAL}`} element={<TutorialContainer/>}/>
+                <Route path={`/${ROUTE_COLORS}`} element={<ColorsContainer/>}/>
+                <Route path={`/${ROUTE_MENU}`} element={<MainMenu/>}/>
+                <Route path={`/${ROUTE_LOCAL_GAME}`} element={<CycleView/>}/>
+                <Route path={`/${ROUTE_LOCAL_OPTIONS}`} element={<LocalGameOptionsPage/>}/>
+            </Routes>
+        </BrowserRouter>
     )
 }

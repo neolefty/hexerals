@@ -1,4 +1,5 @@
 import {List} from 'immutable'
+import {devAssert} from "../../../common/Environment"
 
 import {GameDecision, Robot} from './Robot'
 import {HexMove, PlayerMove} from '../move/Move'
@@ -13,7 +14,6 @@ import {
     // functions
     distillVotes, makeVotes, sortBySentiment,
 } from './Strategy'
-import * as assert from 'assert';
 
 // TODO defend capital
 // TODO move towards opponents — value captures far from home?
@@ -33,7 +33,7 @@ export class StrategyBot implements Robot {
 
     // assign N random strategies
     static byIntelligence(intelligence: number): StrategyBot {
-        assert.ok(intelligence <= StrategyBot.MAX_IQ)
+        devAssert(intelligence <= StrategyBot.MAX_IQ)
         let settings: boolean[] = Array(
             StrategyBot.MAX_IQ).fill(false)
         while (settings.filter(value => value).length < intelligence)
@@ -50,7 +50,7 @@ export class StrategyBot implements Robot {
     }
 
     constructor(readonly strategies: boolean[]) {
-        assert.strictEqual(strategies.length, StrategyBot.MAX_IQ)
+        devAssert(strategies.length === StrategyBot.MAX_IQ)
     }
 
     get intelligence() {

@@ -1,6 +1,6 @@
+import {devAssert} from "../../../common/Environment"
 import {Hex, hexesToString} from './Hex';
 import {List, Set} from 'immutable';
-import * as assert from 'assert';
 
 export const connected = (hexes: Set<Hex>): boolean =>
     hexes.size <= 1 || flood(hexes.first(), hexes).remaining.size === 0
@@ -22,8 +22,8 @@ export class FloodResult {
         readonly flooded: Set<Hex> = Set(),
     ) {}
     transfer(hex: Hex): FloodResult {
-        assert.ok(!this.flooded.has(hex))
-        assert.ok(this.remaining.has(hex))
+        devAssert(!this.flooded.has(hex))
+        devAssert(this.remaining.has(hex))
         return new FloodResult(
             this.remaining.delete(hex),
             this.flooded.add(hex),

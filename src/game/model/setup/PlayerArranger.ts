@@ -1,5 +1,5 @@
 import {Map} from 'immutable';
-import * as assert from 'assert';
+import {devAssert} from "../../../common/Environment"
 
 import {Board} from '../board/Board';
 import {Hex} from '../hex/Hex';
@@ -64,7 +64,7 @@ export class CornersPlayerArranger extends TileArranger {
         board: Board,
         status: StatusMessage[] | undefined = undefined,
     ): Map<Hex, Tile> {
-        assert.ok(board.players.size <= 4)
+        devAssert(board.players.size <= 4)
         let starts = Map<Hex, Tile>()
         const corners = [
             (b: Board) => b.edges.lowerLeft,

@@ -1,10 +1,9 @@
-import {BoardStateReducerTester} from './BoardStateReducerTester';
-import {PlayerFog} from './Fog';
-import {Player} from '../players/Players';
-import {Hex} from '../hex/Hex';
-import {Tile} from '../hex/Tile';
-import {Terrain} from '../hex/Terrain';
-import * as assert from 'assert';
+import {Hex} from '../hex/Hex'
+import {Terrain} from '../hex/Terrain'
+import {Tile} from '../hex/Tile'
+import {Player} from '../players/Players'
+import {BoardStateReducerTester} from './BoardStateReducerTester'
+import {PlayerFog} from './Fog'
 
 it('fogs the board for a player', () => {
     const brt = new BoardStateReducerTester(5, 9)
@@ -19,7 +18,7 @@ it('fogs the board for a player', () => {
     expect(fogged.getTile(upUpUp).known).toBeFalsy()
     // where Player.One starts — fogged city
     expect(fogged.getTile(brt.ur)).toEqual(Tile.MAYBE_MOUNTAIN)
-    assert.strictEqual(brt.getTile(brt.ur).terrain, Terrain.City)
+    expect(brt.getTile(brt.ur).terrain).toBe(Terrain.City)
 })
 
 // TODO test queueing moves in fog goes through mountains

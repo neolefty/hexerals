@@ -1,23 +1,21 @@
 import {List, Map, Seq, Set} from 'immutable'
-
-import {RectEdges} from './Constraints'
-import {PlayerMove} from '../move/Move'
-import {Player} from '../players/Players'
+import {devAssert} from "../../../common/Environment"
 import {StatusMessage} from '../../../common/StatusMessage'
-import {TileArranger} from '../setup/TileArranger'
-import {Tile} from '../hex/Tile'
 import {Hex} from '../hex/Hex'
-import {BoardConstraints, RectangularConstraints} from './Constraints'
-import {MoveValidator, MoveValidatorOptions} from '../move/MoveValidator';
-import {Niches} from "./Niches"
-import {PopStepper} from './PopStepper';
-import {RandomPlayerArranger} from '../setup/PlayerArranger';
-import * as assert from 'assert';
-import {Capture} from '../move/Capture';
-import {HexPaths} from '../hex/ShortestPath';
-import {Terrain} from '../hex/Terrain';
+import {HexPaths} from '../hex/ShortestPath'
+import {Terrain} from '../hex/Terrain'
+import {Tile} from '../hex/Tile'
+import {Capture} from '../move/Capture'
+import {PlayerMove} from '../move/Move'
+import {MoveValidator, MoveValidatorOptions} from '../move/MoveValidator'
+import {Player} from '../players/Players'
+import {RandomPlayerArranger} from '../setup/PlayerArranger'
+import {TileArranger} from '../setup/TileArranger'
 import {BoardStat} from './BoardStat'
+import {BoardConstraints, RectangularConstraints, RectEdges} from './Constraints'
 import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from './LocalGameOptions'
+import {Niches} from "./Niches"
+import {PopStepper} from './PopStepper'
 
 export class BoardAndMessages {
     constructor(
@@ -244,12 +242,12 @@ export class Board {
     }
 
     getTile(coord: Hex): Tile {
-        assert.ok(this.inBounds(coord))
+        devAssert(this.inBounds(coord))
         return this.explicitTiles.get(coord, Tile.MAYBE_EMPTY)
     }
 
     getCartTile(cx: number, cy: number): Tile {
-        assert.strictEqual(((cx + cy) % 2), 0)
+        devAssert((cx + cy) % 2 === 0)
         return this.getTile(Hex.getCart(cx, cy))
     }
 

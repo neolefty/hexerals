@@ -181,7 +181,7 @@ it('makes real moves', () => {
 
     brt.queueMoveDown()
     expect(brt.moves.size).toBe(0) // no current player yet
-    brt.setCurPlayer(Player.One) // cursors is on One's starting point, UR corner
+    brt.setCurPlayer(Player.One) // cursor is on One's starting point, UR corner
     brt.queueMoveDown()
     expect(brt.firstCursor === brt.ur.plus(Hex.DOWN)).toBeTruthy()
     expect(brt.moves.size).toBe(1)

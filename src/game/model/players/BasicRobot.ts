@@ -1,6 +1,6 @@
-import * as assert from 'assert'
 import {List} from 'immutable'
 import {Comma} from '../../../common/Comma'
+import {devAssert} from "../../../common/Environment"
 import {shuffle} from "../../../common/Shuffle"
 import {Board} from '../board/Board'
 import {BoardState} from '../board/BoardState'
@@ -68,7 +68,7 @@ export class BasicRobot implements Robot {
 
     // assign N random skills
     static byIntelligence(intelligence: number): BasicRobot {
-        assert.ok(intelligence <= BasicRobot.MAX_IQ, `${intelligence}`)
+        devAssert(intelligence <= BasicRobot.MAX_IQ, `${intelligence}`)
         let settings: boolean[] = Array(
             BasicRobot.MAX_IQ).fill(false)
         while (settings.filter(value => value).length < intelligence)
@@ -85,7 +85,7 @@ export class BasicRobot implements Robot {
     }
 
     constructor(readonly skills: boolean[]) {
-        assert.strictEqual(skills.length, BasicRobot.MAX_IQ)
+        devAssert(skills.length === BasicRobot.MAX_IQ)
     }
 
     get stopsPartway(): boolean {
@@ -296,7 +296,7 @@ export class BasicRobot implements Robot {
                         Math.random() * Math.random() * moves.size
                     )
                     moves = moves.slice(0, moves.size - movesToDrop) as List<HexMove>
-                    assert.ok(moves.size >= 1)
+                    devAssert(moves.size >= 1)
                 }
                 result.makeMoves = append(result.makeMoves, moves)
             }

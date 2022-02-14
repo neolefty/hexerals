@@ -1,7 +1,7 @@
 import * as React from "react"
 import InputRange, {Range as MinMax} from "react-input-range"
 
-export function MakeInputRange<V>(
+export function MakeInputRange(
     labelBefore: string, labelAfter: (value: number) => string,
     title: string, value: number,
     min: number, max: number,

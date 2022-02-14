@@ -1,9 +1,9 @@
 // A list of planned movements, organized by player
 import {List, Map} from 'immutable'
+import {devAssert} from "../../../common/Environment"
 import {Hex} from '../hex/Hex'
 import {Player} from '../players/Players'
 import {PlayerMove} from './Move';
-import * as assert from 'assert';
 
 export class MovementQueue {
     static readonly EMPTY = new MovementQueue(Map())
@@ -118,7 +118,7 @@ export class MovementQueue {
         }
 
         if (cancelled.length > 0) {
-            assert.strictEqual(cancelled.length + updatedMoves.size, moves.size)
+            devAssert(cancelled.length + updatedMoves.size === moves.size)
             return new QueueAndMoves(
                 new MovementQueue(
                     this.playerQueues.set(

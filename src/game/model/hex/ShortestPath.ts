@@ -1,6 +1,6 @@
 import {List, Map, Set, Range} from 'immutable'
+import {devAssert} from "../../../common/Environment"
 import {Hex} from './Hex';
-import * as assert from 'assert';
 
 export interface HexNum {
     h: Hex
@@ -68,7 +68,7 @@ export const floodShortestPath = (
 //
 //     // extend this with that — that must start where this ends
 //     plus = (that: PathStep): PathStep => {
-//         assert.strictEqual(that.source, this.dest)
+//         devAssert(that.source === this.dest)
 //         return new PathStep(
 //             this.source,
 //             that.dest,
@@ -79,7 +79,7 @@ export const floodShortestPath = (
 //
 //     // the shorter of the two (this or that)
 //     min = (that: PathStep): PathStep => {
-//         assert.ok(this.sameEndpoints(that))
+//         devAssert(this.sameEndpoints(that))
 //         return this.distance < that.distance ? this : that
 //     }
 //
@@ -206,8 +206,8 @@ export class CacheDistance {
     private cache = Map().asMutable() as Map<Hex, Map<Hex, number>>
     constructor(readonly hexes: Set<Hex>) {}
     distance(a: Hex, b: Hex): number {
-        assert.ok(this.hexes.has(a))
-        assert.ok(this.hexes.has(b))
+        devAssert(this.hexes.has(a))
+        devAssert(this.hexes.has(b))
         if (b.id < a.id) // only remember from smaller to larger
             [ a, b ] = [ b, a ]
         if (!this.cache.has(a))
