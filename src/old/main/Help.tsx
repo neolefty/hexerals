@@ -2,16 +2,16 @@ import * as React from 'react'
 import {Map} from 'immutable'
 
 import './Help.css'
-import {DriftColor} from "../color/DriftColor"
-import {CartPair} from "../common/CartPair"
-import {Hex} from "../game/model/hex/Hex"
-import {Terrain} from "../game/model/hex/Terrain"
-import {Tile} from "../game/model/hex/Tile"
-import {HexMove} from "../game/model/move/Move"
-import {Player} from "../game/model/players/Players"
-import {MoveView} from "../game/view/board/MoveQueueView"
-import {hexPixelHeight, hexPixelWidth} from "../game/view/hex/HexConstants"
-import {TileHexView} from "../game/view/hex/TileHexView"
+import {DriftColor} from "../../color/DriftColor"
+import {CartPair} from "../../common/CartPair"
+import {Hex} from "../../game/model/hex/Hex"
+import {Terrain} from "../../game/model/hex/Terrain"
+import {Tile} from "../../game/model/hex/Tile"
+import {HexMove} from "../../game/model/move/Move"
+import {Player} from "../../game/model/players/Players"
+import {MoveView} from "../../game/view/board/MoveQueueView"
+import {hexPixelHeight, hexPixelWidth} from "../../game/view/hex/HexConstants"
+import {TileHexView} from "../../game/view/hex/TileHexView"
 
 export interface HelpOptions {
     displaySize: CartPair

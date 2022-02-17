@@ -359,7 +359,7 @@ export class BasicRobot implements Robot {
 
     toString() {
         let result = `IQ ${this.intelligence}`
-        const comma = new Comma(' — ', ', ')
+        const comma = new Comma(' — ', ', ')
         this.skills.forEach((v, i) =>
             result += v ? `${comma}${BasicRobot.SKILL_NAMES[i]}` : ''
         )

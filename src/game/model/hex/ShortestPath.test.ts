@@ -91,7 +91,7 @@ const timeArranging = (
     const elapsed = Date.now() - start
     if (log)
         // tslint:disable-next-line
-        console.log(`${name} arranger — ${board.players.size} players, ${board.edges.width} x ${board.edges.height} — ${board.hexesOccupiable.size} hexes — ${elapsed} ms`)
+        console.log(`${name} arranger — ${board.players.size} players, ${board.edges.width} x ${board.edges.height} — ${board.hexesOccupiable.size} hexes — ${elapsed} ms`)
 }
 
 const logBenchmarks = false
@@ -127,7 +127,7 @@ const testPerf = (side: number, log: boolean = false) => {
     const elapsed = Date.now() - start
     // tslint:disable-next-line
     if (log) console.log(
-        `${side}x${side} (${hexes} hexes), ${elapsed} ms — ns/hex2.1|2|3|4: ${
+        `${side}x${side} (${hexes} hexes), ${elapsed} ms — ns/hex2.1|2|3|4: ${
             // r(elapsed / side, 1)}/side ${
             // r(elapsed / (side*side))}/side^2 ${
             // r(elapsed / hexes)}/hex ${

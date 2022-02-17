@@ -83,12 +83,12 @@ export class SpreadPlayersArranger extends TileArranger {
                 .insert(0, maxOfMins - minOfMins)
             ++nRounds
             curStarts = nextStarts
-            // console.log(` - Round ${nRounds} — (${minOfMins} to ${maxOfMins}) ${
+            // console.log(` - Round ${nRounds} — (${minOfMins} to ${maxOfMins}) ${
             //     hexesToString(List(List(curStarts.keys()).sort()))}`)
         }
         return curStarts
     }
 
     toString = (): string =>
-        `spread arranger — capital: ${this.startingTerrain}; pop: ${this.startingPop}`
+        `spread arranger — capital: ${this.startingTerrain}; pop: ${this.startingPop}`
 }

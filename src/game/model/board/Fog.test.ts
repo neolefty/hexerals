@@ -16,7 +16,7 @@ it('fogs the board for a player', () => {
     })
     const upUpUp = Hex.ORIGIN.plus(Hex.UP.times(2))
     expect(fogged.getTile(upUpUp).known).toBeFalsy()
-    // where Player.One starts — fogged city
+    // where Player.One starts — fogged city
     expect(fogged.getTile(brt.ur)).toEqual(Tile.MAYBE_MOUNTAIN)
     expect(brt.getTile(brt.ur).terrain).toBe(Terrain.City)
 })

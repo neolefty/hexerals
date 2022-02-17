@@ -6,10 +6,10 @@ import {setColorsAction} from '../../../color/ColorsReducer'
 import {DriftColor} from '../../../color/DriftColor'
 import {AnalyticsAction, AnalyticsCategory, logAnalyticsEvent} from '../../../common/Analytics'
 import {CacheMap} from '../../../common/CacheMap'
-import {AppState} from "../../../main/App"
-import {ROUTE_LOCAL_OPTIONS} from "../../../main/Main"
-import {MainDispatch} from "../../../main/MainReducer"
-import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
+import {AppState} from "../../../old/main/AppOld"
+import {ROUTE_LOCAL_OPTIONS} from "../../../old/main/Main"
+import {MainDispatch} from "../../../old/main/MainReducer"
+import {useMainDispatch, useMainState} from "../../../old/main/MainStateContext"
 import {
     doApplyMoves,
     doCancelMoves,

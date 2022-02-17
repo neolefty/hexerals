@@ -63,7 +63,7 @@ it('color podge basics', () => {
     const drifted = cp.drift(3).drift(1)
     const closenessDrift = Math.abs(drifted.closestTwo() - cp.closestTwo())
     // console.log(`${Math.round(drifted.closestTwo())} - ${Math.round(cp.closestTwo())} = ${Math.round(closenessDrift)}`)
-    // TODO fix this -- sometimes it's less than 1, like 0.91
+    // TODO fix this -- sometimes it's less than 1, like 0.91
     expect(closenessDrift).toBeGreaterThan(1)
 
     const c0: DriftColor = cp.driftColors.get(0) as DriftColor

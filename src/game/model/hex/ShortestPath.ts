@@ -19,7 +19,7 @@ export const floodShortestPath = (
     // initial condition: cost of zero to go from origin to origin, passing through origin
     const scratch = Map<Hex, HexNum>().set(origin, {h: origin, n: 0}).asMutable()
 
-    let prevRing: Set<Hex> = Set<Hex>() // previous layer of flood — avoid going backwards
+    let prevRing: Set<Hex> = Set<Hex>() // previous layer of flood — avoid going backwards
     let curRing: Set<Hex> = Set<Hex>([origin]) // current layer we're traversing
     // console.log(`first ring: ${hexesToString(List(curRing))}`)
     while (!scratch.has(dest)) {
@@ -66,7 +66,7 @@ export const floodShortestPath = (
 //         readonly next: Hex
 //     ) {}
 //
-//     // extend this with that — that must start where this ends
+//     // extend this with that — that must start where this ends
 //     plus = (that: PathStep): PathStep => {
 //         devAssert(that.source === this.dest)
 //         return new PathStep(
@@ -87,7 +87,7 @@ export const floodShortestPath = (
 //         this.source === that.source && this.dest === that.dest
 // }
 
-// TODO move ring logic out to here — it's useful in lots of places
+// TODO move ring logic out to here — it's useful in lots of places
 // export class Rings {
 //     constructor(
 //         readonly hexes: Set<Hex>,

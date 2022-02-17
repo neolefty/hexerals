@@ -39,7 +39,7 @@ export const DEFAULT_LOCAL_GAME_OPTIONS: LocalGameOptions = Object.freeze({
     roundTicks: 50,
     cityTicks: 2,
     startingPop: 0,
-    // booleans — non-zero is true
+    // booleans — non-zero is true
     fog: 1,
     capitals: 1,
     syncedGrowth: 1,
@@ -84,7 +84,7 @@ export const LGO_DIFFICULTY_NAMES = Object.freeze([
     'Hard',
 ])
 
-// "Index types" — typescriptlang.org/docs/handbook/advanced-types.html
+// "Index types" — typescriptlang.org/docs/handbook/advanced-types.html
 export type LGOKey = keyof LocalGameOptions
 
 export const LGO_LIMITS =

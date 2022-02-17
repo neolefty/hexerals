@@ -81,7 +81,7 @@ it('tracks stat history', () => {
     expect(stats().values.size).toBe(6)
     expect(stats().lastTurns.size).toBe(2)
 
-    // 4. Three captures One — Game Over!
+    // 4. Three captures One — Game Over!
     crt.queueMove(crt.ul, Hex.RIGHT_DOWN, Player.Zero)
     crt.queueMove(Hex.RIGHT_UP, Hex.RIGHT_DOWN, Player.Zero) // Zero captures Three
     crt.doMoves()

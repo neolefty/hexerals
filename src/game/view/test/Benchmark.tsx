@@ -63,7 +63,7 @@ const newBoardState = (
     players: assignRobots(),
 })
 
-// the parts of BoardViewProps that don't change — everything except boardState: BoardState
+// the parts of BoardViewProps that don't change — everything except boardState: BoardState
 const staticBoardViewProps: BoardViewProps = {
     ...BOARD_STUBS,
     colors: playerColors(ColorPodge.construct(NUM_PLAYERS)),
@@ -77,7 +77,7 @@ const initialState: BenchmarkState = {
     trials: List<BenchmarkRun>(),
 }
 
-// TODO log somewhere — with browser, OS, date, etc
+// TODO log somewhere — with browser, OS, date, etc
 // TODO record software version
 export class Benchmark
     extends React.Component<BenchmarkProps, BenchmarkState>

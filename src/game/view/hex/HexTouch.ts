@@ -32,6 +32,6 @@ export class HexTouch {
     }
 
     toString(): string {
-        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round()} / client ${ this.client.round()} / page ${this.page.round()}`
+        return `Touch #${this.id} at ${this.hex ? this.hex.toString() : 'no hex'} — screen ${this.screen.round()} / client ${ this.client.round()} / page ${this.page.round()}`
     }
 }

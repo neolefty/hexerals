@@ -1,5 +1,5 @@
 import React, {Context, ReactNode, useContext} from "react"
-import {GenericAction} from "../common/GenericAction"
+import {GenericAction} from "../../common/GenericAction"
 import {initialMainState, MainDispatch, MainState} from "./MainReducer"
 
 export const MainStateContext: Context<MainState> = React.createContext(initialMainState())

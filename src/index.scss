@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  // TODO only when in game — prevents pull-to-reload
+  // TODO only when in game — prevents pull-to-reload
   overscroll-behavior: none; // prevents scrolliness in Chrome
   position: fixed; // prevents scrolliness in iOS Safari
   width: 100%; // compensate for position fixed

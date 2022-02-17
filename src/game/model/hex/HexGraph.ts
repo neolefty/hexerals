@@ -30,7 +30,7 @@ export class FloodResult {
         )
     }
     toString(): string {
-        return `flood / remain — ${this.flooded.size} / ${this.remaining.size} — ${
+        return `flood / remain — ${this.flooded.size} / ${this.remaining.size} — ${
             hexesToString(List(this.flooded))} / ${hexesToString(List(this.remaining))}`
     }
 }

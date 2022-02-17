@@ -118,7 +118,7 @@ it('stops by cities', () => {
         brt.queueMove(Player.Zero, Hex.UP)
         brt.queueMove(Player.Zero, Hex.UP)
         brt.queueMove(Player.Zero, Hex.UP)
-        brt.queueRobots() // should have no effect — robot is happy with plan
+        brt.queueRobots() // should have no effect — robot is happy with plan
         const beforeCity = brt.moves.playerQueues.get(Player.Zero) as List<PlayerMove>
         expect(beforeCity.size === 4)
         brt.doMoves()
@@ -179,7 +179,7 @@ const countAWins = (
     return aWins
 }
 
-it('control — IQ 0 vs self', () => {
+it('control — IQ 0 vs self', () => {
     const control = countAWins(iq0, iq0)
     if (logWinLoss)
         // tslint:disable-next-line

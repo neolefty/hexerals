@@ -1,6 +1,6 @@
 import React from "react"
 import {useDisplaySize} from "../common/ViewSizeContext"
-import {useMainDispatch, useMainState} from "../main/MainStateContext"
+import {useMainDispatch, useMainState} from "../old/main/MainStateContext"
 
 import {ColorsDiv} from './ColorsDiv'
 import {addColorAction, ColorsActions, ColorsDispatch, divergeAction, removeColorAction,} from './ColorsReducer'

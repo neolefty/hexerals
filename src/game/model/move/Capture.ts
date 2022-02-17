@@ -9,7 +9,7 @@ export class Capture {
     ) {}
 
     toString() {
-        return `@${this.hex.toString()} ${this.before.terrain} — ${
+        return `@${this.hex.toString()} ${this.before.terrain} — ${
             this.after.owner} captured ${
             this.before.owner}; new pop is ${this.after.pop}`
     }

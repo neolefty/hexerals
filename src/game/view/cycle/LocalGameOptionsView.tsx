@@ -7,7 +7,7 @@ import {CartPair} from "../../../common/CartPair"
 import {CheckInput, NumberInput} from '../../../common/Inputs'
 import {NavButton} from "../../../common/NavButton"
 import {useDisplaySize} from "../../../common/ViewSizeContext"
-import {ROUTE_TUTORIAL} from "../../../main/Main"
+import {ROUTE_TUTORIAL} from "../../../old/main/Main"
 import {LGO_DIFFICULTY_NAMES, LGOKey, LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {BasicRobot} from '../../model/players/BasicRobot'
 import {MAX_PLAYERS} from '../../model/players/Players'
@@ -88,7 +88,7 @@ export const LocalGameOptionsView = (props: LGOVProps) => {
         />
     )
 
-    // TODO Replace with toggle button — grey when inactive
+    // TODO Replace with toggle button — grey when inactive
     const checkInput = (
         label: string, option: LGOKey, title: string, level: number = 0
     ) => (

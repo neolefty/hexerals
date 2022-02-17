@@ -3,8 +3,8 @@ import {useCallback, useMemo, useState} from "react"
 import {AssertNever} from "../../../common/AssertNever"
 import {Layered} from '../../../common/Layered'
 import {useNavTo} from "../../../common/NavButton"
-import {ROUTE_LOCAL_GAME} from "../../../main/Main"
-import {useMainDispatch, useMainState} from "../../../main/MainStateContext"
+import {ROUTE_LOCAL_GAME} from "../../../old/main/Main"
+import {useMainDispatch, useMainState} from "../../../old/main/MainStateContext"
 import {LocalGameOptions} from '../../model/board/LocalGameOptions'
 import {doChangeLocalOption, doOpenLocalGame} from "../../model/cycle/CycleAction"
 import {IN_LOCAL_GAME, NOT_IN_GAME} from '../../model/cycle/CycleState'

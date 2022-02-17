@@ -7,7 +7,7 @@ export class PopStepper {
         readonly opts: LocalGameOptions,
     ) {}
 
-    // called before incrementing turn — anticipate next turn
+    // called before incrementing turn — anticipate next turn
     step(orig: Board, turn: number): Board {
         let result = orig.explicitTiles
         // TODO consider using a single loop

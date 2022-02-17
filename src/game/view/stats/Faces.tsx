@@ -44,7 +44,7 @@ export const Faces = (props: FacesProps) => {
     const grid = packSquares(players.size, facesArea.x / facesArea.y)
 
     const orderFaces = (a: Player, b: Player): number => {
-        // if currently alive, rank is positive — simply pop
+        // if currently alive, rank is positive — simply pop
         // if dead, rank is more negative the earlier you died
         const aRank = latest.pop.get(a, demises.get(a, 0) - curTurn)
         const bRank = latest.pop.get(b, demises.get(b, 0) - curTurn)
@@ -60,11 +60,11 @@ export const Faces = (props: FacesProps) => {
     const startX = horiz
         ? 0 // horizontal always start at the left
         : props.flipped // start on outside
-            ? ds.x - d // vertical flipped — start in right column
-            : 0 // vertical not flipped — start in left column
+            ? ds.x - d // vertical flipped — start in right column
+            : 0 // vertical not flipped — start in left column
     const side = d - MARGIN
     const viewBox = `${SIZE.scale(-1).toString(' ')} ${SIZE.scale(2).toString(' ')}`
-    // push faces up to front of UI — highest one close to leading edge of graph
+    // push faces up to front of UI — highest one close to leading edge of graph
     const bump = grid.product - players.size
 
     return (

@@ -100,7 +100,7 @@ const queueMovesReducer = (
         const options = result.board.validationOptions(newMessages)
         // newMessages.forEach(m => console.log(m.toString()))
         options.ignoreSmallPop = true
-        // Allow queueing into mountains so we don't circumvent fog — UI prevents
+        // Allow queueing into mountains so we don't circumvent fog — UI prevents
         // known mountains, and also moves are re-validated when executed.
         options.ignoreOccupiability = true
         if (queuedTo) // if the player hopes to have already taken that hex, let them try
@@ -174,7 +174,7 @@ const GameTickReducer = (state: BoardState): BoardState => {
         && result.stats.last.hexes.size <= 1 // no more than one player remains
     ) {
         result.phase = GamePhase.Ended
-        // TODO log local game options — but we don't have them here ...
+        // TODO log local game options — but we don't have them here ...
         logAnalyticsEvent(AnalyticsAction.end, AnalyticsCategory.local, analyticsLabel(result))
     }
 

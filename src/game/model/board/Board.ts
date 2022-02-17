@@ -112,7 +112,7 @@ export class Board {
     private constructor(
         readonly rules: BoardRules,
         readonly players: List<Player>,
-        // empty tiles are implied — see this.hexesAll
+        // empty tiles are implied — see this.hexesAll
         readonly explicitTiles: Map<Hex, Tile>,
     ) {}
 

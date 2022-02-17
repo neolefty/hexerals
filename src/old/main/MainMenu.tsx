@@ -1,6 +1,6 @@
 import * as React from "react"
-import {NavButton} from "../common/NavButton"
-import {useDisplaySize} from "../common/ViewSizeContext"
+import {NavButton} from "../../common/NavButton"
+import {useDisplaySize} from "../../common/ViewSizeContext"
 import {ROUTE_ABOUT, ROUTE_COLORS, ROUTE_LOCAL_GAME, ROUTE_TUTORIAL} from "./Main"
 import './MainMenu.css'
 import {useMainState} from "./MainStateContext"

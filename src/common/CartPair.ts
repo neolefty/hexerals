@@ -37,7 +37,7 @@ export class CartPair {
     get isVertical() { return this.y > this.x }
     get isHorizontal() { return !this.isVertical }
 
-    // don't change — SVG operations depend on exactly this
+    // don't change — SVG operations depend on exactly this
     toString(sep = ',') { return `${this.x}${sep}${this.y}` }
 
     round = (places: number = 0) =>

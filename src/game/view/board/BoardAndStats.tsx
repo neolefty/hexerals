@@ -5,8 +5,8 @@ import {useMemo} from "react"
 import {CartPair} from '../../../common/CartPair'
 import {useLocalStorageState} from '../../../common/HookLocalStorage'
 import {ProvideDisplaySize, useDisplaySize} from "../../../common/ViewSizeContext"
-import {HamburgerMenu} from "../../../main/HamburgerMenu"
-import {ROUTE_MENU} from "../../../main/Main"
+import {HamburgerMenu} from "../../../old/main/HamburgerMenu"
+import {ROUTE_MENU} from "../../../old/main/Main"
 import {StatsPanel} from '../stats/StatsPanel'
 import {BoardViewProps} from './BoardViewProps'
 import {HexBoardView} from './HexBoardView'

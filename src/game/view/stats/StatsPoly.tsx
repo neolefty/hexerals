@@ -52,12 +52,12 @@ export class StatsPoly {
 
     // ordering:
     // stacked area
-    //   — computing
+    //   — computing
     //      > smallest & dead longest first (at the bottom)
     //      > largest currently alive last (at top)
-    //   — drawing — reverse order (large first, behind others)
+    //   — drawing — reverse order (large first, behind others)
     // non-stacked lines: small last
-    //   — largest first (in back)
+    //   — largest first (in back)
 
     constructor(readonly props: HistoryGraphProps) {
         this.history = props.boardState.stats
@@ -127,7 +127,7 @@ export class StatsPoly {
     }
 
     get polys(): React.ReactNode {
-        // Note — Transforms happen in reverse order
+        // Note — Transforms happen in reverse order
         const transform = this.props.displaySize.isHorizontal
             ? `translate(0 ${this.props.flipped ? 0 : this.props.displaySize.y}) scale(1 ${this.props.flipped ? 1 : -1})`
             // vertical graph flowing downward

@@ -51,7 +51,7 @@ it('renders a board with no selection', () => {
         curPlayer: Player.One,
     }
 
-    // TODO redo this whole thing with HexesView & react-test-renderer — https://reactjs.org/docs/test-renderer.html
+    // TODO redo this whole thing with HexesView & react-test-renderer — https://reactjs.org/docs/test-renderer.html
     // also https://itnext.io/testing-react-16-3-components-with-react-test-renderer-without-enzyme-d9c65d689e88
     // also https://jestjs.io/blog/2016/07/27/jest-14.html
 

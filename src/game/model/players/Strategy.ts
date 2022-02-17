@@ -57,7 +57,7 @@ const TERRAIN_VALUES = Map<Terrain, number>([
 ])
 
 export enum StrategyType {
-    Canceller = 'Canceller', // run every time — watch out for problems
+    Canceller = 'Canceller', // run every time — watch out for problems
     Planner = 'Planner', // run when we need something to do
     // Opportunist = 'Opportunist', // just a high-priority planner
 }

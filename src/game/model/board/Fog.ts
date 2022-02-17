@@ -49,7 +49,7 @@ export class PlayerFog {
     }
 
     private fogBoard(board: Board) {
-        // copy visible tiles — owned by or neighboring player's tiles
+        // copy visible tiles — owned by or neighboring player's tiles
         const ownedHexes: Set<Hex> = board.filterTiles(tile => tile.owner === this.player)
         const lost = ownedHexes.size === 0
         if (lost && this.showAllIfLose)

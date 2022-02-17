@@ -29,7 +29,7 @@ export class BoardStat<K> {
     }
 
     toString(): string {
-        return `total: ${this.total} — ${JSON.stringify(this.stats.toJS())}`
+        return `total: ${this.total} — ${JSON.stringify(this.stats.toJS())}`
     }
 
     private sum(m: Map<K, number>): number { // could be static

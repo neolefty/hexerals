@@ -94,7 +94,7 @@ export const nearestBoardSize = (displaySize: CartPair, hexCount: number, statsV
     )[0]
 
 const setBoardSize = (wh: CartPair, highFidelity: boolean, change: ChangePreviewOption) => {
-    // order not preserved — if 1st is low fidelity, it may overwrite 2nd
+    // order not preserved — if 1st is low fidelity, it may overwrite 2nd
     change('boardWidth', wh.x, highFidelity)
     change('boardHeight', wh.y, highFidelity)
 }
@@ -125,7 +125,7 @@ export const fitToDisplay = (
     statsVisible: boolean,
     change: ChangePreviewOption,
 ) => {
-    // console.log(`set board size to ${hexCount} hexes — ${highFidelity ? 'high' : 'low'} fidelity`)
+    // console.log(`set board size to ${hexCount} hexes — ${highFidelity ? 'high' : 'low'} fidelity`)
     setBoardSize(
         nearestBoardSize(displaySize, hexCount, statsVisible),
         highFidelity,

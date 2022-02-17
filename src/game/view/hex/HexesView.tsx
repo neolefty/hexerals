@@ -33,7 +33,7 @@ export const HexesView = (props: BoardViewProps) => {
         // this.logEvent(e)
         for (let i = 0; i < e.touches.length; ++i) {
             const hexTouch = new HexTouch(e.touches[i])
-            // console.log(`  — set cursor ${hexTouch}`)
+            // console.log(`  — set cursor ${hexTouch}`)
             onPlaceCursor(hexTouch.id, hexTouch.hex, false)
         }
         if (e.cancelable)
@@ -44,7 +44,7 @@ export const HexesView = (props: BoardViewProps) => {
         // this.logEvent(e)
         for (let i = 0; i < e.touches.length; ++i) {
             const hexTouch = new HexTouch(e.touches[i])
-            // console.log(`  — ${hexTouch.toString()}`)
+            // console.log(`  — ${hexTouch.toString()}`)
             if (hexTouch.hex !== Hex.NONE)
                 onDrag(hexTouch.id, hexTouch.hex)
         }
@@ -56,7 +56,7 @@ export const HexesView = (props: BoardViewProps) => {
         // this.logEvent(e)
         for (let i = 0; i < e.changedTouches.length; ++i) {
             const hexTouch = new HexTouch(e.changedTouches[i])
-            // console.log(`  — clearing cursor — ${hexTouch}`)
+            // console.log(`  — clearing cursor — ${hexTouch}`)
             onClearCursor(hexTouch.id)
         }
         if (e.cancelable)

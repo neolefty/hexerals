@@ -66,7 +66,7 @@ if (inDev())
     registerTagger(
         Symbol('console'),
         (action, category, label, value, deets) =>
-            console.log(`Analytics event: ${action} — ${JSON.stringify(combineGoogleTags(
+            console.log(`Analytics event: ${action} — ${JSON.stringify(combineGoogleTags(
                 category, label, value, deets
             ))}`)
     )

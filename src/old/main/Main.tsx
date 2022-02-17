@@ -1,12 +1,12 @@
 import * as React from "react"
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import {Tab, TabList, TabPanel, Tabs} from 'react-tabs'
-import {ColorsContainer} from "../color/ColorsContainer"
-import {inDev} from "../common/Environment"
-import {useDisplaySize} from "../common/ViewSizeContext"
-import {CycleView, LocalGameOptionsPage} from "../game/view/cycle/CycleView"
-import {TestTracking} from "../game/view/test/TestTracking"
-import {TutorialContainer} from "../tutorial/TutorialContainer"
+import {ColorsContainer} from "../../color/ColorsContainer"
+import {inDev} from "../../common/Environment"
+import {useDisplaySize} from "../../common/ViewSizeContext"
+import {CycleView, LocalGameOptionsPage} from "../../game/view/cycle/CycleView"
+import {TestTracking} from "../../game/view/test/TestTracking"
+import {TutorialContainer} from "../../tutorial/TutorialContainer"
 import {Help} from './Help'
 import './Main.css'
 import {MainMenu} from "./MainMenu"

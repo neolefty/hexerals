@@ -16,8 +16,8 @@ import {
 } from './Strategy'
 
 // TODO defend capital
-// TODO move towards opponents — value captures far from home?
-// TODO gang up — notice a ring around desirable target — value reinforcements near an opponent?
+// TODO move towards opponents — value captures far from home?
+// TODO gang up — notice a ring around desirable target — value reinforcements near an opponent?
 
 export class StrategyBot implements Robot {
     static readonly STRATEGIES = List<Strategy>([
@@ -105,7 +105,7 @@ export class StrategyBot implements Robot {
 
     toString() {
         let result = `IQ ${this.intelligence}`
-        const comma = new Comma(' — ', ', ')
+        const comma = new Comma(' — ', ', ')
         this.strategies.forEach((has, i) =>
             result += has
                 ? `${comma}${

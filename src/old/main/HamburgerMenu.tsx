@@ -1,7 +1,7 @@
 import {useCallback} from "react"
 import * as React from "react"
 import {useNavigate} from "react-router-dom"
-import {CartPair} from "../common/CartPair"
+import {CartPair} from "../../common/CartPair"
 
 interface HamburgerMenuProps {
     style: React.CSSProperties

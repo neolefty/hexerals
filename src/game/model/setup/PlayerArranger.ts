@@ -90,10 +90,10 @@ export class CornersPlayerArranger extends TileArranger {
     }
 
     toString = (): string =>
-        `corners arranger — capital: ${this.terrain}; pop: ${this.startingPop}`
+        `corners arranger — capital: ${this.terrain}; pop: ${this.startingPop}`
 }
 
-// Spread out players — maximize each player's distance to their nearest neighbor,
+// Spread out players — maximize each player's distance to their nearest neighbor,
 // and minimize the difference between those nearest neighbors.
 // This may not really be fair because some players will have more nearby neighbors than others.
 // Maybe better to minimize difference in total distance to neighbors?
