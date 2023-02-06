@@ -1,7 +1,8 @@
 import * as React from 'react'
 import './Layered.css'
+import { PropsWithChildren } from "react"
 
-export const Layered: React.FunctionComponent = ({children}) => {
+export const Layered = ({children}: PropsWithChildren) => {
     // noinspection JSDeprecatedSymbols
     if (Array.isArray(children)) {
         return (

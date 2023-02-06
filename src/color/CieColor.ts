@@ -1,4 +1,4 @@
-import * as hsluv from 'hsluv'
+import {Hsluv} from "hsluv"
 
 const roundNumArrayToString = (ns: number[]): string =>
     `${Math.round(ns[0])} ${Math.round(ns[1])} ${Math.round(ns[2])}`
@@ -30,12 +30,18 @@ export class CieColor {
         return dHue * dHue + dSat * dSat + dBright * dBright
     }
 
+    /** Private because it is mutable. */
+    private readonly _hsluv: Hsluv
+
     constructor(readonly hsl: number[]) {
         // positive modulo
         this.hsl[0] = ((this.hsl[0] % 360) + 360) % 360
-        const rgb = hsluv.hsluvToRgb(this.hsl)
-        // this.hpl = hsluv.rgbToHpluv(rgb)
-        this.lch = hsluv.rgbToLch(rgb)
+        this._hsluv = new Hsluv()
+        this._hsluv.hsluv_h = hsl[0]
+        this._hsluv.hsluv_s = hsl[1]
+        this._hsluv.hsluv_l = hsl[2]
+        this._hsluv.hsluvToLch()
+        this.lch = [this._hsluv.lch_l, this._hsluv.lch_c, this._hsluv.lch_h]
     }
 
     hslDistance2(that: CieColor) {
@@ -67,11 +73,11 @@ export class CieColor {
         // return CieColor.d2(this.lch, that.lch)
     }
 
-    private _hexString?: string = undefined
     get hexString(): string {
-        if (this._hexString === undefined)
-            this._hexString = hsluv.hsluvToHex(this.hsl)
-        return this._hexString as string
+        if (this._hsluv.hex === undefined) {
+            this._hsluv.hsluvToHex()
+        }
+        return this._hsluv.hex
     }
     get hslString() { return roundNumArrayToString(this.hsl) }
     get lchString() { return roundNumArrayToString(this.lch) }

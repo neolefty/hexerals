@@ -5,7 +5,7 @@ import {MovementQueue} from '../../model/move/MovementQueue';
 import {DriftColor} from '../../../color/DriftColor';
 import {Player} from '../../model/players/Players';
 import {viewBoxHeight} from '../hex/HexesView';
-import {HexMove} from '../../model/move/Move';
+import { HexMove, PlayerMove } from '../../model/move/Move';
 import {centerX, centerY} from '../hex/TileHexView';
 
 interface MoveQueueViewProps {
@@ -18,11 +18,11 @@ interface MoveQueueViewProps {
 export const MoveQueueView = (props: MoveQueueViewProps) => (
     <g id="movementQueue"> {
         props.moves.playerQueues.map(
-            (moveList: List<HexMove>, player: Player) => {
+            (moveList: List<PlayerMove>, player: Player) => {
                 return (
                     <MoveListView
                         key={props.players.indexOf(player)}
-                        moveList={moveList}
+                        moveList={moveList.map(playerMove => playerMove.move)}
                         color={props.colors.get(player)}
                         boardHeight={props.boardHeight}
                     />

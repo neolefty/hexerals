@@ -68,7 +68,10 @@ export class StrategyBot implements Robot {
     ): GameDecision | undefined {
         let result: GameDecision = {}
         const originalMoveCount = curMoves ? curMoves.size : 0
-        let votes: List<MoveVote> = makeVotes(bs.board, curMoves)
+        let votes: List<MoveVote> = makeVotes(
+            bs.board,
+            curMoves?.map(playerMove => playerMove.move),
+        )
 
         // 1. Should we cancel anything?
         votes = this.runStrategies(StrategyType.Canceller, player, bs, votes)
