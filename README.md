@@ -4,3 +4,8 @@
 * Really *really* needs a tutorial
 
 Inspired by https://generals.io/
+
+## Versions
+
+* v1 — made with Create-React-App
+* v2 — [NX monorepo](https://nx.dev/tutorials/integrated-repo-tutorial)

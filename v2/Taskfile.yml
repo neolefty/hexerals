@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  dev:
+    cmds:
+      # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
+      - nx run-many --targets=test,serve --watch
