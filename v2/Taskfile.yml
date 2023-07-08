@@ -5,3 +5,7 @@ tasks:
     cmds:
       # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
       - nx run-many --targets=test,serve --watch
+
+  lint:
+    cmds:
+      - nx run-many -t lint
