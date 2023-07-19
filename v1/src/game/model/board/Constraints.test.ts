@@ -4,7 +4,7 @@ import {CornersPlayerArranger} from '../setup/PlayerArranger';
 import {Hex} from '../hex/Hex';
 import {Board} from './Board';
 import {pickNPlayers} from '../players/Players';
-import {BoardConstraints} from './Constraints';
+import { BoardConstraints, RectangularConstraints } from './Constraints';
 import {countHexes} from '../../view/hex/HexConstants';
 
 it('counts hexes', () => {
@@ -55,4 +55,27 @@ it('checks rectangular board geometry', () => {
     // expect(nineByFour.edges.upperRight === Hex.getCart(7, 3)).toBeTruthy()
     // expect(nineByFour.edges.lowerRight === Hex.getCart(8, 0)).toBeTruthy()
     // expect(nineByFour.edges.lowerLeft === Hex.ORIGIN).toBeTruthy()
+})
+
+const slow = false, reallySlow = false
+
+const timeRect = (w: number, h: number) => {
+    const start = new Date()
+    const constraints = RectangularConstraints.constructDefault(w, h)
+    const n = constraints.all.size
+    expect(n).toBe(countHexes(w, h))
+    if (slow || reallySlow) {
+        const elapsed = new Date().getTime() - start.getTime()
+        const msPerCell = elapsed / n
+        const cellPerMs = Math.round(100/msPerCell) / 100
+        console.log(`Elapsed for ${ w } x ${ h } rectangular constraints: ${
+            elapsed } ms -- ${ cellPerMs } cell per ms / ${ msPerCell } ms per cell`)
+    }
+}
+
+it('checks various sizes of board constraints', () => {
+    const sizes = [ 1, 10, 50, 50 ]
+    if (slow) sizes.concat([100, 200, 200])
+    if (reallySlow) sizes.concat([500, 1000])
+    sizes.forEach(n => timeRect(n, n))
 })
