@@ -47,3 +47,36 @@ it("checks hex neighbors", () => {
         checkHexNeighbors(Hex.get(x, y, -x - y))
     })
 })
+
+it("checks trigonometry", () => {
+    // Hex.DIRECTIONS.forEach((hex) =>
+    //     console.log(`${hex.toString(true, true)}`)
+    // )
+
+    expect(Hex.UP.cartYGeo).toBeCloseTo(1)
+    expect(Hex.UP.cartXGeo).toBeCloseTo(0)
+    // 30 degrees
+    expect(Hex.RIGHT_UP.cartYGeo).toBeCloseTo(0.5)
+    expect(Hex.RIGHT_UP.cartXGeo).toBeCloseTo(Math.cos(Math.PI / 6))
+
+    expect(Hex.RIGHT_UP.degrees).toBeCloseTo(30)
+    expect(Hex.UP.degrees).toBeCloseTo(90)
+    expect(Hex.LEFT_UP.degrees).toBeCloseTo(150)
+    expect(Hex.LEFT_DOWN.degrees).toBeCloseTo(210)
+    expect(Hex.DOWN.degrees).toBeCloseTo(270)
+    expect(Hex.RIGHT_DOWN.degrees).toBeCloseTo(330)
+})
+
+it("sorts hexes", () => {
+    expect(Hex.ORIGIN.compareTo(Hex.ORIGIN)).toBe(0)
+
+    expect(Hex.ORIGIN.compareTo(Hex.UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.DOWN)).toBeGreaterThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.LEFT_UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.RIGHT_UP)).toBeLessThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.LEFT_DOWN)).toBeGreaterThan(0)
+    expect(Hex.ORIGIN.compareTo(Hex.RIGHT_DOWN)).toBeGreaterThan(0)
+
+    expect(Hex.NONE.compareTo(Hex.NONE)).toBeNaN()
+    expect(Hex.NONE.compareTo(Hex.ORIGIN)).toBeNaN()
+})
