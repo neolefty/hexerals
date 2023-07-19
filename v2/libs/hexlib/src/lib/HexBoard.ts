@@ -1,10 +1,5 @@
-export interface HexBoard {
-    positions: ReadonlyArray<HexCoord>
-}
+import { Hex } from "./Hex"
 
-export class HexCoord {
-    constructor(readonly x: number, readonly y: number) {}
-    get z() {
-        return -this.x - this.y
-    }
+export interface HexBoard {
+    positions: ReadonlyArray<Hex>
 }
