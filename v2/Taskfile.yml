@@ -1,11 +1,19 @@
 version: '3'
 
 tasks:
-  dev:
+  serve:
+    desc: "Run hexerals on localhost:4200"
     cmds:
-      # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
-      - nx run-many --targets=test,serve --watch
+      - nx serve hexerals
 
   lint:
+    desc: "Lint sourcecode; useful as a pre-commit hook"
     cmds:
       - nx run-many -t lint
+
+  test:
+    # TODO find a way to monitor tests while also serving; unfortunately "--watch" gets mangled with "--targets=test,serve"
+    desc: "Monitor tests."
+    cmds:
+      # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
+      - nx run-many -t test --watch

@@ -6,8 +6,14 @@
 
 ### Setup
 
-1. Install `task` — for example, `brew install task`. See also `taskfile.yml`.
-2. `task dev`
+1. Install `task` — for example, `brew install task`.
+   - Recommended: [tab-completion](https://taskfile.dev/installation/#zsh) — for example add `/opt/homebrew/share/zsh/site-functions` to `$FPATH`
+   - See `Taskfile.yml`.
+
+### Running
+
+1. `task serve` to serve hexerals on http://localhost:4200/
+2. `task test` in a separate terminal to monitor tests
 
 ## Understand this workspace
 
