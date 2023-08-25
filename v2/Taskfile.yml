@@ -17,3 +17,8 @@ tasks:
     cmds:
       # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
       - nx run-many -t test --watch
+
+  migrate:
+    desc: "Update nx tools and structure"
+    cmds:
+      - nx migrate latest
