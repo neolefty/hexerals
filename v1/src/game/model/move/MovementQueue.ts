@@ -95,7 +95,13 @@ export class MovementQueue {
             && (this.playerQueues.get(player) as List<PlayerMove>).size > 0
     }
 
-    // Cancel most recent moves for a given player and cursor — count = -1 to cancel all of a cursor's moves, -1 to cancel all cursors' moves. If there are no moves to cancel, return undefined. Otherwise return the updated movement queue plus a list containing the cancelled moves, in order from oldest to newest
+    /**
+     * Cancel most recent moves for a given player and cursor.
+     * @param count -1 to cancel all of a cursor's moves
+     * @param cursorIndex -1 to cancel all cursors' moves.
+     * @return If there are no moves to cancel, return undefined. Otherwise return the updated
+     * movement queue plus a list containing the cancelled moves, in order from oldest to newest.
+     */
     cancelMoves(
         player: Player, cursorIndex: number, count: number,
     ): QueueAndMoves | undefined {
