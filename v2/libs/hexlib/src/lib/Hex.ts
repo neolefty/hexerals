@@ -1,8 +1,11 @@
 import { devAssert } from "./Environment"
 
-// Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
-// "Cube coordinates" for a description, see:
-// www.redblobgames.com/grids/hexagons/#coordinates-cube
+/**
+ * A coordinate in a hexagonal grid; each is  a singleton so that reference equality works.
+ * Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
+ * "Cube coordinates" for a description, see:
+ * www.redblobgames.com/grids/hexagons/#coordinates-cube
+ */
 export class Hex {
     // keys are hex.x and then hex.y
     private static readonly xyCache: Record<number, Record<number, Hex>> = {}
@@ -206,9 +209,11 @@ export class Hex {
         return dy !== 0 ? dy : this.cartX - that.cartX
     }
 
+    // may be useless — equals() and hashcode() are from the ValueObject signature from ImmutableJS
     equals(other: any): boolean {
         return other === this
     }
+
     hashCode(): number {
         return this.id
     }
@@ -216,9 +221,9 @@ export class Hex {
 
 export const hexCompare = (a: Hex, b: Hex) => a.compareTo(b)
 
-export const hexesToString = (s?: ReadonlyArray<Hex>) => {
-    if (!s) return "undefined"
-    let result = `${s.length} —`
-    s.forEach((hex) => (result += ` ${hex.toCartString()}`))
+export const hexesToString = (hexes?: ReadonlyArray<Hex>) => {
+    if (!hexes) return "undefined"
+    let result = `${hexes.length} —`
+    hexes.forEach((hex) => (result += ` ${hex.toCartString()}`))
     return result
 }
