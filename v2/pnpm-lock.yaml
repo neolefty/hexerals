@@ -8,15 +8,27 @@ dependencies:
   '@swc/helpers':
     specifier: ~0.5.0
     version: 0.5.0
+  hsluv:
+    specifier: ^1.0.1
+    version: 1.0.1
+  immutable:
+    specifier: 5.0.0-beta.2
+    version: 5.0.0-beta.2
   react:
     specifier: 18.2.0
     version: 18.2.0
   react-dom:
     specifier: 18.2.0
     version: 18.2.0(react@18.2.0)
+  react-dropdown:
+    specifier: ^1.11.0
+    version: 1.11.0(react-dom@18.2.0)(react@18.2.0)
   structurajs:
     specifier: ^0.11.1
     version: 0.11.1
+  ts-deepmerge:
+    specifier: ^6.2.0
+    version: 6.2.0
   type-fest:
     specifier: ^4.0.0
     version: 4.0.0
@@ -3948,6 +3960,10 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /classnames@2.3.2:
+    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+    dev: false
+
   /clean-stack@2.2.0:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
     engines: {node: '>=6'}
@@ -5540,6 +5556,10 @@ packages:
     hasBin: true
     dev: true
 
+  /hsluv@1.0.1:
+    resolution: {integrity: sha512-zCaFTiDqBLQjCCFBu0qg7z9ASYPd+Bxx2GDCVZJsnehjK80S+jByqhuFz0pCd2Aw3FSKr18AWbRlwnKR0YdizQ==}
+    dev: false
+
   /html-encoding-sniffer@3.0.0:
     resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}
     engines: {node: '>=12'}
@@ -5660,6 +5680,10 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /immutable@5.0.0-beta.2:
+    resolution: {integrity: sha512-3v1xnTlom9D2ssrEvcfFHtipjXgmZeNtximyvNyuK2eAWKWWFtfh+9w+VOVujkBSbgpjrYsS55yuWE1E5ES7IA==}
+    dev: false
 
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
@@ -7067,6 +7091,17 @@ packages:
       react: 18.2.0
       scheduler: 0.23.0
 
+  /react-dropdown@1.11.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-E2UWetRPxNdIhQahXw6b984ME7WmcgDj9AEAjrtS/oyLCFVo+2qkCfcS06C22JR0Zj+YLnygwv0Ozf6VKKDq7g==}
+    peerDependencies:
+      react: ^0.14.7 || ^15.0.0-0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^0.14.7 || ^15.0.0-0 || ^16.0.0 || ^17.0.0|| ^18.0.0
+    dependencies:
+      classnames: 2.3.2
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: true
@@ -7863,6 +7898,11 @@ packages:
     dependencies:
       escape-string-regexp: 5.0.0
     dev: true
+
+  /ts-deepmerge@6.2.0:
+    resolution: {integrity: sha512-2qxI/FZVDPbzh63GwWIZYE7daWKtwXZYuyc8YNq0iTmMUwn4mL0jRLsp6hfFlgbdRSR4x2ppe+E86FnvEpN7Nw==}
+    engines: {node: '>=14.13.1'}
+    dev: false
 
   /ts-morph@18.0.0:
     resolution: {integrity: sha512-Kg5u0mk19PIIe4islUI/HWRvm9bC1lHejK4S0oh1zaZ77TMZAEmQC0sHQYiu2RgCQFZKXz1fMVi/7nOOeirznA==}

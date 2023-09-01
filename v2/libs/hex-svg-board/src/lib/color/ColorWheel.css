@@ -1,0 +1,25 @@
+g.addColor {
+  cursor: copy; }
+  g.addColor circle {
+    fill: black; }
+  g.addColor text {
+    fill: white;
+    text-anchor: middle;
+    font-size: 0.5px; }
+    g.addColor text.debug {
+      font-size: 0.15px;
+      fill: #aaa;
+      paint-order: stroke;
+      stroke: #000000;
+      stroke-width: 0.012px;
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
+      font-weight: 700; }
+
+g.colorWedge {
+  cursor: alias; }
+  g.colorWedge text.debug {
+    font-size: 0.09px;
+    font-weight: 600; }
+  g.colorWedge polygon {
+    strokeWidth: 0; }

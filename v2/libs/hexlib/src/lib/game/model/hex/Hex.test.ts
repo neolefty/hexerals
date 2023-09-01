@@ -1,5 +1,5 @@
 import { Hex } from "./Hex"
-import { NumberRange } from "./NumberRange"
+import { NumberRange } from "../../../NumberRange"
 
 it("checks hex neighbors", () => {
     expect(Hex.ORIGIN.getRightDown() === Hex.RIGHT_DOWN).toBeTruthy()

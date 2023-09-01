@@ -1,13 +1,14 @@
-import { devAssert } from "./Environment"
+import { List, ValueObject } from "immutable"
+import { devAssert } from "../../../Environment"
 
-// Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private.
+// Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private, and instances are interned.
 // "Cube coordinates" for a description, see:
 // www.redblobgames.com/grids/hexagons/#coordinates-cube
-export class Hex {
+export class Hex implements ValueObject {
     // keys are hex.x and then hex.y
     private static readonly xyCache: Record<number, Record<number, Hex>> = {}
-    // key is hex.id
-    private static readonly idCache: Record<number, Hex> = {}
+    // array index is hex.id
+    private static readonly idCache: Hex[] = []
 
     private static NEXT_ID = 0
 
@@ -206,7 +207,7 @@ export class Hex {
         return dy !== 0 ? dy : this.cartX - that.cartX
     }
 
-    equals(other: any): boolean {
+    equals(other: unknown): boolean {
         return other === this
     }
     hashCode(): number {
@@ -216,9 +217,22 @@ export class Hex {
 
 export const hexCompare = (a: Hex, b: Hex) => a.compareTo(b)
 
-export const hexesToString = (s?: ReadonlyArray<Hex>) => {
+const sizeOrLength = (collection: ReadonlyArray<unknown> | List<unknown>) => {
+    if (Array.isArray(collection)) return collection.length
+    else return (collection as List<unknown>).size
+}
+
+export const hexesToString = (s?: ReadonlyArray<Hex> | List<Hex>) => {
     if (!s) return "undefined"
-    let result = `${s.length} —`
+    let result = `${sizeOrLength(s)} —`
     s.forEach((hex) => (result += ` ${hex.toCartString()}`))
     return result
 }
+
+// How many hexes are in a full rectangular board?
+export const countHexes = (w: number, h: number) =>
+    // even heights: 1 full zig-zaggy row for every 2 height —> w * h / 2
+    // odd heights:
+    //   - even width: 1 perforated half-row for every height —> (w / 2) * h
+    //   - odd width: 1 more long half-row than short, so round up
+    Math.ceil(w * h * 0.5)

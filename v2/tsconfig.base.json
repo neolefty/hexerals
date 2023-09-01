@@ -8,12 +8,13 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2017",
     "module": "esnext",
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "@hexerals/hex-svg-board": ["libs/hex-svg-board/src/index.ts"],
       "@hexerals/hexlib": ["libs/hexlib/src/index.ts"]

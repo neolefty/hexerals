@@ -1,0 +1,48 @@
+.Dropdown-root {
+  display: inline-flex;
+  margin-left: 0.25em; }
+
+.Dropdown-menu {
+  max-height: 50vh; }
+
+.Dropdown-control, .Dropdown-menu {
+  background-color: black;
+  border: 1px solid white;
+  color: white; }
+
+.Dropdown-option {
+  color: white; }
+  .Dropdown-option:hover {
+    background-color: #444;
+    color: white; }
+  .Dropdown-option.is-selected {
+    color: black;
+    background-color: #bbb; }
+
+.Dropdown-arrow {
+  border-color: #ddd transparent transparent;
+  top: 2.3vmin;
+  right: 0.8vmin;
+  border-left-width: 1vmin;
+  border-right-width: 1vmin;
+  border-top-width: 1vmin;
+  border-bottom-width: 0; }
+
+.is-open .Dropdown-arrow {
+  border-color: transparent transparent #ddd;
+  top: 2.1vmin;
+  right: 0.8vmin;
+  border-left-width: 1vmin;
+  border-right-width: 1vmin;
+  border-top-width: 0;
+  border-bottom-width: 1vmin; }
+
+.SelectNumber {
+  margin: 0.2em 0; }
+  .SelectNumber label {
+    display: inline-flex; }
+  .SelectNumber select {
+    margin-left: 0.35em;
+    display: inline-flex;
+    color: white;
+    background-color: black; }

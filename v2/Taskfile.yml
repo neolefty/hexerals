@@ -13,10 +13,10 @@ tasks:
 
   test:
     # TODO find a way to monitor tests while also serving; unfortunately "--watch" gets mangled with "--targets=test,serve"
-    desc: "Monitor tests."
+    desc: "Monitor tests. To narrow tests, include '-- --testNamePattern <pattern>' or '-- --testFiles <pattern>'"
     cmds:
       # run-many is mighty: https://nx.dev/packages/nx/documents/run-many
-      - nx run-many -t test --watch
+      - nx run-many -t test {{.CLI_ARGS}} --watch
 
   migrate:
     desc: "Update nx tools and structure"
