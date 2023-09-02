@@ -1,5 +1,4 @@
 import { List } from "immutable"
-import { Comma } from "../../../common/Comma"
 import { devAssert } from "../../../common/Environment"
 import { shuffle } from "../../../common/Shuffle"
 import { Board } from "../board/Board"
@@ -29,104 +28,80 @@ const append = <T>(a?: List<T>, b?: List<T>): List<T> | undefined => {
     }
 }
 
-export class BasicRobot implements Robot {
-    static readonly MAX_IQ = 7
-
-    // doesn't always move all the way until blocked
-    static readonly SKILL_STOP_PARTWAY = 0
-    // avoids making losing moves
-    static readonly SKILL_WASTE_NOT = 1
-    // grabs cities if it can
-    static readonly SKILL_CAPTURE_CITY = 2
-    // stops if it's next to an opposing city
-    static readonly SKILL_STOP_BY_CITIES = 3
-    // tends to concentrate pop
-    static readonly SKILL_CONSOLIDATE = 4
-
-    // leaves pop in capital to protect them
-    static readonly SKILL_GARRISON = 5
-    // bias (away from 1 -- 0 would mean never move) towards leaving pop in capital
-    static readonly GARRISON_FACTOR = 0.3
-
-    static readonly SKILL_ACTIVE_DEFENSE = 6
-    // TODO actively defend capital by attacking armies next to it -- either from capital or from nearby
+const SKILLS_SMARTEST = {
+    // Doesn't move all the way until blocked
+    stopPartway: true,
+    // Avoids making losing attacks
+    wasteNot: true,
+    // Captures cities if possible
+    captureCity: true,
+    // Stops if it's next to an opposing city
+    stopByCities: true,
+    // Tends to concentrate pop
+    consolidate: true,
+    // Leaves pop in capitals to protect them
+    garrison: true,
+    // TODO: actively defend capital by attacking armies next to it, either from nearby or from capital
+    activeDefense: true,
 
     // tends to take empty squares
-    // static readonly SKILL_SPREAD = 5
-    // tends to take opponents' squares
-    // static readonly SKILL_CAPTURE = 6
-    /*
-    // captures enemy tiles
-    static readonly SKILL_LIKES_CAPTURE = 4
+    // captureEmpty: true,
+    // tends to take opponents' tiles
+    // captureTile: true,
     // prioritizes economical captures
-    static readonly SKILL_SAVES_POP = 5
-*/
+    // savePop: true,
+}
 
-    static readonly SKILL_NAMES = [
-        "stops partway",
-        "wastes not",
-        "captures nearby",
-        "stops by cities",
-        "consolidates",
-    ]
+type RobotSkills = Record<keyof typeof SKILLS_SMARTEST, boolean> // typeof SKILLS_SMARTEST
+const MAX_IQ = Object.keys(SKILLS_SMARTEST).length
+
+const skillsFromBooleans = (skills: ReadonlyArray<boolean>): RobotSkills => {
+    devAssert(skills.length === BasicRobot.MAX_IQ, `${skills}`)
+    const result: RobotSkills = { ...SKILLS_SMARTEST }
+    // we know that result has no extra keys, so this cast is safe
+    const keys = Object.keys(result) as Array<keyof RobotSkills>
+    keys.forEach((key, i) => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        result[key] = skills[i]!
+    })
+    return result
+}
+
+// This turned out to not really work — maybe in a future version of TypeScript, sigh
+// type RobotSkillsBooleans = FixedLengthArray<boolean, typeof MAX_IQ>
+
+export class BasicRobot implements Robot {
+    // garrison bias (0 means never move, 1 means always) towards leaving pop in capital
+    static readonly GARRISON_FACTOR = 0.3
+    static MAX_IQ = MAX_IQ
 
     // assign N random skills
     static byIntelligence(intelligence: number): BasicRobot {
         devAssert(intelligence <= BasicRobot.MAX_IQ, `${intelligence}`)
-        let settings: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
+        const settings: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
         while (settings.filter((value) => value).length < intelligence)
             settings[Math.floor(Math.random() * this.MAX_IQ)] = true
-        return new BasicRobot(settings)
+        return new BasicRobot(skillsFromBooleans(settings))
     }
 
+    /** A robot with a single skill. */
     static bySkill(skill: number): BasicRobot {
-        let bools = Array(BasicRobot.MAX_IQ).fill(false)
-        bools[skill] = true
-        return new BasicRobot(bools)
+        const skills = Array(BasicRobot.MAX_IQ).fill(false)
+        skills[skill] = true
+        return new BasicRobot(skillsFromBooleans(skills))
     }
 
-    constructor(readonly skills: boolean[]) {
-        devAssert(skills.length === BasicRobot.MAX_IQ)
-    }
-
-    get stopsPartway(): boolean {
-        return this.skills[BasicRobot.SKILL_STOP_PARTWAY]
-    }
-    get wastesNot(): boolean {
-        return this.skills[BasicRobot.SKILL_WASTE_NOT]
-    }
-    get capturesNearby(): boolean {
-        return this.skills[BasicRobot.SKILL_CAPTURE_CITY]
-    }
-    get stopsByCities(): boolean {
-        return this.skills[BasicRobot.SKILL_STOP_BY_CITIES]
-    }
-    get consolidates(): boolean {
-        return this.skills[BasicRobot.SKILL_CONSOLIDATE]
-    }
-    get garrisons(): boolean {
-        return this.skills[BasicRobot.SKILL_GARRISON]
-    }
-    get activelyDefends(): boolean {
-        return this.skills[BasicRobot.SKILL_ACTIVE_DEFENSE]
-    }
-    // get spreads(): boolean {
-    //     return this.skills[BasicRobot.SKILL_SPREAD] }
-    /*
-    get likesCapture(): boolean {
-        return this.skills[BasicRobot.SKILL_LIKES_CAPTURE] }
-    get savesPop(): boolean {
-        return this.skills[BasicRobot.SKILL_SAVES_POP] }
-*/
+    constructor(readonly skills: RobotSkills) {}
 
     get intelligence() {
-        let result = 0
-        this.skills.forEach((skill) => (result += skill ? 1 : 0))
-        return result
+        return Object.values(this.skills).reduce(
+            (sum, skill) => sum + (skill ? 1 : 0),
+            0
+        )
     }
 
     get isWatchingNextMove() {
-        return this.stopsByCities || this.wastesNot
+        return this.skills.stopByCities || this.skills.wasteNot
     }
 
     maxConsolidations(bs: BoardState, player: Player): number {
@@ -152,7 +127,7 @@ export class BasicRobot implements Robot {
         let respondingToThreat = false
 
         // protect the capital
-        if (this.activelyDefends) {
+        if (this.skills.activeDefense) {
             // 1. find the worst threat to a capital
             let threatHex = Hex.NONE
             let threatTile = Tile.EMPTY
@@ -189,7 +164,6 @@ export class BasicRobot implements Robot {
         }
 
         // TODO stop going back into the same city over and over (pattern is queue a move out of a city, it only makes it one hex away and is stopped by something, and then goes back, to reinforce the city
-
         // cancel moves?
         if (
             !respondingToThreat &&
@@ -203,10 +177,11 @@ export class BasicRobot implements Robot {
             let cancel = false
 
             // avoid losing battles?
-            if (this.wastesNot && !canMoveInto(source, dest)) cancel = true
+            if (this.skills.wasteNot && !canMoveInto(source, dest))
+                cancel = true
 
             // stop if we're next to an opponent's city?
-            if (this.stopsByCities) {
+            if (this.skills.stopByCities) {
                 bs.board.forNeighborsOccupiable(
                     nextMove.source,
                     (neighborHex, neighborTile) => {
@@ -225,7 +200,7 @@ export class BasicRobot implements Robot {
         }
 
         // capture a nearby city, if we're stopped anyway
-        if (shouldQueue && this.capturesNearby) {
+        if (shouldQueue && this.skills.captureCity) {
             bs.board
                 .filterTiles((tile) => tile.owner === player)
                 .forEach((myHex) => {
@@ -254,7 +229,7 @@ export class BasicRobot implements Robot {
                 })
         }
 
-        if (shouldQueue && this.consolidates) {
+        if (shouldQueue && this.skills.consolidate) {
             // pairs of [ pop, move ] — ignore smaller moves
             let smallSize = 2 // can't move if pop is 1
             let moves = List<[number, HexMove]>().withMutations((moves) => {
@@ -303,7 +278,7 @@ export class BasicRobot implements Robot {
             result.makeMoves = append(
                 result.makeMoves,
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                moves.map(([pop, move]) => move)
+                moves.map(([_, move]) => move)
             )
             // note: leave shouldQueue = true — go ahead and queue in a random direction, too
         }
@@ -320,7 +295,7 @@ export class BasicRobot implements Robot {
                     let weightedSourcePop = sourceTile.pop
                     if (
                         sourceTile.terrain === Terrain.Capital &&
-                        this.garrisons
+                        this.skills.garrison
                     )
                         weightedSourcePop *= BasicRobot.GARRISON_FACTOR
                     // I think this is a shortcut to giving each move a fair weight
@@ -346,7 +321,7 @@ export class BasicRobot implements Robot {
                     dest = dest.plus(delta)
                 } while (bs.board.canBeOccupied(dest))
                 // randomly shorten the move queue, biased towards longer
-                if (moves.size > 1 && this.stopsPartway) {
+                if (moves.size > 1 && this.skills.stopPartway) {
                     const movesToDrop = Math.floor(
                         Math.random() * Math.random() * moves.size
                     )
@@ -408,7 +383,7 @@ export class BasicRobot implements Robot {
             if (sourceTile.owner === player && sourceTile.pop > 1) {
                 const dests = source.neighbors.filter((dest: Hex) => {
                     if (!board.canBeOccupied(dest)) return false
-                    if (this.wastesNot) {
+                    if (this.skills.wasteNot) {
                         // don't queue a move you'll regret
                         const destTile = board.getTile(dest)
                         if (!canMoveInto(sourceTile, destTile)) return false
@@ -422,11 +397,13 @@ export class BasicRobot implements Robot {
 
     toString() {
         let result = `IQ ${this.intelligence}`
-        const comma = new Comma(" — ", ", ")
-        this.skills.forEach(
-            (v, i) =>
-                (result += v ? `${comma}${BasicRobot.SKILL_NAMES[i]}` : "")
-        )
+        const skillDescription = Object.entries(this.skills)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .filter(([name, value]) => value)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .map(([name, value]) => value)
+            .join(", ")
+        if (skillDescription) result += ` — ${skillDescription}`
         return result
     }
 }
