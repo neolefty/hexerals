@@ -1,16 +1,14 @@
 // A list of planned movements, organized by player
-import {List, Map} from 'immutable'
-import {devAssert} from "../../../common/Environment"
-import {Hex} from '../hex/Hex'
-import {Player} from '../players/Players'
-import {PlayerMove} from './Move';
+import { List, Map } from "immutable"
+import { devAssert } from "../../../common/Environment"
+import { Hex } from "../hex/Hex"
+import { Player } from "../players/Players"
+import { PlayerMove } from "./Move"
 
 export class MovementQueue {
     static readonly EMPTY = new MovementQueue(Map())
 
-    constructor(
-        readonly playerQueues: Map<Player, List<PlayerMove>> = Map()
-    ) {}
+    constructor(readonly playerQueues: Map<Player, List<PlayerMove>> = Map()) {}
 
     public addMove(move: PlayerMove): MovementQueue {
         if (this.playerQueues.has(move.player))
@@ -18,8 +16,9 @@ export class MovementQueue {
                 // update move to the end of this player's queue
                 this.playerQueues.set(
                     move.player,
-                    (this.playerQueues.get(move.player) as List<PlayerMove>)
-                        .push(move),
+                    (
+                        this.playerQueues.get(move.player) as List<PlayerMove>
+                    ).push(move)
                 )
             )
         else
@@ -30,10 +29,13 @@ export class MovementQueue {
     }
 
     public onlyForPlayer(player: Player): MovementQueue {
-        let newQueues = Map<Player, List<PlayerMove>>()
+        const newQueues = Map<Player, List<PlayerMove>>()
         return new MovementQueue(
             this.playerQueues.has(player)
-                ? newQueues.set(player, this.playerQueues.get(player) as List<PlayerMove>)
+                ? newQueues.set(
+                      player,
+                      this.playerQueues.get(player) as List<PlayerMove>
+                  )
                 : newQueues
         )
     }
@@ -42,7 +44,7 @@ export class MovementQueue {
         const reducer = (
             n: number | undefined,
             q: List<PlayerMove> | undefined
-        ): number => (n !== undefined && q) ? n + q.size : (n || 0)
+        ): number => (n !== undefined && q ? n + q.size : n || 0)
         return this.playerQueues.reduce(reducer, 0)
     }
 
@@ -53,12 +55,12 @@ export class MovementQueue {
     // Pop moves of all players.
     // Invalid moves are skipped -- they can arise from out-of-date queueing,
     // so discard them and move on.
-    public popEach(validator: ((move: PlayerMove) => boolean)):
-        QueueAndMoves | undefined
-    {
+    public popEach(
+        validator: (move: PlayerMove) => boolean
+    ): QueueAndMoves | undefined {
         const mutMap = this.playerQueues.asMutable()
         let mutated = false
-        const playerMoves = List<PlayerMove>().withMutations(result =>
+        const playerMoves = List<PlayerMove>().withMutations((result) =>
             this.playerQueues.forEach(
                 (moves: List<PlayerMove>, player: Player) => {
                     while (moves.size > 0) {
@@ -71,28 +73,30 @@ export class MovementQueue {
                             break
                         }
                     }
-                })
+                }
+            )
         )
         if (mutated)
             return new QueueAndMoves(
                 new MovementQueue(mutMap.asImmutable()),
-                playerMoves,
+                playerMoves
             )
-        else // no change
-            return undefined
+        // no change
+        else return undefined
     }
 
     playerIsQueuedTo(player: Player, hex: Hex): boolean {
-        const moves: List<PlayerMove> | undefined = this.playerQueues.get(player)
+        const moves: List<PlayerMove> | undefined =
+            this.playerQueues.get(player)
         // noinspection PointlessBooleanExpressionJS
-        return !!(moves && moves.find(
-            move => !!(move && (move.dest === hex))
-        ))
+        return !!(moves && moves.find((move) => !!(move && move.dest === hex)))
     }
 
     playerHasMove(player: Player) {
-        return this.playerQueues.has(player)
-            && (this.playerQueues.get(player) as List<PlayerMove>).size > 0
+        return (
+            this.playerQueues.has(player) &&
+            (this.playerQueues.get(player) as List<PlayerMove>).size > 0
+        )
     }
 
     /**
@@ -103,12 +107,13 @@ export class MovementQueue {
      * movement queue plus a list containing the cancelled moves, in order from oldest to newest.
      */
     cancelMoves(
-        player: Player, cursorIndex: number, count: number,
+        player: Player,
+        cursorIndex: number,
+        count: number
     ): QueueAndMoves | undefined {
-        const moves: List<PlayerMove> | undefined
-            = this.playerQueues.get(player)
-        if (!moves || moves.size === 0 || count === 0)
-            return undefined
+        const moves: List<PlayerMove> | undefined =
+            this.playerQueues.get(player)
+        if (!moves || moves.size === 0 || count === 0) return undefined
         if (count < 0) count = moves.size
 
         const cancelled: PlayerMove[] = []
@@ -127,24 +132,19 @@ export class MovementQueue {
             devAssert(cancelled.length + updatedMoves.size === moves.size)
             return new QueueAndMoves(
                 new MovementQueue(
-                    this.playerQueues.set(
-                        player, updatedMoves.asImmutable()
-                    )
+                    this.playerQueues.set(player, updatedMoves.asImmutable())
                 ),
-                List<PlayerMove>(cancelled.reverse()))
-        }
-
-        else
-            return undefined
+                List<PlayerMove>(cancelled.reverse())
+            )
+        } else return undefined
     }
 }
 
 export class QueueAndMoves {
     constructor(
         readonly queue: MovementQueue,
-        readonly moves: List<PlayerMove>,
+        readonly moves: List<PlayerMove>
     ) {}
 
-    toString = (): string =>
-        `queue: ${this.queue} moves: ${this.moves}`
+    toString = (): string => `queue: ${this.queue} moves: ${this.moves}`
 }

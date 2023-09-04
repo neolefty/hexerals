@@ -1,22 +1,22 @@
-import {List, Map, Set} from 'immutable';
+import { List, Map, Set } from "immutable"
 
-import {Board} from '../board/Board'
-import {Player} from './Players'
-import {HexMove} from '../move/Move'
-import {Tile} from '../hex/Tile'
-import {Hex} from '../hex/Hex'
-import {Terrain} from '../hex/Terrain'
+import { Board } from "../board/Board"
+import { Player } from "./Players"
+import { HexMove } from "../move/Move"
+import { Tile } from "../hex/Tile"
+import { Hex } from "../hex/Hex"
+import { Terrain } from "../hex/Terrain"
 
 export interface MoveVote {
     sentiment: number
     move: HexMove
-    expectedPop: number  // expected population in the source tile
+    expectedPop: number // expected population in the source tile
 }
 
 export const makeVote = (
     move: HexMove,
-    expectedPop: number = 1,
-    sentiment: number = 1,
+    expectedPop = 1,
+    sentiment = 1
 ): MoveVote => ({
     sentiment: sentiment,
     move: move,
@@ -25,17 +25,18 @@ export const makeVote = (
 
 // all must be for the same player
 export const makeVotes = (
-    board: Board, moves: List<HexMove> | undefined
+    board: Board,
+    moves: List<HexMove> | undefined
 ): List<MoveVote> => {
-    if (!moves || moves.size === 0)
-        return List<MoveVote>()
+    if (!moves || moves.size === 0) return List<MoveVote>()
 
     let prevMove: HexMove | undefined = undefined
-    let prevPop: number = 0
-    return moves.map(move => {
+    let prevPop = 0
+    return moves.map((move) => {
         let pop = board.getTile(move.source).pop
-        if (prevMove && prevMove.dest === move.source)
-            pop += prevPop
+        if (prevMove && prevMove.dest === move.source) pop += prevPop
+        prevMove = move
+        prevPop = pop
         return makeVote(move, pop)
     }) as List<MoveVote>
 }
@@ -44,7 +45,7 @@ export const makeVotes = (
 const VALUE_EMPTY = 5
 const VALUE_CAPITAL = 1000
 const VALUE_CITY = 125
-const VALUE_CONSOLIDATE = 0.02  // per pop
+const VALUE_CONSOLIDATE = 0.02 // per pop
 
 const EXPANSIONS = 10
 const CONSOLIDATIONS = 5
@@ -57,8 +58,8 @@ const TERRAIN_VALUES = Map<Terrain, number>([
 ])
 
 export enum StrategyType {
-    Canceller = 'Canceller', // run every time — watch out for problems
-    Planner = 'Planner', // run when we need something to do
+    Canceller = "Canceller", // run every time — watch out for problems
+    Planner = "Planner", // run when we need something to do
     // Opportunist = 'Opportunist', // just a high-priority planner
 }
 
@@ -68,7 +69,7 @@ export interface Strategy {
     suggest: (
         player: Player,
         board: Board,
-        votes: List<MoveVote>,
+        votes: List<MoveVote>
     ) => List<MoveVote>
 }
 
@@ -76,10 +77,12 @@ export interface Strategy {
 export class WasteNot implements Strategy {
     constructor(
         readonly name = "wastes not",
-        readonly type = StrategyType.Canceller,
+        readonly type = StrategyType.Canceller
     ) {}
     suggest(
-        player: Player, board: Board, votes: List<MoveVote>
+        player: Player,
+        board: Board,
+        votes: List<MoveVote>
     ): List<MoveVote> {
         for (let i = 0; i < votes.size; ++i) {
             const vote = votes.get(i) as MoveVote
@@ -94,21 +97,23 @@ export class WasteNot implements Strategy {
 export class StopByCities implements Strategy {
     constructor(
         readonly name = "stops by cities",
-        readonly type = StrategyType.Canceller,
+        readonly type = StrategyType.Canceller
     ) {}
     suggest(
-        player: Player, board: Board, votes: List<MoveVote>
+        player: Player,
+        board: Board,
+        votes: List<MoveVote>
     ): List<MoveVote> {
         for (let i = 0; i < votes.size; ++i) {
             let cancel = false
             const vote = votes.get(i) as MoveVote
             board.forNeighborsOccupiable(
-                vote.move.source, (neighbor: Hex, tile: Tile) => {
+                vote.move.source,
+                (neighbor: Hex, tile: Tile) => {
                     cancel = cancel || (tile.owner !== player && tile.growsFast)
                 }
             )
-            if (cancel)
-                return votes.slice(0, i) as List<MoveVote>
+            if (cancel) return votes.slice(0, i) as List<MoveVote>
         }
         return votes
     }
@@ -117,23 +122,27 @@ export class StopByCities implements Strategy {
 export class CaptureCities implements Strategy {
     constructor(
         readonly name = "captures cities",
-        readonly type = StrategyType.Planner,
+        readonly type = StrategyType.Planner
     ) {}
     suggest(
-        player: Player, board: Board, votes: List<MoveVote>
+        player: Player,
+        board: Board,
+        votes: List<MoveVote>
     ): List<MoveVote> {
-        board.filterTiles(
-            tile => tile.owner === player
-        ).forEach(source => {
-            const myTile = board.getTile(source)
-            board.forNeighborsOccupiable(
-                source, (dest, destTile) => {
+        board
+            .filterTiles((tile) => tile.owner === player)
+            .forEach((source) => {
+                const myTile = board.getTile(source)
+                board.forNeighborsOccupiable(source, (dest, destTile) => {
                     if (
-                        destTile.owner !== player
-                        && destTile.growsFast
-                        && myTile.pop - 1 > destTile.pop
+                        destTile.owner !== player &&
+                        destTile.growsFast &&
+                        myTile.pop - 1 > destTile.pop
                     ) {
-                        const terrainValue = TERRAIN_VALUES.get(destTile.terrain, 1)
+                        const terrainValue = TERRAIN_VALUES.get(
+                            destTile.terrain,
+                            1
+                        )
                         if (!TERRAIN_VALUES.has(destTile.terrain))
                             console.warn(`Unknown terrain: ${destTile.terrain}`)
                         const sentiment = Math.max(
@@ -141,15 +150,16 @@ export class CaptureCities implements Strategy {
                             terrainValue / destTile.pop,
                             terrainValue - destTile.pop
                         )
-                        votes = votes.push(makeVote(
-                            HexMove.constructDest(source, dest),
-                            myTile.pop,
-                            sentiment,
-                        ))
+                        votes = votes.push(
+                            makeVote(
+                                HexMove.constructDest(source, dest),
+                                myTile.pop,
+                                sentiment
+                            )
+                        )
                     }
-                }
-            )
-        })
+                })
+            })
         return votes
     }
 }
@@ -168,80 +178,95 @@ export const keepNVotes = (votes: MoveVote[], n: number): MoveVote[] => {
 export class Expand implements Strategy {
     constructor(
         readonly name = "expands",
-        readonly type = StrategyType.Planner,
+        readonly type = StrategyType.Planner
     ) {}
     suggest(
-        player: Player, board: Board, votes: List<MoveVote>
+        player: Player,
+        board: Board,
+        votes: List<MoveVote>
     ): List<MoveVote> {
-        let candidates = [] as MoveVote[]
-        board.filterTiles(
-            tile => tile.owner === player
-        ).forEach(myHex => {
-            const myTile = board.getTile(myHex)
-            board.forNeighborsOccupiable(myHex, (neighborHex, neighborTile) => {
-                // is it an "empty" hex (no interesting terrain) that we can capture?
-                if (
-                    neighborTile.terrain === Terrain.Empty
-                    && neighborTile.owner !== player
-                    && neighborTile.pop < myTile.pop - 1
-                ) {
-                    const sentiment = VALUE_EMPTY - neighborTile.pop
-                    if (sentiment > 0)
-                    // TODO consider using ts-priority-queue once packages are updated
-                        candidates.push(makeVote(
-                            HexMove.constructDest(myHex, neighborHex),
-                            myTile.pop,
-                            sentiment,
-                        ))
-                }
+        const candidates = [] as MoveVote[]
+        board
+            .filterTiles((tile) => tile.owner === player)
+            .forEach((myHex) => {
+                const myTile = board.getTile(myHex)
+                board.forNeighborsOccupiable(
+                    myHex,
+                    (neighborHex, neighborTile) => {
+                        // is it an "empty" hex (no interesting terrain) that we can capture?
+                        if (
+                            neighborTile.terrain === Terrain.Empty &&
+                            neighborTile.owner !== player &&
+                            neighborTile.pop < myTile.pop - 1
+                        ) {
+                            const sentiment = VALUE_EMPTY - neighborTile.pop
+                            if (sentiment > 0)
+                                // TODO consider using ts-priority-queue once packages are updated
+                                candidates.push(
+                                    makeVote(
+                                        HexMove.constructDest(
+                                            myHex,
+                                            neighborHex
+                                        ),
+                                        myTile.pop,
+                                        sentiment
+                                    )
+                                )
+                        }
+                    }
+                )
             })
-        })
-        return votes.push(... keepNVotes(candidates, EXPANSIONS))
+        return votes.push(...keepNVotes(candidates, EXPANSIONS))
     }
 }
 
 export class Consolidate implements Strategy {
     constructor(
         readonly name = "consolidates",
-        readonly type = StrategyType.Planner,
+        readonly type = StrategyType.Planner
     ) {}
     suggest(
-        player: Player, board: Board, votes: List<MoveVote>
+        player: Player,
+        board: Board,
+        votes: List<MoveVote>
     ): List<MoveVote> {
         let tooSmall = 1
         let candidates = [] as MoveVote[]
         // Rank consolidation moves.
-        board.filterTiles(
-            tile => tile.owner === player
-        ).forEach(hexA => {
-            const tileA = board.getTile(hexA)
-            if (tileA.pop > tooSmall) {
-                board.forNeighborsOccupiable(hexA, (hexB, tileB) => {
-                    if (tileB.owner === player && tileB.pop > tooSmall)
-                        candidates.push(makeVote(
-                            HexMove.constructDest(hexA, hexB),
-                            tileA.pop,
-                            Math.min(tileA.pop, tileB.pop) * VALUE_CONSOLIDATE,
-                        ))
-                    // efficiency hack: periodically trim and recalibrate
-                    if (candidates.length > CONSOLIDATIONS * 2) {
-                        candidates = keepNVotes(candidates, CONSOLIDATIONS)
-                        tooSmall = candidates[candidates.length - 1].sentiment / VALUE_CONSOLIDATE
-                    }
-                })
-            }
-        })
-        return votes.push(... keepNVotes(candidates, CONSOLIDATIONS))
+        board
+            .filterTiles((tile) => tile.owner === player)
+            .forEach((hexA) => {
+                const tileA = board.getTile(hexA)
+                if (tileA.pop > tooSmall) {
+                    board.forNeighborsOccupiable(hexA, (hexB, tileB) => {
+                        if (tileB.owner === player && tileB.pop > tooSmall)
+                            candidates.push(
+                                makeVote(
+                                    HexMove.constructDest(hexA, hexB),
+                                    tileA.pop,
+                                    Math.min(tileA.pop, tileB.pop) *
+                                        VALUE_CONSOLIDATE
+                                )
+                            )
+                        // efficiency hack: periodically trim and recalibrate
+                        if (candidates.length > CONSOLIDATIONS * 2) {
+                            candidates = keepNVotes(candidates, CONSOLIDATIONS)
+                            tooSmall =
+                                candidates[candidates.length - 1]!.sentiment /
+                                VALUE_CONSOLIDATE
+                        }
+                    })
+                }
+            })
+        return votes.push(...keepNVotes(candidates, CONSOLIDATIONS))
     }
 }
 
 // remove votes for moves that have a source that was moved earlier
-export const distillVotes = (
-    votes: List<MoveVote>
-): List<MoveVote> => {
+export const distillVotes = (votes: List<MoveVote>): List<MoveVote> => {
     const sources = Set<Hex>().asMutable()
     const result = [] as MoveVote[]
-    votes.forEach(vote => {
+    votes.forEach((vote) => {
         if (!sources.has(vote.move.source)) {
             result.push(vote)
             sources.add(vote.move.source)

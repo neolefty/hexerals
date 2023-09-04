@@ -1,5 +1,12 @@
 import { BoardStateReducerTester } from "../board/BoardStateReducerTester"
-import { BasicRobot } from "./BasicRobot"
+import {
+    BasicRobot,
+    RobotSkillName,
+    RobotSkills,
+    SKILL_NAMES,
+    SKILLS_DUMBEST,
+    SKILLS_SMARTEST,
+} from "./BasicRobot"
 import { pickNPlayers, Player } from "./Players"
 import { List, Range } from "immutable"
 import { RandomTerrainArranger } from "../setup/RandomTerrainArranger"
@@ -39,10 +46,10 @@ it("specifies IQ", () => {
     )
 })
 
-it("captures nearby", () => {
+it("captures nearby cities", () => {
     Range(0, 10).forEach(() => {
         const brt = new BoardStateReducerTester(3, 3)
-        brt.setRobot(Player.Zero, BasicRobot.bySkill(2))
+        brt.setRobot(Player.Zero, BasicRobot.bySkill("captureCity"))
         brt.setCursor(brt.ur)
         brt.queueMove(Player.One, Hex.DOWN)
         brt.setCursor(brt.ll)
@@ -64,10 +71,7 @@ it("wastes not", () => {
     Range(0, 20).forEach(() => {
         const brt = new BoardStateReducerTester(3, 3)
         expect(brt.board.hexesAll.size).toBe(5)
-        brt.setRobot(
-            Player.Zero,
-            BasicRobot.bySkill(BasicRobot.SKILL_WASTE_NOT)
-        )
+        brt.setRobot(Player.Zero, BasicRobot.bySkill("wasteNot"))
         for (let turn = 0; turn < 20; ++turn) {
             brt.queueRobots()
             brt.doMoves()
@@ -78,7 +82,7 @@ it("wastes not", () => {
     })
 
     const brt = new BoardStateReducerTester(1, 7)
-    brt.setRobot(Player.Zero, BasicRobot.bySkill(BasicRobot.SKILL_WASTE_NOT))
+    brt.setRobot(Player.Zero, BasicRobot.bySkill("wasteNot"))
     expect(brt.ur === Hex.getCart(0, 6)).toBeTruthy()
     expect(brt.getTile(brt.ur).pop).toBe(50)
     brt.queueRobots()
@@ -102,7 +106,7 @@ it("wastes not", () => {
 
 it("wastes not, even on a small board", () => {
     const brt = new BoardStateReducerTester(1, 3)
-    brt.setRobot(Player.Zero, BasicRobot.bySkill(BasicRobot.SKILL_WASTE_NOT))
+    brt.setRobot(Player.Zero, BasicRobot.bySkill("wasteNot"))
     brt.queueRobots()
     // didn't queue because the only possible move would be a losing battle
     expect(brt.moves.playerQueues.get(Player.Zero)).toBeUndefined()
@@ -112,9 +116,9 @@ it("stops by cities", () => {
     const n = 5
     Range(0, n).forEach(() => {
         const brt = new BoardStateReducerTester(3, 9)
-        const skills: boolean[] = Array(BasicRobot.MAX_IQ).fill(false)
-        skills[BasicRobot.SKILL_CAPTURE_CITY] = true
-        skills[BasicRobot.SKILL_STOP_BY_CITIES] = true
+        const skills: RobotSkills = { ...SKILLS_DUMBEST }
+        skills.captureCity = true
+        skills.stopByCities = true
         brt.setRobot(Player.Zero, new BasicRobot(skills))
         brt.setTile(Hex.RIGHT_UP.plus(Hex.UP), Tile.CITY)
         brt.setCursor(Hex.ORIGIN)
@@ -142,7 +146,8 @@ it("stops by cities", () => {
 type RobotMaker = () => Robot
 const robotTrials = logWinLoss ? 40 : 24
 const IQRobotMaker = (iq: number) => () => BasicRobot.byIntelligence(iq)
-const SkillRobotMaker = (skill: number) => () => BasicRobot.bySkill(skill)
+const SkillRobotMaker = (skill: RobotSkillName) => () =>
+    BasicRobot.bySkill(skill)
 const iq0 = IQRobotMaker(0)
 const iqMax = IQRobotMaker(BasicRobot.MAX_IQ)
 
@@ -201,13 +206,13 @@ it("control — IQ 0 vs self", () => {
 })
 
 it("IQ 1 not lose too much", () => {
-    Range(0, BasicRobot.MAX_IQ).forEach((skillIndex) => {
-        const smart = SkillRobotMaker(skillIndex)
+    SKILL_NAMES.forEach((skillName) => {
+        const smart = SkillRobotMaker(skillName)
         const wins = countAWins(smart, iq0)
         if (logWinLoss)
             // tslint:disable-next-line
             console.log(
-                `Skill #${skillIndex}: ${wins}/${robotTrials} = ${
+                `Skill "${skillName}": ${wins}/${robotTrials} = ${
                     wins / robotTrials
                 } (${smart().toString()})`
             )

@@ -1,11 +1,11 @@
-import {Tile} from '../hex/Tile';
-import {List, Map} from 'immutable';
-import {Hex} from '../hex/Hex';
-import {PlayerMove} from './Move';
-import {BoardConstraints} from '../board/Constraints';
-import {Terrain} from '../hex/Terrain';
-import {Capture} from './Capture';
-import {StatusMessage} from '../../../common/StatusMessage';
+import { Tile } from "../hex/Tile"
+import { List, Map } from "immutable"
+import { Hex } from "../hex/Hex"
+import { PlayerMove } from "./Move"
+import { BoardConstraints } from "../board/Constraints"
+import { Terrain } from "../hex/Terrain"
+import { Capture } from "./Capture"
+import { StatusMessage } from "../../../common/StatusMessage"
 
 export class MoveValidatorOptions {
     // the tiles under consideration, which start out as the current board's tiles
@@ -14,14 +14,14 @@ export class MoveValidatorOptions {
 
     // If true, don't invalidate just because there isn't enough population
     // on the tile *now* to move -- there may be enough in the future.
-    ignoreSmallPop: boolean = false
+    ignoreSmallPop = false
 
     // If true, don't invalidate because the current owner doesn't match the
     // player planning the move -- ownership may change before this move happens.
-    ignoreTileOwner: boolean = false
+    ignoreTileOwner = false
 
     // If true, don't invalidate because of mountains etc.
-    ignoreOccupiability: boolean = false
+    ignoreOccupiability = false
 
     constructor(
         tiles: Map<Hex, Tile>,
@@ -35,9 +35,7 @@ export class MoveValidatorOptions {
 }
 
 export class MoveValidator {
-    constructor(
-        readonly constraints: BoardConstraints
-    ) {}
+    constructor(readonly constraints: BoardConstraints) {}
 
     validate(move: PlayerMove, options: MoveValidatorOptions): boolean {
         // in bounds
@@ -45,20 +43,22 @@ export class MoveValidator {
             if (options.status)
                 options.status.push(
                     new StatusMessage(
-                        'out of bounds',
+                        "out of bounds",
                         `start ${move.source} is out of bounds`,
-                        `${move}`,
-                    ))
+                        `${move}`
+                    )
+                )
             return false
         }
         if (!this.constraints.inBounds(move.dest)) {
             if (options.status)
                 options.status.push(
                     new StatusMessage(
-                        'out of bounds',
+                        "out of bounds",
                         `destination ${move.dest} is out of bounds`,
-                        `${move}`,
-                    ))
+                        `${move}`
+                    )
+                )
             return false
         }
 
@@ -69,10 +69,11 @@ export class MoveValidator {
                 if (options.status)
                     options.status.push(
                         new StatusMessage(
-                            'blocked',
+                            "blocked",
                             `destination ${move.dest} is a ${dest.terrain}`,
-                            `${move}`,
-                        ))
+                            `${move}`
+                        )
+                    )
                 return false
             }
         }
@@ -82,10 +83,11 @@ export class MoveValidator {
             if (options.status)
                 options.status.push(
                     new StatusMessage(
-                        'illegal move', /* TODO use constants for tags*/
+                        "illegal move" /* TODO use constants for tags*/,
                         `Can't move ${move.delta.maxAbs()} steps.`,
-                        `${move}`,
-                    ))
+                        `${move}`
+                    )
+                )
             return false
         }
 
@@ -93,23 +95,27 @@ export class MoveValidator {
         const origin = options.tiles.get(move.source, Tile.EMPTY)
         if (!options.ignoreTileOwner && origin.owner !== move.player) {
             if (options && options.status)
-                options.status.push(new StatusMessage(
-                    'wrong player', // TODO use constant
-                    `${move.player} cannot move from ${move.source} `
-                    + `because it is held by ${origin.owner}.`,
-                    `${move}`,
-                ))
+                options.status.push(
+                    new StatusMessage(
+                        "wrong player", // TODO use constant
+                        `${move.player} cannot move from ${move.source} ` +
+                            `because it is held by ${origin.owner}.`,
+                        `${move}`
+                    )
+                )
             return false
         }
 
         // population >= 1
         if (!options.ignoreSmallPop && origin.pop <= 1) {
             if (options && options.status)
-                options.status.push(new StatusMessage(
-                    'insufficient population',
-                    `${move.source} has population of ${origin.pop}`,
-                    `${move}`,
-                ))
+                options.status.push(
+                    new StatusMessage(
+                        "insufficient population",
+                        `${move.source} has population of ${origin.pop}`,
+                        `${move}`
+                    )
+                )
             return false
         }
 
@@ -119,10 +125,7 @@ export class MoveValidator {
     // Do some moves.
     // Mutates options.messages and options.tiles.
     // Invalid moves are skipped.
-    applyMoves(
-        moves: List<PlayerMove>,
-        options: MoveValidatorOptions,
-    ) {
+    applyMoves(moves: List<PlayerMove>, options: MoveValidatorOptions) {
         moves.forEach((move: PlayerMove) => {
             const valid = this.validate(move, options)
             if (valid) {
@@ -138,23 +141,31 @@ export class MoveValidator {
                     (m: Map<Hex, Tile>) => {
                         m.set(move.source, newSourceTile)
                         m.set(move.dest, newDestTile)
-                    })
+                    }
+                )
                 if (isCapture)
                     options.captures.push(
-                        new Capture(move.dest, oldDestTile, newDestTile))
+                        new Capture(move.dest, oldDestTile, newDestTile)
+                    )
                 // was it a capital capture?
                 if (isCapture && oldDestTile.terrain === Terrain.Capital)
-                // noinspection PointlessBooleanExpressionJS
-                    options.tiles = options.tiles.withMutations(m =>
-                        options.tiles.filter(tile =>
-                            !!(tile && tile.owner === oldDestTile.owner)
-                        ).forEach((tile, hex) => {
-                            // give territory to attacker, with half pop (rounded up)
-                            const capTile = tile.setOwner(move.player)
-                                .setPop(Math.ceil(tile.pop * 0.5))
-                            options.captures.push(new Capture(hex, tile, capTile))
-                            m.set(hex, capTile)
-                        })
+                    // noinspection PointlessBooleanExpressionJS
+                    options.tiles = options.tiles.withMutations((m) =>
+                        options.tiles
+                            .filter(
+                                (tile) =>
+                                    !!(tile && tile.owner === oldDestTile.owner)
+                            )
+                            .forEach((tile, hex) => {
+                                // give territory to attacker, with half pop (rounded up)
+                                const capTile = tile
+                                    .setOwner(move.player)
+                                    .setPop(Math.ceil(tile.pop * 0.5))
+                                options.captures.push(
+                                    new Capture(hex, tile, capTile)
+                                )
+                                m.set(hex, capTile)
+                            })
                     )
             }
         })

@@ -1,6 +1,6 @@
-import {List, Map, Set, Range} from 'immutable'
-import {devAssert} from "../../../common/Environment"
-import {Hex} from './Hex';
+import { List, Map, Set, Range } from "immutable"
+import { devAssert } from "../../../common/Environment"
+import { Hex } from "./Hex"
 
 export interface HexNum {
     h: Hex
@@ -13,11 +13,15 @@ export interface HexNum {
 // extraBenefit: Extra (negative) value of visiting a particular hex. Should be between 0 and -1.
 // Note: extraBenefit complicates things because we can't just stop when we reach the dest. Instead, we have to figure out when to stop looking for better paths. Full Dijkstra I guess if you want to update that.
 export const floodShortestPath = (
-    hexes: Set<Hex>, origin: Hex, dest: Hex // , extraBenefit: HexEvaluator | undefined = undefined
+    hexes: Set<Hex>,
+    origin: Hex,
+    dest: Hex // , extraBenefit: HexEvaluator | undefined = undefined
 ): List<Hex> => {
     // distance (value.n) from origin to intermediate hex (key) and how to start off (value.h)
     // initial condition: cost of zero to go from origin to origin, passing through origin
-    const scratch = Map<Hex, HexNum>().set(origin, {h: origin, n: 0}).asMutable()
+    const scratch = Map<Hex, HexNum>()
+        .set(origin, { h: origin, n: 0 })
+        .asMutable()
 
     let prevRing: Set<Hex> = Set<Hex>() // previous layer of flood — avoid going backwards
     let curRing: Set<Hex> = Set<Hex>([origin]) // current layer we're traversing
@@ -25,15 +29,20 @@ export const floodShortestPath = (
     while (!scratch.has(dest)) {
         const nextRing = Set<Hex>().asMutable() // build the next layer as we go
         if (curRing.size === 0)
-            throw Error(`origin ${origin.toString()} and destination ${
-                dest.toString()} are not connected`)
+            throw Error(
+                `origin ${origin.toString()} and destination ${dest.toString()} are not connected`
+            )
         // eslint-disable-next-line no-loop-func
-        curRing.forEach(curRingHex => {
+        curRing.forEach((curRingHex) => {
             const curCost: HexNum = scratch.get(curRingHex) as HexNum // the cost to get here
             // to get to a neighbor, go here first; the trip will cost you to here + 1
-            const nextCost = {h: curRingHex, n: curCost.n + 1}
-            curRingHex.neighbors.forEach(neighbor => {
-                if (hexes.has(neighbor) && !curRing.has(neighbor) && !prevRing.has(neighbor)) {
+            const nextCost = { h: curRingHex, n: curCost.n + 1 }
+            curRingHex.neighbors.forEach((neighbor) => {
+                if (
+                    hexes.has(neighbor) &&
+                    !curRing.has(neighbor) &&
+                    !prevRing.has(neighbor)
+                ) {
                     nextRing.add(neighbor)
                     const neighborCost = scratch.get(neighbor)
                     if (!neighborCost || neighborCost.n > nextCost.n) {
@@ -52,7 +61,10 @@ export const floodShortestPath = (
     let result = List<Hex>([dest])
     // walk backwards from destination
     while (result.get(0) !== origin)
-        result = result.insert(0, (scratch.get(result.get(0) as Hex) as HexNum).h)
+        result = result.insert(
+            0,
+            (scratch.get(result.get(0) as Hex) as HexNum).h
+        )
 
     return result
 }
@@ -109,11 +121,13 @@ export class HexPaths {
 
     // How to get from source to dest? Return the distance and next step.
     step(source: Hex, dest: Hex): HexNum {
-        return this.paths[this.pathIndex(source)][this.pathIndex(dest)]
+        const result =
+            this.paths[this.pathIndex(source)]![this.pathIndex(dest)]!
+        devAssert(result)
+        return result
     }
 
-    distance = (source: Hex, dest: Hex): number =>
-        this.step(source, dest).n
+    distance = (source: Hex, dest: Hex): number => this.step(source, dest).n
 
     // includes both source and dest
     path(source: Hex, dest: Hex): List<Hex> {
@@ -122,7 +136,7 @@ export class HexPaths {
         result[0] = source
         result[firstStep.n] = dest
         let step = firstStep
-        Range(1, firstStep.n).forEach(i => {
+        Range(1, firstStep.n).forEach((i) => {
             const nextHex = step.h
             result[i] = nextHex
             step = this.step(nextHex, dest)
@@ -134,10 +148,8 @@ export class HexPaths {
         this.hexIdToPathIndex.get(hex.id) as number
 
     private computeLookups() {
-        let i: number = 0
-        this.hexes.forEach(hex =>
-            this.hexIdToPathIndex.set(hex.id, i++)
-        )
+        let i = 0
+        this.hexes.forEach((hex) => this.hexIdToPathIndex.set(hex.id, i++))
     }
 
     // Kind of a universal flood fill:
@@ -146,17 +158,20 @@ export class HexPaths {
     // The first time we find a pair, it will be along a shortest path, since we find paths in order of increasing length.
     private computePaths() {
         // allocate this.paths arrays
-        Range(0, this.hexes.size).forEach(n =>
-            this.paths[n] = Array(this.hexes.size)
+        Range(0, this.hexes.size).forEach(
+            (n) => (this.paths[n] = Array(this.hexes.size))
         )
         const ones = this.initializeOnes()
         let curEndpoints: Map<Hex, List<Hex>> = ones
-        let nextLength = 2  // the length of each of the next set of paths
+        let nextLength = 2 // the length of each of the next set of paths
         while (curEndpoints.size > 0) {
             const nextEndpoints = Map().asMutable() as Map<Hex, List<Hex>>
             // eslint-disable-next-line no-loop-func
             curEndpoints.forEach((curDests: List<Hex>, curSource: Hex) => {
-                const nextStep: HexNum = Object.freeze({ h: curSource, n: nextLength })
+                const nextStep: HexNum = Object.freeze({
+                    h: curSource,
+                    n: nextLength,
+                })
                 curDests.forEach((dest: Hex) => {
                     const destIndex = this.pathIndex(dest)
                     const oneDests = ones.get(curSource) as List<Hex>
@@ -165,13 +180,19 @@ export class HexPaths {
                     oneDests.forEach((nextSource: Hex) => {
                         const sourceIndex = this.pathIndex(nextSource)
                         const sourcePaths: HexNum[] = this.paths[sourceIndex]
-                        if (!sourcePaths[destIndex]) {  // found a new pair!
+                        if (!sourcePaths[destIndex]) {
+                            // found a new pair!
                             // New path starts at 1's dest, then to long path's source, then along long path to its dest.
                             sourcePaths[destIndex] = nextStep
                             if (!nextEndpoints.has(nextSource))
-                                nextEndpoints.set(nextSource, List<Hex>([dest]).asMutable())
+                                nextEndpoints.set(
+                                    nextSource,
+                                    List<Hex>([dest]).asMutable()
+                                )
                             else
-                                (nextEndpoints.get(nextSource) as List<Hex>).push(dest)
+                                (
+                                    nextEndpoints.get(nextSource) as List<Hex>
+                                ).push(dest)
                         }
                     })
                 })
@@ -183,18 +204,23 @@ export class HexPaths {
 
     private initializeOnes(): Map<Hex, List<Hex>> {
         // note two side-effects: populate 0's and 1's in this.paths
-        return Map<Hex, List<Hex>>().withMutations(result => {
-            this.hexes.forEach(source => {
+        return Map<Hex, List<Hex>>().withMutations((result) => {
+            this.hexes.forEach((source) => {
                 const sourceIndex = this.pathIndex(source)
-                this.paths[sourceIndex][sourceIndex] = Object.freeze({ h: source, n: 0 })
+                this.paths[sourceIndex][sourceIndex] = Object.freeze({
+                    h: source,
+                    n: 0,
+                })
                 // 1. map source to dests that are distance 1 away (and in-bounds)
-                const neighbors = source.neighbors.filter(
-                    neighbor => this.hexes.has(neighbor)
+                const neighbors = source.neighbors.filter((neighbor) =>
+                    this.hexes.has(neighbor)
                 ) as List<Hex>
                 result.set(source, neighbors)
                 // 2. update them to the path store
-                neighbors.forEach(neighbor =>
-                    this.paths[sourceIndex][this.pathIndex(neighbor)] = Object.freeze({ h: neighbor, n: 1 })
+                neighbors.forEach(
+                    (neighbor) =>
+                        (this.paths[sourceIndex][this.pathIndex(neighbor)] =
+                            Object.freeze({ h: neighbor, n: 1 }))
                 )
             })
         })
@@ -208,8 +234,9 @@ export class CacheDistance {
     distance(a: Hex, b: Hex): number {
         devAssert(this.hexes.has(a))
         devAssert(this.hexes.has(b))
-        if (b.id < a.id) // only remember from smaller to larger
-            [ a, b ] = [ b, a ]
+        if (b.id < a.id)
+            // only remember from smaller to larger
+            [a, b] = [b, a]
         if (!this.cache.has(a))
             this.cache.set(a, Map().asMutable() as Map<Hex, number>)
         const aCache = this.cache.get(a) as Map<Hex, number>

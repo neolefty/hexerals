@@ -1,27 +1,34 @@
-import {List, Map, Seq, Set} from 'immutable'
-import {devAssert} from "../../../common/Environment"
-import {StatusMessage} from '../../../common/StatusMessage'
-import {Hex} from '../hex/Hex'
-import {HexPaths} from '../hex/ShortestPath'
-import {Terrain} from '../hex/Terrain'
-import {Tile} from '../hex/Tile'
-import {Capture} from '../move/Capture'
-import {PlayerMove} from '../move/Move'
-import {MoveValidator, MoveValidatorOptions} from '../move/MoveValidator'
-import {Player} from '../players/Players'
-import {RandomPlayerArranger} from '../setup/PlayerArranger'
-import {TileArranger} from '../setup/TileArranger'
-import {BoardStat} from './BoardStat'
-import {BoardConstraints, RectangularConstraints, RectEdges} from './Constraints'
-import {DEFAULT_LOCAL_GAME_OPTIONS, LocalGameOptions} from './LocalGameOptions'
-import {Niches} from "./Niches"
-import {PopStepper} from './PopStepper'
+import { List, Map, Seq, Set } from "immutable"
+import { devAssert } from "../../../common/Environment"
+import { StatusMessage } from "../../../common/StatusMessage"
+import { Hex } from "../hex/Hex"
+import { HexPaths } from "../hex/ShortestPath"
+import { Terrain } from "../hex/Terrain"
+import { Tile } from "../hex/Tile"
+import { Capture } from "../move/Capture"
+import { PlayerMove } from "../move/Move"
+import { MoveValidator, MoveValidatorOptions } from "../move/MoveValidator"
+import { Player } from "../players/Players"
+import { RandomPlayerArranger } from "../setup/PlayerArranger"
+import { TileArranger } from "../setup/TileArranger"
+import { BoardStat } from "./BoardStat"
+import {
+    BoardConstraints,
+    RectangularConstraints,
+    RectEdges,
+} from "./Constraints"
+import {
+    DEFAULT_LOCAL_GAME_OPTIONS,
+    LocalGameOptions,
+} from "./LocalGameOptions"
+import { Niches } from "./Niches"
+import { PopStepper } from "./PopStepper"
 
 export class BoardAndMessages {
     constructor(
         readonly board: Board,
         readonly messages: List<StatusMessage>,
-        readonly captures: List<Capture>,
+        readonly captures: List<Capture>
     ) {}
 
     addToMessages = (curMessages: List<StatusMessage>): List<StatusMessage> =>
@@ -31,17 +38,16 @@ export class BoardAndMessages {
 }
 
 export class BoardRules {
-    constructor (
+    constructor(
         readonly constraints: BoardConstraints,
         readonly edges: RectEdges = new RectEdges(constraints),
         readonly validator: MoveValidator = new MoveValidator(constraints),
-        readonly stepper: PopStepper = new PopStepper(constraints.opts),
+        readonly stepper: PopStepper = new PopStepper(constraints.opts)
     ) {}
 
     private _niches?: Niches
     get niches(): Niches {
-        if (!this._niches)
-            this._niches = new Niches(this)
+        if (!this._niches) this._niches = new Niches(this)
         return this._niches
     }
 }
@@ -51,29 +57,31 @@ export type HexTileFilter = (entry: [Hex, Tile]) => boolean
 export type TileSideEffect = (hex: Hex, tile: Tile) => void
 
 export class Board {
-    static readonly DEFAULT_ARRANGERS: TileArranger[] = [new RandomPlayerArranger()]
+    static readonly DEFAULT_ARRANGERS: TileArranger[] = [
+        new RandomPlayerArranger(),
+    ]
 
     static construct(
         constraints: BoardConstraints,
         players: List<Player>,
         // there may be blank tiles not listed here -- see allTiles
-        explicitTiles: Map<Hex, Tile> = Map(),
+        explicitTiles: Map<Hex, Tile> = Map()
     ) {
-        return new Board(
-            new BoardRules(constraints),
-            players,
-            explicitTiles,
-        )
+        return new Board(new BoardRules(constraints), players, explicitTiles)
     }
 
     static constructDefaultSquare(
         size: number,
         players: List<Player> = List(),
         arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
-        messages?: StatusMessage[],
+        messages?: StatusMessage[]
     ): Board {
         return Board.constructDefaultRectangular(
-            size, size * 2 - 1, players, arrangers, messages,
+            size,
+            size * 2 - 1,
+            players,
+            arrangers,
+            messages
         )
     }
 
@@ -82,13 +90,18 @@ export class Board {
         h: number,
         players: List<Player> = List(),
         arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
-        messages?: StatusMessage[],
+        messages?: StatusMessage[]
     ): Board {
-        return Board.constructRectangular({
-            ...DEFAULT_LOCAL_GAME_OPTIONS,
-            boardWidth: w,
-            boardHeight: h,
-        }, players, arrangers, messages)
+        return Board.constructRectangular(
+            {
+                ...DEFAULT_LOCAL_GAME_OPTIONS,
+                boardWidth: w,
+                boardHeight: h,
+            },
+            players,
+            arrangers,
+            messages
+        )
     }
 
     static constructRectangular(
@@ -96,14 +109,15 @@ export class Board {
         players: List<Player> = List(),
         // TODO replace with LocalGameOptions.randomStart
         arrangers: TileArranger[] = this.DEFAULT_ARRANGERS,
-        messages?: StatusMessage[],
+        messages?: StatusMessage[]
     ): Board {
         const constraints = new RectangularConstraints(opts)
         let result = Board.construct(constraints, players)
-        arrangers.forEach(arranger =>
-            result = result.overlayTiles(
-                arranger.arrange(result, messages)
-            )
+        arrangers.forEach(
+            (arranger) =>
+                (result = result.overlayTiles(
+                    arranger.arrange(result, messages)
+                ))
         )
         return result
     }
@@ -113,20 +127,32 @@ export class Board {
         readonly rules: BoardRules,
         readonly players: List<Player>,
         // empty tiles are implied — see this.hexesAll
-        readonly explicitTiles: Map<Hex, Tile>,
+        readonly explicitTiles: Map<Hex, Tile>
     ) {}
 
     // change who is playing
     withPlayers = (players: List<Player>) =>
         new Board(this.rules, players, this.explicitTiles)
 
-    get moveValidator(): MoveValidator { return this.rules.validator }
-    get constraints(): BoardConstraints { return this.rules.constraints }
-    get edges(): RectEdges { return this.rules.edges }
-    get popStepper(): PopStepper { return this.rules.stepper }
-    get opts(): LocalGameOptions { return this.constraints.opts }
+    get moveValidator(): MoveValidator {
+        return this.rules.validator
+    }
+    get constraints(): BoardConstraints {
+        return this.rules.constraints
+    }
+    get edges(): RectEdges {
+        return this.rules.edges
+    }
+    get popStepper(): PopStepper {
+        return this.rules.stepper
+    }
+    get opts(): LocalGameOptions {
+        return this.constraints.opts
+    }
     // half-hexes at top & bottom
-    get niches(): Niches { return this.rules.niches }
+    get niches(): Niches {
+        return this.rules.niches
+    }
 
     perceivedTurn(turn: number): number {
         return Math.floor(turn / this.opts.cityTicks)
@@ -139,14 +165,16 @@ export class Board {
         this.inBounds(coord) && this.getTile(coord).canBeOccupied
 
     // All of this board's possible tiles. Note that this.explicitTiles omits some blanks.
-    get hexesAll(): Set<Hex> { return this.constraints.all }
+    get hexesAll(): Set<Hex> {
+        return this.constraints.all
+    }
 
     // tslint:disable-next-line:member-ordering
     private _occupiableCache: Set<Hex> | undefined = undefined
     get hexesOccupiable(): Set<Hex> {
         if (!this._occupiableCache)
             this._occupiableCache = this.filterTiles(
-                tile => tile.canBeOccupied
+                (tile) => tile.canBeOccupied
             )
         return this._occupiableCache
     }
@@ -157,7 +185,7 @@ export class Board {
     get emptyHexPaths(): HexPaths {
         if (!this._hexPaths)
             this._hexPaths = new HexPaths(
-                this.filterTiles(tile => tile.terrain === Terrain.Empty)
+                this.filterTiles((tile) => tile.terrain === Terrain.Empty)
             )
         return this._hexPaths
     }
@@ -165,8 +193,11 @@ export class Board {
     private _capitals?: Map<Hex, Tile>
     get capitals(): Map<Hex, Tile> {
         if (!this._capitals)
-            this._capitals = Map(this.filterOwnedTiles(([hex, tile]) =>
-                tile.terrain === Terrain.Capital)
+            this._capitals = Map(
+                this.filterOwnedTiles(
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    ([hex, tile]) => tile.terrain === Terrain.Capital
+                )
             )
         return this._capitals
     }
@@ -178,18 +209,17 @@ export class Board {
     // noinspection PointlessBooleanExpressionJS
     filterTiles = (filter: TileFilter): Set<Hex> =>
         this.hexesAll.filter(
-            hex => !!(hex && filter(this.getTile(hex)))
+            (hex) => !!(hex && filter(this.getTile(hex)))
         ) as Set<Hex>
 
     forNeighborsOccupiable(hex: Hex, sideEffect: TileSideEffect) {
-        hex.neighbors.filter(
-            neighbor => this.hexesOccupiable.has(neighbor)
-        ).forEach(
-            occ => sideEffect(occ, this.getTile(occ))
-        )}
+        hex.neighbors
+            .filter((neighbor) => this.hexesOccupiable.has(neighbor))
+            .forEach((occ) => sideEffect(occ, this.getTile(occ)))
+    }
 
     forOccupiableTiles(sideEffect: TileSideEffect) {
-        this.hexesOccupiable.forEach(hex => {
+        this.hexesOccupiable.forEach((hex) => {
             sideEffect(hex, this.getTile(hex))
         })
     }
@@ -198,10 +228,10 @@ export class Board {
     gatherStatistics<K>(
         initialValue: number,
         keyer: (tile: Tile, hex: Hex) => K,
-        extractor: (tile: Tile, hex: Hex) => number,
+        extractor: (tile: Tile, hex: Hex) => number
     ): BoardStat<K> {
         let total = initialValue
-        const stats: Map<K, number> = Map<K, number>().withMutations(result =>
+        const stats: Map<K, number> = Map<K, number>().withMutations((result) =>
             this.explicitTiles.forEach((tile, hex) => {
                 if (tile.owner !== Player.Nobody) {
                     const k = keyer(tile, hex)
@@ -222,8 +252,8 @@ export class Board {
         if (this._hexStatistics === undefined)
             this._hexStatistics = this.gatherStatistics<Player>(
                 0,
-                tile => tile.owner,
-                (/* tile, hex */) => 1,
+                (tile) => tile.owner,
+                (/* tile, hex */) => 1
             )
         return this._hexStatistics
     }
@@ -235,8 +265,8 @@ export class Board {
         if (this._popStatistics === undefined)
             this._popStatistics = this.gatherStatistics(
                 0,
-                tile => tile.owner,
-                (tile/*, hex*/) => tile.pop,
+                (tile) => tile.owner,
+                (tile /*, hex*/) => tile.pop
             )
         return this._popStatistics
     }
@@ -256,19 +286,18 @@ export class Board {
     }
 
     setTiles(tiles: Map<Hex, Tile>): Board {
-        return (this.explicitTiles.equals(tiles))
+        return this.explicitTiles.equals(tiles)
             ? this
             : new Board(this.rules, this.players, tiles)
     }
 
     overlayTiles(overlay: Map<Hex, Tile>): Board {
         return this.setTiles(
-            this.explicitTiles.withMutations(
-                (mTiles: Map<Hex, Tile>) => {
-                    overlay.forEach((value: Tile, key: Hex) => {
-                        mTiles.set(key, value)
-                    })
+            this.explicitTiles.withMutations((mTiles: Map<Hex, Tile>) => {
+                overlay.forEach((value: Tile, key: Hex) => {
+                    mTiles.set(key, value)
                 })
+            })
         )
     }
 
@@ -280,7 +309,7 @@ export class Board {
         return new BoardAndMessages(
             this.setTiles(options.tiles),
             List(options.status || []),
-            List(options.captures),
+            List(options.captures)
         )
     }
 
@@ -290,7 +319,7 @@ export class Board {
 
     validate(
         move: PlayerMove,
-        options: MoveValidatorOptions = this.validationOptions(),
+        options: MoveValidatorOptions = this.validationOptions()
     ): boolean {
         return this.moveValidator.validate(move, options)
     }
@@ -302,17 +331,17 @@ export class Board {
         return new MoveValidatorOptions(this.explicitTiles, messages)
     }
 
-    toString(onlyTiles: boolean = false): string {
-        let result = ''
+    toString(onlyTiles = false): string {
+        let result = ""
         if (!onlyTiles)
-            result += `Constraints: ${this.constraints.toString()}\n`
-                + `Edges: ${ this.edges.toString()}\n`
-                + `Non-blank tiles: (\n`
-        this.explicitTiles.forEach((tile, hex) =>
-            result += `   ${hex.toCartString()} — ${tile}\n`
+            result +=
+                `Constraints: ${this.constraints.toString()}\n` +
+                `Edges: ${this.edges.toString()}\n` +
+                `Non-blank tiles: (\n`
+        this.explicitTiles.forEach(
+            (tile, hex) => (result += `   ${hex.toCartString()} — ${tile}\n`)
         )
-        if (!onlyTiles)
-            result += ')'
+        if (!onlyTiles) result += ")"
         return result
     }
 }

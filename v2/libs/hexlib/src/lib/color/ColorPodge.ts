@@ -1,8 +1,9 @@
 import { List } from "immutable"
 import { DriftColor } from "./DriftColor"
+import { FixedLengthArray } from "type-fest"
 
 interface DistCache {
-    [key: number]: number[]
+    [key: number]: FixedLengthArray<number, 2>
 }
 
 // A collection of colors in CIE space
@@ -105,18 +106,21 @@ export class ColorPodge {
 
     // The perceptual distance between the closest two colors
     closestTwo(): number {
-        return this.closestFurthestTwo()[0]
+        return this.closestFurthestTwo()[0]!
     }
 
     // The perceptual distance between the furthest two colors
     furthestTwo(): number {
-        return this.closestFurthestTwo()[1]
+        return this.closestFurthestTwo()[1]!
     }
 
     /* tslint:disable:member-ordering */
-    private readonly closestFurtherTwoCache: number[] = [Infinity, -Infinity]
+    private readonly closestFurtherTwoCache: FixedLengthArray<number, 2> = [
+        Infinity,
+        -Infinity,
+    ]
     /* tslint:enable */
-    closestFurthestTwo(): number[] {
+    closestFurthestTwo(): FixedLengthArray<number, 2> {
         if (this.closestFurtherTwoCache[0] === Infinity)
             if (this.driftColors.size <= 1)
                 ColorPodge.mutateMinMax2(this.closestFurtherTwoCache, [0, 0])
@@ -131,9 +135,12 @@ export class ColorPodge {
     }
 
     /* tslint:disable:member-ordering */
-    static mutateMinMax2(a: number[], b: number[]) {
+    static mutateMinMax2(
+        a: FixedLengthArray<number, 2>,
+        b: FixedLengthArray<number, 2>
+    ) {
         a[0] = Math.min(a[0], b[0])
-        a[1] = Math.max(a[1], b[1])
+        a[1] = Math.max(a[1]!, b[1]!)
     }
     /* tslint:enable */
 
@@ -154,19 +161,11 @@ export class ColorPodge {
         return result
     }
 
-    minDist(
-        color: DriftColor,
-        ignore?: DriftColor,
-        ignoreCache: boolean = false
-    ) {
-        return this.minMaxDist(color, ignore, ignoreCache)[0]
+    minDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+        return this.minMaxDist(color, ignore, ignoreCache)[0]!
     }
 
-    maxDist(
-        color: DriftColor,
-        ignore?: DriftColor,
-        ignoreCache: boolean = false
-    ) {
+    maxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
         return this.minMaxDist(color, ignore, ignoreCache)[1]
     }
 
@@ -175,19 +174,15 @@ export class ColorPodge {
     /* tslint:enable */
     // what are the distances to the nearest and farthest other color in this podge?
     // if ignore is supplied, skip it in the list of colors
-    minMaxDist(
-        color: DriftColor,
-        ignore?: DriftColor,
-        ignoreCache: boolean = false
-    ) {
-        let result: number[] = this.minMaxDistCache[color.key]
+    minMaxDist(color: DriftColor, ignore?: DriftColor, ignoreCache = false) {
+        let result = this.minMaxDistCache[color.key]
         if (ignoreCache || !result) {
             result = [Infinity, -Infinity]
             this.driftColors.forEach((otherColor: DriftColor) => {
                 if (otherColor !== color && otherColor !== ignore) {
                     // const pd = dc.hslD2(color);
                     const pd = otherColor.perceptualD2(color)
-                    ColorPodge.mutateMinMax2(result, [pd, pd])
+                    ColorPodge.mutateMinMax2(result!, [pd, pd])
                 }
             })
             if (!ignoreCache) this.minMaxDistCache[color.key] = result

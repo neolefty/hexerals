@@ -23,7 +23,7 @@ export class RandomPlayerArranger extends TileArranger {
         board: Board,
         status: StatusMessage[] | undefined = undefined
     ): Map<Hex, Tile> {
-        let emptyHexes: Hex[] = board
+        const emptyHexes: Hex[] = board
             .filterTiles((tile) => tile.terrain === Terrain.Empty)
             .toArray()
         let starts = Map<Hex, Tile>()
@@ -31,7 +31,7 @@ export class RandomPlayerArranger extends TileArranger {
             if (emptyHexes.length > 0) {
                 const i = Math.floor(Math.random() * emptyHexes.length)
                 // shorten emptyHexes by 1
-                const hex = emptyHexes.splice(i, 1)[0]
+                const hex = emptyHexes.splice(i, 1)[0]!
                 starts = starts.set(
                     hex,
                     new Tile(player, this.startingPop, this.startingTerrain)
@@ -73,7 +73,7 @@ export class CornersPlayerArranger extends TileArranger {
             (b: Board) => b.edges.lowerRight,
         ]
         board.players.forEach((player, i) => {
-            const hex = corners[i](board)
+            const hex = corners[i]!(board)
             const prevOwner = starts.get(hex, Tile.EMPTY).owner
             if (prevOwner !== Player.Nobody) {
                 if (status)

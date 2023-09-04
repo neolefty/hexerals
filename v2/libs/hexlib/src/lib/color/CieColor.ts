@@ -1,6 +1,7 @@
-import {Hsluv} from "hsluv"
+import { Hsluv } from "hsluv"
+import { ThreeD } from "../common/FixedLengthArrays"
 
-const roundNumArrayToString = (ns: number[]): string =>
+const roundNumArrayToString = (ns: ThreeD): string =>
     `${Math.round(ns[0])} ${Math.round(ns[1])} ${Math.round(ns[2])}`
 
 export class CieColor {
@@ -19,10 +20,10 @@ export class CieColor {
 
     // perceptually normalized, but not all hues have full saturation range
     // -- good for computing perceptual distance
-    readonly lch: number[]
+    readonly lch: ThreeD
 
     // hsl is computer-standard hue/saturation/lightness
-    private static d2Hsl(a: number[], b: number[]) {
+    private static d2Hsl(a: ThreeD, b: ThreeD) {
         const dHueRaw = Math.abs(a[0] - b[0]),
             dSat = a[1] - b[1],
             dBright = a[2] - b[2]
@@ -33,7 +34,7 @@ export class CieColor {
     /** Private because it is mutable. */
     private readonly _hsluv: Hsluv
 
-    constructor(readonly hsl: number[]) {
+    constructor(readonly hsl: ThreeD) {
         // positive modulo
         this.hsl[0] = ((this.hsl[0] % 360) + 360) % 360
         this._hsluv = new Hsluv()
@@ -50,13 +51,19 @@ export class CieColor {
 
     perceptualDistance2(that: CieColor) {
         const [
-            light1, light2, // lightness
-            chroma1, chroma2, // saturation
-            hue1, hue2,
+            light1,
+            light2, // lightness
+            chroma1,
+            chroma2, // saturation
+            hue1,
+            hue2,
         ] = [
-            this.lch[0], that.lch[0],
-            this.lch[1], that.lch[1],
-            this.lch[2], that.lch[2],
+            this.lch[0],
+            that.lch[0],
+            this.lch[1],
+            that.lch[1],
+            this.lch[2],
+            that.lch[2],
         ]
 
         const dHueRaw = Math.abs(hue1 - hue2),
@@ -65,9 +72,10 @@ export class CieColor {
         const dHue = dHueRaw < 180 ? dHueRaw : 360 - dHueRaw
         // attempt to compensate for low lightness / saturation
         // -- hue that is dark or desaturated is less important
-        const result = dHue * dHue * chroma1 * chroma2 * light1 * light2
-            + dSat * dSat * 1e8 * 0.4  // de-emphasize saturation
-            + dLight * dLight * 1e8
+        const result =
+            dHue * dHue * chroma1 * chroma2 * light1 * light2 +
+            dSat * dSat * 1e8 * 0.4 + // de-emphasize saturation
+            dLight * dLight * 1e8
         // console.log(`${result.toFixed(2)} -- delta ${[dBright.toFixed(2), dSat.toFixed(2), dHueRaw.toFixed(2)]} --from-- ${this.toLchString()} -to- ${that.toLchString()} = `)
         return result / 1e8
         // return CieColor.d2(this.lch, that.lch)
@@ -79,12 +87,22 @@ export class CieColor {
         }
         return this._hsluv.hex
     }
-    get hslString() { return roundNumArrayToString(this.hsl) }
-    get lchString() { return roundNumArrayToString(this.lch) }
+    get hslString() {
+        return roundNumArrayToString(this.hsl)
+    }
+    get lchString() {
+        return roundNumArrayToString(this.lch)
+    }
 
-    get hue() { return this.hsl[0] }
-    get saturation() { return this.hsl[1] }
-    get lightness() { return this.hsl[2] }
+    get hue() {
+        return this.hsl[0]
+    }
+    get saturation() {
+        return this.hsl[1]
+    }
+    get lightness() {
+        return this.hsl[2]
+    }
 
     darker = (diff: number) =>
         this.withLightness(Math.max(0, this.lightness - diff))

@@ -28,7 +28,7 @@ const append = <T>(a?: List<T>, b?: List<T>): List<T> | undefined => {
     }
 }
 
-const SKILLS_SMARTEST = {
+export const SKILLS_SMARTEST = Object.freeze({
     // Doesn't move all the way until blocked
     stopPartway: true,
     // Avoids making losing attacks
@@ -50,10 +50,20 @@ const SKILLS_SMARTEST = {
     // captureTile: true,
     // prioritizes economical captures
     // savePop: true,
-}
+})
 
-type RobotSkills = Record<keyof typeof SKILLS_SMARTEST, boolean> // typeof SKILLS_SMARTEST
-const MAX_IQ = Object.keys(SKILLS_SMARTEST).length
+export const SKILL_NAMES: ReadonlyArray<RobotSkillName> = Object.freeze(
+    Object.keys(SKILLS_SMARTEST) as RobotSkillName[]
+)
+
+export type RobotSkillName = keyof typeof SKILLS_SMARTEST
+
+export type RobotSkills = Record<RobotSkillName, boolean> // typeof SKILLS_SMARTEST
+const MAX_IQ = SKILL_NAMES.length
+
+export const SKILLS_DUMBEST = Object.fromEntries(
+    SKILL_NAMES.map((key) => [key, false])
+) as Readonly<RobotSkills>
 
 const skillsFromBooleans = (skills: ReadonlyArray<boolean>): RobotSkills => {
     devAssert(skills.length === BasicRobot.MAX_IQ, `${skills}`)
@@ -61,7 +71,6 @@ const skillsFromBooleans = (skills: ReadonlyArray<boolean>): RobotSkills => {
     // we know that result has no extra keys, so this cast is safe
     const keys = Object.keys(result) as Array<keyof RobotSkills>
     keys.forEach((key, i) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         result[key] = skills[i]!
     })
     return result
@@ -85,10 +94,10 @@ export class BasicRobot implements Robot {
     }
 
     /** A robot with a single skill. */
-    static bySkill(skill: number): BasicRobot {
-        const skills = Array(BasicRobot.MAX_IQ).fill(false)
+    static bySkill(skill: RobotSkillName): BasicRobot {
+        const skills: RobotSkills = { ...SKILLS_DUMBEST }
         skills[skill] = true
-        return new BasicRobot(skillsFromBooleans(skills))
+        return new BasicRobot(skills)
     }
 
     constructor(readonly skills: RobotSkills) {}
@@ -104,6 +113,8 @@ export class BasicRobot implements Robot {
         return this.skills.stopByCities || this.skills.wasteNot
     }
 
+    // TODO examine this and make sure it's doing what is intended
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     maxConsolidations(bs: BoardState, player: Player): number {
         return Math.min(
             4, // at least 4

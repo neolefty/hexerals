@@ -371,8 +371,8 @@ interface PlaceCursorAction {
 }
 export const doPlaceCursor = (
     position: Hex,
-    index: number = 0,
-    clearOthers: boolean = false
+    index = 0,
+    clearOthers = false
 ): PlaceCursorAction => ({ type: PLACE_CURSOR, position, index, clearOthers })
 const placeCursorReducer = (
     state: BoardState,
