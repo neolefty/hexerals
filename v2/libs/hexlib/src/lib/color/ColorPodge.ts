@@ -1,14 +1,14 @@
 import { List } from "immutable"
 import { DriftColor } from "./DriftColor"
-import { FixedLengthArray } from "type-fest"
+import { ThreeD, TwoD } from "../common/FixedLengthArrays"
 
 interface DistCache {
-    [key: number]: FixedLengthArray<number, 2>
+    [key: number]: TwoD
 }
 
 // A collection of colors in CIE space
 export class ColorPodge {
-    static readonly HSV_DELTAS: number[][] = [
+    static readonly HSV_DELTAS: ReadonlyArray<ThreeD> = [
         // index 1 is larger because LCh Chroma is scaled down saturation
         // and won't shift at all if we use 1 -- shifts happen in HSV space.
         [-1, 0, 0],
@@ -111,16 +111,13 @@ export class ColorPodge {
 
     // The perceptual distance between the furthest two colors
     furthestTwo(): number {
-        return this.closestFurthestTwo()[1]!
+        return this.closestFurthestTwo()[1]
     }
 
     /* tslint:disable:member-ordering */
-    private readonly closestFurtherTwoCache: FixedLengthArray<number, 2> = [
-        Infinity,
-        -Infinity,
-    ]
+    private readonly closestFurtherTwoCache: TwoD = [Infinity, -Infinity]
     /* tslint:enable */
-    closestFurthestTwo(): FixedLengthArray<number, 2> {
+    closestFurthestTwo(): TwoD {
         if (this.closestFurtherTwoCache[0] === Infinity)
             if (this.driftColors.size <= 1)
                 ColorPodge.mutateMinMax2(this.closestFurtherTwoCache, [0, 0])
@@ -135,12 +132,9 @@ export class ColorPodge {
     }
 
     /* tslint:disable:member-ordering */
-    static mutateMinMax2(
-        a: FixedLengthArray<number, 2>,
-        b: FixedLengthArray<number, 2>
-    ) {
+    static mutateMinMax2(a: TwoD, b: TwoD) {
         a[0] = Math.min(a[0], b[0])
-        a[1] = Math.max(a[1]!, b[1]!)
+        a[1] = Math.max(a[1], b[1])
     }
     /* tslint:enable */
 

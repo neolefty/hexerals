@@ -1,11 +1,12 @@
-import {ColorPodge} from "./ColorPodge"
-import {CieColor} from "./CieColor"
-import {DriftColor} from "./DriftColor"
-import {List, Range} from "immutable"
+import { ColorPodge } from "./ColorPodge"
+import { CieColor } from "./CieColor"
+import { DriftColor } from "./DriftColor"
+import { List, Range } from "immutable"
+import { TwoD } from "../common/FixedLengthArrays"
 
 // TODO test that mindist() of each color in a podge is similar, after convergence
 
-it('color equality', () => {
+it("color equality", () => {
     const a1 = new DriftColor(new CieColor([1, 2, 3]))
     const a2 = new DriftColor(new CieColor([1, 2, 3]))
     const b = new DriftColor(new CieColor([1, 2, 0]))
@@ -16,7 +17,7 @@ it('color equality', () => {
     expect(a1.equals(undefined)).toBeFalsy()
 })
 
-it('color distance', () => {
+it("color distance", () => {
     const c0 = new DriftColor(new CieColor([1, 2, 3]))
     const c1 = new DriftColor(new CieColor([2, 4, 6]))
     const c2 = new DriftColor(new CieColor([0, 0, 0]))
@@ -29,17 +30,17 @@ it('color distance', () => {
 
     expect(c0.d2(c1)).toEqual(c0.perceptualD2(c1))
     // expect to tweak these numbers if the color comparison metric changes
-    expect(c0.d2(c1)).toBeCloseTo(9.10, 2)
+    expect(c0.d2(c1)).toBeCloseTo(9.1, 2)
     expect(c0.d2(c2)).toBeCloseTo(9.01, 2)
     expect(c1.d2(c2)).toBeCloseTo(36.18, 2)
 
     expect(c0.key).toEqual(c0.drift(1).key)
-    expect(c0.key).toEqual(c0.shift([1,1,1], 1).key)
+    expect(c0.key).toEqual(c0.shift([1, 1, 1], 1).key)
     expect(c0.contrast().key).toEqual(c0.drift(1).contrast().key)
-    expect(c0.contrast().key).toEqual(c0.shift([1,1,1], 1).contrast().key)
+    expect(c0.contrast().key).toEqual(c0.shift([1, 1, 1], 1).contrast().key)
 })
 
-it('color podge basics', () => {
+it("color podge basics", () => {
     let cp = new ColorPodge()
     expect(cp.driftColors.size).toEqual(0)
     cp = cp.addRandomColor()
@@ -50,12 +51,12 @@ it('color podge basics', () => {
     let cpDispersed = cp.disperse(0)
     expect(cpDispersed.driftColors.size).toEqual(2)
     // ... should have no effect except on
-    Range(0, 2).forEach(i =>
+    Range(0, 2).forEach((i) =>
         Range(0, 3).forEach(() => {
             expect(cp.driftColors.get(i)).toBeDefined()
             const orig = cp.driftColors.get(i) as DriftColor
             const disp = cpDispersed.driftColors.get(i)
-            
+
             expect(orig.equals(disp)).toBeTruthy()
         })
     )
@@ -78,9 +79,7 @@ it('color podge basics', () => {
     cp = cp.disperse(10).disperse(1)
 
     // update 6 more random colors
-    Range(0, 6).forEach(() =>
-        cp = cp.addRandomColor()
-    )
+    Range(0, 6).forEach(() => (cp = cp.addRandomColor()))
 
     // now we expect the first two to be closer to a newcomer than to each other
     expect(Math.abs(cp.minDist(c0) - cp.minDist(c1))).toBeGreaterThan(0)
@@ -94,11 +93,11 @@ it('color podge basics', () => {
     expect(cpDispersed31.closestTwo()).toBeGreaterThan(cpDispersed.closestTwo())
 })
 
-it('color podge math', () => {
-    const z = [10, 20]
-    const y = [7, 23]
-    const x = [13, 17]
-    const m = [Infinity, -Infinity]
+it("color podge math", () => {
+    const z: TwoD = [10, 20]
+    const y: TwoD = [7, 23]
+    const x: TwoD = [13, 17]
+    const m: TwoD = [Infinity, -Infinity]
     ColorPodge.mutateMinMax2(m, z)
     expect(m).toEqual(z)
     ColorPodge.mutateMinMax2(m, y)
@@ -107,7 +106,7 @@ it('color podge math', () => {
     expect(m).toEqual(y)
 })
 
-it('color podge random tests', () => {
+it("color podge random tests", () => {
     Range(0, 5).forEach(() => {
         const a = DriftColor.random()
         const b = DriftColor.random()
@@ -117,10 +116,20 @@ it('color podge random tests', () => {
         const f = DriftColor.random()
         const cp = new ColorPodge(List([a, b, c, d, e, f]))
         const distances = [
-            a.d2(b), a.d2(c), a.d2(d), a.d2(e), a.d2(f),
-            b.d2(c), b.d2(d), b.d2(e), b.d2(f),
-            c.d2(d), c.d2(e), c.d2(f),
-            d.d2(e), d.d2(f),
+            a.d2(b),
+            a.d2(c),
+            a.d2(d),
+            a.d2(e),
+            a.d2(f),
+            b.d2(c),
+            b.d2(d),
+            b.d2(e),
+            b.d2(f),
+            c.d2(d),
+            c.d2(e),
+            c.d2(f),
+            d.d2(e),
+            d.d2(f),
             e.d2(f),
         ]
         expect(cp.closestTwo()).toBeCloseTo(Math.min(...distances))
@@ -139,7 +148,7 @@ it('color podge random tests', () => {
     })
 })
 
-it('textures', () => {
+it("textures", () => {
     Range(0, 10).forEach(() => {
         const orig = DriftColor.random()
         const texture10 = orig.texture(10)
@@ -151,7 +160,10 @@ it('textures', () => {
         expect(orig.hexString).toEqual(lighter0.hexString)
         expect(orig.hexString).toEqual(darker0.hexString)
         expect(orig.saturation).toBe(texture10.saturation)
-        expect(Math.abs(orig.lightness - texture10.lightness)).toBeCloseTo(10, 6)
+        expect(Math.abs(orig.lightness - texture10.lightness)).toBeCloseTo(
+            10,
+            6
+        )
         expect(orig.lightness - darker5.lightness).toBeCloseTo(5, 6)
         expect(orig.lightness - lighter5.lightness).toBeCloseTo(-5, 6)
         expect(orig.texture(10) === texture10) // cached

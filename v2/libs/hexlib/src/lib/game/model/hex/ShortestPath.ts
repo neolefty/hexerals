@@ -179,7 +179,7 @@ export class HexPaths {
                     // We could use curSource.neighbors, but ones is already in-bounds filtered.
                     oneDests.forEach((nextSource: Hex) => {
                         const sourceIndex = this.pathIndex(nextSource)
-                        const sourcePaths: HexNum[] = this.paths[sourceIndex]
+                        const sourcePaths: HexNum[] = this.paths[sourceIndex]!
                         if (!sourcePaths[destIndex]) {
                             // found a new pair!
                             // New path starts at 1's dest, then to long path's source, then along long path to its dest.
@@ -207,19 +207,21 @@ export class HexPaths {
         return Map<Hex, List<Hex>>().withMutations((result) => {
             this.hexes.forEach((source) => {
                 const sourceIndex = this.pathIndex(source)
-                this.paths[sourceIndex][sourceIndex] = Object.freeze({
+                this.paths[sourceIndex]![sourceIndex] = Object.freeze({
                     h: source,
                     n: 0,
                 })
                 // 1. map source to dests that are distance 1 away (and in-bounds)
-                const neighbors = source.neighbors.filter((neighbor) =>
-                    this.hexes.has(neighbor)
-                ) as List<Hex>
+                const neighbors = List(
+                    source.neighbors.filter((neighbor) =>
+                        this.hexes.has(neighbor)
+                    )
+                )
                 result.set(source, neighbors)
                 // 2. update them to the path store
                 neighbors.forEach(
                     (neighbor) =>
-                        (this.paths[sourceIndex][this.pathIndex(neighbor)] =
+                        (this.paths[sourceIndex]![this.pathIndex(neighbor)] =
                             Object.freeze({ h: neighbor, n: 1 }))
                 )
             })
