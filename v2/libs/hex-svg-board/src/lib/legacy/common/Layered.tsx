@@ -15,6 +15,6 @@ export const Layered = ({ children }: PropsWithChildren) => {
             </div>
         )
     } else if (children) {
-        return children as React.ReactElement<any>
+        return children as React.ReactElement
     } else return null
 }

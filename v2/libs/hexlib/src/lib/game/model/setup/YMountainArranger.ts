@@ -17,6 +17,7 @@ export class YMountainArranger extends TileArranger {
 
     arrange(
         board: Board,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         status: StatusMessage[] | undefined = undefined
     ): Map<Hex, Tile> {
         const result = Map<Hex, Tile>().asMutable()

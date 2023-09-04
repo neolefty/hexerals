@@ -5,7 +5,6 @@ import {
     RobotSkills,
     SKILL_NAMES,
     SKILLS_DUMBEST,
-    SKILLS_SMARTEST,
 } from "./BasicRobot"
 import { pickNPlayers, Player } from "./Players"
 import { List, Range } from "immutable"
