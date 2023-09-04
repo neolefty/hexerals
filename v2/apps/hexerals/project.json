@@ -1,78 +1,78 @@
 {
-  "name": "hexerals",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/hexerals/src",
-  "projectType": "application",
-  "targets": {
-    "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "outputPath": "dist/apps/hexerals"
-      },
-      "configurations": {
-        "development": {
-          "mode": "development"
+    "name": "hexerals",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/hexerals/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nx/vite:build",
+            "outputs": ["{options.outputPath}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "outputPath": "dist/apps/hexerals"
+            },
+            "configurations": {
+                "development": {
+                    "mode": "development"
+                },
+                "production": {
+                    "mode": "production"
+                }
+            }
         },
-        "production": {
-          "mode": "production"
-        }
-      }
-    },
-    "serve": {
-      "executor": "@nx/vite:dev-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "hexerals:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "hexerals:build:development",
-          "hmr": true
+        "serve": {
+            "executor": "@nx/vite:dev-server",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "hexerals:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "hexerals:build:development",
+                    "hmr": true
+                },
+                "production": {
+                    "buildTarget": "hexerals:build:production",
+                    "hmr": false
+                }
+            }
         },
-        "production": {
-          "buildTarget": "hexerals:build:production",
-          "hmr": false
-        }
-      }
-    },
-    "preview": {
-      "executor": "@nx/vite:preview-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "hexerals:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "hexerals:build:development"
+        "preview": {
+            "executor": "@nx/vite:preview-server",
+            "defaultConfiguration": "development",
+            "options": {
+                "buildTarget": "hexerals:build"
+            },
+            "configurations": {
+                "development": {
+                    "buildTarget": "hexerals:build:development"
+                },
+                "production": {
+                    "buildTarget": "hexerals:build:production"
+                }
+            }
         },
-        "production": {
-          "buildTarget": "hexerals:build:production"
+        "test": {
+            "executor": "@nx/vite:test",
+            "outputs": ["{workspaceRoot}/coverage/apps/hexerals"],
+            "options": {
+                "passWithNoTests": true,
+                "reportsDirectory": "../../coverage/apps/hexerals"
+            }
+        },
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/hexerals/**/*.{ts,tsx,js,jsx}"]
+            }
+        },
+        "serve-static": {
+            "executor": "@nx/web:file-server",
+            "options": {
+                "buildTarget": "hexerals:build"
+            }
         }
-      }
     },
-    "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["coverage/apps/hexerals"],
-      "options": {
-        "passWithNoTests": true,
-        "reportsDirectory": "../../coverage/apps/hexerals"
-      }
-    },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/hexerals/**/*.{ts,tsx,js,jsx}"]
-      }
-    },
-    "serve-static": {
-      "executor": "@nx/web:file-server",
-      "options": {
-        "buildTarget": "hexerals:build"
-      }
-    }
-  },
-  "tags": []
+    "tags": []
 }

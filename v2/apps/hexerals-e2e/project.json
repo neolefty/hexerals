@@ -1,33 +1,33 @@
 {
-  "name": "hexerals-e2e",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/hexerals-e2e/src",
-  "projectType": "application",
-  "targets": {
-    "e2e": {
-      "executor": "@nx/cypress:cypress",
-      "options": {
-        "cypressConfig": "apps/hexerals-e2e/cypress.config.ts",
-        "devServerTarget": "hexerals:serve:development",
-        "testingType": "e2e"
-      },
-      "configurations": {
-        "production": {
-          "devServerTarget": "hexerals:serve:production"
+    "name": "hexerals-e2e",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/hexerals-e2e/src",
+    "projectType": "application",
+    "targets": {
+        "e2e": {
+            "executor": "@nx/cypress:cypress",
+            "options": {
+                "cypressConfig": "apps/hexerals-e2e/cypress.config.ts",
+                "devServerTarget": "hexerals:serve:development",
+                "testingType": "e2e"
+            },
+            "configurations": {
+                "production": {
+                    "devServerTarget": "hexerals:serve:production"
+                },
+                "ci": {
+                    "devServerTarget": "hexerals:serve-static"
+                }
+            }
         },
-        "ci": {
-          "devServerTarget": "hexerals:serve-static"
+        "lint": {
+            "executor": "@nx/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/hexerals-e2e/**/*.{js,ts}"]
+            }
         }
-      }
     },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/hexerals-e2e/**/*.{js,ts}"]
-      }
-    }
-  },
-  "tags": [],
-  "implicitDependencies": ["hexerals"]
+    "tags": [],
+    "implicitDependencies": ["hexerals"]
 }

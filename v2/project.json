@@ -1,3 +1,5 @@
 {
-  "comment": "deliberately empty, just for file grouping"
+    "name": ".",
+    "$schema": "node_modules/nx/schemas/project-schema.json",
+    "comment": "deliberately empty, just for file grouping"
 }
