@@ -5,3 +5,5 @@ export const inTest = () => process.env?.["NODE_ENV"] === "test"
 export const devAssert = (condition: unknown, message?: string) => {
     if (!inProd() && !condition) throw new Error(message)
 }
+
+export const APP_NAME = "Hexerals"
