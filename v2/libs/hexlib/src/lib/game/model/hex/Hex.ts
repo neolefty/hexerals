@@ -1,5 +1,5 @@
 import { List, ValueObject } from "immutable"
-import { devAssert } from "../../../Environment"
+import { devAssert } from "../../../common/Environment"
 
 // Hex.get(x, y, z)  or Hex.getCart(cx, cy) -- constructor is private, and instances are interned.
 // "Cube coordinates" for a description, see:

@@ -1,7 +1,7 @@
 {
-    "name": "tutorial",
+    "name": "accessible-colors",
     "$schema": "../../node_modules/nx/schemas/project-schema.json",
-    "sourceRoot": "apps/tutorial",
+    "sourceRoot": "apps/accessible-colors",
     "projectType": "application",
     "targets": {
         "build": {
@@ -9,11 +9,11 @@
             "outputs": ["{options.outputPath}"],
             "defaultConfiguration": "production",
             "options": {
-                "outputPath": "dist/apps/tutorial"
+                "outputPath": "dist/apps/accessible-colors"
             },
             "configurations": {
                 "development": {
-                    "outputPath": "apps/tutorial"
+                    "outputPath": "apps/accessible-colors"
                 },
                 "production": {}
             }
@@ -22,16 +22,16 @@
             "executor": "@nx/next:server",
             "defaultConfiguration": "development",
             "options": {
-                "buildTarget": "tutorial:build",
+                "buildTarget": "accessible-colors:build",
                 "dev": true
             },
             "configurations": {
                 "development": {
-                    "buildTarget": "tutorial:build:development",
+                    "buildTarget": "accessible-colors:build:development",
                     "dev": true
                 },
                 "production": {
-                    "buildTarget": "tutorial:build:production",
+                    "buildTarget": "accessible-colors:build:production",
                     "dev": false
                 }
             }
@@ -39,14 +39,14 @@
         "export": {
             "executor": "@nx/next:export",
             "options": {
-                "buildTarget": "tutorial:build:production"
+                "buildTarget": "accessible-colors:build:production"
             }
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
-                "jestConfig": "apps/tutorial/jest.config.ts"
+                "jestConfig": "apps/accessible-colors/jest.config.ts"
             }
         },
         "lint": {
