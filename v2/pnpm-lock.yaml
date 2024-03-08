@@ -18,8 +18,8 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   immutable:
-    specifier: 5.0.0-beta.2
-    version: 5.0.0-beta.2
+    specifier: 5.0.0-beta.5
+    version: 5.0.0-beta.5
   next:
     specifier: 14.0.4
     version: 14.0.4(@babel/core@7.24.0)(react-dom@18.2.0)(react@18.2.0)
@@ -8339,8 +8339,8 @@ packages:
     resolution: {integrity: sha512-8eabxkth9gZatlwl5TBuJnCsoTADlL6ftEr7A4qgdaTsPyreilDSnUk57SO+jfKcNtxPa22U5KK6DSeAYhpBJw==}
     dev: true
 
-  /immutable@5.0.0-beta.2:
-    resolution: {integrity: sha512-3v1xnTlom9D2ssrEvcfFHtipjXgmZeNtximyvNyuK2eAWKWWFtfh+9w+VOVujkBSbgpjrYsS55yuWE1E5ES7IA==}
+  /immutable@5.0.0-beta.5:
+    resolution: {integrity: sha512-1RO6wxfJdh/uyWb2MTn3RuCPXYmpRiAhoKm8vEnA50+2Gy0j++6GBtu5q6sq2d4tpcL+e1sCHzk8NkWnRhT2/Q==}
     dev: false
 
   /import-fresh@3.3.0:
