@@ -1,0 +1,9 @@
+{
+  "name": "hexerals-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/hexerals-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["hexerals"],
+  "// targets": "to see all targets run: nx show project hexerals-e2e --web",
+  "targets": {}
+}

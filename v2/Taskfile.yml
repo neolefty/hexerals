@@ -22,3 +22,9 @@ tasks:
     desc: "Update nx tools and structure"
     cmds:
       - nx migrate latest
+
+  e2e:
+    desc: "Run e2e tests"
+    cmds:
+      - nx run hexerals-e2e:e2e
+      - nx run tutorial-e2e:e2e
