@@ -3,6 +3,8 @@ import { Card } from "@repo/ui/card";
 import { Code } from "@repo/ui/code";
 import styles from "./page.module.css";
 import { Button } from "@repo/ui/button";
+import { createDumbBoard } from "@repo/game-model/Board"
+import { GameBoard } from "@repo/ui/GameBoard"
 
 function Gradient({
   conic,
@@ -52,6 +54,7 @@ const LINKS = [
 ];
 
 export default function Page(): JSX.Element {
+  const board = createDumbBoard()
   return (
     <main className={styles.main}>
       <div className={styles.description}>
@@ -139,6 +142,7 @@ export default function Page(): JSX.Element {
           </Card>
         ))}
       </div>
+      <GameBoard board={board} />
     </main>
   );
 }

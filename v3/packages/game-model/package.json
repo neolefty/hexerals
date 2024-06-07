@@ -1,0 +1,9 @@
+{
+  "name": "@repo/game-model",
+  "exports": {
+    "./Board": "./src/Board.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  }
+}

@@ -5,11 +5,15 @@
   "exports": {
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./code": "./src/code.tsx",
+    "./GameBoard": "./src/GameBoard.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component"
+  },
+  "dependencies": {
+    "@repo/game-model": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
