@@ -1,3 +1,7 @@
+# TODO
+
+[] Configure typescript-eslint: https://typescript-eslint.io/getting-started/
+
 # Turborepo starter
 
 This is an official starter Turborepo.
