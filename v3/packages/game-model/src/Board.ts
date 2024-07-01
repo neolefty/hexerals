@@ -49,35 +49,17 @@ export interface Board {
     spots: ReadonlyArray<Spot>
 }
 
-export const createDumbBoard: () => Board = () => ({
-    topology: {
-        neighbors: [
-            [1, 2, 3],
-            [0, 2, 3],
-            [0, 1, 3],
-            [0, 1, 2],
-        ],
-    },
-    geometry: {
-        locations: [
-            { id: 0, x: 0, y: 0 },
-            { id: 1, x: 1, y: 0 },
-            { id: 2, x: 0, y: 1 },
-            { id: 3, x: 1, y: 1 },
-        ],
-    },
-    spots: [
-        { locationId: 0, contents: { owner: 0, pop: 1, terrain: "land" } },
-        { locationId: 1, contents: { owner: 0, pop: 50, terrain: "city" } },
-        { locationId: 2, contents: { owner: 0, pop: 1, terrain: "mountain" } },
-        { locationId: 3, contents: { owner: 1, pop: 4, terrain: "capital" } },
-    ],
-})
-
 const emptyNumbers: ReadonlyArray<number> = []
 
 /** Neighbors of a spot, up to a distance of `depth`, in index order. */
-export const neighbors = (spotId: number, topology: BoardTopology, depth: number, visited?: Set<Number>): ReadonlyArray<number> => {
+export const neighbors = (
+    spotId: number,
+    topology: BoardTopology,
+    depth: number = 1,
+    onlyOuterRing = false,
+    visited?: Set<Number>,
+): ReadonlyArray<number> => {
+    if (depth < 0) throw new Error("Depth must be non-negative")
     if (depth === 0) return emptyNumbers
     if (depth === 1) return topology.neighbors[spotId] || emptyNumbers
     else {
@@ -86,7 +68,8 @@ export const neighbors = (spotId: number, topology: BoardTopology, depth: number
         for (const neighbor of topology.neighbors[spotId] || emptyNumbers) {
             if (!visitedLocal.has(neighbor)) {
                 visitedLocal.add(neighbor)
-                result.push(...neighbors(neighbor, topology, depth - 1, visitedLocal))
+                result.push(...neighbors(neighbor, topology, depth - 1, onlyOuterRing, visitedLocal))
+                if (!onlyOuterRing) result.push(neighbor)
             }
         }
         const unique = new Set(result)
