@@ -7,6 +7,6 @@ Inspired by https://generals.io/
 
 ## Versions
 
-* v1 — made with Create-React-App
+* v1 — [Create React App](https://create-react-app.dev/)
 * v2 — [NX monorepo](https://nx.dev/tutorials/integrated-repo-tutorial)
 * v3 — [Turborepo](https://turbo.build/repo)
