@@ -9,7 +9,7 @@ Inspired by https://generals.io/
 
 In which I try out different foundations.
 
-* [/neolefty/hexerals/tree/main/v1](v1) — [Create React App](https://create-react-app.dev/)
-* [/neolefty/hexerals/tree/main/v2](v2) — [Next.js](https://nextjs.org/) 14 / [NX monorepo](https://nx.dev/tutorials/integrated-repo-tutorial)
-* [/neolefty/hexerals/tree/main/v3](v3) — [Next.js](https://nextjs.org/) 14 / [Turborepo](https://turbo.build/repo)
-* [/neolefty/hexerals/tree/main/v4](v4) — [Next.js](https://nextjs.org/) 15
+* [v1](/neolefty/hexerals/tree/main/v1) — [Create React App](https://create-react-app.dev/)
+* [v2](/neolefty/hexerals/tree/main/v2) — [Next.js](https://nextjs.org/) 14 / [NX monorepo](https://nx.dev/tutorials/integrated-repo-tutorial)
+* [v3](/neolefty/hexerals/tree/main/v3) — [Next.js](https://nextjs.org/) 14 / [Turborepo](https://turbo.build/repo)
+* [v4](/neolefty/hexerals/tree/main/v4) — [Next.js](https://nextjs.org/) 15
