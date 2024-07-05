@@ -9,3 +9,4 @@ Inspired by https://generals.io/
 
 * v1 — made with Create-React-App
 * v2 — [NX monorepo](https://nx.dev/tutorials/integrated-repo-tutorial)
+* v3 — [Turborepo](https://turbo.build/repo)
