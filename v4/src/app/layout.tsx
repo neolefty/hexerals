@@ -13,7 +13,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Hexerals v4",
-  description: "This time with Next 15",
+  description: "This time with Next.js 15",
 }
 
 export default function RootLayout({
