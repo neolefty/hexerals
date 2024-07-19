@@ -57,7 +57,7 @@ export const neighbors = (
     topology: BoardTopology,
     depth: number = 1,
     onlyOuterRing = false,
-    visited?: Set<Number>,
+    visited?: Set<number>,
 ): ReadonlyArray<number> => {
     if (depth < 0) throw new Error("Depth must be non-negative")
     if (depth === 0) return emptyNumbers
@@ -82,8 +82,8 @@ export const neighbors = (
 export const visibleSpots = (board: Board, player: number, viewDistance: number = 1): Board => {
     const visibleSpots = board.spots.filter(spot => {
         if (spot.contents.owner === player) return true
-        const result = neighbors( spot.locationId, board.topology, viewDistance)
+        const result = neighbors(spot.locationId, board.topology, viewDistance)
         return result.some(id => board.spots[id]!.contents.owner === player)
     })
-    return { ...board, spots: visibleSpots }
+    return {...board, spots: visibleSpots}
 }
